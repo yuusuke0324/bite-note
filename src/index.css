@@ -1,0 +1,197 @@
+/* === リセットCSS === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  /* TASK-002: 横スクロール防止の基盤設定 */
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #213547;
+  background-color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 重要：flexレイアウトを削除 */
+  margin: 0;
+  min-height: 100vh;
+  /* TASK-002: CSS横スクロール防止の強化 */
+  overflow-x: hidden;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#root {
+  min-height: 100vh;
+  /* PWAバナー対応の動的な余白管理 */
+  --banner-height: 0px;
+  padding-bottom: var(--banner-height);
+  transition: padding-bottom 0.3s ease;
+  /* TASK-002: CSS横スクロール防止の強化 */
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* PWAバナー表示時のスタイル */
+body.pwa-banner-visible {
+  --banner-height: 80px;
+}
+
+body.pwa-banner-visible #root {
+  padding-bottom: calc(var(--banner-height) + 20px);
+}
+
+@media (max-width: 768px) {
+  body.pwa-banner-visible {
+    --banner-height: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  body.pwa-banner-visible {
+    --banner-height: 100px;
+  }
+}
+
+/* タイポグラフィのベース */
+h1, h2, h3, h4, h5, h6 {
+  color: inherit;
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0;
+  color: inherit;
+}
+
+a {
+  color: #646cff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+
+/* フォーカス管理 */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
+}
+
+/* 入力要素のベーススタイル */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* TASK-002: CSS Custom Propertiesによる動的サイズ制御 */
+:root {
+  --viewport-width: 100vw;
+  --max-content-width: 100%;
+  --container-padding: 16px;
+  --safe-area-inset-left: env(safe-area-inset-left);
+  --safe-area-inset-right: env(safe-area-inset-right);
+}
+
+/* 全ての要素に対する横スクロール防止の適用 */
+*, *::before, *::after {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 大きなコンテンツに対する制御 */
+img, svg, video, canvas, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* テーブルの横スクロール対応 */
+table {
+  width: 100%;
+  table-layout: fixed;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
+}
+
+/* プリフォーマットテキストの制御 */
+pre, code {
+  overflow-x: auto;
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* スクロールバーのスタイリング（WebKit） */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+  }
+
+  a {
+    color: #8ab4f8;
+  }
+
+  a:hover {
+    color: #aecbfa;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #2d2d2d;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #555;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #777;
+  }
+}

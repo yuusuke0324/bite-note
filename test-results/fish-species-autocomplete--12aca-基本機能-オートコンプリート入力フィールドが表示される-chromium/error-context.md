@@ -1,0 +1,46 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e7]:
+        - heading "釣果記録" [level=1] [ref=e8]
+        - paragraph [ref=e9]: 0件の記録
+      - button [ref=e11] [cursor=pointer]:
+        - img [ref=e12] [cursor=pointer]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e20]:
+          - generic [ref=e21]: "0"
+          - generic [ref=e22]: 総記録数
+        - generic [ref=e24]:
+          - generic [ref=e25]: "0"
+          - generic [ref=e26]: 魚種数
+        - generic [ref=e28]:
+          - generic [ref=e29]: "0"
+          - generic [ref=e30]: 釣り場数
+        - generic [ref=e32]:
+          - generic [ref=e33]: "0"
+          - generic [ref=e34]: 今月の記録
+      - generic [ref=e36]:
+        - img [ref=e37]
+        - generic [ref=e39]: まだ記録がありません
+        - generic [ref=e40]: 最初の釣果を記録してみましょう！
+  - navigation [ref=e41]:
+    - navigation [ref=e42]:
+      - tab "ホーム" [ref=e43] [cursor=pointer]:
+        - img [ref=e45] [cursor=pointer]
+        - generic [ref=e47] [cursor=pointer]: ホーム
+      - tab "記録一覧" [ref=e48] [cursor=pointer]:
+        - img [ref=e50] [cursor=pointer]
+        - generic [ref=e52] [cursor=pointer]: 記録一覧
+        - text: "0"
+      - tab "新規記録" [ref=e53] [cursor=pointer]:
+        - img [ref=e55] [cursor=pointer]
+        - generic [ref=e57] [cursor=pointer]: 新規記録
+      - tab "設定" [ref=e58] [cursor=pointer]:
+        - img [ref=e60] [cursor=pointer]
+        - generic [ref=e62] [cursor=pointer]: 設定
+```

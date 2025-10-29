@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海面水温取得テスト</title>
+</head>
+<body>
+    <h1>🌊 海面水温取得テスト</h1>
+    <div id="result">結果がここに表示されます...</div>
+
+    <script>
+        async function testMarineData() {
+            try {
+                // 山口県長門市付近の座標
+                const coordinates = {
+                    latitude: 34.3704,
+                    longitude: 131.1873
+                };
+
+                console.log('🌊 海面水温取得テスト開始...');
+                console.log('📍 座標:', coordinates);
+
+                // Open-Meteo Marine API を直接呼び出し
+                const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${coordinates.latitude}&longitude=${coordinates.longitude}&current=sea_surface_temperature,wave_height,wave_direction&timezone=Asia%2FTokyo`;
+
+                console.log('🔗 API URL:', url);
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                console.log('📊 取得データ:', data);
+
+                // 結果を画面に表示
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <h2>🌊 海洋データ取得結果</h2>
+                    <p><strong>🌡️ 海面水温:</strong> ${data.current.sea_surface_temperature}°C</p>
+                    <p><strong>🌊 波高:</strong> ${data.current.wave_height}m</p>
+                    <p><strong>🧭 波向き:</strong> ${data.current.wave_direction}°</p>
+                    <p><strong>🕒 取得時刻:</strong> ${data.current.time}</p>
+                    <p><strong>📍 座標:</strong> ${data.latitude}, ${data.longitude}</p>
+                    <hr>
+                    <h3>📋 JSONデータ:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+
+                console.log('✅ 海面水温取得成功！');
+                console.log(`🌡️ 海面水温: ${data.current.sea_surface_temperature}°C`);
+                console.log(`🌊 波高: ${data.current.wave_height}m`);
+                console.log(`🧭 波向き: ${data.current.wave_direction}°`);
+
+            } catch (error) {
+                console.error('❌ 海面水温取得エラー:', error);
+                document.getElementById('result').innerHTML = `
+                    <h2>❌ エラー</h2>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        // ページ読み込み時にテスト実行
+        window.addEventListener('load', testMarineData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>釣果記録アプリ表示テスト</title>
+</head>
+<body>
+    <h1>🐟 釣果記録アプリ表示テスト</h1>
+    <p>このページが表示されている場合、ブラウザは正常に動作しています。</p>
+
+    <iframe
+        src="http://localhost:3000/"
+        width="100%"
+        height="600px"
+        style="border: 2px solid #007bff; border-radius: 8px;">
+    </iframe>
+
+    <script>
+        console.log('🧪 テストページが読み込まれました');
+
+        // アプリの読み込み状況をチェック
+        setTimeout(() => {
+            const iframe = document.querySelector('iframe');
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                console.log('📄 iframeのdocument:', iframeDoc);
+                console.log('🔍 iframeのbody:', iframeDoc.body);
+
+                if (iframeDoc.body && iframeDoc.body.innerHTML.trim() === '') {
+                    console.error('❌ アプリが白画面です - body が空です');
+                } else {
+                    console.log('✅ アプリが正常に読み込まれています');
+                }
+            } catch (error) {
+                console.error('❌ Cross-origin制限のため確認できません:', error);
+                console.log('💡 直接 http://localhost:3000/ にアクセスしてください');
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

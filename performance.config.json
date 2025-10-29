@@ -1,0 +1,17 @@
+{
+  "thresholds": {
+    "maxExecutionTime": 2000,
+    "maxMemoryUsage": 104857600,
+    "minCacheHitRate": 0.5,
+    "maxOverhead": 50
+  },
+  "alerts": {
+    "email": "",
+    "slack": "",
+    "enabled": false
+  },
+  "history": {
+    "maxRecords": 100,
+    "retentionDays": 30
+  }
+}

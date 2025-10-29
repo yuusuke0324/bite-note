@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(rmdir:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run:*)",
+      "Bash(npm start)",
+      "Read(//tmp/**)",
+      "WebFetch(domain:tidesandcurrents.noaa.gov)",
+      "Bash(node:*)",
+      "Read(//Users/nakagawayuusuke/**)",
+      "mcp__ide__getDiagnostics",
+      "Bash(timeout 30s npm test -- src/utils/responsive/__tests__/ViewportDetector.test.ts)",
+      "Bash(NODE_ENV=test npm test -- src/utils/responsive/__tests__/MarginCalculator.test.ts -t \"should handle font size adjustments\" --reporter=verbose)",
+      "Bash(NODE_ENV=test npm test -- src/utils/responsive/__tests__/MarginCalculator.test.ts -t \"should handle very small SVG sizes\" --reporter=verbose)",
+      "Bash(kill:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "WebFetch(domain:oosio.info)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

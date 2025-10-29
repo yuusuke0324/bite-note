@@ -1,0 +1,447 @@
+/**
+ * 魚種オートコンプリート スタイル（モダンデザイン v3）
+ *
+ * @description
+ * - Glassmorphism デザイン
+ * - スムーズアニメーション（cubic-bezier）
+ * - グラデーション & シャドウ階層
+ * - レスポンシブ & ダークモード完全対応
+ * - アクセシビリティ対応（prefers-reduced-motion）
+ *
+ * @version 3.0.0
+ * @since 2025-10-25
+ */
+
+.fish-species-autocomplete {
+  position: relative;
+  width: 100%;
+}
+
+.fish-species-autocomplete .input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.fish-species-autocomplete input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a2e;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+              0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.fish-species-autocomplete input::placeholder {
+  color: #6b7280;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.fish-species-autocomplete input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15),
+              0 10px 15px -3px rgba(0, 0, 0, 0.1),
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.fish-species-autocomplete input:disabled {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.fish-species-autocomplete input.error {
+  border-color: #ef4444;
+  animation: shake 0.5s;
+}
+
+.fish-species-autocomplete input.error:focus {
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15),
+              0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.fish-species-autocomplete .loading-indicator {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.fish-species-autocomplete .loading-indicator::before {
+  content: '';
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.fish-species-autocomplete .error-message {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #ef4444;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fish-species-autocomplete .error-message::before {
+  content: '⚠';
+  font-size: 1rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fish-species-autocomplete .suggestions-list {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  max-height: 20rem;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 0.875rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04),
+              0 0 0 1px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  list-style: none;
+  margin: 0;
+  padding: 0.375rem;
+  animation: slideDownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fish-species-autocomplete .suggestions-list::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+.fish-species-autocomplete .suggestions-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 0.25rem;
+}
+
+.fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.fish-species-autocomplete .suggestion-item {
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0.625rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.fish-species-autocomplete .suggestion-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fish-species-autocomplete .suggestion-item:hover::before,
+.fish-species-autocomplete .suggestion-item.selected::before {
+  opacity: 1;
+}
+
+.fish-species-autocomplete .suggestion-item:hover,
+.fish-species-autocomplete .suggestion-item.selected {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  transform: translateX(0.25rem);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+              0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.fish-species-autocomplete .suggestion-item:active {
+  transform: translateX(0.125rem) scale(0.99);
+}
+
+.fish-species-autocomplete .species-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.fish-species-autocomplete .species-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #111827;
+  transition: color 0.2s;
+}
+
+.fish-species-autocomplete .suggestion-item:hover .species-name,
+.fish-species-autocomplete .suggestion-item.selected .species-name {
+  color: #1e40af;
+}
+
+.fish-species-autocomplete .species-category {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fish-species-autocomplete .suggestion-item:hover .species-category,
+.fish-species-autocomplete .suggestion-item.selected .species-category {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.fish-species-autocomplete .species-scientific {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+  transition: color 0.2s;
+}
+
+.fish-species-autocomplete .suggestion-item:hover .species-scientific,
+.fish-species-autocomplete .suggestion-item.selected .species-scientific {
+  color: #4b5563;
+}
+
+.fish-species-autocomplete .no-results {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 0.875rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  z-index: 1000;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: slideDownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fish-species-autocomplete .no-results::before {
+  content: '🔍';
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 640px) {
+  .fish-species-autocomplete input {
+    font-size: 1rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .fish-species-autocomplete .suggestions-list {
+    max-height: 15rem;
+    border-radius: 0.75rem;
+  }
+
+  .fish-species-autocomplete .suggestion-item {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .fish-species-autocomplete .species-name {
+    font-size: 0.9375rem;
+  }
+
+  .fish-species-autocomplete .species-category {
+    font-size: 0.6875rem;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  .fish-species-autocomplete .no-results {
+    padding: 1.25rem;
+  }
+}
+
+/* タブレット対応 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .fish-species-autocomplete .suggestions-list {
+    max-height: 18rem;
+  }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .fish-species-autocomplete input {
+    background: rgba(31, 41, 55, 0.95);
+    border-color: rgba(75, 85, 99, 0.5);
+    color: #f9fafb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
+                0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .fish-species-autocomplete input::placeholder {
+    color: #9ca3af;
+  }
+
+  .fish-species-autocomplete input:focus {
+    border-color: #60a5fa;
+    background: rgba(31, 41, 55, 1);
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2),
+                0 10px 15px -3px rgba(0, 0, 0, 0.3),
+                0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  }
+
+  .fish-species-autocomplete input:disabled {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  }
+
+  .fish-species-autocomplete .loading-indicator {
+    color: #9ca3af;
+  }
+
+  .fish-species-autocomplete .loading-indicator::before {
+    border-color: #374151;
+    border-top-color: #60a5fa;
+  }
+
+  .fish-species-autocomplete .suggestions-list,
+  .fish-species-autocomplete .no-results {
+    background: rgba(31, 41, 55, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-color: rgba(75, 85, 99, 0.6);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+                0 10px 10px -5px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(0, 0, 0, 0.3);
+  }
+
+  .fish-species-autocomplete .suggestion-item::before {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(147, 197, 253, 0.08) 100%);
+  }
+
+  .fish-species-autocomplete .suggestion-item:hover,
+  .fish-species-autocomplete .suggestion-item.selected {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(29, 78, 216, 0.25) 100%);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
+                0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .fish-species-autocomplete .species-name {
+    color: #f9fafb;
+  }
+
+  .fish-species-autocomplete .suggestion-item:hover .species-name,
+  .fish-species-autocomplete .suggestion-item.selected .species-name {
+    color: #93c5fd;
+  }
+
+  .fish-species-autocomplete .species-category {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.5) 0%, rgba(29, 78, 216, 0.5) 100%);
+    color: #93c5fd;
+  }
+
+  .fish-species-autocomplete .suggestion-item:hover .species-category,
+  .fish-species-autocomplete .suggestion-item.selected .species-category {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+  }
+
+  .fish-species-autocomplete .species-scientific {
+    color: #9ca3af;
+  }
+
+  .fish-species-autocomplete .suggestion-item:hover .species-scientific,
+  .fish-species-autocomplete .suggestion-item.selected .species-scientific {
+    color: #d1d5db;
+  }
+
+  .fish-species-autocomplete .no-results {
+    color: #9ca3af;
+  }
+
+  .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+
+  .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+}
+
+/* アニメーション無効化（アクセシビリティ対応） */
+@media (prefers-reduced-motion: reduce) {
+  .fish-species-autocomplete *,
+  .fish-species-autocomplete *::before,
+  .fish-species-autocomplete *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

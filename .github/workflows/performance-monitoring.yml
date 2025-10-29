@@ -1,0 +1,111 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # 毎日午前9時と午後3時にパフォーマンステストを実行
+    - cron: '0 9,15 * * *'
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install tsx for monitoring script
+      run: npm install tsx
+
+    - name: Run performance benchmarks
+      run: npm run test src/__tests__/performance/TideCalculationBenchmark.test.ts
+
+    - name: Run performance monitor
+      run: npm run performance:test
+      env:
+        ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-results
+        path: |
+          performance-history.json
+          performance.config.json
+        retention-days: 30
+
+    - name: Comment performance results on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          if (fs.existsSync('performance-history.json')) {
+            const history = JSON.parse(fs.readFileSync('performance-history.json', 'utf8'));
+            const latest = history[0];
+
+            if (latest) {
+              const comment = `## 📊 パフォーマンステスト結果
+
+              **ステータス**: ${latest.status === 'PASS' ? '✅ PASS' : '❌ FAIL'}
+              **バージョン**: ${latest.version.substring(0, 7)}
+              **実行時間**: 平均${latest.metrics.avgExecutionTime}ms, 最大${latest.metrics.maxExecutionTime}ms
+              **メモリ使用量**: 平均${(latest.metrics.avgMemoryUsage / 1024 / 1024).toFixed(1)}MB
+              **キャッシュヒット率**: ${(latest.metrics.cacheHitRate * 100).toFixed(1)}%
+              **オーバーヘッド**: ${latest.metrics.overhead.toFixed(1)}%
+
+              ${latest.thresholdViolations.length > 0 ?
+                `### ⚠️ 閾値違反\n${latest.thresholdViolations.map(v => `- ${v}`).join('\n')}` :
+                '### ✅ すべての閾値をクリア'}
+              `;
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+          }
+
+  continuous-monitoring:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install tsx for monitoring script
+      run: npm install tsx
+
+    - name: Start continuous monitoring
+      run: |
+        npm run performance:watch &
+        MONITOR_PID=$!
+        sleep 1800  # 30分間監視
+        kill $MONITOR_PID
+      env:
+        ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
