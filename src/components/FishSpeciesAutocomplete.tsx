@@ -105,10 +105,15 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
 
   // 検索実行
   useEffect(() => {
-    if (!searchEngine) return;
+    if (!searchEngine || typeof searchEngine.search !== 'function') return;
 
-    const results = searchEngine.search(inputValue, { limit: 10 });
-    setSuggestions(results);
+    try {
+      const results = searchEngine.search(inputValue, { limit: 10 });
+      setSuggestions(results);
+    } catch (error) {
+      console.error('検索エラー:', error);
+      setSuggestions([]);
+    }
   }, [inputValue, searchEngine]);
 
   /**

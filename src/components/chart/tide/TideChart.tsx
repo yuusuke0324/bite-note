@@ -1028,10 +1028,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             ariaConfiguration?.describedBy || 'tide-chart-description'
           }
           aria-live={ariaConfiguration?.live || 'polite'}
-          aria-valuemin={ariaConfiguration?.valuemin}
-          aria-valuemax={ariaConfiguration?.valuemax}
-          aria-valuenow={ariaConfiguration?.valuenow}
-          aria-selected={selectedDataPoint !== null ? 'true' : 'false'}
           tabIndex={0}
           onKeyDown={handleKeyDown}
         >

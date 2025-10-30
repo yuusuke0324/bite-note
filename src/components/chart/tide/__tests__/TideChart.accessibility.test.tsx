@@ -74,7 +74,11 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
   });
 
-  describe('TC-A001-02: 数値範囲ARIA属性', () => {
+  describe.skip('TC-A001-02: 数値範囲ARIA属性', () => {
+    // Note: aria-valuemin/max/now are not allowed on role="img"
+    // These attributes are only valid for specific roles like slider, scrollbar, etc.
+    // Skipping these tests as they check for invalid ARIA attributes
+
     test('should set aria-valuemin from data minimum', async () => {
       render(<TideChart data={mockTideData} />);
 
@@ -955,8 +959,9 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
         expect(AccessibilityTester.getAriaLabel(chartContainer)).toContain(
           '潮汐グラフ'
         );
-        expect(chartContainer.getAttribute('aria-valuemin')).toBeTruthy();
-        expect(chartContainer.getAttribute('aria-valuemax')).toBeTruthy();
+        // Note: aria-valuemin/max are not valid for role="img"
+        expect(chartContainer.getAttribute('aria-label')).toBeTruthy();
+        expect(chartContainer.getAttribute('aria-describedby')).toBeTruthy();
       });
     });
 
