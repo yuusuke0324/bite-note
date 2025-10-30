@@ -51,7 +51,7 @@ export class DynamicScaleCalculator {
     // キャッシュサイズ制限
     if (this.scaleCache.size >= this.MAX_CACHE_SIZE) {
       // 最も古いエントリを削除（Map は挿入順序を保持）
-      const firstKey = this.scaleCache.keys().next().value;
+      const firstKey = this.scaleCache.keys().next().value as string;
       this.scaleCache.delete(firstKey);
     }
 

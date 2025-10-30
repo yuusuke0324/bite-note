@@ -204,7 +204,7 @@ export class RegionalDataService {
       const regions = await query.toArray();
 
       // 各地域との距離を計算
-      const distanceResults: DistanceResult[] = regions.map((region, index) => {
+      const distanceResults: DistanceResult[] = regions.map((region) => {
         const distance = this.calculateHaversineDistance(coordinates, {
           latitude: region.latitude,
           longitude: region.longitude

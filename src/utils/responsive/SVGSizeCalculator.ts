@@ -99,7 +99,7 @@ export class SVGSizeCalculator implements ISVGSizeCalculator {
   private ensureMinimumChartSize(
     chartSize: { width: number; height: number },
     margins: ChartMargins,
-    viewport: ViewportInfo
+    __viewport: ViewportInfo
   ): {
     containerWidth: number;
     containerHeight: number;

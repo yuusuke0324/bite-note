@@ -5,14 +5,14 @@
  * IAU天文定数および現代調和解析理論に基づく標準値
  */
 
-import type { TidalConstituent } from '../../../types/tide';
+import type { TidalConstituentConstant } from '../../../types/tide';
 
 // ==============================================
 // 主要分潮定義
 // ==============================================
 
 /** 主要6分潮の基本定数 */
-export const TIDAL_CONSTITUENTS: Record<string, TidalConstituent> = {
+export const TIDAL_CONSTITUENTS: Record<string, TidalConstituentConstant> = {
   /** M2分潮 - 主太陰半日周潮 */
   M2: {
     name: 'M2',
@@ -115,7 +115,7 @@ export function getConstituentNames(): string[] {
 }
 
 /** 分潮データを取得 */
-export function getConstituent(name: string): TidalConstituent {
+export function getConstituent(name: string): TidalConstituentConstant {
   const constituent = TIDAL_CONSTITUENTS[name];
   if (!constituent) {
     throw new Error(`Unknown tidal constituent: ${name}`);

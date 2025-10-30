@@ -99,7 +99,7 @@ export const TideTooltip: React.FC<TideTooltipProps> = ({
   closeOnEscape = false,
   onClose,
 
-  touchEnabled = false,
+  // _touchEnabled = false,
   responsive = true,
   swipeToClose = false,
 

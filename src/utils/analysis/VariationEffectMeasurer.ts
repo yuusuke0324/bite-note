@@ -16,7 +16,7 @@ import { GeographicCalculator } from './helpers/GeographicCalculator';
 
 export class VariationEffectMeasurer {
   // 地理計算定数
-  private static readonly EARTH_RADIUS_KM = 6371;
+  // private static readonly _EARTH_RADIUS_KM = 6371;
   private static readonly DEFAULT_COORDINATE_IMPACT = 0.1; // 1% per 100km
   private static readonly DEFAULT_SEASONAL_IMPACT = 0.05; // 5% per season
 
@@ -72,7 +72,7 @@ export class VariationEffectMeasurer {
   private static async measureCoordinateEffect(
     baseLocation: AnalysisCoordinates,
     testLocations: AnalysisCoordinates[],
-    dateRange: { start: string; end: string }
+    __dateRange: { start: string; end: string }
   ): Promise<CoordinateEffectResult> {
     const impacts: number[] = [];
     let maxDistance = 0;
@@ -110,7 +110,7 @@ export class VariationEffectMeasurer {
    * 季節変動効果測定
    */
   private static async measureSeasonalEffect(
-    baseLocation: AnalysisCoordinates,
+    __baseLocation: AnalysisCoordinates,
     dateRange: { start: string; end: string }
   ): Promise<SeasonalEffectResult> {
     // 最小実装: 日付範囲から季節変動を推定
@@ -187,20 +187,6 @@ export class VariationEffectMeasurer {
   /**
    * 2点間の距離を計算（ハバーシンの公式）
    */
-  private static calculateDistance(point1: AnalysisCoordinates, point2: AnalysisCoordinates): number {
-    const lat1Rad = (point1.lat * Math.PI) / 180;
-    const lat2Rad = (point2.lat * Math.PI) / 180;
-    const deltaLatRad = ((point2.lat - point1.lat) * Math.PI) / 180;
-    const deltaLngRad = ((point2.lng - point1.lng) * Math.PI) / 180;
-
-    const a = Math.sin(deltaLatRad / 2) * Math.sin(deltaLatRad / 2) +
-              Math.cos(lat1Rad) * Math.cos(lat2Rad) *
-              Math.sin(deltaLngRad / 2) * Math.sin(deltaLngRad / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return this.EARTH_RADIUS_KM * c;
-  }
 
   /**
    * 空の結果を生成
@@ -262,7 +248,7 @@ export class VariationEffectMeasurer {
   /**
    * 臨界値取得（t分布）
    */
-  private static getCriticalValue(confidenceLevel: number, df: number): number {
+  private static getCriticalValue(confidenceLevel: number, __df: number): number {
     // 信頼度別の臨界値（簡易テーブル）
     const alpha = 1 - confidenceLevel;
 

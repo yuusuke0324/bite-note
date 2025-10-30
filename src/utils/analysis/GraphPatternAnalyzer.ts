@@ -12,7 +12,6 @@ import type {
   AnalysisPerformanceMetrics
 } from '../../types/analysis';
 import { TTLLRUCache } from './cache/TTLLRUCache';
-import type { FishingRecord } from '../../types/entities';
 
 export class GraphPatternAnalyzer {
   // 改善されたキャッシュシステム
@@ -28,7 +27,7 @@ export class GraphPatternAnalyzer {
    * @returns 分析結果
    */
   static async analyzePatterns(input: GraphPatternAnalysisInput): Promise<GraphPatternAnalysisResult> {
-    const startTime = Date.now();
+    // const _startTime = Date.now();
 
     try {
       // データ検証
@@ -98,7 +97,7 @@ export class GraphPatternAnalyzer {
    */
   private static async extractPatterns(
     records: any[],
-    options?: GraphPatternAnalysisInput['analysisOptions']
+    _options?: GraphPatternAnalysisInput['analysisOptions']
   ): Promise<GraphPatternInfo[]> {
     const patterns: GraphPatternInfo[] = [];
 
@@ -210,18 +209,14 @@ export class GraphPatternAnalyzer {
 
   /**
    * キャッシュに保存（LRU方式）
+   * Note: TTLLRUCache already handles size limits automatically
    */
-  private static saveToCache(key: string, result: GraphPatternAnalysisResult): void {
-    if (this.patternCache.size >= this.MAX_CACHE_SIZE) {
-      const firstKey = this.patternCache.keys().next().value;
-      this.patternCache.delete(firstKey);
-    }
-
+  /* private static _saveToCache(key: string, result: GraphPatternAnalysisResult): void {
     this.patternCache.set(key, {
       ...result,
       patterns: [...result.patterns]
     });
-  }
+  } */
 
   /**
    * キャッシュクリア

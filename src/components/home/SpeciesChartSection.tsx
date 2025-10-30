@@ -4,7 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 import type { FishingRecord } from '../../types';
@@ -218,7 +218,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
           }}>
             <PieChart width={280} height={280}>
               <Pie
-                data={speciesChartData}
+                data={speciesChartData as any}
                 cx={140}
                 cy={140}
                 labelLine={false}
@@ -272,9 +272,6 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
                   border: `1px solid ${colors.border.light}`,
                   cursor: onSpeciesClick && item.name !== 'その他' ? 'pointer' : 'default',
                   transition: 'all 0.2s ease',
-                  ':hover': {
-                    backgroundColor: colors.surface.secondary,
-                  },
                 }}
                 onMouseEnter={(e) => {
                   if (onSpeciesClick && item.name !== 'その他') {

@@ -11,7 +11,7 @@ import type {
   ContainerSize,
   ContainerState
 } from './types';
-import type { DeviceType, ViewportInfo } from '../../../utils/responsive/types';
+import type { ViewportInfo } from '../../../utils/responsive/types';
 import { ViewportDetector } from '../../../utils/responsive/ViewportDetector';
 import { SVGSizeCalculator } from '../../../utils/responsive/SVGSizeCalculator';
 

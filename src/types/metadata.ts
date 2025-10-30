@@ -36,6 +36,11 @@ export interface MarineResult {
 export interface CameraInfo {
   make?: string;           // メーカー
   model?: string;          // 機種
+  lens?: string;           // レンズ情報
+  aperture?: string;       // F値
+  shutterSpeed?: string;   // シャッター速度
+  iso?: string;            // ISO感度
+  focalLength?: string;    // 焦点距離
   settings?: {
     fNumber?: number;      // F値
     exposureTime?: string; // 露出時間

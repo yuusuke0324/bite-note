@@ -21,7 +21,7 @@ export class TideCalculationService {
 
   // パフォーマンス最適化：キャッシュ
   private isInitialized: boolean = false;
-  private cachedRegions: any[] = [];
+  // private _cachedRegions: any[] = [];
 
   constructor() {
     this.harmonicEngine = new HarmonicAnalysisEngine();
@@ -207,7 +207,7 @@ export class TideCalculationService {
       await this.regionalService.initializeDatabase();
 
       // 地域データをキャッシュ
-      this.cachedRegions = await this.regionalService.getAllRegions();
+      // this._cachedRegions = await this.regionalService.getAllRegions();
 
       this.isInitialized = true;
     } catch (error) {

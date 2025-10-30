@@ -147,14 +147,14 @@ export function useFishingRecordForm(defaultValues?: Partial<Record<string, unkn
 
   const form = useValidatedForm({
     schema: createFishingRecordSchema,
-    defaultValues: defaultValues || formStore.formData,
+    defaultValues: (defaultValues || formStore.formData) as any,
     mode: 'onChange'
   });
 
   // Zustandストアとの同期
   const syncWithStore = useCallback((data: Record<string, unknown>) => {
     Object.entries(data).forEach(([field, value]) => {
-      formStore.actions.updateField(field, value);
+      formStore.actions.updateField(field as any, value);
     });
   }, [formStore.actions]);
 

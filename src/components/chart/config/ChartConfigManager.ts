@@ -17,7 +17,7 @@ import type {
   A11yOptions,
   FontOptions,
   ConfigValidationResult,
-  ConfigChangeEvent,
+  
   ConfigChangeListener,
   Size
 } from './types';
@@ -209,7 +209,7 @@ export class ChartConfigManager {
   /**
    * マージン設定取得（スタブ）
    */
-  getMarginConfig(containerSize: Size): MarginConfig {
+  getMarginConfig(__containerSize: Size): MarginConfig {
     return {
       top: 20,
       right: 20,
@@ -348,7 +348,7 @@ export class ChartConfigManager {
    */
   updateConfig(config: Partial<ChartConfig>): void {
     // 設定の検証
-    const validationResult = this.validateConfig(config);
+
 
     // 有効な設定のみを適用
     const validConfig = this.filterValidConfig(config);
@@ -377,7 +377,7 @@ export class ChartConfigManager {
         }
       }
       if (Object.keys(validColors).length > 0) {
-        filtered.colors = validColors;
+        filtered.colors = validColors as ColorConfig;
       }
     }
 

@@ -8,6 +8,8 @@ interface ModernCardProps {
   interactive?: boolean;
   loading?: boolean;
   onClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -19,6 +21,8 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   interactive = false,
   loading = false,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
   className = '',
   style = {}
 }) => {
@@ -121,8 +125,14 @@ export const ModernCard: React.FC<ModernCardProps> = ({
         style={combinedStyles}
         className={className}
         onClick={onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => {
+          setIsHovered(true);
+          onMouseEnter?.();
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          onMouseLeave?.();
+        }}
       >
         {children}
 

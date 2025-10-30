@@ -166,7 +166,7 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        data-testid={props["data-testid"] || "floating-action-button"}
+        data-testid={(props as any)["data-testid"] || "floating-action-button"}
         {...props}
       >
         {loading ? <LoadingSpinner /> : icon}

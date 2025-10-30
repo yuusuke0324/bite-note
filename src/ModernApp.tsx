@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppStore, selectError, selectRecords, selectSettings, selectActions } from './stores/app-store';
-import { useFormStore, selectFormData, selectValidation, selectFormActions } from './stores/form-store';
 
 // モダンコンポーネント
 import AppLayout from './components/layout/AppLayout';
@@ -1482,7 +1481,7 @@ function ModernApp() {
               <div>
                 <LocationRankingSection
                   records={records}
-                  onLocationClick={(location) => {
+                  onLocationClick={(_location) => {
                     // 将来的に場所フィルターを適用して記録一覧へ遷移
                     setActiveTab('list');
                   }}
@@ -1493,7 +1492,7 @@ function ModernApp() {
               <div>
                 <SpeciesChartSection
                   records={records}
-                  onSpeciesClick={(species) => {
+                  onSpeciesClick={(_species) => {
                     // 将来的に魚種フィルターを適用して記録一覧へ遷移
                     setActiveTab('list');
                   }}
@@ -1667,7 +1666,7 @@ function ModernApp() {
             <div style={{ marginBottom: '16px' }}>
               <SegmentedControl
                 segments={monthSegments}
-                selected={filters.selectedMonth}
+                selected={filters.selectedMonth || 'all'}
                 onChange={(id) => setFilters({ ...filters, selectedMonth: id })}
               />
             </div>
@@ -1897,7 +1896,7 @@ function ModernApp() {
             setMapSelectedRecordId(record.id);
             setActiveTab('map');
           }}
-          photoUrl={detailPhotoUrl}
+          photoUrl={detailPhotoUrl ?? undefined}
           loading={detailPhotoLoading}
         />
       )}

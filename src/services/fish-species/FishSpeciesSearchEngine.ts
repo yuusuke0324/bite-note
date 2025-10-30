@@ -94,7 +94,7 @@ export class FishSpeciesSearchEngine {
         const normalized = this.normalize(term);
 
         // 1文字から最大プレフィックス長までのインデックスを作成
-        for (let i = 1; i <= Math.min(normalized.length, this.options.maxPrefixLength); i++) {
+        for (let i = 1; i <= Math.min(normalized.length, this.options.maxPrefixLength || 10); i++) {
           const prefix = normalized.substring(0, i);
 
           if (!this.prefixIndex.has(prefix)) {

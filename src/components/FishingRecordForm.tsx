@@ -397,7 +397,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 }}>
                   <strong>🌙 潮名:</strong> {tideInfo.tideType === 'spring' ? '大潮' :
                     tideInfo.tideType === 'neap' ? '小潮' :
-                    tideInfo.tideType === 'moderate' ? '中潮' :
+                    tideInfo.tideType === 'medium' ? '中潮' :
                     tideInfo.tideType === 'long' ? '長潮' :
                     tideInfo.tideType === 'young' ? '若潮' : tideInfo.tideType}
                 </div>
@@ -808,7 +808,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           </label>
           <FishSpeciesAutocomplete
             value={watch('fishSpecies')}
-            onChange={(species: FishSpecies | null, inputValue: string) => {
+            onChange={(_species: FishSpecies | null, inputValue: string) => {
               setValue('fishSpecies', inputValue, { shouldValidate: true, shouldDirty: true });
             }}
             placeholder="魚種を入力（例: あじ、さば）"
@@ -1121,13 +1121,15 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             }}
             onMouseEnter={(e) => {
               if (!(!isValid || isSubmitting || isLoading || photoUploading)) {
-                e.target.style.transform = 'translateY(-1px)';
-                e.target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.4)';
+                const target = e.target as HTMLElement;
+                target.style.transform = 'translateY(-1px)';
+                target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.4)';
               }
             }}
             onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = !isValid || isSubmitting || isLoading || photoUploading
+              const target = e.target as HTMLElement;
+              target.style.transform = 'translateY(0)';
+              target.style.boxShadow = !isValid || isSubmitting || isLoading || photoUploading
                 ? 'none'
                 : '0 2px 8px rgba(40, 167, 69, 0.3)';
             }}
@@ -1176,14 +1178,16 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             }}
             onMouseEnter={(e) => {
               if (!(isSubmitting || isLoading)) {
-                e.target.style.backgroundColor = '#5a6268';
-                e.target.style.transform = 'translateY(-1px)';
+                const target = e.target as HTMLElement;
+                target.style.backgroundColor = '#5a6268';
+                target.style.transform = 'translateY(-1px)';
               }
             }}
             onMouseLeave={(e) => {
               if (!(isSubmitting || isLoading)) {
-                e.target.style.backgroundColor = '#6c757d';
-                e.target.style.transform = 'translateY(0)';
+                const target = e.target as HTMLElement;
+                target.style.backgroundColor = '#6c757d';
+                target.style.transform = 'translateY(0)';
               }
             }}
           >

@@ -47,12 +47,14 @@ export interface TideChartProps {
 /**
  * チャートエラー種別
  */
-export enum TideChartError {
-  CHART_RENDERING_FAILED = 'CHART_RENDERING_FAILED',
-  SVG_CREATION_FAILED = 'SVG_CREATION_FAILED',
-  AXIS_RENDER_FAILED = 'AXIS_RENDER_FAILED',
-  DATA_PROCESSING_FAILED = 'DATA_PROCESSING_FAILED',
-}
+export const TideChartError = {
+  CHART_RENDERING_FAILED: 'CHART_RENDERING_FAILED',
+  SVG_CREATION_FAILED: 'SVG_CREATION_FAILED',
+  AXIS_RENDER_FAILED: 'AXIS_RENDER_FAILED',
+  DATA_PROCESSING_FAILED: 'DATA_PROCESSING_FAILED',
+} as const;
+
+export type TideChartError = typeof TideChartError[keyof typeof TideChartError];
 
 /**
  * チャート設定オプション

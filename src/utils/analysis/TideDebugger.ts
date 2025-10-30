@@ -102,7 +102,7 @@ export class TideDebugger {
       const lng = Math.round(record.coordinates.longitude * 1000) / 1000;
       const dateStr = record.date instanceof Date
         ? record.date.toISOString().substring(0, 10)
-        : record.date.toString().substring(0, 10);
+        : String(record.date).substring(0, 10);
 
       return `${lat},${lng}@${dateStr}`;
     } catch (error) {
@@ -113,7 +113,7 @@ export class TideDebugger {
   /**
    * 基本調和パラメータ生成
    */
-  private static generateBaseParameters(record: FishingRecord): HarmonicParameters {
+  private static generateBaseParameters(__record: FishingRecord): HarmonicParameters {
     // 最小実装: 標準的な東京湾のパラメータをベースに設定
     return {
       M2: 1.2,   // 主太陰半日潮
@@ -208,14 +208,14 @@ export class TideDebugger {
   /**
    * データ整合性検証
    */
-  private static validateDataIntegrity(record: FishingRecord): boolean {
+  private static validateDataIntegrity(__record: FishingRecord): boolean {
     // 基本的な整合性チェック
-    if (!record.coordinates || !record.date || !record.id) return false;
+    if (!__record.coordinates || !__record.date || !__record.id) return false;
 
-    const { latitude, longitude } = record.coordinates;
+    const { latitude, longitude } = __record.coordinates;
     if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return false;
 
-    const date = new Date(record.date);
+    const date = new Date(__record.date);
     if (isNaN(date.getTime())) return false;
 
     return true;
@@ -307,7 +307,7 @@ export class TideDebugger {
    */
   private static saveToDebugCache(key: string, info: TideCalculationDebugInfo): void {
     if (this.debugCache.size >= this.MAX_CACHE_SIZE) {
-      const firstKey = this.debugCache.keys().next().value;
+      const firstKey = this.debugCache.keys().next().value as string;
       this.debugCache.delete(firstKey);
     }
 

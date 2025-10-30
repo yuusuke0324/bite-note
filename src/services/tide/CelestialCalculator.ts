@@ -6,15 +6,14 @@
  */
 
 import type { MoonPhase, CelestialPosition } from '../../types/tide';
-import { normalizeAngle, julianDay, degreesToRadians, radiansToDegrees } from './utils/celestial-utils';
+import { normalizeAngle, julianDay, degreesToRadians } from './utils/celestial-utils';
 import {
-  J2000_NEW_MOON,
   SYNODIC_MONTH,
   J2000_EPOCH,
   JULIAN_CENTURY,
   SOLAR_MEAN_LONGITUDE,
   SOLAR_MEAN_ANOMALY,
-  SOLAR_ECCENTRICITY,
+  SOLAR_ECCENTRICITY as _SOLAR_ECCENTRICITY,
   SOLAR_CENTER_EQUATION,
   LUNAR_MEAN_LONGITUDE,
   LUNAR_MEAN_ELONGATION,
@@ -215,9 +214,9 @@ export class CelestialCalculator {
     );
 
     // 離心率（時間変化考慮・定数使用）
-    const e = SOLAR_ECCENTRICITY.EPOCH +
-              SOLAR_ECCENTRICITY.RATE * T +
-              SOLAR_ECCENTRICITY.RATE2 * T * T;
+    // const __e = SOLAR_ECCENTRICITY.EPOCH +
+    //           SOLAR_ECCENTRICITY.RATE * T +
+    //           SOLAR_ECCENTRICITY.RATE2 * T * T;
 
     // 中心差（楕円軌道補正・定数使用）
     const C1 = (SOLAR_CENTER_EQUATION.C1.EPOCH +
@@ -464,28 +463,28 @@ export class CelestialCalculator {
    * @param elongation 角度差（度）
    * @returns 正規化された角度差
    */
-  private normalizeElongation(elongation: number): number {
+  /* private __normalizeElongation(elongation: number): number {
     let angle = elongation % 360;
     if (angle < 0) angle += 360;
     return angle;
   }
 
-  /**
-   * 位相補正の計算
-   * @param elongation 太陽-月角度差
-   * @param T 世紀数
-   * @returns 位相補正（日数）
-   */
-  private calculatePhaseCorrection(elongation: number, T: number): number {
-    // 高次項による微小補正（±0.01日程度）
-    const elongationRad = degreesToRadians(elongation);
-
-    // 楕円軌道による位相のずれ補正
-    const eccentricityCorrection = 0.01 * Math.sin(elongationRad);
-
-    // 月の昇交点移動による補正
-    const nodalCorrection = 0.005 * Math.sin(elongationRad * 2) * T;
-
-    return eccentricityCorrection + nodalCorrection;
-  }
+  // 位相補正の計算
+  // @param elongation 太陽-月角度差
+  // @param T 世紀数
+  // @returns 位相補正（日数）
+  //
+  // private __calculatePhaseCorrection(elongation: number, T: number): number {
+  //   // 高次項による微小補正（±0.01日程度）
+  //   const elongationRad = degreesToRadians(elongation);
+  //
+  //   // 楕円軌道による位相のずれ補正
+  //   const eccentricityCorrection = 0.01 * Math.sin(elongationRad);
+  //
+  //   // 月の昇交点移動による補正
+  //   const nodalCorrection = 0.005 * Math.sin(elongationRad * 2) * T;
+  //
+  //   return eccentricityCorrection + nodalCorrection;
+  // }
+  */ // End of commented methods
 }

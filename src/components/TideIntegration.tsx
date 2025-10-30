@@ -11,8 +11,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { TideChart } from './chart/tide/TideChart';
 import type { TideChartData } from './chart/tide/types';
-import { TideSummaryCard } from './TideSummaryCard';
-import { TideTooltip } from './TideTooltip';
 import type { FishingRecord } from '../types/entities';
 import type { TideInfo, TideGraphData } from '../types/tide';
 
@@ -183,61 +181,18 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
   }, [fishingRecord, relatedRecords, onCalculateTide]);
 
   // 実際の潮汐計算サービスを使用した潮位計算
-  const calculateRealTideLevel = useCallback(async (time: Date, coordinates: { latitude: number; longitude: number }): Promise<number> => {
+  /* const ___calculateRealTideLevel = useCallback(async (time: Date, coordinates: { latitude: number; longitude: number }): Promise<number> => {
     try {
       const tideInfo = await onCalculateTide(coordinates, time);
       return tideInfo.currentLevel;
     } catch (error) {
       console.warn('個別時刻の潮位計算でエラー:', error);
       // フォールバック: 基準データから補間計算
-      return calculateTideLevelFromEvents(time, tideInfo?.events || []);
+      return calculateSmoothTideLevel(time, tideInfo?.events || []);
     }
-  }, [onCalculateTide, tideInfo]);
+  }, [onCalculateTide, tideInfo]); */
 
   // 滑らかな潮汐カーブ計算（実際のイベントデータベース）
-  const calculateSmoothTideLevel = (time: Date, events: any[]): number => {
-    if (events.length === 0) {
-      console.warn('⚠️ イベントデータが空です');
-      return 100;
-    }
-
-    // イベントを時刻順にソート
-    const sortedEvents = [...events].sort((a, b) => a.time.getTime() - b.time.getTime());
-    const timeMs = time.getTime();
-
-    // 前後のイベントを探す
-    let prevEvent = null;
-    let nextEvent = null;
-
-    for (let i = 0; i < sortedEvents.length - 1; i++) {
-      if (sortedEvents[i].time.getTime() <= timeMs && sortedEvents[i + 1].time.getTime() > timeMs) {
-        prevEvent = sortedEvents[i];
-        nextEvent = sortedEvents[i + 1];
-        break;
-      }
-    }
-
-    // 境界処理
-    if (!prevEvent) prevEvent = sortedEvents[0];
-    if (!nextEvent) nextEvent = sortedEvents[sortedEvents.length - 1];
-
-    // 滑らかな潮汐カーブの計算（cos曲線で補間）
-    const prevTime = prevEvent.time.getTime();
-    const nextTime = nextEvent.time.getTime();
-    const timeDiff = nextTime - prevTime;
-
-    if (timeDiff === 0) return prevEvent.level;
-
-    // 0から1の範囲で正規化
-    const normalizedTime = (timeMs - prevTime) / timeDiff;
-
-    // cosine補間で滑らかなカーブを作成
-    const cosInterpolation = (1 - Math.cos(normalizedTime * Math.PI)) / 2;
-
-    const interpolatedLevel = prevEvent.level + (nextEvent.level - prevEvent.level) * cosInterpolation;
-
-    return interpolatedLevel;
-  };
 
   // 直接的な調和解析計算（座標・季節変動含む、無限ループ回避）
   const calculateDirectTideLevel = (time: Date, coordinates: { latitude: number; longitude: number }): number => {
@@ -298,12 +253,12 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
   };
 
   // イベントベースの潮位補間計算（フォールバック用）
-  const calculateTideLevelFromEvents = (time: Date, events: any[]): number => {
-    return calculateSmoothTideLevel(time, events);
-  };
+  // const ___calculateTideLevelFromEvents = (time: Date, events: any[]): number => {
+  //   return calculateSmoothTideLevel(time, events);
+  // };
 
   // 実際の潮汐データに基づく潮位計算（旧関数）
-  const calculateTideLevel = (time: Date, info: TideInfo): number => {
+  /* const ___calculateTideLevel = (time: Date, info: TideInfo): number => {
     if (!info.events || info.events.length === 0) return info.currentLevel || 100;
 
     // 実際のイベントから基準レベルと振幅を計算
@@ -318,7 +273,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
     const cycle = (hour / 6) * Math.PI;
 
     return baseLevel + Math.sin(cycle) * amplitude;
-  };
+  }; */
 
   // 潮汐状態判定
   const determineTideState = (time: Date, info: TideInfo): 'rising' | 'falling' | 'high' | 'low' => {
@@ -569,7 +524,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                 const chartHeight = isMobile ? 200 : isTablet ? 320 : 400;
 
                 // 釣果時刻を "HH:mm" 形式に変換し、15分間隔にスナップ
-                const fishingTimes = (tideGraphData.fishingMarkers || []).map((date, idx) => {
+                const fishingTimes = (tideGraphData.fishingMarkers || []).map((date) => {
                   const d = new Date(date);
 
                   // 最も近い15分間隔に丸める

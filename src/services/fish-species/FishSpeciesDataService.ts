@@ -74,11 +74,11 @@ export class FishSpeciesDataService {
         season: s.season as FishSpecies['season'],
         habitat: s.habitat as FishSpecies['habitat'],
         popularity: s.popularity,
-        image: s.image,
+        image: (s as any).image,
         source: s.source as 'official' | 'user',
         // JSONでは日付を文字列として保存しているため、必要に応じてDate型に変換
-        createdAt: s.createdAt ? new Date(s.createdAt) : undefined,
-        updatedAt: s.updatedAt ? new Date(s.updatedAt) : new Date(fishSpeciesData.updatedAt)
+        createdAt: (s as any).createdAt ? new Date((s as any).createdAt) : undefined,
+        updatedAt: (s as any).updatedAt ? new Date((s as any).updatedAt) : new Date(fishSpeciesData.updatedAt)
       }));
 
       // ソースフィルタを適用

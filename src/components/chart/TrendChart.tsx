@@ -12,7 +12,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
 import { colors } from '../../theme/colors';
@@ -76,7 +75,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 export const TrendChart: React.FC<TrendChartProps> = ({
   data,
   type = 'bar',
-  width = '100%',
+  width: __width = '100%',
   height = 250,
   showGrid = true,
   title,

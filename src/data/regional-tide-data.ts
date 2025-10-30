@@ -7,10 +7,35 @@
 
 import type { RegionalDataRecord } from '../types/tide';
 
+/** 簡易地域データから完全な地域データを生成 */
+const createRegionalData = (data: {
+  regionId: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  m2Amplitude: number;
+  m2Phase: number;
+  s2Amplitude: number;
+  s2Phase: number;
+  dataQuality: 'high' | 'medium' | 'low';
+  isActive: boolean;
+}): Omit<RegionalDataRecord, 'id'> => ({
+  ...data,
+  regionName: data.name,
+  characteristics: JSON.stringify({ type: 'coastal', region: 'japan' }),
+  coverageRadius: 50, // デフォルト50km
+  k1Amplitude: data.m2Amplitude * 0.4, // K1はM2の約40%
+  k1Phase: data.m2Phase - 10,
+  o1Amplitude: data.m2Amplitude * 0.3, // O1はM2の約30%
+  o1Phase: data.m2Phase - 20,
+  createdAt: new Date(),
+  updatedAt: new Date()
+});
+
 /** 日本沿岸潮汐地域データ（50箇所） */
 export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
   // ========== 北海道地域 ==========
-  {
+  createRegionalData({
     regionId: 'hokkaido_hakodate',
     name: '函館港',
     latitude: 41.7687,
@@ -20,11 +45,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.28,
     s2Phase: -18.5,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'hokkaido_kushiro',
     name: '釧路港',
     latitude: 42.9742,
@@ -34,11 +57,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.26,
     s2Phase: -25.2,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'hokkaido_abashiri',
     name: '網走港',
     latitude: 44.0206,
@@ -48,11 +69,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.19,
     s2Phase: -31.8,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'hokkaido_wakkanai',
     name: '稚内港',
     latitude: 45.4123,
@@ -62,11 +81,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.16,
     s2Phase: -38.1,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'hokkaido_otaru',
     name: '小樽港',
     latitude: 43.1907,
@@ -76,13 +93,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.22,
     s2Phase: -21.4,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 東北地域 ==========
-  {
+  createRegionalData({
     regionId: 'tohoku_aomori',
     name: '青森港',
     latitude: 40.8267,
@@ -92,11 +107,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.33,
     s2Phase: -15.8,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'tohoku_sendai',
     name: '仙台湾',
     latitude: 38.2682,
@@ -106,11 +119,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.35,
     s2Phase: 11.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'tohoku_akita',
     name: '秋田港',
     latitude: 39.7186,
@@ -120,11 +131,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.17,
     s2Phase: -45.6,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'tohoku_niigata',
     name: '新潟港',
     latitude: 37.9161,
@@ -134,11 +143,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.19,
     s2Phase: -41.2,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'tohoku_fukushima',
     name: '小名浜港',
     latitude: 36.9458,
@@ -148,13 +155,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.41,
     s2Phase: 15.7,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 関東地域 ==========
-  {
+  createRegionalData({
     regionId: 'kanto_tokyo_bay',
     name: '東京湾（晴海）',
     latitude: 35.6762,
@@ -164,11 +169,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.68,
     s2Phase: 28.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kanto_choshi',
     name: '銚子港',
     latitude: 35.7346,
@@ -178,11 +181,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.52,
     s2Phase: 21.9,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kanto_yokohama',
     name: '横浜港',
     latitude: 35.4437,
@@ -192,11 +193,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.64,
     s2Phase: 26.5,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kanto_sagami_bay',
     name: '相模湾（茅ヶ崎）',
     latitude: 35.2131,
@@ -206,11 +205,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.41,
     s2Phase: 15.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kanto_izu_oshima',
     name: '伊豆大島',
     latitude: 34.7312,
@@ -220,13 +217,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.35,
     s2Phase: 11.8,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 中部地域 ==========
-  {
+  createRegionalData({
     regionId: 'chubu_suruga_bay',
     name: '駿河湾（清水）',
     latitude: 35.0281,
@@ -236,11 +231,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.44,
     s2Phase: 18.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'chubu_nagoya_port',
     name: '名古屋港',
     latitude: 35.0739,
@@ -250,11 +243,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.86,
     s2Phase: 41.5,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'chubu_ise_bay',
     name: '伊勢湾（四日市）',
     latitude: 34.8516,
@@ -264,11 +255,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.82,
     s2Phase: 38.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'chubu_toyama_bay',
     name: '富山湾',
     latitude: 36.7581,
@@ -278,11 +267,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.24,
     s2Phase: -31.8,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'chubu_kanazawa',
     name: '金沢港',
     latitude: 36.6472,
@@ -292,13 +279,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.22,
     s2Phase: -35.4,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 関西地域 ==========
-  {
+  createRegionalData({
     regionId: 'kansai_osaka_bay',
     name: '大阪湾（大阪港）',
     latitude: 34.6937,
@@ -308,11 +293,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.61,
     s2Phase: 25.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kansai_kobe',
     name: '神戸港',
     latitude: 34.6901,
@@ -322,11 +305,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.59,
     s2Phase: 23.8,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kansai_wakayama',
     name: '和歌山港',
     latitude: 34.2257,
@@ -336,11 +317,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.44,
     s2Phase: 16.1,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kansai_kii_channel',
     name: '紀伊水道',
     latitude: 34.1389,
@@ -350,13 +329,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.40,
     s2Phase: 12.8,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 中国地域 ==========
-  {
+  createRegionalData({
     regionId: 'chugoku_hiroshima_bay',
     name: '広島湾',
     latitude: 34.3964,
@@ -366,11 +343,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 1.08,
     s2Phase: 58.5,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'chugoku_okayama',
     name: '岡山港（児島湾）',
     latitude: 34.6139,
@@ -380,11 +355,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.98,
     s2Phase: 52.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'chugoku_shimonoseki',
     name: '下関港',
     latitude: 33.9439,
@@ -394,11 +367,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.86,
     s2Phase: 45.6,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'chugoku_tottori',
     name: '鳥取港',
     latitude: 35.4975,
@@ -408,13 +379,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.27,
     s2Phase: -29.1,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 四国地域 ==========
-  {
+  createRegionalData({
     regionId: 'shikoku_takamatsu',
     name: '高松港',
     latitude: 34.3403,
@@ -424,11 +393,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.90,
     s2Phase: 48.9,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'shikoku_matsuyama',
     name: '松山港',
     latitude: 33.8467,
@@ -438,11 +405,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 1.04,
     s2Phase: 55.4,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'shikoku_kochi',
     name: '高知港',
     latitude: 33.5533,
@@ -452,11 +417,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.36,
     s2Phase: 8.5,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'shikoku_tokushima',
     name: '徳島港',
     latitude: 34.0753,
@@ -466,13 +429,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.52,
     s2Phase: 22.2,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 九州地域 ==========
-  {
+  createRegionalData({
     regionId: 'kyushu_fukuoka',
     name: '博多港',
     latitude: 33.6236,
@@ -482,11 +443,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.81,
     s2Phase: 41.8,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kyushu_sasebo',
     name: '佐世保港',
     latitude: 33.1578,
@@ -496,11 +455,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.78,
     s2Phase: 39.0,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kyushu_nagasaki',
     name: '長崎港',
     latitude: 32.7503,
@@ -510,11 +467,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.72,
     s2Phase: 35.4,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kyushu_kumamoto',
     name: '熊本港（有明海）',
     latitude: 32.7917,
@@ -524,11 +479,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 1.50,
     s2Phase: 81.8,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kyushu_beppu_bay',
     name: '別府湾',
     latitude: 33.2847,
@@ -538,11 +491,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.44,
     s2Phase: 16.1,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kyushu_miyazaki',
     name: '宮崎港',
     latitude: 31.9203,
@@ -552,11 +503,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.31,
     s2Phase: 5.8,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'kyushu_kagoshima',
     name: '鹿児島港',
     latitude: 31.5667,
@@ -566,13 +515,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.58,
     s2Phase: 25.7,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 沖縄地域 ==========
-  {
+  createRegionalData({
     regionId: 'okinawa_naha',
     name: '那覇港',
     latitude: 26.2123,
@@ -582,11 +529,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.25,
     s2Phase: -5.1,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'okinawa_ishigaki',
     name: '石垣港',
     latitude: 24.3394,
@@ -596,13 +541,11 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.19,
     s2Phase: -12.5,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+    isActive: true
+  }),
 
   // ========== 離島・その他重要拠点 ==========
-  {
+  createRegionalData({
     regionId: 'other_hachijojima',
     name: '八丈島',
     latitude: 33.1100,
@@ -612,11 +555,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.33,
     s2Phase: 9.1,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_ogasawara',
     name: '小笠原（父島）',
     latitude: 27.0939,
@@ -626,11 +567,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.17,
     s2Phase: -15.2,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_sado',
     name: '佐渡島（両津）',
     latitude: 38.0642,
@@ -640,11 +579,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.21,
     s2Phase: -38.5,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_awajishima',
     name: '淡路島',
     latitude: 34.3028,
@@ -654,11 +591,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.50,
     s2Phase: 19.8,
     dataQuality: 'high',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_tsushima',
     name: '対馬',
     latitude: 34.2042,
@@ -668,11 +603,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.66,
     s2Phase: 32.0,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_goto',
     name: '五島列島',
     latitude: 32.6931,
@@ -682,11 +615,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.62,
     s2Phase: 29.1,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_tanegashima',
     name: '種子島',
     latitude: 30.7403,
@@ -696,11 +627,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.39,
     s2Phase: 12.2,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_yakushima',
     name: '屋久島',
     latitude: 30.3056,
@@ -710,11 +639,9 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.36,
     s2Phase: 9.5,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
+    isActive: true
+  }),
+  createRegionalData({
     regionId: 'other_amami',
     name: '奄美大島',
     latitude: 28.3761,
@@ -724,10 +651,8 @@ export const JAPANESE_COASTAL_REGIONS: Omit<RegionalDataRecord, 'id'>[] = [
     s2Amplitude: 0.30,
     s2Phase: 4.8,
     dataQuality: 'medium',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
+    isActive: true
+  })
 ];
 
 /**

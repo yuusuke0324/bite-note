@@ -7,7 +7,6 @@ import type { ValidationResult, ValidationOptions, ValidationSummary } from './t
 import type { RawTideData, TideChartData } from '../../utils/validation/types';
 import type { ITideDataValidator, ITideDataTransformer } from '../../utils/validation/types';
 import { TideValidationError, EmptyDataError } from '../../utils/validation/errors';
-import { ErrorType } from './types';
 import { ErrorCategorizer } from './utils/ErrorCategorizer';
 import { WarningGenerator } from './utils/WarningGenerator';
 
@@ -15,10 +14,15 @@ import { WarningGenerator } from './utils/WarningGenerator';
  * TideDataValidator - データ検証専用コンポーネント
  */
 export class TideDataValidator {
+  private tideDataValidator: ITideDataValidator;
+  private tideDataTransformer: ITideDataTransformer;
+
   constructor(
-    private tideDataValidator: ITideDataValidator,
-    private tideDataTransformer: ITideDataTransformer
+    tideDataValidator: ITideDataValidator,
+    tideDataTransformer: ITideDataTransformer
   ) {
+    this.tideDataValidator = tideDataValidator;
+    this.tideDataTransformer = tideDataTransformer;
     if (!tideDataValidator || !tideDataTransformer) {
       throw new Error('Not implemented');
     }
@@ -255,9 +259,9 @@ export class TideDataValidator {
   /**
    * 有効データのフィルタリング
    */
-  private filterValidData(data: RawTideData[], errors: any[]): RawTideData[] {
+  private filterValidData(__data: RawTideData[], errors: any[]): RawTideData[] {
     const errorIndices = new Set(errors.map(e => e.index).filter(i => i !== undefined));
-    return data.filter((_, index) => !errorIndices.has(index));
+    return __data.filter((_, index) => !errorIndices.has(index));
   }
 
   /**
@@ -339,7 +343,7 @@ export class TideDataValidator {
   /**
    * タイムアウト結果を作成
    */
-  private createTimeoutResult(data: RawTideData[], processingTime: number): ValidationResult {
+  private createTimeoutResult(__data: RawTideData[], processingTime: number): ValidationResult {
     const timeoutError = new Error('Processing timeout exceeded') as any;
     timeoutError.code = 'PROCESSING_TIMEOUT';
     timeoutError.context = { timeoutMs: processingTime };

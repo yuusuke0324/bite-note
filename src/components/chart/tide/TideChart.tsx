@@ -19,11 +19,9 @@ import {
   YAxis,
   Line,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
 import type { TideChartProps, TideChartData } from './types';
-import { ResponsiveChartContainer } from '../container';
 
 // Accessibility interfaces and managers
 interface AriaConfiguration {
@@ -183,14 +181,14 @@ class FocusManager {
   }
 }
 
-// High Contrast Theme System
-interface HighContrastTheme {
-  background: string;
-  foreground: string;
-  accent: string;
-  focus: string;
-  error: string;
-}
+// High Contrast Theme System (not currently used but kept for future reference)
+// interface HighContrastTheme {
+//   background: string;
+//   foreground: string;
+//   accent: string;
+//   focus: string;
+//   error: string;
+// }
 
 const highContrastThemes = {
   light: {
@@ -522,7 +520,8 @@ const arePropsEqual = (
       ]),
     ];
     for (const key of styleKeys) {
-      if (prevProps.style[key] !== nextProps.style[key]) {
+      const typedKey = key as keyof React.CSSProperties;
+      if (prevProps.style[typedKey] !== nextProps.style[typedKey]) {
         return false;
       }
     }
@@ -551,7 +550,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
   screenReaderAvailable = true,
   keyboardNavigationEnabled = true,
   focusManagementEnabled = true,
-  enableFallback = false,
   showKeyboardShortcuts = false,
   autoDetectionFailed = false,
   colorMode = 'normal',
@@ -568,7 +566,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
   const [selectedDataPoint, setSelectedDataPoint] = useState<number | null>(
     null
   );
-  const [error, setError] = useState<string | null>(null);
   const renderStartTime = useRef<number>(0);
   const liveRegionRef = useRef<HTMLDivElement>(null);
   const focusManagerRef = useRef<FocusManager | null>(null);
@@ -1277,7 +1274,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
           {/* Chart elements with proper contrast */}
           <div style={{ position: 'absolute', left: '-9999px' }}>
-            {validatedData.valid.map((point, index) => (
+            {validatedData.valid.map((_point, index) => (
               <div
                 key={index}
                 className="chart-element"

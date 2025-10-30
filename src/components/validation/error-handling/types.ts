@@ -3,9 +3,6 @@
  * TASK-102: TideChartErrorHandler実装
  */
 
-import type { ValidationResult, ValidationError, ValidationWarning } from '../types';
-import type { TideChartData } from '../../../utils/validation/types';
-
 /**
  * エラー表示情報
  */

@@ -12,7 +12,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import type { TideGraphData } from '../types/tide';
 import { useResizeObserver } from '../hooks/useResizeObserver';
-import { calculateSVGDimensions, createResponsiveConfig, generateResponsiveCSS } from '../utils/responsive';
+import { calculateSVGDimensions, createResponsiveConfig } from '../utils/responsive';
 import type { ResponsiveGraphConfig } from '../utils/responsive';
 import { TestIds } from '../constants/testIds';
 import { DynamicScaleCalculator } from '../utils/scale/DynamicScaleCalculator';
@@ -107,17 +107,6 @@ export const TideGraph: React.FC<TideGraphProps> = ({
 
   // 動的マージン設定（確実にプラス値を保証）
   const margin = useMemo(() => {
-    const availableWidth = svgDimensions.viewBoxWidth;
-    const availableHeight = svgDimensions.viewBoxHeight;
-
-    // 軸ラベル表示に必要な最小サイズ
-    const minChartWidth = 300;
-    const minChartHeight = 200;
-
-    // 軸ラベル領域を確保するマージン
-    const maxHorizontalMargin = Math.max(availableWidth - minChartWidth, 120);
-    const maxVerticalMargin = Math.max(availableHeight - minChartHeight, 80);
-
     // 軸ラベル表示に最適化されたマージン
     const left = 60;   // Y軸ラベル用
     const right = 20;  // 余白
@@ -125,7 +114,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
     const bottom = 40; // X軸ラベル用
 
     return { top, right, bottom, left };
-  }, [svgDimensions.viewBoxWidth, svgDimensions.viewBoxHeight]);
+  }, []);
 
   const rawChartWidth = svgDimensions.viewBoxWidth - margin.left - margin.right;
   const rawChartHeight = svgDimensions.viewBoxHeight - margin.top - margin.bottom;
@@ -205,7 +194,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
       return [];
     }
 
-    const labels = [];
+    const labels: Array<{ x: number; label: string }> = [];
 
     // 24時間表示の場合は4時間間隔で確実に表示
     const hours = [0, 4, 8, 12, 16, 20];
@@ -367,7 +356,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
   }
 
   // レスポンシブCSS生成
-  const responsiveCSS = useMemo(() => generateResponsiveCSS(config), [config]);
+  // const _____responsiveCSS = useMemo(() => generateResponsiveCSS(config), [config]);
 
   return (
     <div

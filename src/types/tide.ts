@@ -262,8 +262,8 @@ export interface TideStrength {
   direction: 'rising' | 'falling'; // 上げ潮・下げ潮
 }
 
-/** 分潮データ */
-export interface TidalConstituent {
+/** 分潮基本データ（定数定義用） */
+export interface TidalConstituentConstant {
   name: string;             // 分潮名
   frequency: number;        // 角周波数 (degrees/hour)
   period: number;           // 周期 (hours)

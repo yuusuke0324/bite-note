@@ -3,7 +3,7 @@
  * 分析関連の型定義
  */
 
-import type { Coordinates, FishingRecord } from './entities';
+import type { FishingRecord } from './entities';
 
 // FR-201: グラフパターン多様性分析エンジン
 export interface GraphPatternAnalysisInput {

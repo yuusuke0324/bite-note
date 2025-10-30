@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, LabelList, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, LabelList } from 'recharts';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 import ModernCard from '../ui/ModernCard';

@@ -6,8 +6,7 @@ import type {
   CameraInfo,
   ExifExtractionResult,
   GeocodeResult,
-  Coordinates,
-  DatabaseResult
+  Coordinates
 } from '../types';
 import { db } from './database';
 
@@ -31,19 +30,10 @@ export class PhotoMetadataService {
         };
       }
 
-      // EXIFデータを読み取り（必要なタグのみ指定して高速化）
+      // EXIFデータを読み取り
       const tags = await ExifReader.load(file, {
         expanded: false,
-        includeUnknown: false,
-        // GPS、日時、カメラ情報のみ取得
-        tags: [
-          'GPSLatitude', 'GPSLongitude', 'GPSLatitudeRef', 'GPSLongitudeRef',
-          'GPSHorizontalPositioningError', 'GPSHPositioningError',
-          'DateTimeOriginal', 'DateTime', 'DateTimeDigitized', 'CreateDate',
-          'Make', 'Model', 'LensModel',
-          'FNumber', 'ApertureValue', 'ExposureTime', 'ShutterSpeedValue',
-          'ISOSpeedRatings', 'ISO', 'FocalLength'
-        ]
+        includeUnknown: false
       });
 
       if (!tags) {

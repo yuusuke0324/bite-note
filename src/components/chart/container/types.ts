@@ -3,7 +3,7 @@
  * TASK-201: ResponsiveChartContainer実装
  */
 
-import type { DeviceType } from '../../utils/responsive/types';
+import type { DeviceType } from '../../../utils/responsive/types';
 
 /**
  * コンテナサイズ情報

@@ -10,11 +10,13 @@ export interface ExecutionResult<T> {
   executionTime?: number;
 }
 
-export enum LogLevel {
-  INFO = 'INFO',
-  WARN = 'WARN',
-  ERROR = 'ERROR'
-}
+export const LogLevel = {
+  INFO: 'INFO',
+  WARN: 'WARN',
+  ERROR: 'ERROR'
+} as const;
+
+export type LogLevel = typeof LogLevel[keyof typeof LogLevel];
 
 export interface LogEntry {
   timestamp: Date;

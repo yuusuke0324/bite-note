@@ -61,7 +61,7 @@ export class TideLRUCache {
       return;
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const request = indexedDB.open(this.dbName, this.dbVersion);
 
       request.onerror = () => {

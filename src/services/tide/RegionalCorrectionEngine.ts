@@ -300,7 +300,7 @@ export class RegionalCorrectionEngine {
   private async applyShallowWaterEffect(
     coordinates: Coordinates,
     harmonicConstants: HarmonicConstant[],
-    regionData: RegionalDataRecord
+    __regionData: RegionalDataRecord
   ): Promise<HarmonicConstant[]> {
     const shallowEffects = await this.calculateShallowWaterEffect(coordinates, harmonicConstants);
 
@@ -345,10 +345,10 @@ export class RegionalCorrectionEngine {
     const waveSpeed = Math.sqrt(9.81 * depth); // 浅水波速度
     const naturalPeriod = 4 * bayLength * 1000 / waveSpeed / 3600; // 時間単位
 
-    for (const constant of harmonicConstants) {
+    for (const __constituent of harmonicConstants) {
       let resonanceFreq = 0;
 
-      switch (constant.constituent) {
+      switch (__constituent.constituent) {
         case 'M2': resonanceFreq = 12.42; break; // M2周期
         case 'S2': resonanceFreq = 12.00; break; // S2周期
         case 'K1': resonanceFreq = 23.93; break; // K1周期
@@ -380,7 +380,7 @@ export class RegionalCorrectionEngine {
       }
 
       resonanceEffects.push({
-        constituent: constant.constituent,
+        constituent: __constituent.constituent,
         amplificationFactor,
         resonanceFrequency: resonanceFreq
       });
@@ -395,7 +395,7 @@ export class RegionalCorrectionEngine {
   private async applyResonanceEffect(
     coordinates: Coordinates,
     harmonicConstants: HarmonicConstant[],
-    regionData: RegionalDataRecord
+    __regionData: RegionalDataRecord
   ): Promise<HarmonicConstant[]> {
     const resonanceEffects = await this.calculateResonanceEffect(coordinates, harmonicConstants);
 
@@ -473,7 +473,7 @@ export class RegionalCorrectionEngine {
   /**
    * 減衰を計算
    */
-  private calculateAttenuation(regionData: RegionalDataRecord, constituent: string): number {
+  private calculateAttenuation(regionData: RegionalDataRecord, __constituent: string): number {
     const distance = (regionData as any).distanceFromOcean || 0;
     const depth = (regionData as any).depth || 20;
 
@@ -490,7 +490,7 @@ export class RegionalCorrectionEngine {
   private async applyStraitEffect(
     coordinates: Coordinates,
     harmonicConstants: HarmonicConstant[],
-    regionData: RegionalDataRecord
+    __regionData: RegionalDataRecord
   ): Promise<HarmonicConstant[]> {
     const straitEffects = await this.calculateStraitEffect(coordinates, harmonicConstants);
 

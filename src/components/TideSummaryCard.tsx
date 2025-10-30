@@ -7,7 +7,7 @@
  * - アイコン・カラーシステム統合
  */
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ModernCard } from './ui/ModernCard';
 import type { TideInfo } from '../types/tide';
 

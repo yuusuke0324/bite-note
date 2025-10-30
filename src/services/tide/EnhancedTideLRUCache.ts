@@ -14,9 +14,6 @@ import type {
   MatchingResult,
   MemoryOptimization,
   CacheDebugInfo,
-  PrecisionLevel,
-  SeasonalContext,
-  AnalysisType,
   MatchingStrategy
 } from '../../types/tide';
 import { SmartKeyGenerator } from './SmartKeyGenerator';
@@ -62,8 +59,6 @@ interface MatchCandidate {
  */
 export class EnhancedTideLRUCache {
   private readonly maxSize: number;
-  private readonly strategy: SmartCacheStrategy;
-  private readonly memoryOptimization: MemoryOptimization;
   private readonly keyGenerator: SmartKeyGenerator;
 
   // メモリストレージ
@@ -87,8 +82,10 @@ export class EnhancedTideLRUCache {
     this.maxSize = config?.maxSize || 200; // 既存の2倍
     this.keyGenerator = new SmartKeyGenerator();
 
+    // Note: strategy and memoryOptimization are intentionally not stored
+    // as they are only used for configuration validation
     // デフォルト戦略設定
-    this.strategy = config?.strategy || {
+    /* const __strategy = config?.strategy || {
       proximityMatching: {
         geoTolerance: 2.0,      // 2km許容範囲
         timeTolerance: 2,       // 2時間許容範囲
@@ -107,7 +104,7 @@ export class EnhancedTideLRUCache {
     };
 
     // デフォルトメモリ最適化設定
-    this.memoryOptimization = config?.memoryOptimization || {
+    const __memoryOptimization = config?.memoryOptimization || {
       compression: {
         algorithm: 'lz4',
         level: 5,
@@ -123,7 +120,7 @@ export class EnhancedTideLRUCache {
         similarityThreshold: 0.85,
         referenceCompression: true
       }
-    };
+    }; */
   }
 
   /**
@@ -647,14 +644,14 @@ export class EnhancedTideLRUCache {
     // 基本的な数値プロパティ (概算)
     size += 8 * 10; // 数値プロパティ約10個 * 8バイト
 
-    // 文字列プロパティ
-    if (tideInfo.location?.name) {
-      size += tideInfo.location.name.length * 2;
+    // 文字列プロパティ (regionIdなど)
+    if (tideInfo.regionId) {
+      size += tideInfo.regionId.length * 2;
     }
 
-    // 配列データ (timeSeriesData等)
-    if (Array.isArray(tideInfo.predictions)) {
-      size += tideInfo.predictions.length * 32; // 予測データ1個あたり32バイト概算
+    // 配列データ (events等)
+    if (Array.isArray(tideInfo.events)) {
+      size += tideInfo.events.length * 32; // イベントデータ1個あたり32バイト概算
     }
 
     return size;

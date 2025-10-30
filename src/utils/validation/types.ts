@@ -43,7 +43,11 @@ export interface TideChartData {
 export type ValidationErrorCode =
   | 'INVALID_TIME_FORMAT'
   | 'TIDE_OUT_OF_RANGE'
-  | 'EMPTY_DATA';
+  | 'EMPTY_DATA'
+  | 'DUPLICATE_TIMESTAMP'
+  | 'STRUCTURE_ERROR'
+  | 'DATA_QUALITY_WARNING'
+  | 'PROCESSING_TIMEOUT';
 
 // ==========================================
 // エラーコンテキスト型定義
