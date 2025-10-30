@@ -1,7 +1,7 @@
 {
   "name": "bite-note",
   "private": true,
-  "version": "0.9.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Bite Note - 釣果記録PWAアプリ（食いついた瞬間を記録する）",
   "scripts": {
