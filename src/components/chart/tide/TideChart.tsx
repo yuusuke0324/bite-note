@@ -344,9 +344,9 @@ const dataSampler = {
 };
 
 /**
- * カスタムツールチップコンポーネント
+ * カスタムツールチップコンポーネント（最適化版）
  */
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = React.memo(({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div
@@ -366,12 +366,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     );
   }
   return null;
-};
+});
 
 /**
- * Enhanced Data Point Component with Accessibility
+ * Enhanced Data Point Component with Accessibility（最適化版）
  */
-const DataPoint = ({
+const DataPoint = React.memo(({
   cx,
   cy,
   payload,
@@ -383,6 +383,10 @@ const DataPoint = ({
 }: any) => {
   const isFocused = focused;
   const isSelected = selected;
+
+  const handleClick = React.useCallback(() => {
+    onClick?.(payload, index);
+  }, [onClick, payload, index]);
 
   return (
     <g>
@@ -400,7 +404,7 @@ const DataPoint = ({
         data-focused={isFocused}
         data-selected={isSelected}
         className={isFocused ? 'highlighted' : ''}
-        onClick={() => onClick?.(payload, index)}
+        onClick={handleClick}
         aria-hidden="true"
       />
       {/* Focus indicator */}
@@ -419,53 +423,64 @@ const DataPoint = ({
       )}
     </g>
   );
-};
+}, (prevProps, nextProps) => {
+  // カスタム比較関数でパフォーマンス最適化
+  return prevProps.cx === nextProps.cx &&
+    prevProps.cy === nextProps.cy &&
+    prevProps.focused === nextProps.focused &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.index === nextProps.index;
+});
 
 
 /**
- * フォールバックデータテーブル
+ * フォールバックデータテーブル（最適化版）
  */
-const FallbackDataTable = ({
+const FallbackDataTable = React.memo(({
   data,
   message,
 }: {
   data: TideChartData[];
   message: string;
-}) => (
-  <div
-    data-testid="fallback-data-table"
-    style={{ padding: '20px', textAlign: 'center' }}
-  >
-    <p style={{ color: 'red', marginBottom: '10px' }}>{message}</p>
-    <table style={{ margin: '0 auto', borderCollapse: 'collapse' }}>
-      <thead>
-        <tr>
-          <th style={{ border: '1px solid #ccc', padding: '8px' }}>時刻</th>
-          <th style={{ border: '1px solid #ccc', padding: '8px' }}>
-            潮位 (cm)
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.slice(0, 10).map((point, index) => (
-          <tr key={index}>
-            <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-              {point.time}
-            </td>
-            <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-              {point.tide}
-            </td>
+}) => {
+  const displayData = React.useMemo(() => data.slice(0, 10), [data]);
+
+  return (
+    <div
+      data-testid="fallback-data-table"
+      style={{ padding: '20px', textAlign: 'center' }}
+    >
+      <p style={{ color: 'red', marginBottom: '10px' }}>{message}</p>
+      <table style={{ margin: '0 auto', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>時刻</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px' }}>
+              潮位 (cm)
+            </th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-    {data.length > 10 && (
-      <p style={{ fontSize: '12px', color: '#666' }}>
-        ...他 {data.length - 10} 件
-      </p>
-    )}
-  </div>
-);
+        </thead>
+        <tbody>
+          {displayData.map((point, index) => (
+            <tr key={index}>
+              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                {point.time}
+              </td>
+              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                {point.tide}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {data.length > 10 && (
+        <p style={{ fontSize: '12px', color: '#666' }}>
+          ...他 {data.length - 10} 件
+        </p>
+      )}
+    </div>
+  );
+});
 
 // カスタム比較関数（React.memo用）
 const arePropsEqual = (

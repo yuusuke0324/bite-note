@@ -96,7 +96,7 @@ describe('TideChart', () => {
       const dataLine = lines.find(
         (line) =>
           line.getAttribute('datakey') === 'tide' &&
-          line.getAttribute('stroke') === '#0088FE'
+          line.getAttribute('stroke') === '#0066CC' // currentTheme.accent (light theme)
       );
       expect(dataLine).toBeInTheDocument();
     });
@@ -178,9 +178,9 @@ describe('TideChart', () => {
       const lines = screen.getAllByTestId('line');
       expect(lines.length).toBeGreaterThan(0);
 
-      // データライン（#0088FE）の確認
+      // データライン（#0066CC - currentTheme.accent）の確認
       const dataLine = lines.find(
-        (line) => line.getAttribute('stroke') === '#0088FE'
+        (line) => line.getAttribute('stroke') === '#0066CC'
       );
       expect(dataLine).toBeInTheDocument();
       expect(dataLine).toHaveAttribute('datakey', 'tide');
@@ -378,7 +378,7 @@ describe('TideChart', () => {
       expect(chartElement).toHaveAttribute('role', 'img');
       expect(chartElement).toHaveAttribute(
         'aria-label',
-        '潮汐グラフ: 06:00から18:00までの潮位変化'
+        '潮汐グラフ: 06:00から18:00までの潮位変化、最高200cm、最低-50cm'
       );
       expect(chartElement).toHaveAttribute('aria-describedby');
     });
