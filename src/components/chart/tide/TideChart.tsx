@@ -401,8 +401,6 @@ const DataPoint = ({
         data-selected={isSelected}
         className={isFocused ? 'highlighted' : ''}
         onClick={() => onClick?.(payload, index)}
-        role="button"
-        aria-label={`データポイント ${index + 1}: ${payload?.time}, ${payload?.tide}cm`}
         aria-hidden="true"
       />
       {/* Focus indicator */}

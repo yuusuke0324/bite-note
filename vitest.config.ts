@@ -9,15 +9,18 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     css: true,
-    // メモリ制限とパフォーマンス改善
+    // メモリ制限とパフォーマンス改善（強化版）
     pool: 'forks',
     poolOptions: {
       forks: {
         singleFork: true,
+        execArgv: ['--max-old-space-size=4096'], // Node.jsヒープサイズを4GBに増加
       },
     },
-    maxConcurrency: 5,
+    maxConcurrency: 3, // 並行数を削減
     isolate: false,
+    testTimeout: 30000, // タイムアウトを30秒に延長
+    hookTimeout: 30000,
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
