@@ -112,8 +112,8 @@ describe('PhotoService', () => {
     });
 
     it('ファイルサイズが制限を超える場合はエラーを返す', async () => {
-      // 5MB を超える大きなファイルを作成
-      const largeContent = new Array(6 * 1024 * 1024).fill('a').join('');
+      // 20MBを超える大きなファイルを作成（実装の制限は20MB）
+      const largeContent = new Array(21 * 1024 * 1024).fill('a').join('');
       const mockFile = new File([largeContent], 'large.jpg', { type: 'image/jpeg' });
 
       const result = await service.savePhoto(mockFile);
