@@ -1,4 +1,8 @@
-module.exports = {
+/**
+ * Lighthouse CI設定
+ * ESM互換性のため、export defaultを使用
+ */
+export default {
   ci: {
     collect: {
       staticDistDir: './dist',

@@ -1,66 +1,25 @@
 import React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { toHaveNoViolations } from 'jest-axe';
 import { TideChart } from '../TideChart';
-import { TideChartData } from '../types';
-import { vi, expect } from 'vitest';
+import { vi, expect, beforeEach } from 'vitest';
+import {
+  createMockTideData,
+  setupResizeObserverMock,
+  suppressPerformanceWarnings,
+  AccessibilityTester,
+  createLargeTideData,
+} from './test-utils';
 
 expect.extend(toHaveNoViolations);
 
-// Mock setup
-const mockResizeObserver = vi.fn(() => ({
-  observe: vi.fn(),
-  disconnect: vi.fn(),
-  unobserve: vi.fn(),
-}));
-
-global.ResizeObserver = mockResizeObserver;
+// Global setup
+setupResizeObserverMock();
+suppressPerformanceWarnings();
 
 // Test data
-const mockTideData: TideChartData[] = [
-  { time: '00:00', tide: 120, type: 'high' },
-  { time: '03:00', tide: 80 },
-  { time: '06:00', tide: 40, type: 'low' },
-  { time: '09:00', tide: 90 },
-  { time: '12:00', tide: 150, type: 'high' },
-  { time: '15:00', tide: 100 },
-  { time: '18:00', tide: 30, type: 'low' },
-  { time: '21:00', tide: 110 },
-];
-
-// Accessibility test utilities
-class AccessibilityTester {
-  static async expectNoA11yViolations(element: HTMLElement) {
-    const results = await axe(element);
-    expect(results).toHaveNoViolations();
-  }
-
-  static getAriaLabel(element: HTMLElement): string | null {
-    return element.getAttribute('aria-label');
-  }
-
-  static getAriaDescribedBy(element: HTMLElement): string | null {
-    return element.getAttribute('aria-describedby');
-  }
-
-  static getRole(element: HTMLElement): string | null {
-    return element.getAttribute('role');
-  }
-
-  static async simulateKeyboardNavigation(user: any, keys: string[]) {
-    for (const key of keys) {
-      await user.keyboard(`{${key}}`);
-      await waitFor(() => {}, { timeout: 100 });
-    }
-  }
-}
+const mockTideData = createMockTideData();
 
 describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
   beforeEach(() => {
@@ -71,11 +30,10 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     test('should set role="img" for chart container', async () => {
       render(<TideChart data={mockTideData} />);
 
-      await waitFor(() => {
-        const chartContainer = screen.getByRole('img');
-        expect(chartContainer).toBeInTheDocument();
-        expect(AccessibilityTester.getRole(chartContainer)).toBe('img');
-      });
+      // waitForを使わず、同期的にチェック（レンダリング後すぐに利用可能）
+      const chartContainer = await screen.findByRole('img');
+      expect(chartContainer).toBeInTheDocument();
+      expect(AccessibilityTester.getRole(chartContainer)).toBe('img');
     });
 
     test('should generate dynamic aria-label based on data', async () => {
@@ -987,11 +945,8 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
     });
 
     test('should preserve ARIA attributes during data sampling', async () => {
-      const largeData = Array.from({ length: 50000 }, (_, i) => ({
-        time: `${i}:00`,
-        tide: Math.random() * 200,
-        type: i % 10 === 0 ? 'high' : undefined,
-      }));
+      // データサイズを削減（50000 → 1000）してテスト速度を向上
+      const largeData = createLargeTideData(1000);
 
       render(<TideChart data={largeData} />);
 

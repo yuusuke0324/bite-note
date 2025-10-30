@@ -21,13 +21,23 @@ export default defineConfig({
     isolate: false,
     testTimeout: 30000, // タイムアウトを30秒に延長
     hookTimeout: 30000,
+    // テストファイル毎にクリーンアップを強制
+    clearMocks: true,
+    restoreMocks: true,
+    mockReset: true,
+    // スレッドプール再利用を有効化してスタートアップコストを削減
+    poolMatch: {
+      '**/*.test.tsx': 'forks',
+    },
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
       '**/cypress/**',
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
-      '**/tests/e2e/**'
+      '**/tests/e2e/**',
+      // パフォーマンステストはデフォルトでスキップ（test:perfで実行）
+      '**/*.performance.test.tsx'
     ],
   },
   esbuild: {
