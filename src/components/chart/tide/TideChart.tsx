@@ -401,9 +401,9 @@ const DataPoint = ({
         data-selected={isSelected}
         className={isFocused ? 'highlighted' : ''}
         onClick={() => onClick?.(payload, index)}
-        tabIndex={isFocused ? 0 : -1}
         role="button"
         aria-label={`データポイント ${index + 1}: ${payload?.time}, ${payload?.tide}cm`}
+        aria-hidden="true"
       />
       {/* Focus indicator */}
       {isFocused && (
@@ -980,7 +980,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
   try {
     return (
-      <main role="region" aria-labelledby="chart-title">
+      <main aria-labelledby="chart-title">
         <h1 id="chart-title" style={{ position: 'absolute', left: '-9999px' }}>
           潮汐データ可視化チャート
         </h1>

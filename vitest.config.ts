@@ -9,6 +9,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     css: true,
+    // メモリ制限とパフォーマンス改善
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+    maxConcurrency: 5,
+    isolate: false,
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
