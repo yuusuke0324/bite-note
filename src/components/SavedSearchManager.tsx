@@ -88,7 +88,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
     setIsCreating(false);
 
     // 成功メッセージ（実際の実装では通知システムを使用）
-    console.log(`検索クエリ「${newSearchName}」を保存しました`);
+    if (import.meta.env.DEV) {
+      console.log(`[Dev] 検索クエリ「${newSearchName}」を保存しました`);
+    }
   };
 
   // 検索の削除確認

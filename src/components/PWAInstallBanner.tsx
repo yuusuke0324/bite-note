@@ -78,7 +78,10 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
 
     try {
       const result = await deferredPrompt.prompt();
-      console.log('PWA install prompt result:', result);
+
+      if (import.meta.env.DEV) {
+        console.log('[Dev] PWA install prompt result:', result);
+      }
 
       if (result.outcome === 'accepted') {
         setDismissed(true);

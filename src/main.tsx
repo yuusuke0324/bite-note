@@ -8,10 +8,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered: ', registration);
+        if (import.meta.env.DEV) {
+          console.log('[Dev] SW registered: ', registration);
+        }
       })
       .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
+        console.error('SW registration failed: ', registrationError);
       });
   });
 } else if ('serviceWorker' in navigator) {
@@ -19,7 +21,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     registrations.forEach((registration) => {
       registration.unregister();
-      console.log('🧹 Service Worker unregistered for development');
+      if (import.meta.env.DEV) {
+        console.log('[Dev] Service Worker unregistered for development');
+      }
     });
   });
 }

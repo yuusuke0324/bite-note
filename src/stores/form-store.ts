@@ -272,14 +272,12 @@ export const useFormStore = create<FormStore>()((set, get) => ({
           // photoFileがあり、既存のphotoIdがない場合のみアップロード
           photoId = await actions.uploadPhoto();
         }
-        console.log('💾 Final photoId for record:', photoId);
 
         // 記録の作成
         const recordData = {
           ...formData,
           photoId
         };
-        console.log('💾 Creating record with data:', recordData);
 
         const result = await fishingRecordService.createRecord(recordData);
 

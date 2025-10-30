@@ -225,20 +225,22 @@ export class SafeExecutor {
       this.logs.shift(); // 古いログを削除
     }
 
-    // コンソール出力
-    const timeStr = executionTime ? ` (${executionTime.toFixed(2)}ms)` : '';
-    const fullMessage = `[${level}] ${context}: ${message}${timeStr}`;
+    // コンソール出力（開発環境のみ）
+    if (import.meta.env.DEV) {
+      const timeStr = executionTime ? ` (${executionTime.toFixed(2)}ms)` : '';
+      const fullMessage = `[${level}] ${context}: ${message}${timeStr}`;
 
-    switch (level) {
-      case LogLevel.ERROR:
-        console.error(fullMessage, error);
-        break;
-      case LogLevel.WARN:
-        console.warn(fullMessage);
-        break;
-      case LogLevel.INFO:
-        console.info(fullMessage);
-        break;
+      switch (level) {
+        case LogLevel.ERROR:
+          console.error(fullMessage, error);
+          break;
+        case LogLevel.WARN:
+          console.warn(fullMessage);
+          break;
+        case LogLevel.INFO:
+          console.info(fullMessage);
+          break;
+      }
     }
   }
 

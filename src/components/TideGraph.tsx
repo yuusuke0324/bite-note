@@ -75,7 +75,6 @@ export const TideGraph: React.FC<TideGraphProps> = ({
   // データ検証とエラーハンドリング
   const isValidData = useMemo(() => {
     if (!data || !data.points || data.points.length === 0) {
-      console.log('🚨 TideGraph: データが無効 - データなし');
       return false;
     }
 
@@ -203,7 +202,6 @@ export const TideGraph: React.FC<TideGraphProps> = ({
   // 時間軸ラベル生成（24時間表示用）
   const timeLabels = useMemo(() => {
     if (!isValidData || !data.dateRange) {
-      console.log('🚨 TideGraph: 時間ラベル生成スキップ', { isValidData, hasDateRange: !!data?.dateRange });
       return [];
     }
 
@@ -335,7 +333,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
       // キーボードナビゲーションの実装は簡略化
-      console.log('Keyboard navigation:', event.key);
+      // Keyboard navigation placeholder
     }
   }, []);
 

@@ -575,8 +575,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
   // 釣果マーカーのデバッグログ
   useEffect(() => {
-    if (fishingTimes.length > 0) {
-      console.log('🎣 Fishing times received:', fishingTimes);
+    if (import.meta.env.DEV && fishingTimes.length > 0) {
+      console.log('[Dev] 🎣 Fishing times received:', fishingTimes);
     }
   }, [fishingTimes]);
 

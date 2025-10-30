@@ -123,7 +123,9 @@ export const usePWA = () => {
         }
       });
 
-      console.log('[PWA] Service Worker registered successfully');
+      if (import.meta.env.DEV) {
+        console.log('[Dev] [PWA] Service Worker registered successfully');
+      }
     } catch (error) {
       console.error('[PWA] Service Worker registration failed:', error);
     }
@@ -138,7 +140,9 @@ export const usePWA = () => {
     };
 
     const handleAppInstalled = () => {
-      console.log('[PWA] App was installed');
+      if (import.meta.env.DEV) {
+        console.log('[Dev] [PWA] App was installed');
+      }
       setDeferredPrompt(null);
       setInstallState(prev => ({
         ...prev,
@@ -168,7 +172,9 @@ export const usePWA = () => {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
 
-      console.log(`[PWA] User response to install prompt: ${outcome}`);
+      if (import.meta.env.DEV) {
+        console.log(`[Dev] [PWA] User response to install prompt: ${outcome}`);
+      }
 
       setDeferredPrompt(null);
       setInstallState(prev => ({ ...prev, isInstallable: false }));
