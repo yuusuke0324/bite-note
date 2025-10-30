@@ -578,15 +578,6 @@ export class EnhancedTideLRUCache {
   }
 
   /**
-   * @deprecated 使用非推奨：SmartKeyGenerator.generateKeyString()を使用してください
-   */
-  generateEnhancedKey(input: Partial<EnhancedCacheKey>): string {
-    return this.keyGenerator.generateKeyString(
-      this.keyGenerator.generateEnhancedKey(input)
-    );
-  }
-
-  /**
    * 統計情報取得
    * NFR-304: 監視要件対応
    */
