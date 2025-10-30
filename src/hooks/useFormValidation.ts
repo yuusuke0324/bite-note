@@ -20,7 +20,7 @@ interface UseValidatedFormOptions<T extends FieldValues> {
 interface UseValidatedFormReturn<T extends FieldValues> extends UseFormReturn<T> {
   isSubmitting: boolean;
   submitWithValidation: (onValidSubmit: (data: T) => Promise<void> | void) => Promise<void>;
-  validateField: (fieldName: keyof T, value: any) => Promise<string | undefined>;
+  validateField: (fieldName: keyof T, value: unknown) => Promise<string | undefined>;
   hasUnsavedChanges: boolean;
   resetWithConfirm: () => Promise<boolean>;
 }
@@ -92,7 +92,7 @@ export function useValidatedForm<T extends FieldValues>({
   // 個別フィールドのバリデーション
   const validateField = useCallback(async (
     fieldName: keyof T,
-    value: any
+    value: unknown
   ): Promise<string | undefined> => {
     try {
       // 部分的なスキーマでバリデーション
@@ -142,7 +142,7 @@ export function useValidatedForm<T extends FieldValues>({
 }
 
 // 釣果記録フォーム専用フック
-export function useFishingRecordForm(defaultValues?: any) {
+export function useFishingRecordForm(defaultValues?: Partial<Record<string, unknown>>) {
   const formStore = useFormStore();
 
   const form = useValidatedForm({
@@ -152,9 +152,9 @@ export function useFishingRecordForm(defaultValues?: any) {
   });
 
   // Zustandストアとの同期
-  const syncWithStore = useCallback((data: any) => {
+  const syncWithStore = useCallback((data: Record<string, unknown>) => {
     Object.entries(data).forEach(([field, value]) => {
-      formStore.actions.updateField(field as any, value);
+      formStore.actions.updateField(field, value);
     });
   }, [formStore.actions]);
 

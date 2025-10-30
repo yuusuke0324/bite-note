@@ -10,6 +10,54 @@ import type {
   Coordinates
 } from '../types';
 
+// Open-Meteo API レスポンス型定義
+interface OpenMeteoHistoricalResponse {
+  hourly: {
+    time: string[];
+    weather_code?: number[];
+    temperature_2m?: number[];
+    relative_humidity_2m?: number[];
+    wind_speed_10m?: number[];
+    surface_pressure?: number[];
+    precipitation?: number[];
+  };
+}
+
+interface OpenMeteoCurrentResponse {
+  current: {
+    weather_code: number;
+    temperature_2m: number;
+    relative_humidity_2m: number;
+    wind_speed_10m: number;
+    surface_pressure: number;
+    precipitation: number;
+  };
+}
+
+interface OpenMeteoMarineResponse {
+  current: {
+    sea_surface_temperature?: number;
+    wave_height?: number;
+    wave_period?: number;
+    wave_direction?: number;
+  };
+}
+
+interface OpenWeatherMapResponse {
+  weather?: Array<{ description: string }>;
+  main?: {
+    temp: number;
+    humidity: number;
+    pressure: number;
+  };
+  wind?: {
+    speed: number;
+  };
+  rain?: {
+    '1h': number;
+  };
+}
+
 export class WeatherService {
   private readonly config: WeatherApiConfig = {
     apiKey: process.env.REACT_APP_WEATHER_API_KEY || '', // 実際の使用時は環境変数から取得
@@ -132,7 +180,7 @@ export class WeatherService {
   /**
    * Open-Meteo履歴APIレスポンスを解析
    */
-  private parseOpenMeteoHistoricalResponse(data: any, targetDateTime: Date): WeatherData {
+  private parseOpenMeteoHistoricalResponse(data: OpenMeteoHistoricalResponse, targetDateTime: Date): WeatherData {
     const hourly = data.hourly;
     const times = hourly.time;
     const targetHour = targetDateTime.getHours();
@@ -312,7 +360,7 @@ export class WeatherService {
   /**
    * Open-Meteo APIレスポンスを解析
    */
-  private parseOpenMeteoResponse(data: any): WeatherData {
+  private parseOpenMeteoResponse(data: OpenMeteoCurrentResponse): WeatherData {
     const current = data.current;
     const weatherCode = current.weather_code;
 
@@ -372,7 +420,7 @@ export class WeatherService {
   /**
    * OpenWeatherMap APIレスポンスを解析（レガシー）
    */
-  private parseCurrentWeatherResponse(data: any): WeatherData {
+  private parseCurrentWeatherResponse(data: OpenWeatherMapResponse): WeatherData {
     return {
       condition: data.weather?.[0]?.description || '不明',
       temperature: Math.round(data.main?.temp || 0),
@@ -496,7 +544,7 @@ export class WeatherService {
   /**
    * Open-Meteo Marine APIレスポンスを解析
    */
-  private parseOpenMeteoMarineResponse(data: any): MarineData {
+  private parseOpenMeteoMarineResponse(data: OpenMeteoMarineResponse): MarineData {
     const current = data.current;
 
     return {
