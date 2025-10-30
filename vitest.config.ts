@@ -9,17 +9,17 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     css: true,
-    // メモリ制限とパフォーマンス改善（強化版）
+    // メモリ制限とパフォーマンス改善（最適化版）
     pool: 'forks',
     poolOptions: {
       forks: {
-        singleFork: true,
-        execArgv: ['--max-old-space-size=4096'], // Node.jsヒープサイズを4GBに増加
+        singleFork: false, // 複数フォークで並行実行
+        execArgv: ['--max-old-space-size=4096'],
       },
     },
-    maxConcurrency: 3, // 並行数を削減
+    maxConcurrency: 5, // 並行数を増加
     isolate: false,
-    testTimeout: 30000, // タイムアウトを30秒に延長
+    testTimeout: 30000,
     hookTimeout: 30000,
     // テストファイル毎にクリーンアップを強制
     clearMocks: true,
@@ -37,7 +37,9 @@ export default defineConfig({
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '**/tests/e2e/**',
       // パフォーマンステストはデフォルトでスキップ（test:perfで実行）
-      '**/*.performance.test.tsx'
+      '**/*.performance.test.tsx',
+      // アクセシビリティテストもデフォルトでスキップ（test:a11yで実行）
+      '**/*.accessibility.test.tsx'
     ],
   },
   esbuild: {
