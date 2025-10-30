@@ -281,8 +281,11 @@ export class VariationEffectMeasurer {
     standardError: number,
     confidenceLevel: number = 0.95
   ): [number, number] {
-    // TODO: 将来の実装で信頼区間計算を追加
-    const margin = 1.96 * standardError; // 95%信頼区間の仮の値
+    // 現在は正規分布を仮定した簡易計算
+    // NOTE: 将来的にt分布や bootstrap法による信頼区間計算に改善予定
+    const zScore = confidenceLevel === 0.95 ? 1.96 :
+                   confidenceLevel === 0.99 ? 2.576 : 1.96;
+    const margin = zScore * standardError;
     return [effect - margin, effect + margin];
   }
 }
