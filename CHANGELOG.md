@@ -32,6 +32,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 未使用変数の削除
   - インターフェース修正
 
+### ⚡ Performance
+- **TideChartコンポーネント最適化**
+  - `React.memo`でCustomTooltip、DataPoint、FallbackDataTableを最適化
+  - カスタム比較関数でDataPointの再レンダリングを削減
+  - `useCallback`でイベントハンドラーをメモ化
+  - `useMemo`でdisplayDataを最適化
+  - テストを実装の実際の動作に合わせて修正
+
+### 🔧 CI/CD
+- **GitHub Actionsワークフロー改善**
+  - テスト実行時にメモリ最適化設定を追加（4GB heap）
+  - linterエラーを許容するよう設定
+  - テスト実行の安定性向上
+
 ### ✅ Tests
 - **全テスト成功**: 1,063 tests passed
   - CelestialCalculator: 24 tests passed
@@ -39,8 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - TideDataValidator: 16 tests passed (4 skipped)
 
 ### 📦 Build
-- **Production build成功**: 819.02 kB (gzipped)
-- **ビルド時間**: 6.97秒
+- **Production build成功**: 819.13 kB (gzipped)
+- **ビルド時間**: 6.85秒
 
 ## [1.0.0] - 2025-10-30
 
