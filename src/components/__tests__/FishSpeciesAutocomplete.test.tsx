@@ -89,21 +89,25 @@ describe('FishSpeciesAutocomplete', () => {
   });
 
   describe('基本的なレンダリング', () => {
-    it('コンポーネントが表示されること', () => {
+    it('コンポーネントが表示されること', async () => {
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
-      expect(input).toBeInTheDocument();
+      await waitFor(() => {
+        const input = screen.getByRole('combobox');
+        expect(input).toBeInTheDocument();
+      });
     });
 
-    it('デフォルトのプレースホルダーが表示されること', () => {
+    it('デフォルトのプレースホルダーが表示されること', async () => {
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByPlaceholderText('魚種を入力（例: あじ）');
-      expect(input).toBeInTheDocument();
+      await waitFor(() => {
+        const input = screen.getByPlaceholderText('魚種を入力（例: あじ）');
+        expect(input).toBeInTheDocument();
+      });
     });
 
-    it('カスタムプレースホルダーが表示されること', () => {
+    it('カスタムプレースホルダーが表示されること', async () => {
       render(
         <FishSpeciesAutocomplete
           value=""
@@ -112,15 +116,19 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = screen.getByPlaceholderText('カスタムプレースホルダー');
-      expect(input).toBeInTheDocument();
+      await waitFor(() => {
+        const input = screen.getByPlaceholderText('カスタムプレースホルダー');
+        expect(input).toBeInTheDocument();
+      });
     });
 
-    it('初期値が表示されること', () => {
+    it('初期値が表示されること', async () => {
       render(<FishSpeciesAutocomplete value="マアジ" onChange={mockOnChange} />);
 
-      const input = screen.getByDisplayValue('マアジ');
-      expect(input).toBeInTheDocument();
+      await waitFor(() => {
+        const input = screen.getByDisplayValue('マアジ');
+        expect(input).toBeInTheDocument();
+      });
     });
   });
 
@@ -129,7 +137,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       expect(mockOnChange).toHaveBeenCalled();
@@ -139,7 +147,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'a');
 
       expect(mockOnChange).toHaveBeenCalledWith(null, 'a');
@@ -151,7 +159,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.click(input);
 
       await waitFor(() => {
@@ -163,7 +171,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
@@ -175,7 +183,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
@@ -195,7 +203,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'xyz存在しない魚種');
 
       await waitFor(() => {
@@ -209,7 +217,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
@@ -226,7 +234,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
@@ -245,7 +253,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
@@ -265,7 +273,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
@@ -281,10 +289,10 @@ describe('FishSpeciesAutocomplete', () => {
   });
 
   describe('アクセシビリティ', () => {
-    it('ARIA属性が正しく設定されていること', () => {
+    it('ARIA属性が正しく設定されていること', async () => {
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
 
       expect(input).toHaveAttribute('aria-label', '魚種名');
       expect(input).toHaveAttribute('aria-autocomplete', 'list');
@@ -295,7 +303,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       expect(input).toHaveAttribute('aria-expanded', 'false');
 
       await user.click(input);
@@ -309,7 +317,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
@@ -325,7 +333,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.click(input);
 
       await waitFor(() => {
@@ -338,7 +346,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
@@ -349,16 +357,16 @@ describe('FishSpeciesAutocomplete', () => {
   });
 
   describe('状態管理', () => {
-    it('ローディング中は入力が無効化されること', () => {
+    it('ローディング中は入力が無効化されること', async () => {
       // 初期ローディング状態をテスト
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       // 読み込み完了までは無効化される可能性がある
       // ただし、モックではすぐに完了するため、このテストは調整が必要
     });
 
-    it('エラーメッセージが表示されること', () => {
+    it('エラーメッセージが表示されること', async () => {
       render(
         <FishSpeciesAutocomplete
           value=""
@@ -367,10 +375,12 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      expect(screen.getByText('エラーメッセージ')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('エラーメッセージ')).toBeInTheDocument();
+      });
     });
 
-    it('エラー時は入力フィールドにerrorクラスが付与されること', () => {
+    it('エラー時は入力フィールドにerrorクラスが付与されること', async () => {
       render(
         <FishSpeciesAutocomplete
           value=""
@@ -379,27 +389,27 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       expect(input).toHaveClass('error');
     });
   });
 
   describe('props の動作', () => {
-    it('disabled 状態で入力が無効化されること', () => {
+    it('disabled 状態で入力が無効化されること', async () => {
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} disabled />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       expect(input).toBeDisabled();
     });
 
-    it('required 属性が設定されること', () => {
+    it('required 属性が設定されること', async () => {
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} required />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       expect(input).toBeRequired();
     });
 
-    it('カスタムクラス名が適用されること', () => {
+    it('カスタムクラス名が適用されること', async () => {
       const { container } = render(
         <FishSpeciesAutocomplete
           value=""
@@ -408,8 +418,10 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const wrapper = container.querySelector('.fish-species-autocomplete');
-      expect(wrapper).toHaveClass('custom-class');
+      await waitFor(() => {
+        const wrapper = container.querySelector('.fish-species-autocomplete');
+        expect(wrapper).toHaveClass('custom-class');
+      });
     });
   });
 
@@ -418,7 +430,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.click(input);
 
       await waitFor(() => {
@@ -435,7 +447,7 @@ describe('FishSpeciesAutocomplete', () => {
         </>
       );
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.click(input);
 
       await waitFor(() => {
@@ -456,7 +468,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
@@ -470,7 +482,7 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
-      const input = screen.getByRole('textbox');
+      const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
