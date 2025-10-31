@@ -19,8 +19,8 @@ export default defineConfig({
     },
     maxConcurrency: 3, // CI環境向けに安定性重視
     isolate: false,
-    testTimeout: 30000,
-    hookTimeout: 30000,
+    testTimeout: 10000, // CI環境での早期検出のため短縮（30s → 10s）
+    hookTimeout: 10000,
     // テストファイル毎にクリーンアップを強制
     clearMocks: true,
     restoreMocks: true,
