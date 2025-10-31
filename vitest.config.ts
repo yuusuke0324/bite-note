@@ -17,7 +17,7 @@ export default defineConfig({
         execArgv: ['--max-old-space-size=4096'],
       },
     },
-    maxConcurrency: 5, // 並行数を増加
+    maxConcurrency: 3, // CI環境向けに安定性重視
     isolate: false,
     testTimeout: 30000,
     hookTimeout: 30000,
