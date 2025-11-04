@@ -56,6 +56,12 @@ interface FishSpeciesAutocompleteProps {
    * カスタムクラス名
    */
   className?: string;
+
+  /**
+   * 検索エンジンインスタンス（テスト時のモック注入用）
+   * @internal
+   */
+  searchEngine?: FishSpeciesSearchEngine;
 }
 
 /**
@@ -68,26 +74,35 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   disabled = false,
   error,
   required = false,
-  className = ''
+  className = '',
+  searchEngine: externalSearchEngine
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [suggestions, setSuggestions] = useState<FishSpecies[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchEngine, setSearchEngine] = useState<FishSpeciesSearchEngine | null>(null);
+  const [isLoading, setIsLoading] = useState(!externalSearchEngine);
+  const [internalSearchEngine, setInternalSearchEngine] = useState<FishSpeciesSearchEngine | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  // 検索エンジンの初期化
+  // 使用する検索エンジン（外部 or 内部）
+  const searchEngine = externalSearchEngine || internalSearchEngine;
+
+  // 検索エンジンの初期化（外部から提供されていない場合のみ）
   useEffect(() => {
+    if (externalSearchEngine) {
+      // 外部から提供されている場合はスキップ
+      return;
+    }
+
     const initSearchEngine = async () => {
       try {
         setIsLoading(true);
         const data = await fishSpeciesDataService.loadSpecies();
         const engine = new FishSpeciesSearchEngine(data, { debug: false });
-        setSearchEngine(engine);
+        setInternalSearchEngine(engine);
         setIsLoading(false);
       } catch (error) {
         console.error('魚種データの読み込みに失敗:', error);
@@ -96,7 +111,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
     };
 
     initSearchEngine();
-  }, []);
+  }, [externalSearchEngine]);
 
   // propsのvalueが変更されたら入力値を更新
   useEffect(() => {
