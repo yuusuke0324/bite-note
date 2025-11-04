@@ -26,7 +26,19 @@ import userEvent from '@testing-library/user-event';
 import { TideChart } from '../TideChart';
 import type { TideChartData, TideChartProps } from '../types';
 
-// ResizeObserver モック（Rechartsが内部で使用）
+// 軽量Rechartsモック: DOMベース、レンダリングブロックなし
+vi.mock('recharts', () => ({
+  LineChart: ({ children, ...props }: any) => (
+    <div data-testid="recharts-line-chart" {...props}>{children}</div>
+  ),
+  XAxis: (props: any) => <div data-testid="recharts-x-axis" {...props} />,
+  YAxis: (props: any) => <div data-testid="recharts-y-axis" {...props} />,
+  Line: (props: any) => <div data-testid="recharts-line" {...props} />,
+  Tooltip: (props: any) => <div data-testid="recharts-tooltip" {...props} />,
+  ReferenceLine: (props: any) => <div data-testid="recharts-reference-line" {...props} />,
+}));
+
+// ResizeObserver モック
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
