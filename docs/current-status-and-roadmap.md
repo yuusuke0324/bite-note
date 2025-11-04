@@ -670,6 +670,42 @@ jobs:
 
 ## 📝 v1.0.8リリース実績（2025-11-04）
 
+### 🚨 新規発見の問題: Chart関連テストのCIタイムアウト
+
+**発見日**: 2025-11-04
+**影響**: CI全体が5分でタイムアウト
+
+**問題の詳細**:
+- `ResponsiveChartContainer.test.tsx` がCI環境でタイムアウト
+- `TideChart.test.tsx` がCI環境でタイムアウト
+- ローカル環境(macOS)では正常に実行可能
+- CI環境(Ubuntu + JSDOM)では異常に遅い
+
+**根本原因**:
+```typescript
+// ResizeObserverのポーリング動作がCI環境で極端に遅い
+const observer = new ResizeObserver(callback);
+
+// Recharts + JSDOM の組み合わせでレンダリングが重い
+<LineChart data={tideData}>  // ← CI環境で5分以上かかる
+```
+
+**対策方針** (2つの選択肢):
+1. ❌ **その場しのぎ**: Chart テストをtest:fastから除外
+   - メリット: 即座にCI正常化
+   - デメリット: テストカバレッジ低下、根本解決にならない
+
+2. ✅ **根本解決**: Chart コンポーネントのテスト戦略を見直す
+   - メリット: 長期的に健全
+   - デメリット: 時間がかかる (P0-1優先)
+
+**当面の判断**:
+- **P0-1 (FishSpeciesAutocomplete) を優先** して完全修正
+- Chart問題は**P0-1完了後**に対処
+- 理由: FishSpeciesAutocompleteは52%しか成功しておらず、より深刻
+
+---
+
 ### 実施内容
 
 **📚 P0-2: テストベストプラクティスドキュメント作成 (完了)**
@@ -729,10 +765,90 @@ timeout-minutes: 3  # 3分 (-40%)
 
 ### 残タスク
 
-- [ ] P0-1: FishSpeciesAutocomplete.test.tsx完全修正 (4-6h)
-  - 現状: 15/29成功 (52%成功率)
-  - 目標: 29/29成功 (100%成功率)
-- [ ] P1-4: テスト分離戦略実装 (2-3h)
+#### 🔴 **P0-1: FishSpeciesAutocomplete.test.tsx完全修正** (4-6h) - **次に着手**
+
+**現状分析**:
+- 成功率: **52%** (15/29テスト)
+- 実行時間: 34.01秒 (遅い)
+- 問題: モックアーキテクチャの根本的な欠陥
+
+**失敗しているテスト (14個)**:
+```
+候補の表示 (4個):
+- フォーカス時に候補が表示されること
+- 入力に応じた候補が表示されること
+- 候補をクリックして選択できること
+- マッチしない場合のメッセージ表示
+
+キーボード操作 (4個):
+- ArrowDown/ArrowUp による選択
+- Enter による確定
+- Escape による閉じる
+
+アクセシビリティ (4個):
+- aria-expanded の動的更新
+- aria-activedescendant の設定
+- role="listbox" の設定
+- 候補アイテムのrole="option"
+
+エッジケース (2個):
+- 大量候補のパフォーマンス
+- 存在しない候補の処理
+```
+
+**修正アプローチ (推奨: オプションA)**:
+
+**オプションA: コンポーネントリファクタリング** ⭐推奨
+```typescript
+// 1. Props に searchEngine を追加
+interface FishSpeciesAutocompleteProps {
+  value: string;
+  onChange: (value: string) => void;
+  searchEngine?: FishSpeciesSearchEngine; // ← 追加
+}
+
+// 2. デフォルト値として実インスタンスを使用
+const FishSpeciesAutocomplete: React.FC<Props> = ({
+  searchEngine = new FishSpeciesSearchEngine()  // ← デフォルト値
+}) => {
+  // searchEngine を使用
+};
+
+// 3. テストではモックインスタンスを直接渡す
+const mockEngine = {
+  search: vi.fn((query) => [...]),
+  initialize: vi.fn(),
+};
+
+render(<FishSpeciesAutocomplete searchEngine={mockEngine} />);
+```
+
+**メリット**:
+- ✅ vi.mock()のホイスティング問題を完全回避
+- ✅ 依存性注入パターンでテスタビリティ向上
+- ✅ モックが確実に動作する
+- ✅ 他のコンポーネントでも再利用可能なパターン
+
+**デメリット**:
+- コンポーネントのAPIが変わる (破壊的変更)
+- 既存の使用箇所を確認する必要がある
+
+**実装ステップ**:
+1. FishSpeciesAutocomplete.tsx にsearchEngine propsを追加
+2. 既存の使用箇所を確認 (破壊的変更がないか)
+3. テストファイルを全面書き直し (vi.mock削除)
+4. 29個すべてのテストを検証
+5. 実行時間が5秒以内になることを確認
+
+**期待される成果**:
+- ✅ 成功率: 52% → **100%**
+- ✅ 実行時間: 34秒 → **5秒以内**
+- ✅ CI実行時間への貢献: **-30秒**
+- ✅ 技術的負債の解消
+
+---
+
+#### 🟡 P1-4: テスト分離戦略実装 (2-3h) - **P0-1完了後**
   - テストタイプ別の分離
   - CI並列化による高速化
 
