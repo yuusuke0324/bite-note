@@ -20,7 +20,7 @@ import type { FishSpecies } from '../../types';
 // FishSpeciesSearchEngineのモック
 vi.mock('../../services/fish-species', () => {
   // モックデータをファクトリー内で定義
-  const mockSpeciesData: FishSpecies[] = [
+  const mockSpeciesData = [
     {
       id: 'ma-aji',
       standardName: 'マアジ',
@@ -60,17 +60,20 @@ vi.mock('../../services/fish-species', () => {
   ];
 
   return {
-    FishSpeciesSearchEngine: vi.fn().mockImplementation(() => ({
-      search: vi.fn((query: string) => {
-        if (!query) return mockSpeciesData.slice(0, 3);
-        const normalized = query.toLowerCase();
-        return mockSpeciesData.filter(s =>
-          s.standardName.toLowerCase().includes(normalized) ||
-          s.aliases.some(a => a.toLowerCase().includes(normalized))
-        );
-      }),
-      isReady: vi.fn(() => true)
-    })),
+    FishSpeciesSearchEngine: vi.fn().mockImplementation(() => {
+      return {
+        search: (query: string, options?: { limit?: number }) => {
+          if (!query) return mockSpeciesData.slice(0, options?.limit || 10);
+          const normalized = query.toLowerCase();
+          const results = mockSpeciesData.filter((s: any) =>
+            s.standardName.toLowerCase().includes(normalized) ||
+            s.aliases.some((a: string) => a.toLowerCase().includes(normalized))
+          );
+          return results.slice(0, options?.limit || 10);
+        },
+        isReady: () => true
+      };
+    }),
     fishSpeciesDataService: {
       loadSpecies: vi.fn().mockResolvedValue(mockSpeciesData)
     },
@@ -159,36 +162,52 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ（ローディング表示が消えるまで）
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.click(input);
 
+      // 候補リストが表示されるまで待機
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
 
     it('入力に応じた候補が表示されること', async () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
         expect(screen.getByText('マアジ')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
 
     it('候補をクリックして選択できること', async () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
         expect(screen.getByText('マアジ')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
 
       const suggestion = screen.getByText('マアジ');
       await user.click(suggestion);
@@ -203,12 +222,17 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'xyz存在しない魚種');
 
       await waitFor(() => {
         expect(screen.getByText('該当する魚種が見つかりません')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
   });
 
@@ -217,12 +241,17 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
 
       await user.keyboard('{ArrowDown}');
 
@@ -234,12 +263,17 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
 
       await user.keyboard('{ArrowDown}');
       await user.keyboard('{ArrowDown}');
@@ -253,12 +287,17 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
 
       await user.keyboard('{ArrowDown}');
       await user.keyboard('{Enter}');
@@ -273,12 +312,17 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
 
       await user.keyboard('{Escape}');
 
@@ -468,12 +512,17 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
         expect(screen.getByText('Trachurus japonicus')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
   });
 
@@ -482,12 +531,17 @@ describe('FishSpeciesAutocomplete', () => {
       const user = userEvent.setup();
       render(<FishSpeciesAutocomplete value="" onChange={mockOnChange} />);
 
+      // 初期化完了を待つ
+      await waitFor(() => {
+        expect(screen.queryByText('読み込み中...')).not.toBeInTheDocument();
+      });
+
       const input = await screen.findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
         expect(screen.getByText('青魚')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
   });
 });
