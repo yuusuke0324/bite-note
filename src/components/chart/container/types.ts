@@ -4,6 +4,8 @@
  */
 
 import type { DeviceType } from '../../../utils/responsive/types';
+import type { ViewportDetector } from '../../../utils/responsive/ViewportDetector';
+import type { SVGSizeCalculator } from '../../../utils/responsive/SVGSizeCalculator';
 
 /**
  * コンテナサイズ情報
@@ -48,6 +50,18 @@ export interface ResponsiveChartContainerProps {
 
   // TASK-001連携
   enableViewportDetection?: boolean; // デフォルト: true
+
+  /**
+   * テスト用: ViewportDetector インスタンス注入
+   * @internal
+   */
+  viewportDetector?: ViewportDetector;
+
+  /**
+   * テスト用: SVGSizeCalculator インスタンス注入
+   * @internal
+   */
+  sizeCalculator?: SVGSizeCalculator;
 }
 
 /**

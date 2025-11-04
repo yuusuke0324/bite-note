@@ -35,7 +35,9 @@ export const ResponsiveChartContainer: React.FC<ResponsiveChartContainerProps> =
   style,
   onSizeChange,
   onDeviceChange,
-  enableViewportDetection = true
+  enableViewportDetection = true,
+  viewportDetector: externalViewportDetector,
+  sizeCalculator: externalSizeCalculator
 }) => {
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,13 +56,19 @@ export const ResponsiveChartContainer: React.FC<ResponsiveChartContainerProps> =
 
   // ViewportDetector とSVGSizeCalculator のインスタンス化
   React.useEffect(() => {
-    if (!viewportDetectorRef.current) {
+    // 外部から提供されていない場合のみインスタンス化
+    if (!externalViewportDetector && !viewportDetectorRef.current) {
       viewportDetectorRef.current = new ViewportDetector();
+    } else if (externalViewportDetector) {
+      viewportDetectorRef.current = externalViewportDetector;
     }
-    if (!sizeCalculatorRef.current) {
+
+    if (!externalSizeCalculator && !sizeCalculatorRef.current) {
       sizeCalculatorRef.current = new SVGSizeCalculator();
+    } else if (externalSizeCalculator) {
+      sizeCalculatorRef.current = externalSizeCalculator;
     }
-  }, []);
+  }, [externalViewportDetector, externalSizeCalculator]);
 
   // コンテナサイズ計算
   const calculateContainerSize = useCallback((containerElement: HTMLElement | null): ContainerSize => {
