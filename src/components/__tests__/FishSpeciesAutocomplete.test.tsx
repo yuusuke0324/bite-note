@@ -87,13 +87,44 @@ describe('FishSpeciesAutocomplete', () => {
 
   describe('基本的なレンダリング', () => {
     it('コンポーネントが表示されること', () => {
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
+      console.log('[TEST] Starting component render...');
+      console.log('[TEST] mockSearchEngine:', mockSearchEngine);
+      console.log('[TEST] mockOnChange:', mockOnChange);
+
+      let renderError: Error | null = null;
+      const ErrorBoundary = class extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+        constructor(props: { children: React.ReactNode }) {
+          super(props);
+          this.state = { hasError: false };
+        }
+        static getDerivedStateFromError(error: Error) {
+          renderError = error;
+          console.error('[TEST] Component threw error:', error.message, error.stack);
+          return { hasError: true };
+        }
+        render() {
+          if (this.state.hasError) {
+            return <div>Error caught</div>;
+          }
+          return this.props.children;
+        }
+      };
+
+      const result = render(
+        <ErrorBoundary>
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        </ErrorBoundary>
       );
+
+      console.log('[TEST] Render complete. Container:', result.container.innerHTML.substring(0, 200));
+      console.log('[TEST] Document body:', document.body.innerHTML.substring(0, 200));
+      if (renderError) {
+        console.error('[TEST] Render error detected:', renderError.message);
+      }
 
       const input = screen.getByRole('combobox');
       expect(input).toBeInTheDocument();
