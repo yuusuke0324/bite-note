@@ -5,6 +5,21 @@
  * Red Phase: 失敗テストケース実装
  */
 
+// 軽量Rechartsモック: DOMベース、レンダリングブロックなし
+// CRITICAL: vi.mock() must be at the top of the file for proper hoisting
+import { vi } from 'vitest';
+
+vi.mock('recharts', () => ({
+  LineChart: ({ children, ...props }: any) => (
+    <div data-testid="recharts-line-chart" {...props}>{children}</div>
+  ),
+  XAxis: (props: any) => <div data-testid="recharts-x-axis" {...props} />,
+  YAxis: (props: any) => <div data-testid="recharts-y-axis" {...props} />,
+  Line: (props: any) => <div data-testid="recharts-line" {...props} />,
+  Tooltip: (props: any) => <div data-testid="recharts-tooltip" {...props} />,
+  ReferenceLine: (props: any) => <div data-testid="recharts-reference-line" {...props} />,
+}));
+
 import React from 'react';
 import {
   describe,
@@ -12,7 +27,6 @@ import {
   expect,
   beforeEach,
   afterEach,
-  vi,
   beforeAll,
 } from 'vitest';
 import {
@@ -25,18 +39,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { TideChart } from '../TideChart';
 import type { TideChartData, TideChartProps } from '../types';
-
-// 軽量Rechartsモック: DOMベース、レンダリングブロックなし
-vi.mock('recharts', () => ({
-  LineChart: ({ children, ...props }: any) => (
-    <div data-testid="recharts-line-chart" {...props}>{children}</div>
-  ),
-  XAxis: (props: any) => <div data-testid="recharts-x-axis" {...props} />,
-  YAxis: (props: any) => <div data-testid="recharts-y-axis" {...props} />,
-  Line: (props: any) => <div data-testid="recharts-line" {...props} />,
-  Tooltip: (props: any) => <div data-testid="recharts-tooltip" {...props} />,
-  ReferenceLine: (props: any) => <div data-testid="recharts-reference-line" {...props} />,
-}));
 
 // ResizeObserver モック
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
