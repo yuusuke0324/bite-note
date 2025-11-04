@@ -87,21 +87,13 @@ describe('FishSpeciesAutocomplete', () => {
 
   describe('基本的なレンダリング', () => {
     it('コンポーネントが表示されること', () => {
-      console.log('=== TEST START: コンポーネントが表示されること ===');
-      console.log('mockSearchEngine:', mockSearchEngine);
-      console.log('mockSearchEngine.search:', typeof mockSearchEngine?.search);
-      console.log('mockSearchEngine.isReady:', typeof mockSearchEngine?.isReady);
-
-      const { container } = render(
+      render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
           searchEngine={mockSearchEngine as any}
         />
       );
-
-      console.log('Rendered HTML:', container.innerHTML);
-      console.log('Body content:', document.body.innerHTML);
 
       const input = screen.getByRole('combobox');
       expect(input).toBeInTheDocument();
