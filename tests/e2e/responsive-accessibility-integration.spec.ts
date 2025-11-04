@@ -237,7 +237,7 @@ test.describe('TASK-301-012: キーボードナビゲーション', () => {
     await page.waitForSelector('[data-testid="tide-graph-canvas"]');
 
     // Then: Tabキーで全要素にアクセス可能
-    let focusedElement = await page.locator(':focus');
+    const focusedElement = await page.locator(':focus');
     let tabCount = 0;
     const maxTabs = 20; // 無限ループ防止
 

@@ -87,7 +87,7 @@ test.describe('パフォーマンス・アクセシビリティテスト', () =>
 
     // 初期メモリ使用量を記録
     const initialMemory = await page.evaluate(() => {
-      // @ts-ignore
+      // @ts-expect-error - performance.memory is Chrome-specific non-standard API
       return performance.memory ? performance.memory.usedJSHeapSize : 0;
     });
 
@@ -101,7 +101,7 @@ test.describe('パフォーマンス・アクセシビリティテスト', () =>
 
     // 最終メモリ使用量をチェック
     const finalMemory = await page.evaluate(() => {
-      // @ts-ignore
+      // @ts-expect-error - performance.memory is Chrome-specific non-standard API
       return performance.memory ? performance.memory.usedJSHeapSize : 0;
     });
 

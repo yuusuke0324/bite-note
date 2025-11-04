@@ -135,7 +135,7 @@ describe('TideGraph Responsive Integration', () => {
           data={mockTideGraphData}
           width={800}
           height={450}
-          // @ts-ignore - 将来の拡張Props
+          // @ts-expect-error - 将来の拡張Props
           responsiveConfig={responsiveConfig}
         />
       );

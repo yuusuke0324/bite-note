@@ -77,7 +77,7 @@ export const ResponsiveChartContainer: React.FC<ResponsiveChartContainerProps> =
     }
 
     const rect = containerElement.getBoundingClientRect();
-    let width = Math.max(rect.width || minWidth, minWidth);
+    const width = Math.max(rect.width || minWidth, minWidth);
     let height = Math.max(rect.height || minHeight, minHeight);
 
     // アスペクト比維持

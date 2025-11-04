@@ -91,7 +91,7 @@ export class TideClassificationEngine {
     const age = moonPhase.age;
 
     // 基本強度（月齢ベース）
-    let baseStrength = this.calculateBaseStrength(age);
+    const baseStrength = this.calculateBaseStrength(age);
 
     // 月の距離による補正（距離の3乗に反比例）
     const distanceFactor = Math.pow(1.0 / moonDistance, 3);

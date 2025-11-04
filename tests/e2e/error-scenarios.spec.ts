@@ -190,7 +190,7 @@ test.describe('エラーシナリオとリカバリー', () => {
 
     // 意図的にJavaScriptエラーを発生させる
     await page.evaluate(() => {
-      // @ts-ignore
+      // @ts-expect-error - Intentionally calling undefined function to test error handling
       window.undefinedFunction();
     });
 
@@ -214,7 +214,7 @@ test.describe('エラーシナリオとリカバリー', () => {
     if (browserName === 'webkit') {
       // Safari/WebKitでのIndexedDB制限をシミュレート
       await page.addInitScript(() => {
-        // @ts-ignore
+        // @ts-expect-error - Intentionally deleting indexedDB to test browser compatibility
         delete window.indexedDB;
       });
 

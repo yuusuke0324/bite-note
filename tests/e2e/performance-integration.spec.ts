@@ -263,7 +263,7 @@ test.describe('TASK-301-010: CI/CD統合パフォーマンステスト', () => {
     await page.goto('/');
 
     // メトリクス送信の確認
-    let performanceReports = [];
+    const performanceReports = [];
 
     page.on('response', response => {
       if (response.url().includes('/api/performance-metrics')) {

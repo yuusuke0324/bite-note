@@ -114,7 +114,7 @@ export class SVGSizeCalculator implements ISVGSizeCalculator {
 
     let adjustedChartWidth = chartSize.width;
     let adjustedChartHeight = chartSize.height;
-    let adjustedMargins = { ...margins };
+    const adjustedMargins = { ...margins };
 
     // 最小チャート幅を保証
     if (chartSize.width < SIZE_CONSTRAINTS.MIN_CHART_WIDTH) {

@@ -171,7 +171,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       render(<TideGraph data={negativeData} width={600} height={300} />);
 
       // 負の値と正の値の両方が表示される
-      const allLabels = screen.getAllByText(/\-?\d+cm/);
+      const allLabels = screen.getAllByText(/-?\d+cm/);
       expect(allLabels.length).toBeGreaterThanOrEqual(3);
 
       // 0cmラベルが含まれていることを確認（ゼロライン）
