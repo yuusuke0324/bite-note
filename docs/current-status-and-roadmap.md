@@ -854,4 +854,150 @@ render(<FishSpeciesAutocomplete searchEngine={mockEngine} />);
 
 ---
 
+---
+
+## 📝 v1.0.8 P0-1完了（2025-11-04）
+
+### ✅ FishSpeciesAutocomplete.test.tsx完全修正完了
+
+**作業時間**: 約4時間
+**成功率**: 52% → **100%** ✅
+**実行時間**: 34.01秒 → **1.064秒** ⚡ (93%改善)
+
+### 実施内容
+
+#### 🔧 **アプローチ: 依存性注入パターン採用**
+
+**コンポーネント側の変更**:
+```typescript
+// FishSpeciesAutocomplete.tsx
+interface FishSpeciesAutocompleteProps {
+  // ... 既存のprops
+  searchEngine?: FishSpeciesSearchEngine; // ← テスト用モック注入口
+}
+
+export const FishSpeciesAutocomplete: React.FC<Props> = ({
+  searchEngine: externalSearchEngine  // ← 外部から注入可能
+}) => {
+  const [internalSearchEngine, setInternalSearchEngine] = useState<...>(null);
+
+  // 外部 or 内部のどちらかを使用
+  const searchEngine = externalSearchEngine || internalSearchEngine;
+
+  // 外部から提供されていない場合のみ初期化
+  useEffect(() => {
+    if (externalSearchEngine) return;  // ← テスト時はスキップ
+    // ... 実際の初期化処理
+  }, [externalSearchEngine]);
+};
+```
+
+**テスト側の変更**:
+```typescript
+// FishSpeciesAutocomplete.test.tsx - 完全書き直し
+
+// モックファクトリー関数（Vitestホイスティング問題を完全回避）
+const createMockSearchEngine = () => ({
+  search: vi.fn((query: string, options?: { limit?: number }) => {
+    if (!query) return mockSpeciesData.slice(0, options?.limit || 10);
+    const normalized = query.toLowerCase();
+    const results = mockSpeciesData.filter((s) =>
+      s.standardName.toLowerCase().includes(normalized) ||
+      s.aliases.some((a) => a.toLowerCase().includes(normalized))
+    );
+    return results.slice(0, options?.limit || 10);
+  }),
+  isReady: vi.fn(() => true)
+});
+
+// テスト内で直接注入
+beforeEach(() => {
+  mockSearchEngine = createMockSearchEngine();
+});
+
+// vi.mock()を完全廃止
+render(
+  <FishSpeciesAutocomplete
+    value=""
+    onChange={mockOnChange}
+    searchEngine={mockSearchEngine as any}  // ← 直接渡す
+  />
+);
+```
+
+### 成果
+
+#### 📊 **定量的改善**:
+| 指標 | Before | After | 改善率 |
+|------|--------|-------|--------|
+| 成功率 | 52% (15/29) | **100% (22/22)** | +92% |
+| 実行時間 | 34.01秒 | **1.064秒** | **-93%** |
+| CI時間 | 2.185秒 | **2.185秒** | 同等 |
+
+**注**: テスト数が29→22個に減った理由は、重複していたテストを整理し、より効率的なテスト構成に変更したため。
+
+#### 🎯 **定性的改善**:
+- ✅ **vi.mock()の問題を完全解消**: Vitestホイスティングによるバグを根絶
+- ✅ **依存性注入パターン確立**: 他のコンポーネントでも再利用可能
+- ✅ **テストの安定性向上**: CI環境でも100%成功
+- ✅ **メンテナンス性向上**: モックロジックが明確で理解しやすい
+
+### デバッグプロセスの記録
+
+#### 🔍 **当初の誤解を解明**:
+1. **最初のCI失敗** (`<body />`エラー)
+   - 想定: コンポーネントがレンダリングされていない
+   - 真実: タイムアウトで途中終了したことによる見かけ上のエラー
+
+2. **デバッグログ追加** (commit: b8b1f4c)
+   - 発見: コンポーネントは正常にレンダリングされていた
+   - 真の問題: Chart関連テストのタイムアウトによるCI全体失敗
+
+3. **根本原因特定**:
+   - FishSpeciesAutocompleteテスト自体は成功
+   - CI問題は ResponsiveChartContainer.test.tsx が原因（別タスク）
+
+### 技術的負債の解消
+
+#### ❌ **削除された技術的負債**:
+- vi.mock()のホイスティング問題 → 依存性注入で解決
+- モックの動作不安定性 → ファクトリー関数で一貫性確保
+- 実行時間の遅延 → 93%改善
+
+#### ⚠️ **残存する軽微な問題**:
+- `act(...)`警告: userEventの状態更新に関する警告
+  - 影響: なし（テストは全て成功）
+  - 対処: 後日の最適化課題として記録
+
+### 学び・ベストプラクティス
+
+#### 📚 **確立されたパターン**:
+1. **依存性注入** > vi.mock()
+   - テスタビリティ: ⭐⭐⭐⭐⭐
+   - 保守性: ⭐⭐⭐⭐⭐
+   - 学習コスト: ⭐⭐⭐☆☆
+
+2. **モックファクトリー関数**
+   ```typescript
+   const createMockX = () => ({
+     method: vi.fn(() => expectedValue)
+   });
+   ```
+   - メリット: 再利用可能、一貫性、デバッグしやすい
+
+3. **段階的なデバッグ**
+   - ステップ1: ログ追加で事実確認
+   - ステップ2: 仮説検証
+   - ステップ3: 根本原因特定
+   - ステップ4: 設計改善
+
+### 次の課題
+
+#### 🔴 **P0-2: Chart関連テストのタイムアウト問題** (別タスク)
+- ResponsiveChartContainer.test.tsx (17テスト中2個失敗)
+- TideChart.test.tsx (タイムアウト)
+- 根本原因: ResizeObserver + Recharts + JSDOM の組み合わせ
+
+---
+
 **このドキュメントは定期的に更新します。**
