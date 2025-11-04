@@ -1000,4 +1000,166 @@ render(
 
 ---
 
+## 📝 v1.0.8 P0-3完了（2025-11-04）
+
+### ✅ TideChart.test.tsx vi.mock()ホイスティング修正完了
+
+**作業時間**: 約3時間
+**状態**: vi.mock()修正完了、プロジェクト全体のlintエラーが残存
+
+### 実施内容
+
+#### 🔧 **問題: TideChartテストがCIで5分タイムアウト**
+
+**発見した問題**:
+- ローカル環境: 1154ms (正常)
+- CI環境: 5分以上でタイムアウト
+- 各テスト: 21秒以上かかっていた
+
+**根本原因**:
+```typescript
+// Rechartsの実際のSVGレンダリングがCI環境(JSDOM)で極端に重い
+<LineChart data={tideData}>  // ← 実際のRechartsが読み込まれていた
+```
+
+**証拠**:
+```
+Performance warning: TideChart render took 21459.10ms
+at Dots (/home/runner/work/bite-note/bite-note/node_modules/recharts/lib/cartesian/Line.js:160:5)
+```
+
+#### 🔬 **試行錯誤のプロセス**
+
+**Attempt 1: モック削除** (Commit fa9d453)
+- アプローチ: FishSpeciesAutocompleteと同じく実際のライブラリを使用
+- 結果: ❌ CI 5分タイムアウト
+- 理由: Rechartsは軽量ではなく、実際のSVGレンダリングが重すぎる
+
+**Attempt 2: JSX形式の軽量モック** (Commit 38d9cc3)
+```typescript
+// ❌ 効かなかった
+vi.mock('recharts', () => ({
+  LineChart: ({ children, ...props }: any) => (
+    <div data-testid="recharts-line-chart">{children}</div>
+  )
+}));
+```
+- 結果: ❌ CI 5分タイムアウト（モックが効いていない）
+- 理由: Vitestではvi.fn()形式が必要
+
+**Attempt 3: vi.mock()位置変更** (Commit 927ced3)
+- importより前に移動
+- 結果: ❌ CI 5分タイムアウト（JSX形式が問題）
+
+**Attempt 4: vi.fn()形式に変更** (Commit c0d8d5e)
+```typescript
+// ✅ 正しい形式
+vi.mock('recharts', () => {
+  return {
+    LineChart: vi.fn(() => null),
+    XAxis: vi.fn(() => null),
+    YAxis: vi.fn(() => null),
+    Line: vi.fn(() => null),
+    Tooltip: vi.fn(() => null),
+    ReferenceLine: vi.fn(() => null),
+  };
+});
+```
+- 結果: ❌ Lintエラーで失敗
+
+**Attempt 5: Lint修正** (Commit 838b7fc)
+- 未使用のpropsパラメータ削除
+- 未使用のimport削除
+- 型アサーション削除
+- 結果: ⚠️ TideChart.test.tsxは通ったが、プロジェクト全体のlintエラー360件で失敗
+
+### 技術的成果
+
+#### ✅ **TideChart.test.tsx 修正完了**:
+
+**修正前**:
+```typescript
+// ❌ JSX形式（効かない）
+vi.mock('recharts', () => ({
+  LineChart: ({ children, ...props }: any) => <div>{children}</div>
+}));
+```
+
+**修正後**:
+```typescript
+// ✅ vi.fn()形式（正しい）
+import { vi } from 'vitest';
+
+vi.mock('recharts', () => {
+  return {
+    LineChart: vi.fn(() => null),
+    XAxis: vi.fn(() => null),
+    YAxis: vi.fn(() => null),
+    Line: vi.fn(() => null),
+    Tooltip: vi.fn(() => null),
+    ReferenceLine: vi.fn(() => null),
+  };
+});
+
+import React from 'react';
+// ... 他のimport
+```
+
+**配置ルール**:
+1. vi.mock()は**最上部**、全てのimportより前
+2. vi.fn()で**null**を返す形式
+3. JSX要素は使用不可
+
+### 残課題
+
+#### ⚠️ **プロジェクト全体のLintエラー** (別タスク)
+- **エラー数**: 360件のエラー、11件の警告
+- **影響**: CIがlintステップで失敗
+- **TideChart.test.tsx**: ✅ 修正完了（このファイルのlintは通過）
+- **他のファイル**: ❌ 未修正
+  - scripts/*, src/*, tests/*に大量のlintエラーが残存
+
+**対応方針**:
+- TideChart.test.tsxのvi.mock()ホイスティング問題は解決済み
+- プロジェクト全体のlint修正は別タスク（P0-4）として対応
+
+### 学び・ベストプラクティス
+
+#### 📚 **Vitestのvi.mock()正しい使い方**:
+
+**❌ 間違い**:
+```typescript
+// JSX要素を返す（効かない）
+LineChart: (props: any) => <div>Mock</div>
+```
+
+**✅ 正しい**:
+```typescript
+// vi.fn()でnullを返す
+LineChart: vi.fn(() => null)
+```
+
+**配置ルール**:
+```typescript
+// CRITICAL: vi.mock() must be at the top, BEFORE all imports
+import { vi } from 'vitest';
+
+vi.mock('recharts', () => {
+  return {
+    Component: vi.fn(() => null)
+  };
+});
+
+import React from 'react';  // ← モックの後
+```
+
+### 次のタスク
+
+#### 🔴 **P0-4: プロジェクト全体のLint修正** (推定: 6-8h)
+- 360件のエラーを修正
+- CI lint ステップを通過させる
+- 優先度: 高（CI全体がブロックされている）
+
+---
+
 **このドキュメントは定期的に更新します。**
