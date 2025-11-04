@@ -11,7 +11,7 @@ import { vi } from 'vitest';
 
 vi.mock('recharts', () => {
   return {
-    LineChart: vi.fn((props: any) => null),
+    LineChart: vi.fn(() => null),
     XAxis: vi.fn(() => null),
     YAxis: vi.fn(() => null),
     Line: vi.fn(() => null),
@@ -26,14 +26,10 @@ import {
   test,
   expect,
   beforeEach,
-  afterEach,
-  beforeAll,
 } from 'vitest';
 import {
   render,
   screen,
-  fireEvent,
-  waitFor,
   act,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -64,9 +60,9 @@ describe('TideChart', () => {
   ];
 
   const invalidData = [
-    { time: 'invalid', tide: 'not-number' as any },
+    { time: 'invalid', tide: 'not-number' },
     { time: '25:00', tide: NaN },
-    { time: '', tide: undefined as any },
+    { time: '', tide: undefined },
   ];
 
   beforeEach(() => {
