@@ -327,7 +327,7 @@ describe('HarmonicAnalysisEngine', () => {
       const testDate = new Date('2024-06-15T12:00:00Z');
       const factors = engine.calculateConstituentFactors(testDate);
 
-      expect(factors).toHaveLength(6); // 6分潮
+      expect(factors).toHaveLength(8); // 主要6分潮 + 浅海効果分潮2個 (M4, MS4)
 
       factors.forEach(factor => {
         expect(factor.f).toBeGreaterThan(0);
