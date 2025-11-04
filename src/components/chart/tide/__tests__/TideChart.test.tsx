@@ -6,19 +6,19 @@
  */
 
 // 軽量Rechartsモック: DOMベース、レンダリングブロックなし
-// CRITICAL: vi.mock() must be at the top of the file for proper hoisting
+// CRITICAL: vi.mock() must be at the top, BEFORE all imports including React
 import { vi } from 'vitest';
 
-vi.mock('recharts', () => ({
-  LineChart: ({ children, ...props }: any) => (
-    <div data-testid="recharts-line-chart" {...props}>{children}</div>
-  ),
-  XAxis: (props: any) => <div data-testid="recharts-x-axis" {...props} />,
-  YAxis: (props: any) => <div data-testid="recharts-y-axis" {...props} />,
-  Line: (props: any) => <div data-testid="recharts-line" {...props} />,
-  Tooltip: (props: any) => <div data-testid="recharts-tooltip" {...props} />,
-  ReferenceLine: (props: any) => <div data-testid="recharts-reference-line" {...props} />,
-}));
+vi.mock('recharts', () => {
+  return {
+    LineChart: vi.fn((props: any) => null),
+    XAxis: vi.fn(() => null),
+    YAxis: vi.fn(() => null),
+    Line: vi.fn(() => null),
+    Tooltip: vi.fn(() => null),
+    ReferenceLine: vi.fn(() => null),
+  };
+});
 
 import React from 'react';
 import {
