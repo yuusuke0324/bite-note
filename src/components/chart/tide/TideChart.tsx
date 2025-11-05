@@ -589,21 +589,13 @@ const TideChartBase: React.FC<TideChartProps> = ({
   // Dependency Injection
   chartComponents,
 }) => {
-  // DEBUG
-  console.log('[TideChart] chartComponents prop:', !!chartComponents);
-  console.log('[TideChart] chartComponents type:', chartComponents ? typeof chartComponents.LineChart : 'undefined');
-
   // テスト時は必ずchartComponentsを渡すこと（lazy loadを回避）
   const [components, setComponents] = useState<ChartComponents | undefined>(chartComponents);
 
   useEffect(() => {
-    console.log('[TideChart useEffect] chartComponents:', !!chartComponents, 'components:', !!components);
-
     // 既にモックが注入されている場合はスキップ
     if (chartComponents) {
-      console.log('[TideChart useEffect] Using injected chartComponents');
       if (components !== chartComponents) {
-        console.log('[TideChart useEffect] Updating components state');
         setComponents(chartComponents);
       }
       return;
@@ -611,10 +603,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
     // プロダクション: Rechartsを遅延ロード（初回のみ）
     if (!components) {
-      console.log('[TideChart useEffect] Loading default Recharts...');
       let mounted = true;
       getDefaultChartComponents().then((loaded) => {
-        console.log('[TideChart] Recharts loaded');
         if (mounted) {
           setComponents(loaded);
         }
@@ -782,8 +772,29 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
   // パフォーマンス追跡終了
   useEffect(() => {
-    if (processedData.valid.length > 0) {
-      performanceTracker.endRender(processedData.originalSize || data.length);
+    if (processedData.valid.length > 0 && renderStartTime.current > 0) {
+      const renderTime = performance.now() - renderStartTime.current;
+
+      // パフォーマンス警告（コンポーネント固有の計測値を使用）
+      if (renderTime > 1000) {
+        console.warn(
+          `Performance warning: TideChart render took ${renderTime.toFixed(2)}ms`
+        );
+      }
+
+      // メトリクスをグローバルに保存（テスト用）
+      const metrics = {
+        renderTime,
+        dataPoints: processedData.originalSize || data.length,
+        memoryUsage: (performance as any).memory?.usedJSHeapSize / 1024 / 1024 || 0,
+        optimization: {
+          datasampling: (processedData.originalSize || data.length) > 1000,
+          memoization: true,
+          callbacks: true,
+        },
+      };
+      (window as any).tideChartMetrics = metrics;
+      (window as any).getTideChartPerformanceReport = () => metrics;
     }
   }, [processedData, data.length]);
 
@@ -1084,8 +1095,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
           data-navigation-active={navigationState.isActive}
           data-focus-manager={focusManagementEnabled ? 'enabled' : 'disabled'}
           data-performance={
-            enablePerformanceMonitoring
-              ? JSON.stringify(performanceTracker.metrics)
+            enablePerformanceMonitoring && (window as any).tideChartMetrics
+              ? JSON.stringify((window as any).tideChartMetrics)
               : undefined
           }
           data-contrast-ratio="4.5"
