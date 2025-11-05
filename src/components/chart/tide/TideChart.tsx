@@ -13,18 +13,32 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import * as RechartsModule from 'recharts';
-import type { TideChartProps, TideChartData } from './types';
+// CRITICAL: Rechartsを条件付きimportに変更（テスト時の依存性注入を可能にする）
+import type { TideChartProps, TideChartData, ChartComponents } from './types';
 
-// デフォルトのRechartsコンポーネント
-const defaultChartComponents = {
-  LineChart: RechartsModule.LineChart,
-  XAxis: RechartsModule.XAxis,
-  YAxis: RechartsModule.YAxis,
-  Line: RechartsModule.Line,
-  Tooltip: RechartsModule.Tooltip,
-  ReferenceLine: RechartsModule.ReferenceLine,
+// Lazy Recharts import（プロダクション用）
+// テスト時は chartComponents props でモックを注入
+const loadRecharts = async () => {
+  return await import('recharts');
 };
+
+// デフォルトチャートコンポーネントを遅延取得
+const getDefaultChartComponents = (() => {
+  let cache: ChartComponents | null = null;
+  return async (): Promise<ChartComponents> => {
+    if (cache) return cache;
+    const Recharts = await loadRecharts();
+    cache = {
+      LineChart: Recharts.LineChart,
+      XAxis: Recharts.XAxis,
+      YAxis: Recharts.YAxis,
+      Line: Recharts.Line,
+      Tooltip: Recharts.Tooltip,
+      ReferenceLine: Recharts.ReferenceLine,
+    };
+    return cache;
+  };
+})();
 
 // Accessibility interfaces and managers
 interface AriaConfiguration {
@@ -573,10 +587,61 @@ const TideChartBase: React.FC<TideChartProps> = ({
   enablePerformanceMonitoring = false,
 
   // Dependency Injection
-  chartComponents = defaultChartComponents,
+  chartComponents,
 }) => {
+  // DEBUG
+  console.log('[TideChart] chartComponents prop:', !!chartComponents);
+  console.log('[TideChart] chartComponents type:', chartComponents ? typeof chartComponents.LineChart : 'undefined');
+
+  // テスト時は必ずchartComponentsを渡すこと（lazy loadを回避）
+  const [components, setComponents] = useState<ChartComponents | undefined>(chartComponents);
+
+  useEffect(() => {
+    console.log('[TideChart useEffect] chartComponents:', !!chartComponents, 'components:', !!components);
+
+    // 既にモックが注入されている場合はスキップ
+    if (chartComponents) {
+      console.log('[TideChart useEffect] Using injected chartComponents');
+      if (components !== chartComponents) {
+        console.log('[TideChart useEffect] Updating components state');
+        setComponents(chartComponents);
+      }
+      return;
+    }
+
+    // プロダクション: Rechartsを遅延ロード（初回のみ）
+    if (!components) {
+      console.log('[TideChart useEffect] Loading default Recharts...');
+      let mounted = true;
+      getDefaultChartComponents().then((loaded) => {
+        console.log('[TideChart] Recharts loaded');
+        if (mounted) {
+          setComponents(loaded);
+        }
+      });
+      return () => {
+        mounted = false;
+      };
+    }
+  }, [chartComponents, components]);
+
+  // コンポーネントがロード中の場合はローディング表示
+  if (!components) {
+    return (
+      <div
+        className={`tide-chart ${className || ''}`}
+        style={{ width, height, ...style }}
+        data-testid="tide-chart"
+      >
+        <div style={{ textAlign: 'center', paddingTop: '100px' }}>
+          読み込み中...
+        </div>
+      </div>
+    );
+  }
+
   // 注入されたコンポーネントを取得
-  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = chartComponents;
+  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = components;
   const [focusedPointIndex, setFocusedPointIndex] = useState(-1);
   const [navigationState, setNavigationState] =
     useState<KeyboardNavigationState>({

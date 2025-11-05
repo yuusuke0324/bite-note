@@ -102,12 +102,23 @@ describe('TideChart', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockChartComponents = createMockChartComponents();
+    console.log('[TEST beforeEach] mockChartComponents created:', !!mockChartComponents);
+    console.log('[TEST beforeEach] LineChart type:', typeof mockChartComponents.LineChart);
   });
 
   // A. 基本レンダリングテスト (4個)
   describe('Basic Rendering Tests', () => {
     test('should render with default props', () => {
-      render(<TideChart data={basicData} chartComponents={mockChartComponents} />);
+      const { container, debug } = render(<TideChart data={basicData} chartComponents={mockChartComponents} />);
+
+      // DEBUG: 実際のDOM構造を確認
+      console.log('=== DOM STRUCTURE ===');
+      debug();
+      console.log('=== CONTAINER HTML ===');
+      console.log(container.innerHTML.substring(0, 500));
+      console.log('=== mockChartComponents ===');
+      console.log('LineChart type:', typeof mockChartComponents.LineChart);
+      console.log('LineChart name:', mockChartComponents.LineChart.name);
 
       // 基本要素の確認
       expect(screen.getByTestId('tide-chart')).toBeInTheDocument();
