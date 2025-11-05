@@ -10,6 +10,7 @@ import type {
   ImportResult,
   DatabaseResult
 } from '../types';
+import * as XLSX from 'xlsx';
 
 export class ExportImportService {
 
@@ -478,8 +479,279 @@ export class ExportImportService {
     return isNaN(parsed) ? null : parsed;
   }
 
+  // Excel形式でのエクスポート（記録のみ）
+  async exportRecordsAsExcel(): Promise<DatabaseResult<ArrayBuffer>> {
+    try {
+      const recordsResult = await fishingRecordService.getRecords();
+      if (!recordsResult.success || !recordsResult.data) {
+        return {
+          success: false,
+          error: {
+            code: 'EXPORT_EXCEL_FAILED',
+            message: 'Failed to get records for Excel export',
+            details: recordsResult.error
+          }
+        };
+      }
+
+      // ワークブックの作成
+      const workbook = XLSX.utils.book_new();
+
+      // データの変換
+      const worksheetData = recordsResult.data.map(record => ({
+        'ID': record.id,
+        'Date': record.date.toISOString().split('T')[0],
+        'Location': record.location,
+        'Fish Species': record.fishSpecies,
+        'Size (cm)': record.size || '',
+        'Weight (g)': record.weight || '',
+        'Weather': record.weather || '',
+        'Temperature (°C)': record.temperature || '',
+        'Latitude': record.coordinates?.latitude || '',
+        'Longitude': record.coordinates?.longitude || '',
+        'GPS Accuracy': record.coordinates?.accuracy || '',
+        'Notes': record.notes || '',
+        'Created At': record.createdAt.toISOString(),
+        'Updated At': record.updatedAt.toISOString()
+      }));
+
+      // ワークシートの作成
+      const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+
+      // カラム幅の設定
+      const columnWidths = [
+        { wch: 36 }, // ID
+        { wch: 12 }, // Date
+        { wch: 20 }, // Location
+        { wch: 15 }, // Fish Species
+        { wch: 10 }, // Size
+        { wch: 10 }, // Weight
+        { wch: 10 }, // Weather
+        { wch: 14 }, // Temperature
+        { wch: 12 }, // Latitude
+        { wch: 12 }, // Longitude
+        { wch: 12 }, // GPS Accuracy
+        { wch: 30 }, // Notes
+        { wch: 20 }, // Created At
+        { wch: 20 }  // Updated At
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // ワークブックにシートを追加
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Fishing Records');
+
+      // ArrayBufferに変換
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array'
+      });
+
+      return {
+        success: true,
+        data: excelBuffer
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'EXPORT_EXCEL_FAILED',
+          message: 'Failed to export records as Excel',
+          details: error
+        }
+      };
+    }
+  }
+
+  // Excel形式からのインポート（記録のみ）
+  async importRecordsFromExcel(arrayBuffer: ArrayBuffer): Promise<DatabaseResult<ImportResult>> {
+    try {
+      // ワークブックの読み込み
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+      // 最初のシートを取得
+      const firstSheetName = workbook.SheetNames[0];
+      if (!firstSheetName) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_EXCEL_FORMAT',
+            message: 'Excel file contains no sheets'
+          }
+        };
+      }
+
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      // JSON に変換
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      if (jsonData.length < 2) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_EXCEL_FORMAT',
+            message: 'Excel file must contain header and at least one data row'
+          }
+        };
+      }
+
+      // ヘッダー行の取得
+      const headers = jsonData[0] as string[];
+
+      // 必須カラムの検証
+      const requiredColumns = ['Date', 'Location', 'Fish Species'];
+      const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+
+      if (missingColumns.length > 0) {
+        return {
+          success: false,
+          error: {
+            code: 'MISSING_REQUIRED_COLUMNS',
+            message: `Missing required columns: ${missingColumns.join(', ')}`,
+            details: { missingColumns }
+          }
+        };
+      }
+
+      // カラムインデックスのマッピング
+      const columnIndices = {
+        date: headers.indexOf('Date'),
+        location: headers.indexOf('Location'),
+        fishSpecies: headers.indexOf('Fish Species'),
+        size: headers.indexOf('Size (cm)'),
+        weight: headers.indexOf('Weight (g)'),
+        weather: headers.indexOf('Weather'),
+        temperature: headers.indexOf('Temperature (°C)'),
+        latitude: headers.indexOf('Latitude'),
+        longitude: headers.indexOf('Longitude'),
+        gpsAccuracy: headers.indexOf('GPS Accuracy'),
+        notes: headers.indexOf('Notes')
+      };
+
+      let importedRecords = 0;
+      let skippedItems = 0;
+      const errors: string[] = [];
+
+      // データ行の処理（ヘッダーをスキップ）
+      for (let i = 1; i < jsonData.length; i++) {
+        try {
+          const row = jsonData[i] as any[];
+
+          // 空行をスキップ
+          if (!row || row.length === 0 || !row[columnIndices.date]) {
+            continue;
+          }
+
+          // 日付の変換（Excelのシリアル番号対応）
+          let dateValue: string;
+          const rawDate = row[columnIndices.date];
+
+          if (typeof rawDate === 'number') {
+            // Excelのシリアル番号を日付に変換
+            const excelDate = XLSX.SSF.parse_date_code(rawDate);
+            dateValue = `${excelDate.y}-${String(excelDate.m).padStart(2, '0')}-${String(excelDate.d).padStart(2, '0')}`;
+          } else if (typeof rawDate === 'string') {
+            dateValue = rawDate;
+          } else {
+            errors.push(`Row ${i + 1}: Invalid date format`);
+            skippedItems++;
+            continue;
+          }
+
+          // バリデーション
+          if (!row[columnIndices.location] || !row[columnIndices.fishSpecies]) {
+            errors.push(`Row ${i + 1}: Missing required fields`);
+            skippedItems++;
+            continue;
+          }
+
+          // 座標データの作成
+          let coordinates = undefined;
+          const latitude = this.parseExcelNumber(row[columnIndices.latitude]);
+          const longitude = this.parseExcelNumber(row[columnIndices.longitude]);
+
+          if (latitude !== null && longitude !== null) {
+            coordinates = {
+              latitude,
+              longitude,
+              accuracy: this.parseExcelNumber(row[columnIndices.gpsAccuracy]) || undefined,
+              timestamp: new Date().toISOString()
+            };
+          }
+
+          // 記録データの作成
+          const createData = {
+            date: dateValue,
+            location: String(row[columnIndices.location]),
+            fishSpecies: String(row[columnIndices.fishSpecies]),
+            size: this.parseExcelNumber(row[columnIndices.size]) || undefined,
+            weight: this.parseExcelNumber(row[columnIndices.weight]) || undefined,
+            weather: row[columnIndices.weather] ? String(row[columnIndices.weather]) : undefined,
+            temperature: this.parseExcelNumber(row[columnIndices.temperature]) || undefined,
+            coordinates,
+            notes: row[columnIndices.notes] ? String(row[columnIndices.notes]) : undefined,
+            useGPS: false
+          };
+
+          // 記録の保存
+          const createResult = await fishingRecordService.createRecord(createData);
+
+          if (createResult.success) {
+            importedRecords++;
+          } else {
+            errors.push(`Row ${i + 1}: Failed to import - ${createResult.error?.message}`);
+            skippedItems++;
+          }
+        } catch (error) {
+          errors.push(`Row ${i + 1}: Failed to process - ${error}`);
+          skippedItems++;
+        }
+      }
+
+      const result: ImportResult = {
+        success: errors.length === 0 || importedRecords > 0,
+        importedRecords,
+        importedPhotos: 0, // Excel does not include photos
+        skippedItems,
+        errors
+      };
+
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'EXCEL_IMPORT_FAILED',
+          message: 'Failed to import Excel data',
+          details: error
+        }
+      };
+    }
+  }
+
+  // Excelセルの数値をパース
+  private parseExcelNumber(value: any): number | null {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? null : parsed;
+    }
+
+    return null;
+  }
+
   // ファイルダウンロード用のBlob作成
-  createDownloadBlob(data: string, mimeType: string): Blob {
+  createDownloadBlob(data: string | ArrayBuffer, mimeType: string): Blob {
     return new Blob([data], { type: mimeType });
   }
 

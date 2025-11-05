@@ -23,11 +23,20 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
 
   // ファイル選択ハンドラー
   const handleFileSelect = useCallback((file: File) => {
-    const allowedTypes = ['application/json', 'text/csv', '.json', '.csv'];
+    const allowedTypes = [
+      'application/json',
+      'text/csv',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      '.json',
+      '.csv',
+      '.xlsx',
+      '.xls'
+    ];
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
 
     if (!allowedTypes.includes(file.type) && !allowedTypes.includes(fileExtension)) {
-      alert('JSON または CSV ファイルを選択してください。');
+      alert('JSON、CSV、または Excel ファイルを選択してください。');
       return;
     }
 
@@ -72,14 +81,26 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
     setImportResult(null);
 
     try {
-      const fileContent = await selectedFile.text();
       const fileExtension = '.' + selectedFile.name.split('.').pop()?.toLowerCase();
 
       // ファイルタイプに応じてインポート処理を切り替え
       const isCSV = fileExtension === '.csv' || selectedFile.type === 'text/csv';
-      const result = isCSV
-        ? await exportImportService.importRecordsFromCSV(fileContent)
-        : await exportImportService.importData(fileContent);
+      const isExcel = fileExtension === '.xlsx' || fileExtension === '.xls' ||
+                      selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                      selectedFile.type === 'application/vnd.ms-excel';
+
+      let result;
+
+      if (isCSV) {
+        const fileContent = await selectedFile.text();
+        result = await exportImportService.importRecordsFromCSV(fileContent);
+      } else if (isExcel) {
+        const arrayBuffer = await selectedFile.arrayBuffer();
+        result = await exportImportService.importRecordsFromExcel(arrayBuffer);
+      } else {
+        const fileContent = await selectedFile.text();
+        result = await exportImportService.importData(fileContent);
+      }
 
       if (result.success && result.data) {
         setImportResult(result.data);
@@ -206,6 +227,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
             <li>JSON形式: 全データ（記録、写真、設定）</li>
             <li>CSV形式: 釣果記録のみ</li>
+            <li>Excel形式: 釣果記録のみ (.xlsx, .xls)</li>
           </ul>
         </div>
 
@@ -229,7 +251,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept=".json,.csv"
+            accept=".json,.csv,.xlsx,.xls"
             onChange={handleFileInputChange}
             style={{ display: 'none' }}
           />
@@ -266,7 +288,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
                 fontSize: '0.875rem',
                 color: '#666'
               }}>
-                JSON または CSV ファイル
+                JSON、CSV、または Excel ファイル
               </div>
             </div>
           )}
