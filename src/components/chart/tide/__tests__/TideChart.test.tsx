@@ -9,16 +9,24 @@
 // CRITICAL: vi.mock() must be at the top, BEFORE all imports including React
 import { vi } from 'vitest';
 
-vi.mock('recharts', () => {
-  return {
-    LineChart: vi.fn(() => null),
-    XAxis: vi.fn(() => null),
-    YAxis: vi.fn(() => null),
-    Line: vi.fn(() => null),
-    Tooltip: vi.fn(() => null),
-    ReferenceLine: vi.fn(() => null),
-  };
-});
+// vi.hoisted()で明示的にホイストし、CI環境でも確実にモックを適用
+const mockRecharts = vi.hoisted(() => ({
+  // Rechartsコンポーネントはpropsを受け取るため、引数を明示的に定義
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  LineChart: vi.fn((_props: any) => null),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  XAxis: vi.fn((_props?: any) => null),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  YAxis: vi.fn((_props?: any) => null),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Line: vi.fn((_props?: any) => null),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Tooltip: vi.fn((_props?: any) => null),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ReferenceLine: vi.fn((_props?: any) => null),
+}));
+
+vi.mock('recharts', () => mockRecharts);
 
 import React from 'react';
 import {
