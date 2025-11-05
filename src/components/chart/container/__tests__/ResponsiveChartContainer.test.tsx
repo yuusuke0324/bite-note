@@ -11,6 +11,9 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { ResponsiveChartContainer } from '../ResponsiveChartContainer';
 import type { DeviceType } from '../../../../utils/responsive/types';
 
+// CI環境チェック
+const isCI = process.env.CI === 'true';
+
 // モック設定
 const mockViewportDetector = {
   getCurrentDeviceType: vi.fn().mockReturnValue('desktop'),
