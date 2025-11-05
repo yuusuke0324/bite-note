@@ -1,6 +1,8 @@
 // エラーバウンダリコンポーネント
 
 import React, { Component, type ReactNode } from 'react';
+import { errorManager } from '../lib/errors/ErrorManager';
+import { AppError, ErrorSeverity, ErrorCategory } from '../lib/errors/ErrorTypes';
 
 interface Props {
   children: ReactNode;
@@ -24,7 +26,38 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // errorManagerに統合
+    const appError = error instanceof AppError
+      ? error
+      : new AppError({
+          code: 'RENDER_ERROR',
+          message: error.message || 'レンダリング中にエラーが発生しました',
+          userMessage: 'コンポーネントのレンダリング処理でエラーが発生しました。ページを再読み込みしてください。',
+          severity: ErrorSeverity.CRITICAL,
+          category: ErrorCategory.SYSTEM,
+          cause: error,
+          context: {
+            componentStack: errorInfo.componentStack,
+          },
+          recovery: {
+            actions: [
+              {
+                label: 'ページ再読み込み',
+                handler: () => window.location.reload(),
+                primary: true,
+              },
+            ],
+          },
+        });
+
+    errorManager.handleError(appError, {
+      context: {
+        componentStack: errorInfo.componentStack,
+      },
+      suppressDisplay: true, // ErrorBoundaryで独自UIを表示するため
+    });
+
+    // カスタムコールバックを実行
     this.props.onError?.(error, errorInfo);
   }
 

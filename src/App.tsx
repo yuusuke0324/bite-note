@@ -13,6 +13,8 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 import { PWAUpdateNotification } from './components/PWAUpdateNotification'
 import { TideChart } from './components/chart/tide/TideChart'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { ErrorDisplay } from './components/errors'
 import Button from './components/ui/Button'
 import { colors } from './theme/colors'
 import { textStyles, typography } from './theme/typography'
@@ -223,25 +225,26 @@ function App() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      fontFamily: typography.fontFamily.primary,
-      backgroundColor: colors.background.primary,
-      color: colors.text.primary,
-    }}>
-      {/* ヘッダー */}
+    <ErrorBoundary>
       <div style={{
-        backgroundColor: colors.primary[500],
-        color: colors.text.inverse,
-        padding: '1rem 2rem',
-        boxShadow: '0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15)',
+        minHeight: '100vh',
+        fontFamily: typography.fontFamily.primary,
+        backgroundColor: colors.background.primary,
+        color: colors.text.primary,
       }}>
-        <h1 style={{
-          margin: 0,
-          ...textStyles.headline.medium,
+        {/* ヘッダー */}
+        <div style={{
+          backgroundColor: colors.primary[500],
           color: colors.text.inverse,
-        }}>🎣 釣果記録アプリ</h1>
-      </div>
+          padding: '1rem 2rem',
+          boxShadow: '0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15)',
+        }}>
+          <h1 style={{
+            margin: 0,
+            ...textStyles.headline.medium,
+            color: colors.text.inverse,
+          }}>🎣 釣果記録アプリ</h1>
+        </div>
 
       {/* タブナビゲーション */}
       <div style={{
@@ -546,13 +549,17 @@ function App() {
         />
       )}
 
-      {/* PWAインストールプロンプト */}
-      <PWAInstallPrompt />
+        {/* PWAインストールプロンプト */}
+        <PWAInstallPrompt />
 
-      {/* PWA機能 */}
-      <PWAUpdateNotification />
-      <PWAInstallBanner />
-    </div>
+        {/* PWA機能 */}
+        <PWAUpdateNotification />
+        <PWAInstallBanner />
+      </div>
+
+      {/* エラー表示システム */}
+      <ErrorDisplay />
+    </ErrorBoundary>
   )
 }
 
