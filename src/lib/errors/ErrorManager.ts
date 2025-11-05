@@ -3,8 +3,8 @@
  * アプリケーション全体のエラーハンドリングを一元管理
  */
 
+import { AppError } from './ErrorTypes';
 import type {
-  AppError,
   ErrorDisplayOptions,
   ErrorSeverity,
   RecoveryStrategy,

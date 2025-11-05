@@ -266,6 +266,218 @@ export class ExportImportService {
     }
   }
 
+  // CSVフォーマットからのインポート（記録のみ）
+  async importRecordsFromCSV(csvString: string): Promise<DatabaseResult<ImportResult>> {
+    try {
+      // CSVの解析
+      const lines = csvString.split(/\r?\n/).filter(line => line.trim());
+
+      if (lines.length < 2) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_CSV_FORMAT',
+            message: 'CSV file must contain header and at least one data row'
+          }
+        };
+      }
+
+      // ヘッダーの解析
+      const headers = this.parseCSVLine(lines[0]);
+
+      // 必須カラムの検証
+      const requiredColumns = ['Date', 'Location', 'Fish Species'];
+      const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+
+      if (missingColumns.length > 0) {
+        return {
+          success: false,
+          error: {
+            code: 'MISSING_REQUIRED_COLUMNS',
+            message: `Missing required columns: ${missingColumns.join(', ')}`,
+            details: { missingColumns }
+          }
+        };
+      }
+
+      // カラムインデックスのマッピング
+      const columnIndices = {
+        date: headers.indexOf('Date'),
+        location: headers.indexOf('Location'),
+        fishSpecies: headers.indexOf('Fish Species'),
+        size: headers.indexOf('Size (cm)'),
+        latitude: headers.indexOf('Latitude'),
+        longitude: headers.indexOf('Longitude'),
+        gpsAccuracy: headers.indexOf('GPS Accuracy'),
+        notes: headers.indexOf('Notes')
+      };
+
+      let importedRecords = 0;
+      let skippedItems = 0;
+      const errors: string[] = [];
+
+      // データ行の処理（ヘッダーをスキップ）
+      for (let i = 1; i < lines.length; i++) {
+        try {
+          const values = this.parseCSVLine(lines[i]);
+
+          // 行のバリデーション
+          const validationError = this.validateCSVRow(values, columnIndices, i + 1);
+          if (validationError) {
+            errors.push(validationError);
+            skippedItems++;
+            continue;
+          }
+
+          // 座標データの作成
+          let coordinates = undefined;
+          const latitude = this.parseNumber(values[columnIndices.latitude]);
+          const longitude = this.parseNumber(values[columnIndices.longitude]);
+
+          if (latitude !== null && longitude !== null) {
+            coordinates = {
+              latitude,
+              longitude,
+              accuracy: this.parseNumber(values[columnIndices.gpsAccuracy]) || undefined,
+              timestamp: new Date().toISOString()
+            };
+          }
+
+          // 記録データの作成
+          const createData = {
+            date: values[columnIndices.date],
+            location: values[columnIndices.location],
+            fishSpecies: values[columnIndices.fishSpecies],
+            size: this.parseNumber(values[columnIndices.size]) || undefined,
+            coordinates,
+            notes: values[columnIndices.notes] || undefined,
+            useGPS: false // CSV インポート時はGPSフラグは無効
+          };
+
+          // 記録の保存
+          const createResult = await fishingRecordService.createRecord(createData);
+
+          if (createResult.success) {
+            importedRecords++;
+          } else {
+            errors.push(`Row ${i + 1}: Failed to import - ${createResult.error?.message}`);
+            skippedItems++;
+          }
+        } catch (error) {
+          errors.push(`Row ${i + 1}: Failed to process - ${error}`);
+          skippedItems++;
+        }
+      }
+
+      const result: ImportResult = {
+        success: errors.length === 0 || importedRecords > 0,
+        importedRecords,
+        importedPhotos: 0, // CSV does not include photos
+        skippedItems,
+        errors
+      };
+
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'CSV_IMPORT_FAILED',
+          message: 'Failed to import CSV data',
+          details: error
+        }
+      };
+    }
+  }
+
+  // CSV行のパース（引用符とエスケープ処理）
+  private parseCSVLine(line: string): string[] {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const nextChar = line[i + 1];
+
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          // エスケープされた引用符
+          current += '"';
+          i++; // 次の引用符をスキップ
+        } else {
+          // 引用符の開始/終了
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // フィールドの区切り
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+
+    // 最後のフィールドを追加
+    result.push(current.trim());
+
+    return result;
+  }
+
+  // CSV行のバリデーション
+  private validateCSVRow(
+    values: string[],
+    columnIndices: Record<string, number>,
+    rowNumber: number
+  ): string | null {
+    // 必須フィールドの検証
+    if (!values[columnIndices.date]) {
+      return `Row ${rowNumber}: Date is required`;
+    }
+
+    if (!values[columnIndices.location]) {
+      return `Row ${rowNumber}: Location is required`;
+    }
+
+    if (!values[columnIndices.fishSpecies]) {
+      return `Row ${rowNumber}: Fish Species is required`;
+    }
+
+    // 日付フォーマットの検証
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (!datePattern.test(values[columnIndices.date])) {
+      return `Row ${rowNumber}: Invalid date format (expected YYYY-MM-DD)`;
+    }
+
+    // 数値フィールドの検証
+    if (values[columnIndices.size] && this.parseNumber(values[columnIndices.size]) === null) {
+      return `Row ${rowNumber}: Invalid size value`;
+    }
+
+    if (values[columnIndices.latitude] && this.parseNumber(values[columnIndices.latitude]) === null) {
+      return `Row ${rowNumber}: Invalid latitude value`;
+    }
+
+    if (values[columnIndices.longitude] && this.parseNumber(values[columnIndices.longitude]) === null) {
+      return `Row ${rowNumber}: Invalid longitude value`;
+    }
+
+    return null;
+  }
+
+  // 数値のパース（空文字列やnullを処理）
+  private parseNumber(value: string | undefined): number | null {
+    if (!value || value.trim() === '') {
+      return null;
+    }
+
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? null : parsed;
+  }
+
   // ファイルダウンロード用のBlob作成
   createDownloadBlob(data: string, mimeType: string): Blob {
     return new Blob([data], { type: mimeType });

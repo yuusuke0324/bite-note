@@ -3,7 +3,8 @@
  * エラーの記録、保存、外部サービスへの送信を管理
  */
 
-import type { ErrorLogEntry, AppError } from './ErrorTypes';
+import { AppError } from './ErrorTypes';
+import type { ErrorLogEntry } from './ErrorTypes';
 
 /**
  * エラーロガー設定

@@ -6,45 +6,49 @@
 /**
  * エラーの重要度
  */
-export enum ErrorSeverity {
+export const ErrorSeverity = {
   /** 情報: ユーザーに知らせるべき情報（青色） */
-  INFO = 'info',
+  INFO: 'info',
 
   /** 警告: 注意が必要だが続行可能（黄色） */
-  WARNING = 'warning',
+  WARNING: 'warning',
 
   /** エラー: 処理が失敗したが回復可能（赤色） */
-  ERROR = 'error',
+  ERROR: 'error',
 
   /** 致命的: アプリケーションの続行が困難（紫色） */
-  CRITICAL = 'critical',
-}
+  CRITICAL: 'critical',
+} as const;
+
+export type ErrorSeverity = typeof ErrorSeverity[keyof typeof ErrorSeverity];
 
 /**
  * エラーカテゴリー
  */
-export enum ErrorCategory {
+export const ErrorCategory = {
   /** ネットワーク関連 */
-  NETWORK = 'network',
+  NETWORK: 'network',
 
   /** ストレージ関連（IndexedDB等） */
-  STORAGE = 'storage',
+  STORAGE: 'storage',
 
   /** 権限関連（GPS、カメラ等） */
-  PERMISSION = 'permission',
+  PERMISSION: 'permission',
 
   /** バリデーション関連 */
-  VALIDATION = 'validation',
+  VALIDATION: 'validation',
 
   /** 外部API関連 */
-  API = 'api',
+  API: 'api',
 
   /** システム関連 */
-  SYSTEM = 'system',
+  SYSTEM: 'system',
 
   /** ユーザー操作関連 */
-  USER = 'user',
-}
+  USER: 'user',
+} as const;
+
+export type ErrorCategory = typeof ErrorCategory[keyof typeof ErrorCategory];
 
 /**
  * ユーザーアクション定義

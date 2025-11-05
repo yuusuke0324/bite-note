@@ -73,7 +73,13 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
 
     try {
       const fileContent = await selectedFile.text();
-      const result = await exportImportService.importData(fileContent);
+      const fileExtension = '.' + selectedFile.name.split('.').pop()?.toLowerCase();
+
+      // ファイルタイプに応じてインポート処理を切り替え
+      const isCSV = fileExtension === '.csv' || selectedFile.type === 'text/csv';
+      const result = isCSV
+        ? await exportImportService.importRecordsFromCSV(fileContent)
+        : await exportImportService.importData(fileContent);
 
       if (result.success && result.data) {
         setImportResult(result.data);
