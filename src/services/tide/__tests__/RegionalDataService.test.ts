@@ -10,8 +10,8 @@ import { JAPANESE_COASTAL_REGIONS, REGIONAL_DATA_STATS } from '../../../data/reg
 import { calculateHaversineDistance } from '../utils/geo-utils';
 import type { RegionalDataRecord, Coordinates } from '../../../types/tide';
 
-// モックデータベースの設定
-const mockDb = {
+// モックデータベースの設定（vi.hoisted()で初期化）
+const mockDb = vi.hoisted(() => ({
   tide_regional_data: {
     count: vi.fn(),
     toArray: vi.fn(),
@@ -22,7 +22,7 @@ const mockDb = {
     update: vi.fn(),
     toCollection: vi.fn()
   }
-};
+}));
 
 // データベースモック
 vi.mock('../../../lib/database', () => ({

@@ -62,10 +62,11 @@ describe('responsive utilities', () => {
         deviceType: 'mobile'
       });
 
+      // 実装では軸ラベル表示のため最小幅600pxを強制
       expect(dimensions.containerWidth).toBe(375);
-      expect(dimensions.viewBoxWidth).toBe(375);
-      expect(dimensions.viewBoxHeight).toBeCloseTo(210, 1); // 375 / (16/9) = 210.9375
-      expect(dimensions.containerHeight).toBeCloseTo(210, 1);
+      expect(dimensions.viewBoxWidth).toBe(600); // minWidth enforced
+      expect(dimensions.viewBoxHeight).toBeCloseTo(337, 1); // 600 / (16/9) = 337.5
+      expect(dimensions.containerHeight).toBeCloseTo(210, 1); // container size based on actual 375px
       expect(dimensions.scaleFactor).toBe(1);
     });
 
@@ -81,14 +82,15 @@ describe('responsive utilities', () => {
       expect(dimensions.containerWidth).toBe(1200);
     });
 
-    it('should enforce minimum width of 320px', () => {
+    it('should enforce minimum width of 600px', () => {
       const dimensions = calculateSVGDimensions({
         containerWidth: 280,
         aspectRatio: 16/9,
         deviceType: 'mobile'
       });
 
-      expect(dimensions.viewBoxWidth).toBe(320);
+      // 軸ラベル表示のため最小幅600px
+      expect(dimensions.viewBoxWidth).toBe(600);
       expect(dimensions.containerWidth).toBe(280); // 実際のコンテナサイズは保持
     });
 
@@ -111,7 +113,7 @@ describe('responsive utilities', () => {
         deviceType: 'mobile'
       });
 
-      expect(dimensionsZero.viewBoxWidth).toBe(320); // 最小幅
+      expect(dimensionsZero.viewBoxWidth).toBe(600); // 最小幅
 
       const dimensionsNegative = calculateSVGDimensions({
         containerWidth: -100,
@@ -119,7 +121,7 @@ describe('responsive utilities', () => {
         deviceType: 'mobile'
       });
 
-      expect(dimensionsNegative.viewBoxWidth).toBe(320); // 最小幅
+      expect(dimensionsNegative.viewBoxWidth).toBe(600); // 最小幅
     });
 
     it('should use default aspect ratio for invalid values', () => {
@@ -138,10 +140,11 @@ describe('responsive utilities', () => {
     it('should create default responsive config', () => {
       const config = createResponsiveConfig();
 
+      // 軸ラベル表示に適したアスペクト比2.0を使用
       expect(config).toEqual({
         responsive: true,
         maxWidth: '100%',
-        aspectRatio: 16/9,
+        aspectRatio: 2.0, // changed from 1.5 for axis labels
         breakpoints: {
           mobile: 480,
           tablet: 768,
@@ -230,9 +233,10 @@ describe('responsive utilities', () => {
         deviceType
       });
 
+      // 軸ラベル表示のため最小幅600pxが強制される
       expect(dimensions.containerWidth).toBe(375);
-      expect(dimensions.viewBoxWidth).toBe(375);
-      expect(dimensions.containerHeight).toBeCloseTo(210, 1);
+      expect(dimensions.viewBoxWidth).toBe(600); // minWidth enforced
+      expect(dimensions.containerHeight).toBeCloseTo(187, 1); // 375 / 2.0 = 187.5
 
       const css = generateResponsiveCSS(config);
       expect(css).toContain('max-width: 100%');
@@ -250,8 +254,8 @@ describe('responsive utilities', () => {
         deviceType
       });
 
-      // 最小幅が適用される
-      expect(dimensions.viewBoxWidth).toBe(320);
+      // 軸ラベル表示のため最小幅600pxが適用される
+      expect(dimensions.viewBoxWidth).toBe(600);
       expect(dimensions.containerWidth).toBe(280); // 実際のコンテナは小さいまま
     });
 

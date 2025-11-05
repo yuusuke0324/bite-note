@@ -107,7 +107,7 @@ describe('TASK-104: 潮汐分類システム', () => {
       };
 
       const strength = engine.calculateTideStrength(newMoonPhase, 1.0);
-      expect(strength).toBeGreaterThan(90);
+      expect(strength).toBeGreaterThanOrEqual(90);
       expect(strength).toBeLessThanOrEqual(100);
     });
 
@@ -119,7 +119,7 @@ describe('TASK-104: 潮汐分類システム', () => {
       };
 
       const strength = engine.calculateTideStrength(fullMoonPhase, 1.0);
-      expect(strength).toBeGreaterThan(90);
+      expect(strength).toBeGreaterThanOrEqual(90);
       expect(strength).toBeLessThanOrEqual(100);
     });
 

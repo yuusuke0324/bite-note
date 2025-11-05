@@ -10,13 +10,13 @@ import type { FishingRecord, Photo } from '../types';
 describe('DataValidationService', () => {
   beforeEach(async () => {
     // データベースをクリア
-    await db.records.clear();
+    await db.fishing_records.clear();
     await db.photos.clear();
     await db.app_settings.clear();
   });
 
   afterEach(async () => {
-    await db.records.clear();
+    await db.fishing_records.clear();
     await db.photos.clear();
     await db.app_settings.clear();
   });
@@ -217,7 +217,7 @@ describe('DataValidationService', () => {
       });
 
       // 1つだけ参照する記録を作成
-      await db.records.add({
+      await db.fishing_records.add({
         id: 'record-1',
         date: new Date(),
         location: 'テスト',
@@ -246,7 +246,7 @@ describe('DataValidationService', () => {
         createdAt: new Date()
       });
 
-      await db.records.add({
+      await db.fishing_records.add({
         id: 'record-1',
         date: new Date(),
         location: 'テスト',
