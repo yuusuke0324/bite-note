@@ -1,8 +1,8 @@
 # 釣果記録アプリ - 現状と今後のロードマップ
 
 **最終更新**: 2025年11月5日
-**現在のバージョン**: v1.0.9
-**プロジェクトフェーズ**: パフォーマンス最適化完了、テスト品質向上フェーズ
+**現在のバージョン**: v1.3.0
+**プロジェクトフェーズ**: データエクスポート/インポート機能拡張完了フェーズ
 
 ---
 
@@ -51,9 +51,9 @@
 ├── 状態管理: Zustand ✅ 本格実装
 ├── フォーム: React Hook Form + Zod ✅ 本格実装
 ├── 天気API: Open-Meteo（モック的） 🔶 キャッシュ実装済み
-├── 潮汐API: NOAA API（設計完了） 🚧 未実装
-├── エクスポート: JSON形式 🔶 基本実装のみ
-└── PWA: Service Worker 🚧 未実装
+├── 潮汐計算: 独自実装 ✅ 完全実装（5,757行）
+├── エクスポート: JSON/CSV/Excel ✅ 完全実装
+└── PWA: Service Worker ✅ 完全実装
 ```
 
 ### データ層の成熟度
@@ -72,10 +72,11 @@
 | **FishingRecordService** | ✅ 完成 | CRUD、検索、集計 |
 | **PhotoService** | ✅ 完成 | Blob保存、メタデータ抽出 |
 | **WeatherService** | 🔶 基本実装 | キャッシュあり、エラーハンドリング弱い |
-| **TideService** | 🚧 設計完了 | 実装準備完了、未統合 |
+| **TideService** | ✅ 完成 | 潮汐計算、UI統合完了 |
 | **GeolocationService** | ✅ 完成 | GPS取得、エラーハンドリング |
 | **StatisticsService** | ✅ 完成 | 基本統計処理 |
-| **ExportImportService** | 🔶 基本実装 | JSON形式のみ |
+| **ExportImportService** | ✅ 完成 | JSON/CSV/Excel対応 |
+| **ErrorHandlingService** | ✅ 完成 | 統一エラー管理システム |
 | **FishSpeciesDataService** | ✅ 完成 | 231種マスターデータ、高速検索 |
 
 ---
@@ -1756,6 +1757,173 @@ v1.0.10以降のタスクについては、roadmap下部の「今後の開発予
 - コードベース: +1,650行
 
 ---
+
+## 📝 v1.2.0リリース完了（2025-11-05）
+
+### 🎯 CSVインポート機能実装
+
+#### 実装内容
+**CSVインポート機能:**
+- `exportImportService.importRecordsFromCSV()` 新規実装（212行）
+- RFC 4180準拠のCSVパーサー
+- 引用符・エスケープ処理完全対応
+- ヘッダー検証（必須カラム: Date, Location, Fish Species）
+- 行レベルバリデーション（日付フォーマット、数値フィールド）
+
+**バリデーション強化:**
+- 日付フォーマット検証（YYYY-MM-DD）
+- 数値フィールド検証（Size, Latitude, Longitude）
+- 必須フィールドチェック
+- 部分的インポート（エラー行の自動スキップ）
+- GPS座標の適切な処理（両方揃っている場合のみ設定）
+
+**UI統合:**
+- `DataImportModal` でCSV/JSON自動判別
+- ファイルタイプに応じた処理切り替え
+- エラーレポート表示（行番号付き）
+
+**テスト:**
+- 21個の包括的テスト（全パス）
+- エッジケース網羅（引用符内カンマ、エスケープ）
+- バリデーションエラーケース
+
+#### エラーハンドリング修正
+- `ErrorSeverity`, `ErrorCategory` をenum→const objectに変更
+- TypeScript erasableSyntaxOnly互換性対応
+- `import type` から通常import へ修正（AppError）
+
+#### 改善効果
+- **データ可搬性**: CSV形式でのインポート可能に
+- **他ツール連携**: Excel等で編集したCSVの取り込み
+- **エラー回復**: 部分的な失敗でも成功した行はインポート
+- **ユーザビリティ**: 詳細なエラーメッセージ
+
+#### 技術的成果
+- TypeScript型チェック: 合格
+- Production build: 成功
+- テストカバレッジ: CSV機能100%
+- コードベース: +473行
+
+---
+
+## 📝 v1.3.0リリース完了（2025-11-05）
+
+### 🎯 Excelエクスポート/インポート機能実装
+
+#### 実装内容
+**Excel機能:**
+- `exportImportService.exportRecordsAsExcel()` 新規実装（81行）
+- `exportImportService.importRecordsFromExcel()` 新規実装（168行）
+- xlsx ライブラリ統合（SheetJS）
+- 依存関係: xlsx ^0.18.5
+
+**エクスポート機能:**
+- XLSX形式ワークブック生成
+- カラム幅の自動調整（14項目）
+- 拡張フィールド対応:
+  - Weight (g) - 重量
+  - Weather - 天候
+  - Temperature (°C) - 気温
+- 日付、座標、メモ情報の完全エクスポート
+- MIME type: `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+
+**インポート機能:**
+- Excelシリアル番号 → YYYY-MM-DD 自動変換
+- 複数データ型対応（Number, String, Date）
+- ヘッダー検証（必須カラム確認）
+- 空行の自動スキップ
+- 部分的インポート（エラー行スキップ）
+- 拡張フィールドの取り込み（Weight, Weather, Temperature）
+
+**UI統合:**
+- `DataExportModal`: Excel形式オプション追加
+- `DataImportModal`: xlsx/xls ファイル対応
+- ファイルタイプ自動判別（JSON/CSV/Excel）
+- ArrayBuffer vs String 処理の適切な切り替え
+- 受け入れ形式表示の更新
+
+#### 技術詳細
+**使用API:**
+- `XLSX.utils.book_new()` - ワークブック作成
+- `XLSX.utils.json_to_sheet()` - データ→シート変換
+- `XLSX.utils.sheet_to_json()` - シート→JSON変換
+- `XLSX.SSF.parse_date_code()` - Excel日付シリアル処理
+- `XLSX.write()` - ArrayBuffer出力
+
+**データ構造:**
+```typescript
+// エクスポート: 14カラム
+ID, Date, Location, Fish Species, Size (cm), Weight (g),
+Weather, Temperature (°C), Latitude, Longitude, GPS Accuracy,
+Notes, Created At, Updated At
+
+// カラム幅最適化（wch指定）
+ID: 36, Location: 20, Notes: 30, etc.
+```
+
+#### 改善効果
+- **データ互換性**: Excel/Googleスプレッドシート連携
+- **業務利用**: 表計算ソフトでの分析可能
+- **プロフェッショナル**: 体裁の整ったデータ出力
+- **双方向**: エクスポート・インポート両対応
+
+#### 技術的成果
+- TypeScript型チェック: 合格
+- Production build: 成功
+- Excel日付処理: 完全対応
+- コードベース: +447行
+- バンドルサイズ: 822.15 kB（xlsxライブラリ込み）
+
+---
+
+## 🎯 次にやること（v1.4.0以降）
+
+### 🔴 P0: 最優先
+
+#### 1. PDFエクスポート機能実装
+**現状**: JSON/CSV/Excel対応済み
+**工数見積**: 6-8時間
+
+```
+追加機能:
+- PDFレポート生成（jspdf + jspdf-autotable）
+- 画像埋め込み対応
+- 見栄えの良いレイアウト
+- 統計情報の表示
+- カスタマイズ可能なテンプレート
+```
+
+**期待される効果**:
+- 印刷用レポート生成
+- プレゼンテーション対応
+- ユーザー価値: ⭐⭐⭐⭐⭐
+
+---
+
+#### 2. エラーハンドリングUI実装（残タスク）
+**工数見積**: 3-4時間
+
+```
+残りのタスク:
+- ErrorBoundary拡張（errorManager統合）
+- ErrorToast実装（トースト通知UI）
+- ErrorModal実装（モーダルエラー表示）
+- 既存エラーハンドラーのマイグレーション
+```
+
+---
+
+#### 3. データバリデーション強化
+**工数見積**: 4-5時間
+
+```
+強化項目:
+- フィールドレベル詳細検証
+- 参照整合性チェック（photoId）
+- バージョン互換性管理
+- データマイグレーション機構
+- トランザクション/ロールバック対応
+```
 
 ---
 
