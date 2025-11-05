@@ -589,20 +589,13 @@ const TideChartBase: React.FC<TideChartProps> = ({
   // Dependency Injection
   chartComponents,
 }) => {
-  // テスト時は必ずchartComponentsを渡すこと（lazy loadを回避）
+  // テスト時はchartComponentsを直接使用（同期的）
+  // プロダクション時はlazy load（非同期）
   const [components, setComponents] = useState<ChartComponents | undefined>(chartComponents);
 
   useEffect(() => {
-    // 既にモックが注入されている場合はスキップ
-    if (chartComponents) {
-      if (components !== chartComponents) {
-        setComponents(chartComponents);
-      }
-      return;
-    }
-
-    // プロダクション: Rechartsを遅延ロード（初回のみ）
-    if (!components) {
+    // プロダクション: Rechartsを遅延ロード（chartComponentsが未指定の場合のみ）
+    if (!chartComponents && !components) {
       let mounted = true;
       getDefaultChartComponents().then((loaded) => {
         if (mounted) {
@@ -615,8 +608,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
     }
   }, [chartComponents, components]);
 
+  // 使用するコンポーネント: propsが優先、なければstate
+  const activeComponents = chartComponents || components;
+
   // コンポーネントがロード中の場合はローディング表示
-  if (!components) {
+  if (!activeComponents) {
     return (
       <div
         className={`tide-chart ${className || ''}`}
@@ -631,7 +627,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
   }
 
   // 注入されたコンポーネントを取得
-  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = components;
+  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = activeComponents;
   const [focusedPointIndex, setFocusedPointIndex] = useState(-1);
   const [navigationState, setNavigationState] =
     useState<KeyboardNavigationState>({
