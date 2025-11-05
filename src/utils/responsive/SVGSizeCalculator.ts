@@ -50,7 +50,13 @@ export class SVGSizeCalculator implements ISVGSizeCalculator {
     const adjustedSize = this.ensureMinimumChartSize(
       { width: chartWidth, height: chartHeight },
       margins,
-      viewport
+      viewport,
+      {
+        originalWidth: containerSize.originalWidth,
+        originalHeight: containerSize.originalHeight,
+        viewportWidth: viewport.width,
+        viewportHeight: viewport.height
+      }
     );
 
     return {
@@ -99,7 +105,13 @@ export class SVGSizeCalculator implements ISVGSizeCalculator {
   private ensureMinimumChartSize(
     chartSize: { width: number; height: number },
     margins: ChartMargins,
-    __viewport: ViewportInfo
+    __viewport: ViewportInfo,
+    originalSize?: {
+      originalWidth: number;
+      originalHeight: number;
+      viewportWidth?: number;
+      viewportHeight?: number;
+    }
   ): {
     containerWidth: number;
     containerHeight: number;
@@ -108,10 +120,6 @@ export class SVGSizeCalculator implements ISVGSizeCalculator {
     margins: ChartMargins;
     isMinimumSize: boolean;
   } {
-    // 元のコンテナサイズを計算
-    const originalContainerWidth = chartSize.width + margins.left + margins.right;
-    const originalContainerHeight = chartSize.height + margins.top + margins.bottom;
-
     let adjustedChartWidth = chartSize.width;
     let adjustedChartHeight = chartSize.height;
     const adjustedMargins = { ...margins };
@@ -130,10 +138,17 @@ export class SVGSizeCalculator implements ISVGSizeCalculator {
     const finalContainerWidth = adjustedChartWidth + adjustedMargins.left + adjustedMargins.right;
     const finalContainerHeight = adjustedChartHeight + adjustedMargins.top + adjustedMargins.bottom;
 
-    // 最小サイズ制約が適用されたかチェック（元のサイズから拡大された場合）
-    const isMinimumSize =
-      (originalContainerWidth < SIZE_CONSTRAINTS.MIN_WIDTH && finalContainerWidth >= SIZE_CONSTRAINTS.MIN_WIDTH) ||
-      (originalContainerHeight < SIZE_CONSTRAINTS.MIN_HEIGHT && finalContainerHeight >= SIZE_CONSTRAINTS.MIN_HEIGHT);
+    // 最小サイズ制約が適用されたかチェック
+    let isMinimumSize = false;
+    if (originalSize) {
+      // アスペクト比計算前の元サイズ、またはviewportサイズで判定
+      const checkWidth = originalSize.viewportWidth || originalSize.originalWidth;
+      const checkHeight = originalSize.viewportHeight || originalSize.originalHeight;
+
+      isMinimumSize =
+        (checkWidth < SIZE_CONSTRAINTS.MIN_WIDTH && finalContainerWidth >= SIZE_CONSTRAINTS.MIN_WIDTH) ||
+        (checkHeight < SIZE_CONSTRAINTS.MIN_HEIGHT && finalContainerHeight >= SIZE_CONSTRAINTS.MIN_HEIGHT);
+    }
 
     return {
       containerWidth: finalContainerWidth,
