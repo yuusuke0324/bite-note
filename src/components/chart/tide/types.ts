@@ -12,6 +12,18 @@ export interface TideChartData {
 }
 
 /**
+ * Recharts コンポーネント型定義（依存性注入用）
+ */
+export interface ChartComponents {
+  LineChart: React.ComponentType<any>;
+  XAxis: React.ComponentType<any>;
+  YAxis: React.ComponentType<any>;
+  Line: React.ComponentType<any>;
+  Tooltip: React.ComponentType<any>;
+  ReferenceLine: React.ComponentType<any>;
+}
+
+/**
  * TideChart コンポーネントProps
  */
 export interface TideChartProps {
@@ -42,6 +54,12 @@ export interface TideChartProps {
   colorMode?: 'normal' | 'monochrome';
   responsive?: boolean;
   enablePerformanceMonitoring?: boolean;
+
+  /**
+   * チャートコンポーネント（テスト時のモック注入用）
+   * @internal
+   */
+  chartComponents?: ChartComponents;
 }
 
 /**

@@ -13,15 +13,18 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import {
-  LineChart,
-  XAxis,
-  YAxis,
-  Line,
-  Tooltip,
-  ReferenceLine,
-} from 'recharts';
+import * as RechartsModule from 'recharts';
 import type { TideChartProps, TideChartData } from './types';
+
+// デフォルトのRechartsコンポーネント
+const defaultChartComponents = {
+  LineChart: RechartsModule.LineChart,
+  XAxis: RechartsModule.XAxis,
+  YAxis: RechartsModule.YAxis,
+  Line: RechartsModule.Line,
+  Tooltip: RechartsModule.Tooltip,
+  ReferenceLine: RechartsModule.ReferenceLine,
+};
 
 // Accessibility interfaces and managers
 interface AriaConfiguration {
@@ -568,7 +571,12 @@ const TideChartBase: React.FC<TideChartProps> = ({
   colorMode = 'normal',
   responsive = false,
   enablePerformanceMonitoring = false,
+
+  // Dependency Injection
+  chartComponents = defaultChartComponents,
 }) => {
+  // 注入されたコンポーネントを取得
+  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = chartComponents;
   const [focusedPointIndex, setFocusedPointIndex] = useState(-1);
   const [navigationState, setNavigationState] =
     useState<KeyboardNavigationState>({

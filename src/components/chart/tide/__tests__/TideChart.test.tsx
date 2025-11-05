@@ -2,31 +2,11 @@
  * TideChart テストスイート
  * TASK-202: TideChart メインコンポーネント実装
  *
- * Red Phase: 失敗テストケース実装
+ * v1.0.9: 依存性注入パターンに完全移行
+ * - vi.mock()を完全削除
+ * - chartComponents propsでモック注入
+ * - FishSpeciesAutocompleteパターンを踏襲
  */
-
-// 軽量Rechartsモック: DOMベース、レンダリングブロックなし
-// CRITICAL: vi.mock() must be at the top, BEFORE all imports including React
-import { vi } from 'vitest';
-
-// vi.hoisted()で明示的にホイストし、CI環境でも確実にモックを適用
-const mockRecharts = vi.hoisted(() => ({
-  // Rechartsコンポーネントはpropsを受け取るため、引数を明示的に定義
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  LineChart: vi.fn((_props: any) => null),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  XAxis: vi.fn((_props?: any) => null),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  YAxis: vi.fn((_props?: any) => null),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Line: vi.fn((_props?: any) => null),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Tooltip: vi.fn((_props?: any) => null),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ReferenceLine: vi.fn((_props?: any) => null),
-}));
-
-vi.mock('recharts', () => mockRecharts);
 
 import React from 'react';
 import {
@@ -34,6 +14,7 @@ import {
   test,
   expect,
   beforeEach,
+  vi,
 } from 'vitest';
 import {
   render,
@@ -42,7 +23,49 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TideChart } from '../TideChart';
-import type { TideChartData, TideChartProps } from '../types';
+import type { TideChartData, TideChartProps, ChartComponents } from '../types';
+
+/**
+ * モックChartComponentsファクトリー
+ * 軽量なDOM要素を返し、実Rechartsの重い描画処理を回避
+ */
+const createMockChartComponents = (): ChartComponents => ({
+  LineChart: ({ children, data, width, height }: any) => (
+    <div
+      data-testid="mock-line-chart"
+      data-points={data?.length || 0}
+      style={{ width, height }}
+    >
+      {children}
+    </div>
+  ),
+  XAxis: ({ dataKey }: any) => (
+    <div data-testid="mock-x-axis" data-key={dataKey} />
+  ),
+  YAxis: ({ dataKey, unit }: any) => (
+    <div data-testid="mock-y-axis" data-key={dataKey} data-unit={unit} />
+  ),
+  Line: ({ dataKey, stroke, strokeWidth, dot }: any) => (
+    <div
+      data-testid="mock-line"
+      data-key={dataKey}
+      data-stroke={stroke}
+      data-stroke-width={strokeWidth}
+      data-has-dot={!!dot}
+    />
+  ),
+  Tooltip: ({ content }: any) => (
+    <div data-testid="mock-tooltip">{content}</div>
+  ),
+  ReferenceLine: ({ x, stroke, label }: any) => (
+    <div
+      data-testid="mock-reference-line"
+      data-x={x}
+      data-stroke={stroke}
+      data-label={label?.value}
+    />
+  ),
+});
 
 // ResizeObserver モック
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -52,6 +75,9 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 describe('TideChart', () => {
+  // モックコンポーネント（全テストで共有）
+  let mockChartComponents: ChartComponents;
+
   // テストデータ
   const basicData: TideChartData[] = [
     { time: '06:00', tide: 120 },
@@ -75,23 +101,25 @@ describe('TideChart', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockChartComponents = createMockChartComponents();
   });
 
   // A. 基本レンダリングテスト (4個)
   describe('Basic Rendering Tests', () => {
     test('should render with default props', () => {
-      render(<TideChart data={basicData} />);
+      render(<TideChart data={basicData} chartComponents={mockChartComponents} />);
 
       // 基本要素の確認
       expect(screen.getByTestId('tide-chart')).toBeInTheDocument();
 
-      // Rechartsは実際のSVGを生成するため、SVG要素の存在を確認
+      // モックチャートコンポーネントが正常にレンダリングされることを確認
       const chartElement = screen.getByTestId('tide-chart');
       expect(chartElement).toBeInTheDocument();
+      expect(screen.getByTestId('mock-line-chart')).toBeInTheDocument();
     });
 
     test('should render empty data message when data is empty', () => {
-      render(<TideChart data={[]} />);
+      render(<TideChart data={[]} chartComponents={mockChartComponents} />);
 
       expect(screen.getByText(/データがありません/)).toBeInTheDocument();
       // チャート要素は表示されない
@@ -107,6 +135,7 @@ describe('TideChart', () => {
         showTooltip: false,
         className: 'custom-chart',
         style: { backgroundColor: 'rgb(255, 0, 0)' },
+        chartComponents: mockChartComponents,
       };
 
       render(<TideChart {...customProps} />);
@@ -119,7 +148,7 @@ describe('TideChart', () => {
     });
 
     test('should render complex data with markers', () => {
-      render(<TideChart data={complexData} showMarkers={true} />);
+      render(<TideChart data={complexData} chartComponents={mockChartComponents} />);
 
       // チャートが正常にレンダリングされることを確認
       expect(screen.getByTestId('tide-chart')).toBeInTheDocument();
@@ -129,7 +158,7 @@ describe('TideChart', () => {
   // B. レスポンシブとプロパティテスト (5個)
   describe('Props and Responsive Tests', () => {
     test('should apply custom width and height', () => {
-      render(<TideChart data={basicData} width={800} height={400} />);
+      render(<TideChart data={basicData} width={800} height={400} chartComponents={mockChartComponents} />);
 
       const chartElement = screen.getByTestId('tide-chart');
       // 渡されたサイズが適用されることを確認
@@ -144,6 +173,7 @@ describe('TideChart', () => {
           data={basicData}
           className="custom-chart"
           style={customStyle}
+          chartComponents={mockChartComponents}
         />
       );
 
@@ -153,21 +183,21 @@ describe('TideChart', () => {
     });
 
     test('should disable grid when showGrid is false', () => {
-      render(<TideChart data={basicData} showGrid={false} />);
+      render(<TideChart data={basicData} showGrid={false} chartComponents={mockChartComponents} />);
 
       // グリッドなしでもチャートはレンダリングされる
       expect(screen.getByTestId('tide-chart')).toBeInTheDocument();
     });
 
     test('should disable tooltip when showTooltip is false', () => {
-      render(<TideChart data={basicData} showTooltip={false} />);
+      render(<TideChart data={basicData} showTooltip={false} chartComponents={mockChartComponents} />);
 
       // ツールチップなしでもチャートはレンダリングされる
       expect(screen.getByTestId('tide-chart')).toBeInTheDocument();
     });
 
     test('should enforce minimum size constraints', () => {
-      render(<TideChart data={basicData} width={300} height={150} />);
+      render(<TideChart data={basicData} width={300} height={150} chartComponents={mockChartComponents} />);
 
       const chartElement = screen.getByTestId('tide-chart');
       // 最小サイズ保証：600x300px
@@ -187,7 +217,7 @@ describe('TideChart', () => {
 
       testCases.forEach(({ width, height, device }) => {
         const { unmount } = render(
-          <TideChart data={basicData} width={width} height={height} />
+          <TideChart data={basicData} width={width} height={height} chartComponents={mockChartComponents} />
         );
 
         const chartElement = screen.getByTestId('tide-chart');
@@ -203,7 +233,7 @@ describe('TideChart', () => {
     });
 
     test('should apply device attribute correctly', () => {
-      render(<TideChart data={basicData} width={1024} height={512} />);
+      render(<TideChart data={basicData} width={1024} height={512} chartComponents={mockChartComponents} />);
 
       const chartElement = screen.getByTestId('tide-chart');
       expect(chartElement).toHaveAttribute('data-device');
@@ -216,7 +246,7 @@ describe('TideChart', () => {
       const onDataPointClick = vi.fn();
 
       render(
-        <TideChart data={basicData} onDataPointClick={onDataPointClick} />
+        <TideChart data={basicData} onDataPointClick={onDataPointClick} chartComponents={mockChartComponents} />
       );
 
       // コンポーネント正常レンダリング確認
@@ -227,7 +257,7 @@ describe('TideChart', () => {
     });
 
     test('should handle showMarkers prop', () => {
-      render(<TideChart data={complexData} showMarkers={true} />);
+      render(<TideChart data={complexData} chartComponents={mockChartComponents} />);
 
       // マーカー有効時もチャートは正常にレンダリングされる
       expect(screen.getByTestId('tide-chart')).toBeInTheDocument();
@@ -241,7 +271,7 @@ describe('TideChart', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      render(<TideChart data={invalidData as TideChartData[]} />);
+      render(<TideChart data={invalidData as TideChartData[]} chartComponents={mockChartComponents} />);
 
       // エラーメッセージが表示される
       expect(
@@ -257,7 +287,7 @@ describe('TideChart', () => {
     test('should render with minimal valid data', () => {
       const minimalData = [{ time: '12:00', tide: 100 }];
 
-      render(<TideChart data={minimalData} />);
+      render(<TideChart data={minimalData} chartComponents={mockChartComponents} />);
 
       // 最小限のデータでもレンダリング成功
       expect(screen.getByTestId('tide-chart')).toBeInTheDocument();
@@ -272,7 +302,7 @@ describe('TideChart', () => {
         tide: Math.sin(i / 100) * 200,
       }));
 
-      render(<TideChart data={largeData} />);
+      render(<TideChart data={largeData} chartComponents={mockChartComponents} />);
 
       // データサンプリング警告
       expect(
@@ -287,7 +317,7 @@ describe('TideChart', () => {
   // F. アクセシビリティテスト (2個)
   describe('Accessibility Tests', () => {
     test('should have proper ARIA attributes', () => {
-      render(<TideChart data={basicData} />);
+      render(<TideChart data={basicData} chartComponents={mockChartComponents} />);
 
       const chartElement = screen.getByTestId('tide-chart');
       expect(chartElement).toHaveAttribute('role', 'img');
@@ -298,14 +328,12 @@ describe('TideChart', () => {
       expect(chartElement).toHaveAttribute('aria-describedby');
     });
 
-    // CI環境でタイムアウトするため一時的にスキップ
-    // TODO: TideChartがCI環境(JSDOM)で正常にレンダリングされるよう修正後に有効化
-    test.skipIf(process.env.CI === 'true')('should support keyboard navigation', async () => {
+    test('should support keyboard navigation', async () => {
       const user = userEvent.setup();
       const onDataPointClick = vi.fn();
 
       render(
-        <TideChart data={basicData} onDataPointClick={onDataPointClick} />
+        <TideChart data={basicData} onDataPointClick={onDataPointClick} chartComponents={mockChartComponents} />
       );
 
       const chartElement = screen.getByTestId('tide-chart');
