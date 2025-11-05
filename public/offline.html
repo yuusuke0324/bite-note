@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#007bff">
+  <title>オフライン - 釣果記録アプリ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .offline-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .icon {
+      font-size: 4rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      color: #333;
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    .status-box {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+      0%, 100% {
+        box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+      }
+      50% {
+        box-shadow: 0 8px 24px rgba(245, 87, 108, 0.5);
+      }
+    }
+
+    .features {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .features h2 {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .features ul {
+      list-style: none;
+    }
+
+    .features li {
+      padding: 0.75rem 0;
+      color: #555;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .features li:last-child {
+      border-bottom: none;
+    }
+
+    .features li::before {
+      margin-right: 0.75rem;
+      font-size: 1.2rem;
+    }
+
+    .features li.available::before {
+      content: '✅';
+    }
+
+    .features li.limited::before {
+      content: '⚠️';
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.875rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .connection-status {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e9ecef;
+      color: #999;
+      font-size: 0.85rem;
+    }
+
+    .connection-status.online {
+      color: #28a745;
+      font-weight: 600;
+    }
+
+    .connection-status.offline {
+      color: #dc3545;
+      font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+      .offline-container {
+        padding: 2rem 1.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .icon {
+        font-size: 3rem;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="icon">📡</div>
+
+    <h1>オフラインモード</h1>
+
+    <p class="subtitle">
+      現在インターネットに接続されていません<br>
+      オフラインでも一部の機能をご利用いただけます
+    </p>
+
+    <div class="status-box" id="statusBox">
+      オフライン中
+    </div>
+
+    <div class="features">
+      <h2>利用可能な機能</h2>
+      <ul>
+        <li class="available">釣果記録の閲覧・追加・編集</li>
+        <li class="available">保存済みの写真の表示</li>
+        <li class="available">統計情報の閲覧</li>
+        <li class="available">地図機能の表示</li>
+        <li class="limited">天気情報・潮汐情報は最後に取得したデータを表示</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="location.reload()">
+        🔄 再読み込み
+      </button>
+      <button class="btn-secondary" onclick="goHome()">
+        🏠 ホームへ
+      </button>
+    </div>
+
+    <div class="connection-status offline" id="connectionStatus">
+      ● オフライン
+    </div>
+  </div>
+
+  <script>
+    // オンライン状態を監視
+    function updateConnectionStatus() {
+      const statusBox = document.getElementById('statusBox');
+      const connectionStatus = document.getElementById('connectionStatus');
+
+      if (navigator.onLine) {
+        statusBox.textContent = 'オンラインに復帰しました！';
+        statusBox.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+        connectionStatus.textContent = '● オンライン';
+        connectionStatus.className = 'connection-status online';
+
+        // 3秒後に自動リロード
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
+      } else {
+        statusBox.textContent = 'オフライン中';
+        statusBox.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+        connectionStatus.textContent = '● オフライン';
+        connectionStatus.className = 'connection-status offline';
+      }
+    }
+
+    // ホームへ戻る
+    function goHome() {
+      window.location.href = '/';
+    }
+
+    // イベントリスナー
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // 初期チェック
+    updateConnectionStatus();
+
+    // 定期的にチェック（10秒ごと）
+    setInterval(updateConnectionStatus, 10000);
+  </script>
+</body>
+</html>

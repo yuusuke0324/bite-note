@@ -231,6 +231,8 @@ const highContrastThemes = {
   },
 } as const;
 
+// Performance tracking (currently disabled - kept for future use)
+/*
 // パフォーマンス監視ユーティリティ
 interface PerformanceMetrics {
   renderTime: number;
@@ -284,6 +286,7 @@ const performanceTracker = {
     return 0;
   },
 };
+*/
 
 // データサンプリング機能
 interface SamplingStrategy {

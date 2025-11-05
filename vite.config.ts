@@ -47,7 +47,11 @@ export default defineConfig(({ mode }) => {
           drop_debugger: true,
         },
       } : undefined,
+      // Copy public files (including sw.js and offline.html)
+      copyPublicDir: true,
     },
+    // Public directory configuration for PWA files
+    publicDir: 'public',
     server: {
       port: 3000,
       host: true,
