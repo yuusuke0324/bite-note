@@ -15,58 +15,64 @@ import { vi } from 'vitest';
  * This enhanced polyfill provides a more complete implementation
  * Supports callbacks and maintains observed elements list
  */
+const ResizeObserverPolyfill = class ResizeObserver {
+  private callback: ResizeObserverCallback;
+  private observations = new Map<Element, any>();
+
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback;
+  }
+
+  observe(target: Element, options?: ResizeObserverOptions) {
+    if (!target) {
+      throw new TypeError('Failed to execute \'observe\' on \'ResizeObserver\': 1 argument required, but only 0 present.');
+    }
+
+    // Store observation
+    this.observations.set(target, options || {});
+
+    // Simulate initial callback
+    setTimeout(() => {
+      if (this.observations.has(target)) {
+        const entries = [{
+          target,
+          contentRect: {
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 100,
+            top: 0,
+            right: 100,
+            bottom: 100,
+            left: 0,
+          },
+          borderBoxSize: [{ inlineSize: 100, blockSize: 100 }],
+          contentBoxSize: [{ inlineSize: 100, blockSize: 100 }],
+          devicePixelContentBoxSize: [{ inlineSize: 100, blockSize: 100 }],
+        }];
+        this.callback(entries as any, this);
+      }
+    }, 0);
+  }
+
+  unobserve(target: Element) {
+    if (!target) {
+      throw new TypeError('Failed to execute \'unobserve\' on \'ResizeObserver\': 1 argument required, but only 0 present.');
+    }
+    this.observations.delete(target);
+  }
+
+  disconnect() {
+    this.observations.clear();
+  }
+} as any;
+
+// Set on both global and window
 if (typeof global.ResizeObserver === 'undefined') {
-  global.ResizeObserver = class ResizeObserver {
-    private callback: ResizeObserverCallback;
-    private observations = new Map<Element, any>();
-
-    constructor(callback: ResizeObserverCallback) {
-      this.callback = callback;
-    }
-
-    observe(target: Element, options?: ResizeObserverOptions) {
-      if (!target) {
-        throw new TypeError('Failed to execute \'observe\' on \'ResizeObserver\': 1 argument required, but only 0 present.');
-      }
-
-      // Store observation
-      this.observations.set(target, options || {});
-
-      // Simulate initial callback
-      setTimeout(() => {
-        if (this.observations.has(target)) {
-          const entries = [{
-            target,
-            contentRect: {
-              x: 0,
-              y: 0,
-              width: 100,
-              height: 100,
-              top: 0,
-              right: 100,
-              bottom: 100,
-              left: 0,
-            },
-            borderBoxSize: [{ inlineSize: 100, blockSize: 100 }],
-            contentBoxSize: [{ inlineSize: 100, blockSize: 100 }],
-            devicePixelContentBoxSize: [{ inlineSize: 100, blockSize: 100 }],
-          }];
-          this.callback(entries as any, this);
-        }
-      }, 0);
-    }
-
-    unobserve(target: Element) {
-      if (!target) {
-        throw new TypeError('Failed to execute \'unobserve\' on \'ResizeObserver\': 1 argument required, but only 0 present.');
-      }
-      this.observations.delete(target);
-    }
-
-    disconnect() {
-      this.observations.clear();
-    }
-  } as any;
+  global.ResizeObserver = ResizeObserverPolyfill;
+}
+if (typeof window !== 'undefined' && typeof window.ResizeObserver === 'undefined') {
+  (window as any).ResizeObserver = ResizeObserverPolyfill;
 }
 
 /**
