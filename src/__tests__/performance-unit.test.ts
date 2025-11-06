@@ -4,15 +4,24 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ImageOptimizer } from '../lib/image-optimizer';
 import { PerformanceMonitor } from '../lib/performance-monitor';
 
+// Create spy functions before assigning to window.performance
+const performanceNowSpy = vi.fn(() => Date.now());
+const performanceMarkSpy = vi.fn();
+const performanceMeasureSpy = vi.fn();
+const performanceGetEntriesByTypeSpy = vi.fn(() => []);
+const performanceGetEntriesByNameSpy = vi.fn(() => []);
+
 // Mock performance APIs
 Object.defineProperty(window, 'performance', {
   value: {
-    now: vi.fn(() => Date.now()),
-    mark: vi.fn(),
-    measure: vi.fn(),
-    getEntriesByType: vi.fn(() => []),
-    getEntriesByName: vi.fn(() => []),
-  }
+    now: performanceNowSpy,
+    mark: performanceMarkSpy,
+    measure: performanceMeasureSpy,
+    getEntriesByType: performanceGetEntriesByTypeSpy,
+    getEntriesByName: performanceGetEntriesByNameSpy,
+  },
+  writable: true,
+  configurable: true
 });
 
 describe('ImageOptimizer', () => {
@@ -115,6 +124,13 @@ describe('PerformanceMonitor', () => {
   let monitor: PerformanceMonitor;
 
   beforeEach(() => {
+    // Clear all spy calls before each test
+    performanceNowSpy.mockClear();
+    performanceMarkSpy.mockClear();
+    performanceMeasureSpy.mockClear();
+    performanceGetEntriesByTypeSpy.mockClear();
+    performanceGetEntriesByNameSpy.mockClear();
+
     monitor = new PerformanceMonitor();
   });
 
@@ -124,9 +140,9 @@ describe('PerformanceMonitor', () => {
     const result = await monitor.measureAsync('test-operation', operation);
 
     expect(result).toBe('result');
-    expect(performance.mark).toHaveBeenCalledWith('test-operation-start');
-    expect(performance.mark).toHaveBeenCalledWith('test-operation-end');
-    expect(performance.measure).toHaveBeenCalledWith(
+    expect(performanceMarkSpy).toHaveBeenCalledWith('test-operation-start');
+    expect(performanceMarkSpy).toHaveBeenCalledWith('test-operation-end');
+    expect(performanceMeasureSpy).toHaveBeenCalledWith(
       'test-operation',
       'test-operation-start',
       'test-operation-end'
@@ -137,7 +153,7 @@ describe('PerformanceMonitor', () => {
     monitor.trackWebVitals();
 
     // Should set up performance observers
-    expect(performance.getEntriesByType).toHaveBeenCalled();
+    expect(performanceGetEntriesByTypeSpy).toHaveBeenCalled();
   });
 
   it('should report performance metrics', () => {
