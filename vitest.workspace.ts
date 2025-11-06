@@ -16,29 +16,52 @@ export default defineWorkspace([
       ],
     },
   },
-  // コンポーネントテスト
+  // コンポーネントテスト（軽量UI）
   {
     extends: './vitest.config.ts',
     test: {
-      name: 'components',
-      include: ['src/components/**/*.test.tsx'],
+      name: 'components-ui',
+      include: [
+        'src/components/__tests__/FishSpeciesAutocomplete.test.tsx',
+        'src/components/__tests__/TideSummaryCard.test.tsx',
+        'src/components/__tests__/TideTooltip.test.tsx',
+      ],
+      setupFiles: ['./src/setupTests.ts'],
+      pool: 'forks',
+      testTimeout: 20000,
+    },
+  },
+  // コンポーネントテスト（Chart系・重い）
+  {
+    extends: './vitest.config.ts',
+    test: {
+      name: 'components-chart',
+      include: [
+        'src/components/chart/**/*.test.tsx',
+        'src/components/__tests__/TideGraph.test.tsx',
+      ],
       exclude: [
         '**/*.a11y.test.tsx',
-        '**/integration.test.tsx',
+        '**/*.accessibility.test.tsx',
         '**/*.performance.test.tsx',
       ],
-      // setupFiles を明示的に指定（継承問題を解決）
       setupFiles: ['./src/setupTests.ts'],
-      // コンポーネント用の設定（メモリとスピードのバランス）
       pool: 'forks',
-      poolOptions: {
-        forks: {
-          singleFork: false, // 2並列実行
-        },
-      },
-      maxConcurrency: 2, // 2テストファイルを同時実行
-      testTimeout: 20000, // タイムアウトを20秒に設定
-      // メモリ制限は親のvitest.config.tsから継承（4GB）
+      testTimeout: 20000,
+    },
+  },
+  // コンポーネントテスト（複雑系）
+  {
+    extends: './vitest.config.ts',
+    test: {
+      name: 'components-complex',
+      include: [
+        'src/components/__tests__/TideGraph.axis-labels.test.tsx',
+        'src/components/__tests__/TideIntegration.test.tsx',
+      ],
+      setupFiles: ['./src/setupTests.ts'],
+      pool: 'forks',
+      testTimeout: 20000,
     },
   },
   // 統合テスト（重い）

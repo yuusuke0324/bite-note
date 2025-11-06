@@ -25,9 +25,9 @@ jobs:
       run: npm run test:unit
       timeout-minutes: 10
 
-  # UIコンポーネントテスト
-  test-components:
-    name: Component Tests
+  # UIコンポーネントテスト（軽量）
+  test-components-ui:
+    name: Component Tests (UI)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -40,9 +40,47 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Run Component Tests
-      run: npm run test:components
-      timeout-minutes: 30
+    - name: Run UI Component Tests
+      run: npm run test:components:ui
+      timeout-minutes: 15
+
+  # Chartコンポーネントテスト（重い）
+  test-components-chart:
+    name: Component Tests (Chart)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Chart Component Tests
+      run: npm run test:components:chart
+      timeout-minutes: 15
+
+  # 複雑系コンポーネントテスト
+  test-components-complex:
+    name: Component Tests (Complex)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Complex Component Tests
+      run: npm run test:components:complex
+      timeout-minutes: 15
 
   # 統合テスト（オプショナル）
   test-integration:
@@ -68,7 +106,7 @@ jobs:
   check-required:
     name: Required Tests Check
     runs-on: ubuntu-latest
-    needs: [test-core, test-components]
+    needs: [test-core, test-components-ui, test-components-chart, test-components-complex]
     steps:
     - name: All required tests passed
       run: echo "✅ All required tests passed!"
