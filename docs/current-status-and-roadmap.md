@@ -1938,9 +1938,9 @@ ID: 36, Location: 20, Notes: 30, etc.
 
 ### 🚨 進行中: P0-1 CI/CD安定化
 
-#### 1. CI/CD安定化 🟡 Phase 1完了（2025-11-06）
-**実績**: 8時間（分析6h + 実装2h）
-**現状**: Phase 1完了、6ファイル修正、失敗17→14件に削減
+#### 1. CI/CD安定化 🟡 Phase 1+2完了（2025-11-06）
+**実績**: 8.5時間（分析6h + Phase 1: 2h + Phase 2: 0.5h）
+**現状**: Phase 2完了、7ファイル修正（6 test fixes + 1 polyfill）、失敗17→14件に削減
 
 **Phase 0: responsive系修正（完了）**:
 - ✅ SVGSizeCalculator.ts: isMinimumSize判定ロジック修正
@@ -1949,10 +1949,16 @@ ID: 36, Location: 20, Notes: 30, etc.
 
 **Phase 1: P0/P1修正（完了 2025-11-06）**:
 - ✅ 6ファイル修正: data-validation, TideClassification, MarginCalculator, RegionalDataService, responsive, DynamicScaleCalculator
-- ✅ コミット: `3d6c94b`, `7a6279e`
+- ✅ コミット: `3d6c94b`, `7a6279e`, `bb6025e`
 - ⏱️ 所要時間: 2時間
 
-**CI実行結果の改善**:
+**Phase 2: JSDOM Polyfill実装（完了 2025-11-06）**:
+- ✅ setupTests.ts: ResizeObserver + Canvas API polyfill追加
+- ✅ コミット: `5d36b2f`
+- ⏱️ 所要時間: 30分
+- 📊 CI再実行: 78分（986 tests）
+
+**CI実行結果の推移**:
 
 Before (Phase 1前):
 ```
@@ -1960,22 +1966,40 @@ Test Files: 17 failed | 34 passed | 3 skipped (54 total)
 Tests: 137 failed | 752 passed | 59 skipped (966 total)
 ```
 
-After (Phase 1後):
+After Phase 1:
 ```
 Test Files: 14 failed | 37 passed | 3 skipped (55 total)  ← 3ファイル改善
 Tests: 128 failed | 781 passed | 59 skipped (986 total)  ← 29テスト改善
 Duration: 25分43秒
 ```
 
-**改善効果**:
+After Phase 2 (Polyfill追加後):
+```
+Test Files: 14 failed | 37 passed | 3 skipped (55 total)  ← 変化なし
+Tests: 132 failed | 777 passed | 59 skipped (986 total)  ← 失敗+4, 合格-4
+Duration: 78分16秒 (4697.65s)
+Errors: 1 unhandled error (Worker exited unexpectedly)
+```
+
+**Phase 2の結果分析**:
+- ⚠️ テスト失敗数が微増（128→132, +4件）
+- ⚠️ Worker exit errorが1件発生
+- ⚠️ RegionalDataService.test.tsの3テストで`expect.stringContaining`マッチ失敗
+  - RD-014: `'地域データが不足しています (10/50)'` vs `'地域データが不足しています'`
+  - RD-015/016: 同様のパターン
+- ✅ Polyfill自体は動作（ResizeObserver/Canvas errors解消）
+- 📊 完全実行時間: 25分→78分（全テストスイート実行による）
+
+**改善効果（Phase 1+2トータル）**:
 - 失敗ファイル数: 17 → 14 (▼3件, -17.6%)
-- 失敗テスト数: 137 → 128 (▼9件, -6.6%)
-- 合格テスト数: 752 → 781 (▲29件, +3.9%)
+- 失敗テスト数: 137 → 132 (▼5件, -3.6%) ※Phase 2で微増あり
+- 合格テスト数: 752 → 777 (▲25件, +3.3%)
 
 **重要な発見**:
 - ❌ 誤認: 「ローカル成功、リモート失敗」は誤り
 - ✅ 真実: **両環境で同一の失敗**（v1.4.0/v1.5.0以降）
 - 📊 履歴: GitHub Actions過去50回中45回失敗、最後の成功は10/30
+- ⚠️ Polyfill追加で新たな互換性問題が一部発生（stringContaining判定）
 
 ---
 
@@ -2011,12 +2035,18 @@ Duration: 25分43秒
 - 実績工数: **5分**
 - Result: **12/12 tests passing**
 
-**5. RegionalDataService.test.ts** (P1) ✅ Phase 1完了（部分）
+**5. RegionalDataService.test.ts** (P1) ✅ Phase 1完了（部分）⚠️ Phase 2で新規失敗3件
 - 直接原因: `vi.mock` factory内でトップレベル変数使用
 - 根本原因: vitestモックAPI誤用
 - 改修完了: `vi.hoisted()`使用に修正
 - 実績工数: **10分**
-- Result: hoisting error解消、logic issues残存
+- Result: hoisting error解消
+- ⚠️ Phase 2追加失敗:
+  - RD-014: `expect.stringContaining('地域データが不足しています')` が `'地域データが不足しています (10/50)'` とマッチしない
+  - RD-015: 同様（'不正な座標のデータ'）
+  - RD-016: 同様（'異常な振幅値のデータ'）
+- 原因: `toContain(expect.stringContaining())` が正確なマッチを要求（実装は `(10/50)` 付加）
+- 次回修正: `expect.stringMatching(/地域データが不足しています/)` に変更 or 実装の文字列形式に合わせる
 
 **6. validation/integration.test.ts** (P0 ← P1) ⏸️ 保留
 - 直接原因: `expected 0 to be greater than 0` (warnings.length)
@@ -2040,31 +2070,47 @@ Duration: 25分43秒
 
 #### カテゴリB: JSDOM環境制約（Polyfillで解決） - 5ファイル
 
-**10. useResizeObserver.test.ts** (P2)
+**10. useResizeObserver.test.ts** (P2) ✅ Phase 2完了
 - 直接原因: ResizeObserver callback未発火
 - 根本原因: JSDOM環境にResizeObserver未実装
-- 改修: グローバルPolyfill追加
-- 工数: **15分**（動作検証含む）
-- コード例:
+- 改修完了: グローバルPolyfill追加（setupTests.ts）
+- 実績工数: **15分**（Phase 2に含む）
+- コード実装済:
   ```typescript
   // src/setupTests.ts
-  global.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+  if (typeof global.ResizeObserver === 'undefined') {
+    global.ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    } as any;
   }
   ```
 - ⚠️ 限界: 実際のリサイズは検出できない（ロジック検証のみ）
+- ⏸️ 残存問題: integration.test.tsの2テストは依然失敗（callback未発火）
 
-**11. FishSpeciesAutocomplete.a11y.test.ts** (P2)
+**11. FishSpeciesAutocomplete.a11y.test.ts** (P2) ✅ Phase 2完了
 - 直接原因: `HTMLCanvasElement.getContext not implemented`
 - 根本原因: JSDOM未実装Canvas API
-- 改修: **動作検証→canvas package or stub**
-- 工数: **1時間**（検証・代替案検討含む）
-- ⚠️ 注意: `canvas` packageがJSDOMで動作するか未確認
-- 代替案: `getContext()`をスタブ化
+- 改修完了: Canvas API Polyfill追加（setupTests.ts）
+- 実績工数: **15分**（Phase 2に含む）
+- コード実装済:
+  ```typescript
+  // src/setupTests.ts
+  if (typeof HTMLCanvasElement !== 'undefined') {
+    HTMLCanvasElement.prototype.getContext = function() {
+      return {
+        fillRect: () => {}, clearRect: () => {},
+        // ... 20+ canvas methods
+      } as any;
+    };
+    HTMLCanvasElement.prototype.toDataURL = function() {
+      return '';
+    };
+  }
+  ```
 
-**12-14. TideGraph系（3ファイル）** (P2)
+**12-14. TideGraph系（3ファイル）** (P2) ⏸️ 未完
 - 直接原因: `Unable to find element: [data-testid="tide-path"]`
 - 根本原因: JSDOM環境でRecharts SVG未レンダリング
 - 改修: **テスト精読→必要コンポーネント特定→モック実装**
@@ -2088,6 +2134,7 @@ Duration: 25分43秒
 - 実装コスト: 3-4時間（現実的見積）
 - skipリスク: リグレッション検出不可（無限大）
 - 結論: 4時間投資 << 本番障害リスク
+- Phase 2実績: ResizeObserver + Canvas polyfill = 30分
 
 #### カテゴリC: 要詳細調査 - 3ファイル
 
@@ -2109,34 +2156,51 @@ Duration: 25分43秒
 
 ---
 
-### 改修計画（現実的見積版）
+### 改修計画（Phase 1+2完了、Phase 3以降）
 
-#### Phase 1: P0優先修正 - **3時間**
-**目標**: データ整合性・コア機能の修正
-- [ ] 1. data-validation テーブル名修正（10分）
-- [ ] 3. TideClassificationEngine 境界値修正（10分）
+#### ✅ Phase 0: responsive系修正（完了 2025-11-06）
+- ✅ SVGSizeCalculator.ts: isMinimumSize判定ロジック修正
+- ✅ integration.test.ts: テスト期待値の修正
+- 実績工数: **1時間**
+
+#### ✅ Phase 1: P0/P1修正（完了 2025-11-06）
+- ✅ 1. data-validation テーブル名修正（5分）
+- ✅ 3. TideClassificationEngine 境界値修正（5分）
+- ✅ 4. MarginCalculator 境界値修正（5分）
+- ✅ 5. RegionalDataService vi.hoisted()修正（10分）
+- ✅ 2. responsive.test 600px/aspectRatio修正（15分）
+- ✅ 7. DynamicScaleCalculator 期待値修正（15分）
+- 実績工数: **2時間**
+- 📊 改善: 17 failed → 14 failed (▼3件)
+
+#### ✅ Phase 2: JSDOM Polyfill実装（完了 2025-11-06）
+- ✅ 10. ResizeObserver Polyfill（15分）
+- ✅ 11. Canvas API Polyfill（15分）
+- 実績工数: **30分**
+- 📊 結果: 14 failed（変化なし）、132 failed tests（Phase 1: 128から+4）
+- ⚠️ 新規問題: RegionalDataService stringContaining判定失敗3件
+
+#### Phase 3: 残存14失敗ファイル対応 - **推定8-11時間**
+**目標**: CI完全成功
+
+**P0: 即修正必須** - **3.5時間**
+- [ ] 5. RegionalDataService stringContaining修正（15分）
+  - `toContain(expect.stringContaining('地域データ'))` → `expect.stringMatching(/地域データが不足/)`
 - [ ] 6. validation/integration デバッグ・修正（2時間）
-- [ ] 4. MarginCalculator 境界値修正（10分）
 - [ ] 15-16. ErrorBoundary/WarningGenerator 調査・修正（各1時間）
-- 🎯 目標: P0完了、アプリ信頼性確保
+- 🎯 目標: データ整合性・アプリ安定性確保
 
-#### Phase 2: P1修正 - **11時間**
-**目標**: コア機能・ビジネス価値高い修正
+**P1: コア機能修正** - **4.5時間**
 - [ ] 8-9. FishSpecies系 ロジック修正（各2時間 = 4時間）
-- [ ] 2. responsive.test 仕様確認・修正（30分）
-- [ ] 7. DynamicScaleCalculator 検証・修正（2時間）
-- [ ] 5. RegionalDataService コード確認・修正（1時間）
-- [ ] 11. Canvas Polyfill検証・実装（1時間）
-- [ ] 12-14. Recharts モック実装（2時間）
-- [ ] 10. ResizeObserver Polyfill（15分）
-- 🎯 目標: 17→1失敗（CelestialCalculator残り）
+- [ ] 10. integration.test ResizeObserver callback発火問題（30分）
+- 🎯 目標: ビジネス価値高い機能の修正
 
-#### Phase 3: P2修正 - **30分-5時間**
-**目標**: 残課題対応（選択的）
+**P2: 環境依存対応** - **3-5時間**
+- [ ] 12-14. TideGraph系 Rechartsモック実装（2時間）
 - [ ] 17. CelestialCalculator 対応（選択肢による）
-  - Option A: 許容誤差調整 or テスト削除（30分）← 推奨
+  - Option A: 許容誤差調整（30分）← 推奨
   - Option B: アルゴリズム修正（3-5時間）
-- 🎯 目標: 完全成功（0失敗）
+- 🎯 目標: CI完全成功（0 failed）
 
 #### Phase 4: E2Eテスト補完（推奨） - **2-3時間**
 **目標**: 実環境動作保証
@@ -2147,27 +2211,32 @@ Duration: 25分43秒
 
 ---
 
-### 現実的な成功基準とタイムライン
+### 現実的な成功基準とタイムライン（Phase 1+2完了後）
 
-**短期（3時間）**: Phase 1完了
-- P0修正完了
-- アプリ信頼性確保
-- 17→12失敗程度
+**✅ 完了済（3.5時間）**: Phase 0+1+2完了
+- ✅ responsive系修正（1h）
+- ✅ P0/P1修正6ファイル（2h）
+- ✅ Polyfill実装（0.5h）
+- 📊 実績: 17 failed → 14 failed (▼3件)
+- ⚠️ 問題: テスト失敗数 128 → 132 (+4件、Phase 2副作用)
 
-**中期（14時間 = 2日）**: Phase 1+2完了
-- P0/P1修正完了
-- CI合格可能性高い
-- 17→1失敗（CelestialCalculator）
+**短期（3.5時間）**: Phase 3 P0完了
+- RegionalDataService stringContaining修正
+- validation/integration デバッグ
+- ErrorBoundary/WarningGenerator 調査
+- 🎯 目標: アプリ信頼性確保、14→10失敗程度
 
-**長期（14.5-19時間 = 2-3日）**: Phase 1+2+3完了
-- 全修正完了
-- CI完全成功
-- 実装完了
+**中期（8時間 = 1日）**: Phase 3 P0+P1完了
+- P0完了 + FishSpecies系修正
+- 🎯 目標: コア機能修正完了、14→6失敗程度
 
-**最長（16.5-22時間 = 3-4日）**: 全Phase完了
-- E2Eテスト補完
-- 本番品質保証
-- 完璧な状態
+**長期（11-13時間 = 1.5-2日）**: Phase 3完了
+- P0+P1+P2修正完了
+- 🎯 目標: CI完全成功（0 failed）
+
+**最長（13-16時間 = 2-3日）**: Phase 3+4完了
+- 全修正 + E2Eテスト補完
+- 🎯 目標: 本番品質保証
 
 ---
 
