@@ -1,7 +1,10 @@
 import '@testing-library/jest-dom';
 
 // Mock ResizeObserver for Recharts components
-class ResizeObserverMock {
+global.ResizeObserver = class ResizeObserver {
+  constructor() {
+    // Mock constructor
+  }
   observe() {
     // Mock implementation
   }
@@ -11,6 +14,4 @@ class ResizeObserverMock {
   disconnect() {
     // Mock implementation
   }
-}
-
-global.ResizeObserver = ResizeObserverMock as any;
+} as any;
