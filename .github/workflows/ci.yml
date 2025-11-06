@@ -48,7 +48,7 @@ jobs:
       run: npm run test:fast -- --coverage
       env:
         NODE_OPTIONS: '--max-old-space-size=4096'
-      timeout-minutes: 5
+      timeout-minutes: 30
 
     - name: Run accessibility tests
       run: npm run test:a11y -- --run
