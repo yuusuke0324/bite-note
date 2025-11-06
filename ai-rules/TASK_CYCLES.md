@@ -244,4 +244,80 @@
 
 ---
 
+## 8. Issue駆動開発タスク
+
+**Issue起点の開発フロー**
+
+```
+Issue作成
+  ↓
+task-coordinator エージェント（タスク種別判定）
+  ↓ タスク種別に応じたサイクル選択（1-7）
+作業開始（ブランチ作成、WIPラベル）
+  ↓
+実装 + 該当サイクルのエージェントレビュー
+  ↓
+PR作成（"Closes #123"でリンク）
+  ↓
+最終レビュー（tech-lead必須）
+  ↓
+マージ後、Issue自動クローズ
+```
+
+### Issue作成時の確認
+
+- [ ] Issue番号を取得
+- [ ] タスク粒度（2-6時間、1-5ファイル）を確認
+- [ ] Files to Edit（予定）を記載
+- [ ] 依存関係（Blocked by, Blocks）を明示
+- [ ] size:S/M/Lラベルを付与
+
+### 作業開始時
+
+```bash
+# 1. ブランチ作成（Issue番号を含める）
+git checkout -b feat-issue-42-photo-exif
+
+# 2. Issue に WIPラベル付与（手動またはGitHub CLI）
+gh issue edit 42 --add-label "Status: WIP"
+
+# 3. セルフアサイン
+gh issue edit 42 --add-assignee @me
+```
+
+### 作業中
+
+- **Session Notes更新**: 各セッション後に進捗を記録
+- **Files to Edit更新**: 実際に編集したファイルをチェック
+- **依存関係確認**: 他のWIP Issueと重複していないか確認
+
+### PR作成時
+
+```bash
+# PR作成時に"Closes #123"を含める
+gh pr create --title "feat(photo): add EXIF metadata auto-extraction" \
+  --body "$(cat <<'EOF'
+## 概要
+写真のEXIF情報から位置・日時を自動抽出
+
+## 変更内容
+- photo-service.tsにEXIF抽出ロジック追加
+- GPS情報をgeolocation APIと統合
+
+## テスト
+- npm run test:fast: ✅ パス
+
+Closes #42
+EOF
+)"
+```
+
+### マージ後
+
+- Issue自動クローズ（"Closes #42"により）
+- 必要に応じてロードマップに`(→ #42)`を追記
+- Epic Issueの場合は進捗チェックリスト更新
+
+---
+
 **ヒント**: タスクの種類が不明確な場合は、`task-coordinator` エージェントに相談して、適切なサイクルを提案してもらってください。

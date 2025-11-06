@@ -14,25 +14,29 @@
 
 ### ブランチ命名規則
 
+**Issue駆動開発対応**: 必ずIssue番号を含める
+
 ```
-feat/<機能名>      # 新機能追加
-fix/<修正内容>     # バグ修正
-refactor/<対象>   # リファクタリング
-docs/<対象>       # ドキュメント更新
-test/<対象>       # テスト追加・修正
-chore/<内容>      # その他の作業
+feat-issue-番号-短い説明      # 新機能追加
+fix-issue-番号-短い説明       # バグ修正
+refactor-issue-番号-短い説明  # リファクタリング
+docs-issue-番号-短い説明      # ドキュメント更新
+test-issue-番号-短い説明      # テスト追加・修正
+chore-issue-番号-短い説明     # その他の作業
 ```
 
 ### 例
 
 ```bash
-feat/weight-field            # 重量フィールド追加
-fix/skeleton-loading        # スケルトンローディングのバグ修正
-refactor/tide-calculation   # 潮汐計算のリファクタリング
-docs/readme-update          # README更新
-test/photo-service          # 写真サービスのテスト追加
-chore/dependencies-update   # 依存関係の更新
+feat-issue-42-photo-exif           # Issue #42: 写真EXIF情報抽出
+fix-issue-58-tide-scale            # Issue #58: 潮汐グラフスケール修正
+refactor-issue-73-error-handling   # Issue #73: エラーハンドリング統一
+docs-issue-19-api-guide            # Issue #19: APIガイド作成
+test-issue-85-tide-calculation     # Issue #85: 潮汐計算テスト追加
+chore-issue-12-deps-update         # Issue #12: 依存関係更新
 ```
+
+**重要**: Issue番号を含めることで、GitHub上でブランチとIssueが自動リンクされます。
 
 ---
 

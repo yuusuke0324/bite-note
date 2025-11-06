@@ -56,6 +56,7 @@
 ♻️ Refactoring  - リファクタリング
 🔒 Security     - セキュリティ関連
 ❓ Question     - 質問・相談
+🎯 Epic         - 大規模タスク（複数Issue）
 ```
 
 ### 推奨ラベル
@@ -66,14 +67,20 @@ priority:medium   - 優先度：中
 priority:low      - 優先度：低
 
 status:to-triage  - トリアージ待ち
-status:in-progress - 作業中
+status:wip        - 作業中（Work In Progress）
 status:blocked    - ブロック中
 status:on-hold    - 保留中
+status:in-review  - レビュー中
 
 type:bug          - バグ
 type:feature      - 新機能
 type:enhancement  - 改善
 type:docs         - ドキュメント
+type:epic         - Epic Issue
+
+size:S            - 小規模（2-4h, 1-3ファイル）
+size:M            - 中規模（4-8h, 3-5ファイル）
+size:L            - 大規模（8-16h, 5-10ファイル） ← Epic分割推奨
 ```
 
 ---
@@ -212,6 +219,102 @@ type:docs         - ドキュメント
 - **不完全な情報**: 再現手順や環境情報の欠落
 - **感情的な表現**: "最悪"、"ひどい"等の主観的表現
 - **長すぎる**: 必要以上に冗長な説明
+
+---
+
+## 🔄 Issue駆動開発のベストプラクティス
+
+### タスク粒度の判断基準
+
+**1 Issue = 1 PR の原則**を守り、以下の粒度を目安にする：
+
+- **推奨作業時間**: 2-6時間（1セッション完結）
+- **ファイル数の目安**: 1-5ファイル（テスト含む10ファイルまで許容）
+- **コミット数の目安**: 1-3コミット
+- **見積もりラベル**: size:S (2-4h), size:M (4-8h), size:L (8-16h)
+
+```
+✅ 良い粒度の例:
+- "写真EXIF情報からGPS座標を自動入力する機能"
+  → 2-6時間、3-5ファイル、1 PR
+
+❌ 粒度が大きすぎる例:
+- "写真管理機能の実装"
+  → 16時間以上、10ファイル以上、複数PR必要
+  → Epic Issueとして分割が必要
+
+❌ 粒度が小さすぎる例:
+- "PhotoUpload.tsxに型定義を追加"
+  → 30分、1ファイル、些細な変更
+  → 他のタスクに含めるべき
+```
+
+### 依存関係の表現
+
+Issue本文に以下のセクションを追加：
+
+```markdown
+## 🔗 Dependencies
+- Blocked by: #123, #124
+- Blocks: #125
+- Related: #126, #127
+```
+
+**Epic Issueの場合**: Mermaidで依存関係グラフを作成：
+
+```markdown
+## 依存関係グラフ（Mermaid）
+```mermaid
+graph TD
+    A[Epic #100: PWA対応] --> B[#101: Service Worker実装]
+    A --> C[#102: マニフェスト最適化]
+    A --> D[#103: オフラインキャッシュ]
+    B --> D
+    C --> D
+```
+```
+
+### 編集対象ファイルの記載
+
+**2段階管理**で実施：
+
+```markdown
+## 📂 Files to Edit
+
+### 予定（事前）
+- [ ] src/lib/photo-service.ts
+- [ ] src/lib/photo-service.test.ts
+- [ ] src/types/photo.ts (?)  ← 不確定なファイルは「?」付与
+
+### 実績（作業中〜完了時）
+- [x] src/lib/photo-service.ts
+- [x] src/lib/photo-service.test.ts
+- [x] src/types/photo.ts ← 実際に編集したファイル
+- [x] src/lib/exif-utils.ts ← 作業中に追加されたファイル
+```
+
+**重要**: 作業開始前に他のWIP Issueの「Files to Edit実績」と重複チェック
+
+### セッション引き継ぎ
+
+各セッション後にSession Notesを更新：
+
+```markdown
+## Session Notes
+
+### Session 1 (2025-11-07 10:00)
+- **実施内容**: photo-service.ts のEXIF抽出ロジック実装完了
+- **完了項目**: ✅ src/lib/photo-service.ts
+- **未完了項目**: ❌ src/lib/photo-service.test.ts (未着手)
+- **技術メモ**: ExifReader v4.31.2 を使用、GPS取得は navigator.geolocation と併用
+- **ブロッカー**: なし
+
+### Session 2 (2025-11-07 14:00)
+- **実施内容**: テストコード追加、qa-engineerレビュー完了
+- **完了項目**: ✅ src/lib/photo-service.test.ts
+- **技術メモ**: モック作成時に注意が必要（非同期処理）
+- **次回**: tech-leadレビュー依頼
+```
 
 ---
 
