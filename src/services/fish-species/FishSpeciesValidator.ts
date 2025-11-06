@@ -22,7 +22,7 @@ const DEFAULT_VALIDATION_RULES: UserSpeciesValidationRules = {
   standardName: {
     minLength: 2,
     maxLength: 20,
-    pattern: /^[ぁ-んァ-ヶー一-龠々\u3000-\u303F]+$/,  // 日本語（ひらがな、カタカナ、漢字、句読点）
+    pattern: /^[ぁ-んァ-ヶー一-龠々\u3001-\u303F\u4E00-\u9FFF]+$/,  // 日本語（ひらがな、カタカナ、漢字拡張、句読点）全角スペース除外
     forbiddenWords: [
       'テスト', 'test', 'TEST',
       'あああ', 'アアア',
@@ -115,19 +115,7 @@ export class FishSpeciesValidator {
       };
     }
 
-    // パターンチェック（日本語のみ）
-    if (!this.rules.standardName.pattern.test(sanitized)) {
-      return {
-        valid: false,
-        error: {
-          code: 'INVALID_PATTERN',
-          message: ERROR_MESSAGES['INVALID_PATTERN'],
-          details: '許可されている文字: ひらがな、カタカナ、漢字'
-        }
-      };
-    }
-
-    // 禁止語チェック
+    // 禁止語チェック（パターンチェックより先に実行）
     const lowerInput = sanitized.toLowerCase();
     for (const word of this.rules.standardName.forbiddenWords) {
       if (lowerInput.includes(word.toLowerCase())) {
@@ -140,6 +128,18 @@ export class FishSpeciesValidator {
           }
         };
       }
+    }
+
+    // パターンチェック（日本語のみ）
+    if (!this.rules.standardName.pattern.test(sanitized)) {
+      return {
+        valid: false,
+        error: {
+          code: 'INVALID_PATTERN',
+          message: ERROR_MESSAGES['INVALID_PATTERN'],
+          details: '許可されている文字: ひらがな、カタカナ、漢字'
+        }
+      };
     }
 
     // 重複チェック
@@ -189,7 +189,11 @@ export class FishSpeciesValidator {
    * バリデーションルールを取得
    */
   getRules(): UserSpeciesValidationRules {
-    return { ...this.rules };
+    return {
+      ...this.rules,
+      standardName: { ...this.rules.standardName },
+      sanitization: { ...this.rules.sanitization }
+    };
   }
 
   /**
