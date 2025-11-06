@@ -2,8 +2,20 @@ name: Split CI Tests
 on:
   push:
     branches: [ main, develop ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.claude/**'
+      - 'ai-rules/**'
+      - '.vscode/**'
+      - '.idea/**'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.claude/**'
+      - 'ai-rules/**'
 
 jobs:
   # 高速で安定したコアテスト

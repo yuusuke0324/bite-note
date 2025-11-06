@@ -7,6 +7,7 @@ on:
       - 'docs/**'
       - '**.md'
       - '.claude/**'
+      - 'ai-rules/**'
       - '.vscode/**'
       - '.idea/**'
   pull_request:
@@ -15,6 +16,7 @@ on:
       - 'docs/**'
       - '**.md'
       - '.claude/**'
+      - 'ai-rules/**'
 
 jobs:
   test:
