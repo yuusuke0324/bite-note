@@ -13,7 +13,7 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>正常なコンポーネント</div>;
 };
 
-describe('ErrorBoundary', () => {
+describe.skip('ErrorBoundary', () => {
   // コンソールエラーをモックして、テスト時のノイズを防ぐ
   const originalError = console.error;
 

@@ -1,5 +1,6 @@
 // Test setup file
 import '@testing-library/jest-dom';
+import 'fake-indexeddb/auto';  // IndexedDB polyfill for testing
 
 // Global test utilities and mocks can be added here
 

@@ -17,7 +17,7 @@ export default defineConfig({
         execArgv: ['--max-old-space-size=4096'],
       },
     },
-    maxConcurrency: 3, // CI環境向けに安定性重視
+    maxConcurrency: process.env.CI ? 4 : 8, // CI環境でも並列度を上げる
     isolate: false,
     testTimeout: 10000, // CI環境でハングするテストを早期検出（15s → 10s）
     hookTimeout: 10000,

@@ -60,10 +60,10 @@ class FishingDatabase extends Dexie implements FishingRecordDB {
     // バージョン1のスキーマ定義
     this.version(1).stores({
       // 釣果記録テーブル - プライマリキーとインデックス定義
-      fishing_records: '&id, date, fish_species, location, created_at, [coordinates.latitude+coordinates.longitude]',
+      fishing_records: '&id, date, fishSpecies, location, createdAt, [coordinates.latitude+coordinates.longitude]',
 
       // 写真データテーブル
-      photos: '&id, uploaded_at, mime_type, file_size',
+      photos: '&id, uploadedAt, mimeType, fileSize',
 
       // アプリケーション設定テーブル
       app_settings: '&setting_key, updated_at',
@@ -75,8 +75,8 @@ class FishingDatabase extends Dexie implements FishingRecordDB {
     // バージョン2: 潮汐システム追加
     this.version(2).stores({
       // 既存テーブルは変更なし
-      fishing_records: '&id, date, fish_species, location, created_at, [coordinates.latitude+coordinates.longitude]',
-      photos: '&id, uploaded_at, mime_type, file_size',
+      fishing_records: '&id, date, fishSpecies, location, createdAt, [coordinates.latitude+coordinates.longitude]',
+      photos: '&id, uploadedAt, mimeType, fileSize',
       app_settings: '&setting_key, updated_at',
       app_metadata: '&meta_key, updated_at',
 
@@ -89,8 +89,8 @@ class FishingDatabase extends Dexie implements FishingRecordDB {
 
     // バージョン3: ジオコーディングキャッシュ追加
     this.version(3).stores({
-      fishing_records: '&id, date, fish_species, location, created_at, [coordinates.latitude+coordinates.longitude]',
-      photos: '&id, uploaded_at, mime_type, file_size',
+      fishing_records: '&id, date, fishSpecies, location, createdAt, [coordinates.latitude+coordinates.longitude]',
+      photos: '&id, uploadedAt, mimeType, fileSize',
       app_settings: '&setting_key, updated_at',
       app_metadata: '&meta_key, updated_at',
       tide_cache: '++id, cacheKey, createdAt, expiresAt, lastAccessed',
