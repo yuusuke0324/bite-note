@@ -27,16 +27,18 @@ export default defineWorkspace([
         '**/integration.test.tsx',
         '**/*.performance.test.tsx',
       ],
-      // setupFiles を明示的に指定（singleFork時の継承問題を解決）
+      // setupFiles を明示的に指定（継承問題を解決）
       setupFiles: ['./src/setupTests.ts'],
-      // コンポーネント用の設定（メモリ使用量を抑えるため順次実行）
+      // コンポーネント用の設定（メモリとスピードのバランス）
       pool: 'forks',
       poolOptions: {
         forks: {
-          singleFork: true,
+          singleFork: false, // 2並列実行
         },
       },
-      testTimeout: 30000, // コンポーネントテストは長めのタイムアウト
+      maxConcurrency: 2, // 2テストファイルを同時実行
+      testTimeout: 20000, // タイムアウトを20秒に設定
+      // メモリ制限は親のvitest.config.tsから継承（4GB）
     },
   },
   // 統合テスト（重い）
