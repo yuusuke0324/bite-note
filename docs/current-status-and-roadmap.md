@@ -2541,3 +2541,35 @@ jobs:
 ---
 
 **最終更新**: 2025-11-06 PM - Phase 4完了（CI分割アーキテクチャ、Mock整備、実行時間98.8%削減達成）
+
+## 🎯 次の具体的アクション（2025-11-06時点）
+
+### 📌 今すぐやること（30分以内）
+1. **Integration Testsのファイル問題を修正** 🔴
+   ```bash
+   find . -name "*.integration.test.*" -type f
+   # vitest.workspace.tsのinclude設定を調整
+   ```
+
+2. **Component Tests結果を確認** 🟡
+   ```bash
+   gh run list --workflow=ci-split.yml --limit=1
+   ```
+
+### 📅 今日中にやること（1-2時間）
+3. **FishSpeciesValidatorの方針決定**
+   - Option A: テスト期待値を現仕様に合わせる
+   - Option B: 仕様変更（最小1文字許可等）
+
+4. **performance-unit.testのspy修正**
+   ```typescript
+   // vi.hoisted()使用検討
+   ```
+
+### 📋 今週中にやること
+5. **integration.testメモリ問題調査**（2-3時間）
+6. **最優先skipテスト1つを復活**（1-2時間）
+
+### 💡 判断ポイント
+- **このドキュメントだけ見れば次のアクションがわかる**
+- NEXT_ACTIONS.mdは削除して一本化
