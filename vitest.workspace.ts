@@ -27,14 +27,14 @@ export default defineWorkspace([
         '**/integration.test.tsx',
         '**/*.performance.test.tsx',
       ],
-      // コンポーネント用の設定
-      pool: 'threads',
+      // コンポーネント用の設定（メモリ使用量を抑えるため順次実行）
+      pool: 'forks',
       poolOptions: {
-        threads: {
-          singleThread: false,
-          maxThreads: 4,
+        forks: {
+          singleFork: true,
         },
       },
+      testTimeout: 30000, // コンポーネントテストは長めのタイムアウト
     },
   },
   // 統合テスト（重い）
