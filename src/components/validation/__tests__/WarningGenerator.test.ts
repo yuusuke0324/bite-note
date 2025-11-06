@@ -47,7 +47,7 @@ describe('WarningGenerator', () => {
 
   test('should provide helpful suggestions', () => {
     const problematicData: RawTideData[] = [
-      { time: '2025-01-29T06:00:00Z', tide: 4.8 }
+      { time: '2025-01-29T06:00:00Z', tide: 4.95 } // MAX_TIDE=5.0, threshold=0.1 → 4.95 > 4.9で警告
     ];
 
     const warnings = WarningGenerator.generate(problematicData);

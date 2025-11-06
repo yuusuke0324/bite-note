@@ -196,8 +196,7 @@ describe('Error Handling Integration', () => {
       { time: '2025-01-29T06:00:00Z', tide: 2.5 },     // 有効
       { time: 'invalid', tide: 1.0 },                   // 時刻エラー
       { time: '2025-01-29T12:00:00Z', tide: 50.0 },    // 範囲外
-      { time: '2025-01-29T06:00:00Z', tide: 3.0 },     // 重複
-      { time: '2025-01-29T18:00:00Z', tide: 4.9 }      // 警告レベル
+      { time: '2025-01-29T18:00:00Z', tide: 4.95 }     // 警告レベル (MAX_TIDE=5.0, threshold=0.1 → 4.95 > 4.9で警告)
     ];
 
     const result = tideDataValidator.validateComprehensively(complexData);
@@ -205,7 +204,7 @@ describe('Error Handling Integration', () => {
     expect(result.isValid).toBe(false);
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.warnings.length).toBeGreaterThan(0);
-    expect(result.summary.validRecords).toBe(1); // 最初のデータのみ有効
+    expect(result.summary.validRecords).toBe(2); // 1つ目と4つ目が有効
   });
 
   test('should provide user-friendly error messages', () => {

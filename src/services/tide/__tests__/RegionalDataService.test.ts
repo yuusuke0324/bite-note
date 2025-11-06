@@ -290,9 +290,7 @@ describe('RegionalDataService', () => {
       const integrity = await service.checkDatabaseIntegrity();
 
       expect(integrity.isValid).toBe(false);
-      expect(integrity.issues).toContain(
-        expect.stringContaining('地域データが不足しています')
-      );
+      expect(integrity.issues.some(issue => issue.includes('地域データが不足しています'))).toBe(true);
     });
 
     it('RD-015: 不正座標の検出', async () => {
@@ -308,9 +306,7 @@ describe('RegionalDataService', () => {
       const integrity = await service.checkDatabaseIntegrity();
 
       expect(integrity.isValid).toBe(false);
-      expect(integrity.issues).toContain(
-        expect.stringContaining('不正な座標のデータ')
-      );
+      expect(integrity.issues.some(issue => issue.includes('不正な座標のデータ'))).toBe(true);
     });
 
     it('RD-016: 異常振幅値の検出', async () => {
@@ -326,9 +322,7 @@ describe('RegionalDataService', () => {
       const integrity = await service.checkDatabaseIntegrity();
 
       expect(integrity.isValid).toBe(false);
-      expect(integrity.issues).toContain(
-        expect.stringContaining('異常な振幅値のデータ')
-      );
+      expect(integrity.issues.some(issue => issue.includes('異常な振幅値のデータ'))).toBe(true);
     });
   });
 
