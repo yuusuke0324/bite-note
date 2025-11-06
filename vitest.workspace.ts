@@ -9,7 +9,7 @@ export default defineWorkspace([
       include: ['src/**/*.test.{ts,tsx}'],
       exclude: [
         '**/node_modules/**',
-        '**/*.integration.test.{ts,tsx}',
+        '**/integration.test.{ts,tsx}',
         '**/*.a11y.test.{ts,tsx}',
         '**/*.performance.test.{ts,tsx}',
         '**/components/**/*.test.tsx', // コンポーネントは別枠
@@ -24,7 +24,7 @@ export default defineWorkspace([
       include: ['src/components/**/*.test.tsx'],
       exclude: [
         '**/*.a11y.test.tsx',
-        '**/*.integration.test.tsx',
+        '**/integration.test.tsx',
         '**/*.performance.test.tsx',
       ],
       // コンポーネント用の設定
@@ -42,7 +42,7 @@ export default defineWorkspace([
     extends: './vitest.config.ts',
     test: {
       name: 'integration',
-      include: ['**/*.integration.test.{ts,tsx}'],
+      include: ['**/integration.test.{ts,tsx}'],
       // 統合テストは順次実行
       pool: 'forks',
       poolOptions: {
