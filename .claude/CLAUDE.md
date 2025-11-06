@@ -9,9 +9,17 @@
 
 ### Git作業フロー
 - **mainブランチでの直接作業は絶対禁止**: いかなる変更もmainブランチに直接コミットしない
-- **作業開始時**: 必ず専用ブランチを作成（feat-*, fix-*, refactor-*）
+- **作業開始時**: 必ず専用ブランチを作成（feat-issue-番号-説明）
 - **作業終了時**: コミット → push → PR作成の3ステップを必ず実施
 - 📄 **詳細**: `ai-rules/COMMIT_AND_PR_GUIDELINES.md`
+
+### Issue駆動開発フロー
+- **Issue作成**: タスク粒度（2-6時間、1-5ファイル）を確認
+- **作業開始時**: Issue番号を含むブランチ作成、WIPラベル付与、セルフアサイン
+- **作業中**: Session Notes更新、Files to Edit実績更新
+- **PR作成時**: `Closes #番号` でIssueとリンク
+- **マージ後**: Issue自動クローズ
+- 📄 **詳細**: `ai-rules/TASK_CYCLES.md` セクション8
 
 ### 専門エージェント活用
 - **タスク開始時**: `task-coordinator` エージェントに相談し、適切なサイクルを決定
