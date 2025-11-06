@@ -3,8 +3,18 @@ name: CI
 on:
   push:
     branches: [ main, develop ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.claude/**'
+      - '.vscode/**'
+      - '.idea/**'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.claude/**'
 
 jobs:
   test:

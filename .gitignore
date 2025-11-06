@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Claude Code local settings (should NOT be committed)
+.claude/settings.local.json
+.claude/**/*.local.*
+.claude/mcp/
+
+# Temporary test output files
+/tmp/
+*.tmp
+ci_*.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
