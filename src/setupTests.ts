@@ -15,7 +15,7 @@ import { vi } from 'vitest';
  * This enhanced polyfill provides a more complete implementation
  * Supports callbacks and maintains observed elements list
  */
-const ResizeObserverPolyfill = class ResizeObserver {
+class ResizeObserverPolyfill implements ResizeObserver {
   private callback: ResizeObserverCallback;
   private observations = new Map<Element, any>();
 
@@ -23,7 +23,7 @@ const ResizeObserverPolyfill = class ResizeObserver {
     this.callback = callback;
   }
 
-  observe(target: Element, options?: ResizeObserverOptions) {
+  observe(target: Element, options?: ResizeObserverOptions): void {
     if (!target) {
       throw new TypeError('Failed to execute \'observe\' on \'ResizeObserver\': 1 argument required, but only 0 present.');
     }
@@ -55,24 +55,35 @@ const ResizeObserverPolyfill = class ResizeObserver {
     }, 0);
   }
 
-  unobserve(target: Element) {
+  unobserve(target: Element): void {
     if (!target) {
       throw new TypeError('Failed to execute \'unobserve\' on \'ResizeObserver\': 1 argument required, but only 0 present.');
     }
     this.observations.delete(target);
   }
 
-  disconnect() {
+  disconnect(): void {
     this.observations.clear();
   }
-} as any;
-
-// Set on both global and window
-if (typeof global.ResizeObserver === 'undefined') {
-  global.ResizeObserver = ResizeObserverPolyfill;
 }
-if (typeof window !== 'undefined' && typeof window.ResizeObserver === 'undefined') {
+
+// グローバルスコープにResizeObserverを設定
+// 既存の不完全な実装を完全に上書き
+if (typeof window !== 'undefined') {
+  // windowオブジェクトが存在する場合（JSDOM環境）
   (window as any).ResizeObserver = ResizeObserverPolyfill;
+}
+if (typeof global !== 'undefined') {
+  // Node.js グローバルスコープ
+  (global as any).ResizeObserver = ResizeObserverPolyfill;
+  // global.windowが存在する場合も設定
+  if ((global as any).window) {
+    (global as any).window.ResizeObserver = ResizeObserverPolyfill;
+  }
+}
+// globalThisにも設定（最新の標準）
+if (typeof globalThis !== 'undefined') {
+  (globalThis as any).ResizeObserver = ResizeObserverPolyfill;
 }
 
 /**

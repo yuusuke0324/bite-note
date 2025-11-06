@@ -27,6 +27,8 @@ export default defineWorkspace([
         '**/integration.test.tsx',
         '**/*.performance.test.tsx',
       ],
+      // setupFiles を明示的に指定（singleFork時の継承問題を解決）
+      setupFiles: ['./src/setupTests.ts'],
       // コンポーネント用の設定（メモリ使用量を抑えるため順次実行）
       pool: 'forks',
       poolOptions: {
