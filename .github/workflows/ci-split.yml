@@ -22,12 +22,7 @@ jobs:
       run: npm ci
 
     - name: Run Core Tests
-      run: |
-        npm run test:fast -- \
-          --exclude="**/*.integration.test.ts" \
-          --exclude="**/*.a11y.test.tsx" \
-          --exclude="**/components/**/*.test.tsx" \
-          --bail=3
+      run: npm run test:unit
       timeout-minutes: 10
 
   # UIコンポーネントテスト
@@ -46,12 +41,7 @@ jobs:
       run: npm ci
 
     - name: Run Component Tests
-      run: |
-        npm run test:fast -- \
-          "src/components/**/*.test.tsx" \
-          --exclude="**/*.a11y.test.tsx" \
-          --exclude="**/*.integration.test.ts" \
-          --bail=5
+      run: npm run test:components
       timeout-minutes: 15
 
   # 統合テスト（オプショナル）
@@ -71,10 +61,7 @@ jobs:
       run: npm ci
 
     - name: Run Integration Tests
-      run: |
-        npm run test:fast -- \
-          "**/*.integration.test.ts" \
-          --bail=3
+      run: npm run test:integration
       timeout-minutes: 10
 
   # 必須テストの成功チェック
