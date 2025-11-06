@@ -1,7 +1,7 @@
 # Bite Note - AI駆動開発ガイドライン
 
 プロジェクト: 個人釣果記録PWA (React + TypeScript + IndexedDB)
-開発方針: モック優先・動作重視のMVP開発
+開発方針: 品質とUX両立・AI駆動開発
 
 ---
 
