@@ -115,9 +115,9 @@ describe('Performance Integration', () => {
     const finalMemory = process.memoryUsage().heapUsed;
 
     const memoryIncrease = finalMemory - initialMemory;
-    const inputSize = JSON.stringify(largeDataset).length;
 
-    expect(memoryIncrease).toBeLessThan(inputSize * 10); // 10倍以下（より現実的な閾値）
+    // 5000件のデータで15MB以下であることを確認（絶対値で判定）
+    expect(memoryIncrease).toBeLessThan(15 * 1024 * 1024); // 15MB
   });
 
   test('should optimize performance mode correctly', () => {

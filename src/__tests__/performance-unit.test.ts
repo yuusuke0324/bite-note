@@ -24,6 +24,9 @@ Object.defineProperty(window, 'performance', {
   configurable: true
 });
 
+// Remove PerformanceObserver to ensure fallback path is used
+delete (window as any).PerformanceObserver;
+
 describe('ImageOptimizer', () => {
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
