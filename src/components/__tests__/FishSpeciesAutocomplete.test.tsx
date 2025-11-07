@@ -99,14 +99,6 @@ describe('FishSpeciesAutocomplete', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     }
 
-    // 環境診断（CI環境での問題特定用）
-    if (process.env.CI) {
-      console.log('[Test beforeEach] JSDOM State:', {
-        hasBody: !!document.body,
-        bodyChildren: document.body?.children.length || 0
-      });
-    }
-
     mockOnChange = vi.fn();
     mockSearchEngine = createMockSearchEngine();
 
@@ -125,12 +117,6 @@ describe('FishSpeciesAutocomplete', () => {
 
   describe('基本的なレンダリング', () => {
     it('コンポーネントが表示されること', async () => {
-      // CI環境での詳細診断ログ（Issue #37）
-      if (process.env.CI) {
-        console.log('[Before render] document.body.children:', document.body.children.length);
-        console.log('[Before render] document.body.innerHTML:', document.body.innerHTML);
-      }
-
       const result = render(
         <FishSpeciesAutocomplete
           value=""
@@ -138,15 +124,6 @@ describe('FishSpeciesAutocomplete', () => {
           searchEngine={mockSearchEngine}
         />
       );
-
-      // CI環境での詳細診断ログ（Issue #37）
-      if (process.env.CI) {
-        console.log('[After render] document.body.children:', document.body.children.length);
-        console.log('[After render] document.body.innerHTML:', document.body.innerHTML);
-        console.log('[After render] container.innerHTML:', result.container.innerHTML);
-        console.log('[After render] screen.debug output:');
-        screen.debug();
-      }
 
       // CI環境では screen オブジェクトがforks modeで正しく動作しない可能性があるため、
       // result.containerから直接クエリを実行（Issue #37 fix）
