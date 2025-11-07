@@ -45,9 +45,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     document.documentElement.appendChild(document.body);
   }
 
-  // bodyを空にリセット（各テストで綺麗な状態から開始）
-  document.body.innerHTML = '';
-
   // CI環境での追加初期化（Tech-lead recommendation for Issue #37）
   if (process.env.CI) {
     // レンダリングコンテナを事前に作成
@@ -58,6 +55,10 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     // DOMContentLoadedイベントを同期的に発火（React初期化トリガー）
     const event = new Event('DOMContentLoaded');
     document.dispatchEvent(event);
+  } else {
+    // 非CI環境のみbodyを空にリセット（各テストで綺麗な状態から開始）
+    // CI環境ではroot containerを保持するためリセットしない
+    document.body.innerHTML = '';
   }
 }
 
