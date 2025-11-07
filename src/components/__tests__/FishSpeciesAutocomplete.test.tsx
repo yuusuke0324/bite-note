@@ -121,13 +121,28 @@ describe('FishSpeciesAutocomplete', () => {
 
   describe('基本的なレンダリング', () => {
     it('コンポーネントが表示されること', async () => {
-      render(
+      // CI環境での詳細診断ログ（Issue #37）
+      if (process.env.CI) {
+        console.log('[Before render] document.body.children:', document.body.children.length);
+        console.log('[Before render] document.body.innerHTML:', document.body.innerHTML);
+      }
+
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
           searchEngine={mockSearchEngine}
         />
       );
+
+      // CI環境での詳細診断ログ（Issue #37）
+      if (process.env.CI) {
+        console.log('[After render] document.body.children:', document.body.children.length);
+        console.log('[After render] document.body.innerHTML:', document.body.innerHTML);
+        console.log('[After render] container.innerHTML:', result.container.innerHTML);
+        console.log('[After render] screen.debug output:');
+        screen.debug();
+      }
 
       const input = await screen.findByRole('combobox');
       expect(input).toHaveAttribute('aria-label', '魚種名');
