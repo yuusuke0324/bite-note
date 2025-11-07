@@ -236,11 +236,11 @@ if (typeof HTMLCanvasElement !== 'undefined') {
           width,
           height,
         })),
-        getImageData: vi?.fn((sx: number, sy: number, sw: number, sh: number) => ({
+        getImageData: vi?.fn((_sx: number, _sy: number, sw: number, sh: number) => ({
           data: new Uint8ClampedArray(sw * sh * 4),
           width: sw,
           height: sh,
-        })) || ((sx: number, sy: number, sw: number, sh: number) => ({
+        })) || ((_sx: number, _sy: number, sw: number, sh: number) => ({
           data: new Uint8ClampedArray(sw * sh * 4),
           width: sw,
           height: sh,
@@ -258,11 +258,11 @@ if (typeof HTMLCanvasElement !== 'undefined') {
     return null;
   };
 
-  HTMLCanvasElement.prototype.toDataURL = function(type?: string, quality?: number) {
+  HTMLCanvasElement.prototype.toDataURL = function(_type?: string, _quality?: number) {
     return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
   };
 
-  HTMLCanvasElement.prototype.toBlob = function(callback: BlobCallback, type?: string, quality?: number) {
+  HTMLCanvasElement.prototype.toBlob = function(callback: BlobCallback, type?: string, _quality?: number) {
     setTimeout(() => {
       callback(new Blob([''], { type: type || 'image/png' }));
     }, 0);
