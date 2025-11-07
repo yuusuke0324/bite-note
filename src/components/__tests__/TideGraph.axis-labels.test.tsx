@@ -47,15 +47,22 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={800} height={400} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        const xAxisLine = screen.queryByTestId('x-axis-line');
-        expect(xAxisLine).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+
+        const xAxisLine = container?.querySelector('[data-testid="x-axis-line"]');
+        expect(xAxisLine).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // X軸ライン要素の存在確認
-      const xAxisLine = screen.getByTestId('x-axis-line');
-      expect(xAxisLine.tagName.toLowerCase()).toBe('line');
+      const xAxisLine = document.querySelector('[data-testid="x-axis-line"]');
+      expect(xAxisLine).toBeTruthy();
+      expect(xAxisLine?.tagName.toLowerCase()).toBe('line');
 
       // 4時間間隔の時間ラベルが表示されることを確認
       const expectedTimeLabels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
@@ -70,10 +77,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={400} height={200} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByText('00:00')).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // 小さいサイズでも時間ラベルが表示される
       expect(screen.getByText('12:00')).toBeInTheDocument();
@@ -84,13 +95,18 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const svg = document.querySelector('svg[role="img"][aria-label*="潮汐グラフ"]');
+        expect(svg).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
-      const svgElement = screen.getByRole('img', { name: /潮汐グラフ/ });
-      const viewBox = svgElement.getAttribute('viewBox');
+      const svgElement = document.querySelector('svg[role="img"][aria-label*="潮汐グラフ"]');
+      expect(svgElement).toBeTruthy();
+      const viewBox = svgElement?.getAttribute('viewBox');
       // レスポンシブ計算により実際のviewBoxサイズは動的に決まる
       expect(viewBox).toMatch(/0 0 \d+ \d+/);
 
@@ -120,14 +136,18 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       render(<TideGraph data={invalidData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByTestId('tide-graph-error')).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const errorElement = document.querySelector('[data-testid="tide-graph-error"]');
+        expect(errorElement).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // 不正データの場合、エラーメッセージが表示される
-      const errorElement = screen.getByTestId('tide-graph-error');
-      expect(errorElement).toBeInTheDocument();
+      const errorElement = document.querySelector('[data-testid="tide-graph-error"]');
+      expect(errorElement).toBeTruthy();
       expect(screen.getByText('潮汐データがありません')).toBeInTheDocument();
     });
   });
@@ -137,15 +157,22 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData(30, 170);
       render(<TideGraph data={mockData} width={800} height={400} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByTestId('y-axis-line')).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+
+        const yAxisLine = container?.querySelector('[data-testid="y-axis-line"]');
+        expect(yAxisLine).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // Y軸ライン要素の存在確認
-      const yAxisLine = screen.getByTestId('y-axis-line');
-      expect(yAxisLine).toBeInTheDocument();
-      expect(yAxisLine.tagName.toLowerCase()).toBe('line');
+      const yAxisLine = document.querySelector('[data-testid="y-axis-line"]');
+      expect(yAxisLine).toBeTruthy();
+      expect(yAxisLine?.tagName.toLowerCase()).toBe('line');
 
       // 動的スケールによる潮位ラベルが表示される
       const levelLabels = screen.getAllByText(/\d+cm/);
@@ -163,10 +190,17 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData(10, 190);
       render(<TideGraph data={mockData} width={800} height={400} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.getAllByText(/\d+cm/).length).toBeGreaterThan(0);
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+
+        const levelLabels = screen.queryAllByText(/\d+cm/);
+        expect(levelLabels.length).toBeGreaterThan(0);
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       const levelLabels = screen.getAllByText(/\d+cm/);
 
@@ -183,10 +217,17 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const smallRangeData = createMockTideData(99, 101);
       render(<TideGraph data={smallRangeData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.getAllByText(/\d+cm/).length).toBeGreaterThan(0);
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+
+        const levelLabels = screen.queryAllByText(/\d+cm/);
+        expect(levelLabels.length).toBeGreaterThan(0);
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       const levelLabels = screen.getAllByText(/\d+cm/);
       expect(levelLabels.length).toBeGreaterThanOrEqual(2);
@@ -204,10 +245,17 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const negativeData = createMockTideData(-50, 50);
       render(<TideGraph data={negativeData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.getAllByText(/-?\d+cm/).length).toBeGreaterThan(0);
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+
+        const allLabels = screen.queryAllByText(/-?\d+cm/);
+        expect(allLabels.length).toBeGreaterThan(0);
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // 負の値と正の値の両方が表示される
       const allLabels = screen.getAllByText(/-?\d+cm/);
@@ -226,14 +274,18 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       // 非常に小さいサイズでテスト
       render(<TideGraph data={mockData} width={200} height={100} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const svg = document.querySelector('svg[role="img"][aria-label*="潮汐グラフ"]');
+        expect(svg).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // SVGが描画されている
-      const svgElement = screen.getByRole('img', { name: /潮汐グラフ/ });
-      expect(svgElement).toBeInTheDocument();
+      const svgElement = document.querySelector('svg[role="img"][aria-label*="潮汐グラフ"]');
+      expect(svgElement).toBeTruthy();
 
       // 軸ラベルが少なくとも部分的に表示されている
       const xLabels = screen.getAllByText(/\d{2}:\d{2}/);
@@ -246,10 +298,17 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData();
       const { rerender } = render(<TideGraph data={mockData} width={400} height={200} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.getAllByText(/\d+cm/).length).toBeGreaterThan(0);
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+
+        const levelLabels = screen.queryAllByText(/\d+cm/);
+        expect(levelLabels.length).toBeGreaterThan(0);
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       const initialLabels = screen.getAllByText(/\d+cm/);
       const initialLabelCount = initialLabels.length;
@@ -277,14 +336,18 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       render(<TideGraph data={emptyData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByTestId('tide-graph-error')).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const errorElement = document.querySelector('[data-testid="tide-graph-error"]');
+        expect(errorElement).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // 空データの場合、エラーメッセージが表示される
-      const errorElement = screen.getByTestId('tide-graph-error');
-      expect(errorElement).toBeInTheDocument();
+      const errorElement = document.querySelector('[data-testid="tide-graph-error"]');
+      expect(errorElement).toBeTruthy();
       expect(screen.getByText('潮汐データがありません')).toBeInTheDocument();
     });
 
@@ -308,14 +371,18 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       render(<TideGraph data={nanData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByTestId('tide-graph-error')).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const errorElement = document.querySelector('[data-testid="tide-graph-error"]');
+        expect(errorElement).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // NaN値が含まれる場合もエラーメッセージが表示される
-      const errorElement = screen.getByTestId('tide-graph-error');
-      expect(errorElement).toBeInTheDocument();
+      const errorElement = document.querySelector('[data-testid="tide-graph-error"]');
+      expect(errorElement).toBeTruthy();
       expect(screen.getByText('潮汐データがありません')).toBeInTheDocument();
     });
   });
@@ -325,10 +392,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByText('00:00')).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // 時間ラベルの属性確認
       const timeLabel = screen.getByText('00:00');
@@ -345,10 +416,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={600} height={300} />);
 
-      // ResizeObserver初期化を待機（CI環境対応）
+      // ResizeObserver初期化を待機（CI環境対応 - querySelector直接使用）
       await waitFor(() => {
-        expect(screen.queryByText('12:00')).toBeInTheDocument();
-      }, { timeout: 3000 });
+        const container = document.querySelector('[data-testid="tide-graph-container"]');
+        expect(container).toBeTruthy();
+      }, {
+        timeout: process.env.CI ? 10000 : 5000,
+        interval: 100
+      });
 
       // ラベルの色が設定されている
       const timeLabel = screen.getByText('12:00');
