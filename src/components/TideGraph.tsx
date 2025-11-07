@@ -418,7 +418,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
           {/* X軸 */}
           <g data-testid={TestIds.TIDE_GRAPH_TIME_LABELS}>
             <line
-              data-testid={TestIds.X_AXIS_LINE}
+              data-testid="x-axis-line"
               x1={0}
               y1={chartHeight}
               x2={chartWidth}
@@ -479,7 +479,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
           {/* Y軸 */}
           <g data-testid={TestIds.TIDE_GRAPH_Y_AXIS}>
             <line
-              data-testid={TestIds.Y_AXIS_LINE}
+              data-testid="y-axis-line"
               x1={0}
               y1={0}
               x2={0}
