@@ -92,6 +92,8 @@ if (typeof globalThis !== 'undefined') {
 /**
  * Element.getBoundingClientRect Polyfill
  * JSDOMではgetBoundingClientRectが常に0を返すため、テスト用に適切な値を返すようにする
+ *
+ * CI環境対応: TideGraphコンテナに対して確実にサイズを返す
  */
 if (typeof Element !== 'undefined') {
   const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
@@ -99,8 +101,25 @@ if (typeof Element !== 'undefined') {
   Element.prototype.getBoundingClientRect = function() {
     const rect = originalGetBoundingClientRect.call(this);
 
-    // JSDOMで全て0の場合は、デフォルト値を返す
+    // JSDOMで全て0の場合は、要素に応じたデフォルト値を返す
     if (rect.width === 0 && rect.height === 0) {
+      // TideGraphコンテナの場合は確実に適切なサイズを返す
+      const testId = this.getAttribute('data-testid');
+      if (testId === 'tide-graph-container') {
+        return {
+          x: 0,
+          y: 0,
+          width: 800,
+          height: 400,
+          top: 0,
+          right: 800,
+          bottom: 400,
+          left: 0,
+          toJSON: () => ({})
+        } as DOMRect;
+      }
+
+      // その他の要素にもデフォルト値を提供
       return {
         x: 0,
         y: 0,

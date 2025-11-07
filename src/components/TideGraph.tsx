@@ -46,7 +46,15 @@ export const TideGraph: React.FC<TideGraphProps> = ({
   } | null>(null);
 
   // レスポンシブ設定
-  const config = useMemo(() => createResponsiveConfig(responsiveConfig), [responsiveConfig]);
+  // テスト環境対応: width/height が明示的に指定されている場合は、レスポンシブモードを無効化
+  const config = useMemo(() => {
+    const isFixedSize = width > 0 && height > 0;
+    return createResponsiveConfig({
+      ...responsiveConfig,
+      // 固定サイズ指定時はレスポンシブ無効（テスト環境対応）
+      responsive: responsiveConfig?.responsive ?? !isFixedSize
+    });
+  }, [responsiveConfig, width, height]);
 
   // コンテナサイズ監視
   const [containerRef, resizeEntry] = useResizeObserver<HTMLDivElement>();
