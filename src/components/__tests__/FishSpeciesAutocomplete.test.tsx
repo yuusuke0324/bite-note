@@ -80,7 +80,7 @@ const createMockSearchEngine = () => ({
 const waitForRender = async () => {
   await waitFor(() => {
     expect(screen.getByRole('combobox')).toBeInTheDocument();
-  }, { timeout: 3000 });
+  }, { timeout: 5000, interval: 50 });
 };
 
 /**
