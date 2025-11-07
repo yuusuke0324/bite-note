@@ -85,7 +85,18 @@ describe('FishSpeciesAutocomplete', () => {
   let mockOnChange: ReturnType<typeof vi.fn>;
   let mockSearchEngine: ReturnType<typeof createMockSearchEngine>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // JSDOM初期化を待機（CI環境での確実なレンダリング基盤）
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    // 環境診断（CI環境での問題特定用）
+    if (process.env.CI) {
+      console.log('[Test beforeEach] JSDOM State:', {
+        hasBody: !!document.body,
+        bodyChildren: document.body?.children.length || 0
+      });
+    }
+
     mockOnChange = vi.fn();
     mockSearchEngine = createMockSearchEngine();
 
@@ -95,6 +106,7 @@ describe('FishSpeciesAutocomplete', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    document.body.innerHTML = '';  // クリーンアップ（各テストで綺麗な状態から開始）
   });
 
   describe('基本的なレンダリング', () => {

@@ -58,9 +58,9 @@ interface FishSpeciesAutocompleteProps {
 
   /**
    * 検索エンジンインスタンス
-   * Phase 1 (Issue #37): 非同期初期化を削除し、必須プロパティに変更
+   * Tech-lead分析 (Issue #37): null許容に変更（親での非同期初期化対応）
    */
-  searchEngine: FishSpeciesSearchEngine;
+  searchEngine: FishSpeciesSearchEngine | null;
 }
 
 /**
@@ -83,8 +83,25 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
+  // ローディング状態: searchEngineがnullの場合
+  if (!searchEngine) {
+    return (
+      <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
+        <div className="input-wrapper">
+          <input
+            type="text"
+            disabled
+            placeholder="読み込み中..."
+            className="loading-input"
+            aria-label="魚種名（読み込み中）"
+          />
+        </div>
+      </div>
+    );
+  }
+
   // 検索結果の計算（派生状態）
-  // Phase 1 (Issue #37): searchEngineは必須プロパティとなり、常に利用可能
+  // Tech-lead分析 (Issue #37): searchEngineがnullでないことを確認済み
   const suggestions = useMemo(() => {
     try {
       return searchEngine.search(inputValue, { limit: 10 });
