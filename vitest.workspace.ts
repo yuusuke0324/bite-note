@@ -28,6 +28,13 @@ export default defineWorkspace([
         // 'src/components/__tests__/TideTooltip.test.tsx',
       ],
       setupFiles: ['./src/setupTests.ts'],
+      environment: 'jsdom',
+      environmentOptions: {
+        jsdom: {
+          resources: 'usable',
+          runScripts: 'dangerously',
+        },
+      },
       /**
        * プール戦略: forksモード（CI/ローカル共通）
        *
