@@ -16,7 +16,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { FishSpecies } from '../types';
 import { FishSpeciesSearchEngine } from '../services/fish-species';
-import { fishSpeciesDataService } from '../services/fish-species';
 import './FishSpeciesAutocomplete.css';
 
 interface FishSpeciesAutocompleteProps {
@@ -58,10 +57,10 @@ interface FishSpeciesAutocompleteProps {
   className?: string;
 
   /**
-   * 検索エンジンインスタンス（テスト時のモック注入用）
-   * @internal
+   * 検索エンジンインスタンス
+   * Phase 1 (Issue #37): 非同期初期化を削除し、必須プロパティに変更
    */
-  searchEngine?: FishSpeciesSearchEngine;
+  searchEngine: FishSpeciesSearchEngine;
 }
 
 /**
@@ -75,49 +74,18 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   error,
   required = false,
   className = '',
-  searchEngine: externalSearchEngine
+  searchEngine
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [isLoading, setIsLoading] = useState(!externalSearchEngine);
-  const [internalSearchEngine, setInternalSearchEngine] = useState<FishSpeciesSearchEngine | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  // 使用する検索エンジン（外部 or 内部）
-  const searchEngine = externalSearchEngine || internalSearchEngine;
-
-  // 検索エンジンの初期化（外部から提供されていない場合のみ）
-  useEffect(() => {
-    if (externalSearchEngine) {
-      // 外部から提供されている場合はスキップ
-      return;
-    }
-
-    const initSearchEngine = async () => {
-      try {
-        setIsLoading(true);
-        const data = await fishSpeciesDataService.loadSpecies();
-        const engine = new FishSpeciesSearchEngine(data, { debug: false });
-        setInternalSearchEngine(engine);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('魚種データの読み込みに失敗:', error);
-        setIsLoading(false);
-      }
-    };
-
-    initSearchEngine();
-  }, [externalSearchEngine]);
-
   // 検索結果の計算（派生状態）
-  // NOTE: Issue #38 - searchEngine初期化の非同期処理によりact()警告が発生
-  // テスト全パス（23/23）、本番動作に影響なし
-  // 根本解決は別Issue化（サービス層の同期初期化対応、v1.6.0以降）
+  // Phase 1 (Issue #37): searchEngineは必須プロパティとなり、常に利用可能
   const suggestions = useMemo(() => {
-    if (!searchEngine || typeof searchEngine.search !== 'function') return [];
     try {
       return searchEngine.search(inputValue, { limit: 10 });
     } catch (error) {
@@ -235,7 +203,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder={placeholder}
-          disabled={disabled || isLoading}
+          disabled={disabled}
           required={required}
           data-testid="fish-species-input"
           aria-label="魚種名"
@@ -247,11 +215,6 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
           }
           className={error ? 'error' : ''}
         />
-        {isLoading && (
-          <div className="loading-indicator" aria-live="polite">
-            読み込み中...
-          </div>
-        )}
       </div>
 
       {error && (
@@ -260,7 +223,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         </div>
       )}
 
-      {isOpen && !isLoading && suggestions.length > 0 && (
+      {isOpen && suggestions.length > 0 && (
         <ul
           ref={listRef}
           id="fish-species-list"
@@ -295,7 +258,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         </ul>
       )}
 
-      {isOpen && !isLoading && suggestions.length === 0 && inputValue && (
+      {isOpen && suggestions.length === 0 && inputValue && (
         <div className="no-results" role="status" data-testid="fish-species-no-results">
           該当する魚種が見つかりません
         </div>
