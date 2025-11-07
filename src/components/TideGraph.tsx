@@ -92,28 +92,32 @@ export const TideGraph: React.FC<TideGraphProps> = ({
     });
   }, [config, resizeEntry, width, height]);
 
-  // データ検証とエラーハンドリング
-  const isValidData = useMemo(() => {
+  // データ検証: NaN値を除外したvalidPointsを作成
+  const validPoints = useMemo(() => {
     if (!data || !data.points || data.points.length === 0) {
-      return false;
+      return [];
     }
 
-    const validPoints = data.points.filter(point =>
+    return data.points.filter(point =>
       point.time instanceof Date &&
       !isNaN(point.time.getTime()) &&
       typeof point.level === 'number' &&
-      !isNaN(point.level)
+      !isNaN(point.level) &&
+      isFinite(point.level)
     );
+  }, [data]);
 
+  // データ検証とエラーハンドリング
+  const isValidData = useMemo(() => {
     const isValid = validPoints.length > 0;
 
     if (process.env.NODE_ENV === 'development') {
       console.log('🔧 TideGraph: データ検証結果', {
-        totalPoints: data.points.length,
+        totalPoints: data?.points?.length || 0,
         validPoints: validPoints.length,
-        invalidPoints: data.points.length - validPoints.length,
+        invalidPoints: (data?.points?.length || 0) - validPoints.length,
         isValid,
-        firstFewPoints: data.points.slice(0, 3).map(p => ({
+        firstFewPoints: (data?.points || []).slice(0, 3).map(p => ({
           time: p.time instanceof Date ? p.time.toISOString() : p.time,
           level: p.level,
           timeValid: p.time instanceof Date && !isNaN(p.time.getTime()),
@@ -123,7 +127,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
     }
 
     return isValid;
-  }, [data]);
+  }, [data, validPoints]);
 
   // 動的マージン設定（確実にプラス値を保証）
   const margin = useMemo(() => {
@@ -155,7 +159,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
 
   // スケール計算（動的スケールシステム統合）
   const { xScale, yScale, dynamicScale } = useMemo(() => {
-    if (!isValidData || !data.points || data.points.length === 0) {
+    if (!isValidData || validPoints.length === 0) {
       return {
         xScale: () => 0,
         yScale: () => 0,
@@ -167,8 +171,8 @@ export const TideGraph: React.FC<TideGraphProps> = ({
     const timeRange = data.dateRange.end.getTime() - data.dateRange.start.getTime();
     const xScale = (time: Date) => (time.getTime() - data.dateRange.start.getTime()) / timeRange * chartWidth;
 
-    // TASK-101統合: 動的Y軸スケール計算
-    const calculatedScale = DynamicScaleCalculator.calculateScale(data.points, {
+    // TASK-101統合: 動的Y軸スケール計算 (validPointsを使用)
+    const calculatedScale = DynamicScaleCalculator.calculateScale(validPoints, {
       marginRatio: 0.15,
       preferredIntervals: [10, 25, 50, 100, 200],
       forceZero: false
@@ -193,20 +197,20 @@ export const TideGraph: React.FC<TideGraphProps> = ({
       yScale,
       dynamicScale: calculatedScale
     };
-  }, [data, chartWidth, chartHeight, isValidData]);
+  }, [data, validPoints, chartWidth, chartHeight, isValidData]);
 
-  // パスデータ生成
+  // パスデータ生成 (NaN値を除外したvalidPointsを使用)
   const pathData = useMemo(() => {
-    if (!isValidData) return '';
+    if (!isValidData || validPoints.length === 0) return '';
 
-    return data.points
+    return validPoints
       .map((point, index) => {
         const x = xScale(point.time);
         const y = yScale(point.level);
         return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
       })
       .join(' ');
-  }, [data.points, xScale, yScale, isValidData]);
+  }, [validPoints, xScale, yScale, isValidData]);
 
   // 時間軸ラベル生成（24時間表示用）
   const timeLabels = useMemo(() => {

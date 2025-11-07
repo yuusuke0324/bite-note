@@ -351,21 +351,21 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       expect(screen.getByText('潮汐データがありません')).toBeInTheDocument();
     });
 
-    it('TC-AL012: NaN値を含むデータでも適切にハンドリングされる', async () => {
-      // NaN値を含むデータセット
+    it('TC-AL012: NaN値のみのデータでエラーが表示される', async () => {
+      // すべてNaN値のデータセット（validPoints.length === 0）
       const nanData: TideGraphData = {
         points: [
-          { time: new Date('2024-09-28T00:00:00'), level: 100, state: 'rising', isEvent: false },
+          { time: new Date('2024-09-28T00:00:00'), level: NaN, state: 'rising', isEvent: false },
           { time: new Date('2024-09-28T06:00:00'), level: NaN, state: 'rising', isEvent: false },
-          { time: new Date('2024-09-28T12:00:00'), level: 120, state: 'high', isEvent: true },
-          { time: new Date('2024-09-28T18:00:00'), level: 80, state: 'falling', isEvent: false }
+          { time: new Date('2024-09-28T12:00:00'), level: NaN, state: 'high', isEvent: true },
+          { time: new Date('2024-09-28T18:00:00'), level: NaN, state: 'falling', isEvent: false }
         ],
         dateRange: {
           start: new Date('2024-09-28T00:00:00'),
           end: new Date('2024-09-28T23:59:59')
         },
-        minLevel: 80,
-        maxLevel: 120,
+        minLevel: 0,
+        maxLevel: 200,
         events: []
       };
 
@@ -380,7 +380,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
         interval: 100
       });
 
-      // NaN値が含まれる場合もエラーメッセージが表示される
+      // 全データがNaNの場合、エラーメッセージが表示される
       const errorElement = document.querySelector('[data-testid="tide-graph-error"]');
       expect(errorElement).toBeTruthy();
       expect(screen.getByText('潮汐データがありません')).toBeInTheDocument();
