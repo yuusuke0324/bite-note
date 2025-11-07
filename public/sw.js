@@ -192,17 +192,27 @@ async function cacheFirstStrategy(request, cacheName) {
     const cached = await cache.match(request);
 
     if (cached) {
-      console.log('[SW] Cache hit:', request.url);
-      return cached;
+      // キャッシュの有効期限をチェック
+      const expiration = cacheName === IMAGE_CACHE ? IMAGE_CACHE_EXPIRATION : API_CACHE_EXPIRATION;
+      const isCacheValid = await checkCacheExpiration(cached, expiration);
+
+      if (isCacheValid) {
+        console.log('[SW] Cache hit (valid):', request.url);
+        return cached;
+      } else {
+        console.log('[SW] Cache expired, fetching fresh:', request.url);
+        // 有効期限切れなのでキャッシュを削除
+        await cache.delete(request);
+      }
     }
 
     // キャッシュになければネットワークから取得
     console.log('[SW] Cache miss, fetching:', request.url);
     const response = await fetch(request);
 
-    // 成功したらキャッシュに保存
+    // 成功したらキャッシュに保存（タイムスタンプ付き）
     if (response && response.status === 200) {
-      cache.put(request, response.clone());
+      await cacheWithExpiration(cache, request, response.clone());
 
       // キャッシュサイズを制限
       if (cacheName === IMAGE_CACHE) {
@@ -235,10 +245,10 @@ async function networkFirstStrategy(request, cacheName) {
     // ネットワークから取得
     const response = await fetch(request);
 
-    // 成功したらキャッシュに保存
+    // 成功したらキャッシュに保存（タイムスタンプ付き）
     if (response && response.status === 200) {
       const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      await cacheWithExpiration(cache, request, response.clone());
 
       // キャッシュサイズを制限
       await limitCacheSize(cacheName, MAX_API_CACHE_SIZE);
@@ -255,8 +265,18 @@ async function networkFirstStrategy(request, cacheName) {
     const cached = await cache.match(request);
 
     if (cached) {
-      console.log('[SW] Serving from cache (offline):', request.url);
-      return cached;
+      // キャッシュの有効期限をチェック
+      const expiration = API_CACHE_EXPIRATION;
+      const isCacheValid = await checkCacheExpiration(cached, expiration);
+
+      if (isCacheValid) {
+        console.log('[SW] Serving from cache (offline, valid):', request.url);
+        return cached;
+      } else {
+        console.log('[SW] Cache expired (offline):', request.url);
+        // オフライン時は期限切れでもキャッシュを返す（UX優先）
+        return cached;
+      }
     }
 
     throw error;
@@ -313,6 +333,41 @@ async function limitCacheSize(cacheName, maxSize) {
     }
     console.log(`[SW] Cache trimmed: ${cacheName} (removed ${deleteCount} entries)`);
   }
+}
+
+/**
+ * タイムスタンプ付きでキャッシュに保存
+ */
+async function cacheWithExpiration(cache, request, response) {
+  // レスポンスヘッダーにタイムスタンプを追加
+  const clonedResponse = response.clone();
+  const headers = new Headers(clonedResponse.headers);
+  headers.append('sw-cache-timestamp', Date.now().toString());
+
+  const modifiedResponse = new Response(clonedResponse.body, {
+    status: clonedResponse.status,
+    statusText: clonedResponse.statusText,
+    headers: headers
+  });
+
+  await cache.put(request, modifiedResponse);
+}
+
+/**
+ * キャッシュの有効期限をチェック
+ */
+async function checkCacheExpiration(response, expirationMs) {
+  const cachedTimestamp = response.headers.get('sw-cache-timestamp');
+
+  if (!cachedTimestamp) {
+    // タイムスタンプがない場合は有効とみなす（後方互換性）
+    return true;
+  }
+
+  const now = Date.now();
+  const cacheAge = now - parseInt(cachedTimestamp, 10);
+
+  return cacheAge < expirationMs;
 }
 
 /**
