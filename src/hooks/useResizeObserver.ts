@@ -5,7 +5,7 @@
  * SVGの動的リサイズを実現するカスタムフック
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 
 export interface ResizeObserverEntry {
   width: number;
@@ -38,6 +38,16 @@ export const useResizeObserver = <T extends HTMLElement>(): [
     });
   }, [detectDeviceType]);
 
+  // CI環境対応: useLayoutEffectで同期的に初期化
+  // これにより、ResizeObserverPolyfillのコールバックが確実に最初のレンダリング前に実行される
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    // 初回実行を同期的に行う（テスト環境で重要）
+    updateEntry(element);
+  }, [updateEntry]);
+
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
@@ -51,8 +61,6 @@ export const useResizeObserver = <T extends HTMLElement>(): [
       });
 
       observer.observe(element);
-      // 初回実行
-      updateEntry(element);
 
       return () => {
         observer.unobserve(element);
@@ -65,8 +73,6 @@ export const useResizeObserver = <T extends HTMLElement>(): [
       };
 
       window.addEventListener('resize', handleResize);
-      // 初回実行
-      updateEntry(element);
 
       return () => {
         window.removeEventListener('resize', handleResize);
