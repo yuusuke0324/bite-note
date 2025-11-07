@@ -76,11 +76,11 @@ const createMockSearchEngine = () => ({
 /**
  * コンポーネント描画を待つヘルパー関数
  * CI環境での描画遅延に対応
+ * findByRole()を使用してより確実に待機
  */
 const waitForRender = async () => {
-  await waitFor(() => {
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
-  }, { timeout: 5000, interval: 50 });
+  // findByRole()は内部でwaitForを使用し、より信頼性が高い
+  await screen.findByRole('combobox', {}, { timeout: 10000 });
 };
 
 /**
