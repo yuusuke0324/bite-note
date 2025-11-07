@@ -49,7 +49,8 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByTestId('x-axis-line')).toBeInTheDocument();
+        const xAxisLine = screen.queryByTestId('x-axis-line');
+        expect(xAxisLine).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // X軸ライン要素の存在確認
@@ -71,7 +72,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByText('00:00')).toBeInTheDocument();
+        expect(screen.queryByText('00:00')).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // 小さいサイズでも時間ラベルが表示される
@@ -85,7 +86,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
+        expect(screen.queryByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
       }, { timeout: 3000 });
 
       const svgElement = screen.getByRole('img', { name: /潮汐グラフ/ });
@@ -121,7 +122,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByTestId('tide-graph-error')).toBeInTheDocument();
+        expect(screen.queryByTestId('tide-graph-error')).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // 不正データの場合、エラーメッセージが表示される
@@ -138,7 +139,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByTestId('y-axis-line')).toBeInTheDocument();
+        expect(screen.queryByTestId('y-axis-line')).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // Y軸ライン要素の存在確認
@@ -227,7 +228,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
+        expect(screen.queryByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // SVGが描画されている
@@ -278,7 +279,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByTestId('tide-graph-error')).toBeInTheDocument();
+        expect(screen.queryByTestId('tide-graph-error')).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // 空データの場合、エラーメッセージが表示される
@@ -309,7 +310,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByTestId('tide-graph-error')).toBeInTheDocument();
+        expect(screen.queryByTestId('tide-graph-error')).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // NaN値が含まれる場合もエラーメッセージが表示される
@@ -326,7 +327,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByText('00:00')).toBeInTheDocument();
+        expect(screen.queryByText('00:00')).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // 時間ラベルの属性確認
@@ -346,7 +347,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       // ResizeObserver初期化を待機（CI環境対応）
       await waitFor(() => {
-        expect(screen.getByText('12:00')).toBeInTheDocument();
+        expect(screen.queryByText('12:00')).toBeInTheDocument();
       }, { timeout: 3000 });
 
       // ラベルの色が設定されている
