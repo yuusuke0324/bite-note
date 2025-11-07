@@ -113,7 +113,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   }, [externalSearchEngine]);
 
   // 検索結果の計算（派生状態）
-  // NOTE: Issue #37 - searchEngine初期化の非同期処理によりact()警告が発生
+  // NOTE: Issue #38 - searchEngine初期化の非同期処理によりact()警告が発生
   // テスト全パス（23/23）、本番動作に影響なし
   // 根本解決は別Issue化（サービス層の同期初期化対応、v1.6.0以降）
   const suggestions = useMemo(() => {
