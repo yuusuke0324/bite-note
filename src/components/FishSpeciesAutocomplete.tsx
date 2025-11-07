@@ -83,29 +83,8 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  // ローディング状態: searchEngineがnullの場合
-  if (!searchEngine) {
-    return (
-      <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
-        <div className="input-wrapper">
-          <input
-            type="text"
-            role="combobox"
-            disabled
-            placeholder="読み込み中..."
-            className="loading-input"
-            aria-label="魚種名"
-            aria-expanded="false"
-            aria-autocomplete="list"
-            aria-controls="fish-species-list"
-          />
-        </div>
-      </div>
-    );
-  }
-
   // 検索結果の計算（派生状態）
-  // Tech-lead分析 (Issue #37): searchEngineがnullでないことを確認済みだが、安全のためnull guardを追加
+  // React Hooks修正 (Issue #37): 早期returnを削除し、全てのHooksを無条件で実行
   const suggestions = useMemo(() => {
     if (!searchEngine) return [];
     try {
@@ -211,6 +190,28 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
       }
     }
   }, [selectedIndex]);
+
+  // ローディング状態: searchEngineがnullの場合
+  // React Hooks修正 (Issue #37): 全てのHooks実行後に条件分岐
+  if (!searchEngine) {
+    return (
+      <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
+        <div className="input-wrapper">
+          <input
+            type="text"
+            role="combobox"
+            disabled
+            placeholder="読み込み中..."
+            className="loading-input"
+            aria-label="魚種名"
+            aria-expanded="false"
+            aria-autocomplete="list"
+            aria-controls="fish-species-list"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
