@@ -10,12 +10,9 @@ export default defineConfig({
     setupFiles: ['./src/setupTests.ts'],
     css: true,
     // メモリ制限とパフォーマンス改善（最適化版）
-    // CI環境ではthreadsを使用（forksはクラスインスタンスのシリアライゼーション問題あり）
-    pool: process.env.CI ? 'threads' : 'forks',
+    // すべての環境でforksモードを使用（threadsモードはCI環境でグローバルPolyfillとクラスインスタンスの初期化問題あり）
+    pool: 'forks',
     poolOptions: {
-      threads: {
-        singleThread: false,
-      },
       forks: {
         singleFork: false, // 複数フォークで並行実行
         execArgv: ['--max-old-space-size=4096'],

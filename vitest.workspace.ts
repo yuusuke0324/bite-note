@@ -28,31 +28,49 @@ export default defineWorkspace([
         // 'src/components/__tests__/TideTooltip.test.tsx',
       ],
       setupFiles: ['./src/setupTests.ts'],
+      environment: 'jsdom',
+      environmentOptions: {
+        jsdom: {
+          resources: 'usable',
+          runScripts: 'dangerously',
+        },
+      },
       /**
-       * プール戦略の環境別設定
+       * プール戦略: forksモード（CI/ローカル共通）
        *
        * 【背景】
-       * FishSpeciesDataServiceがシングルトンパターンを使用しており、
-       * threadsモードでのシリアライゼーション時にクラスインスタンスが正常に
-       * 初期化されない問題が発生（CI環境でのみ再現）。
+       * FishSpeciesDataServiceのシングルトンパターンとReact Testing Libraryの組み合わせで、
+       * threadsモードではCI環境でコンポーネントが全くレンダリングされない問題が発生。
+       *
+       * **根本原因（Tech-lead分析結果）:**
+       * 1. threadsモードでのグローバルPolyfill（ResizeObserver等）の初期化タイミング問題
+       * 2. クラスインスタンスのスレッド間シリアライゼーション失敗
+       * 3. React DOMのマウント時に必要なブラウザAPIが欠如
        *
        * 【対策】
-       * - CI環境: threads を明示的に指定
-       *   → クラスインスタンスのシリアライゼーションが安定して動作
-       *   → GitHub Actions環境での確実なテスト実行を保証
+       * - **すべての環境でforksモードを使用**
+       *   → プロセス分離により、グローバル状態の問題を完全に回避
+       *   → setupTests.tsのPolyfillが各テストで確実に有効化
+       *   → クラスインスタンスのシリアライゼーション問題を回避
        *
-       * - ローカル環境: undefined（vitest.config.tsから forks を継承）
-       *   → forksモードの方がローカル開発時のパフォーマンスが良好
-       *   → 開発者体験を最適化
+       * - メモリ最適化: execArgv で Node.js ヒープサイズを4GBに設定
+       *   → GitHub Actions の標準メモリ制限（7GB）内で安定動作
        *
        * 【検証済み】
-       * - CI=true (threads): 23/23 tests passing
-       * - CI=undefined (forks): 23/23 tests passing
+       * - ローカル環境 (forks): 23/23 tests passing ✅
+       * - CI環境 (threads): 23 failed ❌ → forksで解決予定
        *
        * @see https://github.com/[repo]/issues/37 - CI失敗の根本原因分析
        * @see src/services/fish-species/FishSpeciesDataService.ts:150 - シングルトンインスタンス
+       * @see tech-lead review - threadsモードでのグローバルPolyfill初期化問題
        */
-      pool: process.env.CI ? 'threads' : undefined,
+      pool: 'forks',
+      poolOptions: {
+        forks: {
+          singleFork: false, // 並列実行を維持
+          execArgv: ['--max-old-space-size=4096'], // 4GB heap size
+        },
+      },
       testTimeout: 20000,
     },
   },

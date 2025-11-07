@@ -6,6 +6,63 @@ import { vi } from 'vitest';
 // Global test utilities and mocks can be added here
 
 // ============================================================================
+// JSDOM Environment Initialization (CI Stability Fix for Issue #37)
+// ============================================================================
+
+/**
+ * CI環境でのJSDOMレンダリング問題の診断と初期化
+ *
+ * 【背景】
+ * GitHub Actions CI環境でFishSpeciesAutocomplete.test.tsxが全失敗（<body />が空）
+ * ローカル環境とCI simulationでは成功するが、実際のCI環境でのみ失敗
+ *
+ * 【根本原因（Tech-lead分析）】
+ * - JSDOMの初期化タイミング問題
+ * - document.bodyが存在しない状態でReactがレンダリングを試みる
+ * - GitHub Actions環境とローカル環境でのJSDOM初期化の違い
+ *
+ * @see https://github.com/[repo]/issues/37
+ */
+
+// 環境診断ログ（CI環境での問題特定用）
+if (process.env.CI) {
+  console.log('[SetupTests] CI Environment Initialization:', {
+    hasWindow: typeof window !== 'undefined',
+    hasDocument: typeof document !== 'undefined',
+    hasBody: typeof document?.body !== 'undefined',
+    nodeEnv: process.env.NODE_ENV,
+    ci: process.env.CI,
+    githubActions: process.env.GITHUB_ACTIONS,
+  });
+}
+
+// JSDOM環境の完全初期化（CI環境での確実なレンダリング基盤）
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  // document.bodyが存在しない場合は作成
+  if (!document.body) {
+    console.warn('[SetupTests] document.body not found, creating...');
+    document.body = document.createElement('body');
+    document.documentElement.appendChild(document.body);
+  }
+
+  // CI環境での追加初期化（Tech-lead recommendation for Issue #37）
+  if (process.env.CI) {
+    // レンダリングコンテナを事前に作成
+    const container = document.createElement('div');
+    container.id = 'root';
+    document.body.appendChild(container);
+
+    // DOMContentLoadedイベントを同期的に発火（React初期化トリガー）
+    const event = new Event('DOMContentLoaded');
+    document.dispatchEvent(event);
+  } else {
+    // 非CI環境のみbodyを空にリセット（各テストで綺麗な状態から開始）
+    // CI環境ではroot containerを保持するためリセットしない
+    document.body.innerHTML = '';
+  }
+}
+
+// ============================================================================
 // JSDOM Polyfills for Browser APIs
 // ============================================================================
 
