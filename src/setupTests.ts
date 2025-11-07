@@ -31,28 +31,31 @@ class ResizeObserverPolyfill implements ResizeObserver {
     // Store observation
     this.observations.set(target, options || {});
 
-    // Simulate initial callback
-    setTimeout(() => {
-      if (this.observations.has(target)) {
-        const entries = [{
-          target,
-          contentRect: {
-            x: 0,
-            y: 0,
-            width: 100,
-            height: 100,
-            top: 0,
-            right: 100,
-            bottom: 100,
-            left: 0,
-          },
-          borderBoxSize: [{ inlineSize: 100, blockSize: 100 }],
-          contentBoxSize: [{ inlineSize: 100, blockSize: 100 }],
-          devicePixelContentBoxSize: [{ inlineSize: 100, blockSize: 100 }],
-        }];
-        this.callback(entries as any, this);
-      }
-    }, 0);
+    // getBoundingClientRectから実際のサイズを取得
+    const rect = target.getBoundingClientRect();
+    const width = rect.width || 800;  // デフォルト値
+    const height = rect.height || 400; // デフォルト値
+
+    // 即座にコールバックを同期実行（CI環境での確実な初期化）
+    const entries = [{
+      target,
+      contentRect: {
+        x: rect.x || 0,
+        y: rect.y || 0,
+        width,
+        height,
+        top: rect.top || 0,
+        right: rect.right || width,
+        bottom: rect.bottom || height,
+        left: rect.left || 0,
+      },
+      borderBoxSize: [{ inlineSize: width, blockSize: height }],
+      contentBoxSize: [{ inlineSize: width, blockSize: height }],
+      devicePixelContentBoxSize: [{ inlineSize: width, blockSize: height }],
+    }];
+
+    // 同期実行でコールバックを即座に呼び出す
+    this.callback(entries as any, this);
   }
 
   unobserve(target: Element): void {
@@ -84,6 +87,35 @@ if (typeof global !== 'undefined') {
 // globalThisにも設定（最新の標準）
 if (typeof globalThis !== 'undefined') {
   (globalThis as any).ResizeObserver = ResizeObserverPolyfill;
+}
+
+/**
+ * Element.getBoundingClientRect Polyfill
+ * JSDOMではgetBoundingClientRectが常に0を返すため、テスト用に適切な値を返すようにする
+ */
+if (typeof Element !== 'undefined') {
+  const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+
+  Element.prototype.getBoundingClientRect = function() {
+    const rect = originalGetBoundingClientRect.call(this);
+
+    // JSDOMで全て0の場合は、デフォルト値を返す
+    if (rect.width === 0 && rect.height === 0) {
+      return {
+        x: 0,
+        y: 0,
+        width: 800,
+        height: 400,
+        top: 0,
+        right: 800,
+        bottom: 400,
+        left: 0,
+        toJSON: () => ({})
+      } as DOMRect;
+    }
+
+    return rect;
+  };
 }
 
 /**

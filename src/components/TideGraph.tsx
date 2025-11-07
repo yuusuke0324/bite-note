@@ -53,9 +53,8 @@ export const TideGraph: React.FC<TideGraphProps> = ({
 
   // 動的SVG寸法計算
   const svgDimensions = useMemo(() => {
-    // レスポンシブ無効、または初期状態、またはサイズが0の場合は固定サイズを使用
-    if (!config.responsive || !resizeEntry || resizeEntry.width === 0 || resizeEntry.height === 0) {
-      // レスポンシブ無効または初期状態では従来の固定サイズを使用
+    // レスポンシブ無効の場合は固定サイズを使用
+    if (!config.responsive) {
       return {
         containerWidth: width,
         containerHeight: height,
@@ -65,6 +64,18 @@ export const TideGraph: React.FC<TideGraphProps> = ({
       };
     }
 
+    // ResizeObserver未初期化、またはサイズが0の場合は固定サイズを使用
+    if (!resizeEntry || resizeEntry.width === 0 || resizeEntry.height === 0) {
+      return {
+        containerWidth: width,
+        containerHeight: height,
+        viewBoxWidth: width,
+        viewBoxHeight: height,
+        scaleFactor: 1
+      };
+    }
+
+    // レスポンシブモード: 動的計算
     return calculateSVGDimensions({
       containerWidth: resizeEntry.width,
       aspectRatio: config.aspectRatio,
