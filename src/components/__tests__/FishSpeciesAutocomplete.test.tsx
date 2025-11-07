@@ -155,7 +155,7 @@ describe('FishSpeciesAutocomplete', () => {
     });
 
     it('初期値が設定されること', async () => {
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value="マアジ"
           onChange={mockOnChange}
@@ -163,12 +163,12 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox') as HTMLInputElement;
+      const input = await within(result.container).findByRole('combobox') as HTMLInputElement;
       expect(input.value).toBe('マアジ');
     });
 
     it('プレースホルダーが表示されること', async () => {
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -177,12 +177,12 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       expect(input).toHaveAttribute('placeholder', 'カスタムプレースホルダー');
     });
 
     it('無効化されること', async () => {
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -191,12 +191,12 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       expect(input).toBeDisabled();
     });
 
     it('エラーメッセージが表示されること', async () => {
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -205,8 +205,8 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      await screen.findByRole('combobox');
-      expect(screen.getByRole('alert')).toHaveTextContent('エラーが発生しました');
+      await within(result.container).findByRole('combobox');
+      expect(within(result.container).getByRole('alert')).toHaveTextContent('エラーが発生しました');
     });
   });
 
@@ -214,7 +214,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('テキストを入力できること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -222,7 +222,7 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
@@ -233,7 +233,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('onChange コールバックが呼ばれること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -241,7 +241,7 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
@@ -254,7 +254,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('フォーカス時に候補が表示されること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -262,17 +262,17 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      const listbox = await screen.findByRole('listbox');
+      const listbox = await within(result.container).findByRole('listbox');
       expect(listbox).toBeInTheDocument();
     });
 
     it('入力に応じた候補が表示されること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -280,18 +280,18 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.type(input, 'あじ');
 
       await waitFor(() => {
-        expect(screen.getByText('マアジ')).toBeInTheDocument();
+        expect(within(result.container).getByText('マアジ')).toBeInTheDocument();
       });
     });
 
     it('候補をクリックして選択できること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -299,14 +299,14 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
       await waitFor(() => {
-        expect(screen.getByText('マアジ')).toBeInTheDocument();
+        expect(within(result.container).getByText('マアジ')).toBeInTheDocument();
       });
 
-      await user.click(screen.getByText('マアジ'));
+      await user.click(within(result.container).getByText('マアジ'));
 
       await waitFor(() => {
         expect(mockOnChange).toHaveBeenCalledWith(
@@ -319,7 +319,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('マッチしない場合は「該当する魚種が見つかりません」と表示されること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -327,11 +327,11 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.type(input, 'xxxxx');
 
       await waitFor(() => {
-        expect(screen.getByText('該当する魚種が見つかりません')).toBeInTheDocument();
+        expect(within(result.container).getByText('該当する魚種が見つかりません')).toBeInTheDocument();
       });
     });
   });
@@ -340,7 +340,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('ArrowDown で次の候補を選択できること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -348,15 +348,15 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      await screen.findByRole('listbox');
+      await within(result.container).findByRole('listbox');
 
       await user.keyboard('{ArrowDown}');
 
       await waitFor(() => {
-        const firstOption = screen.getByRole('option', { name: /マアジ/ });
+        const firstOption = within(result.container).getByRole('option', { name: /マアジ/ });
         expect(firstOption).toHaveAttribute('aria-selected', 'true');
       });
     });
@@ -364,7 +364,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('ArrowUp で前の候補を選択できること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -372,17 +372,17 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      await screen.findByRole('listbox');
+      await within(result.container).findByRole('listbox');
 
       await user.keyboard('{ArrowDown}');
       await user.keyboard('{ArrowDown}');
       await user.keyboard('{ArrowUp}');
 
       await waitFor(() => {
-        const firstOption = screen.getByRole('option', { name: /マアジ/ });
+        const firstOption = within(result.container).getByRole('option', { name: /マアジ/ });
         expect(firstOption).toHaveAttribute('aria-selected', 'true');
       });
     });
@@ -390,7 +390,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('Enter で選択した候補を確定できること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -398,10 +398,10 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      await screen.findByRole('listbox');
+      await within(result.container).findByRole('listbox');
 
       await user.keyboard('{ArrowDown}');
       await user.keyboard('{Enter}');
@@ -417,7 +417,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('Escape で候補リストを閉じられること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -425,22 +425,22 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      await screen.findByRole('listbox');
+      await within(result.container).findByRole('listbox');
 
       await user.keyboard('{Escape}');
 
       await waitFor(() => {
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+        expect(within(result.container).queryByRole('listbox')).not.toBeInTheDocument();
       });
     });
 
     it('Tab で候補リストを閉じられること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -448,15 +448,15 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      await screen.findByRole('listbox');
+      await within(result.container).findByRole('listbox');
 
       await user.keyboard('{Tab}');
 
       await waitFor(() => {
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+        expect(within(result.container).queryByRole('listbox')).not.toBeInTheDocument();
       });
     });
   });
@@ -465,7 +465,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('候補リストが開いているときaria-expandedがtrueになること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -473,7 +473,7 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       expect(input).toHaveAttribute('aria-expanded', 'false');
 
       await user.click(input);
@@ -486,7 +486,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('選択した候補のaria-activedescendantが設定されること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -494,10 +494,10 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      await screen.findByRole('listbox');
+      await within(result.container).findByRole('listbox');
 
       await user.keyboard('{ArrowDown}');
 
@@ -509,7 +509,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('候補リストにrole="listbox"が設定されていること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -517,17 +517,17 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
-      const listbox = await screen.findByRole('listbox');
+      const listbox = await within(result.container).findByRole('listbox');
       expect(listbox).toBeInTheDocument();
     });
 
     it('候補アイテムにrole="option"が設定されていること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -535,11 +535,11 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.click(input);
 
       await waitFor(() => {
-        const options = screen.getAllByRole('option');
+        const options = within(result.container).getAllByRole('option');
         expect(options.length).toBeGreaterThan(0);
       });
     });
@@ -556,7 +556,7 @@ describe('FishSpeciesAutocomplete', () => {
 
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -564,11 +564,11 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.type(input, 'あ');
 
       await waitFor(() => {
-        const options = screen.getAllByRole('option');
+        const options = within(result.container).getAllByRole('option');
         expect(options.length).toBeLessThanOrEqual(10);
       });
     });
@@ -576,7 +576,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('存在しない候補を入力しても動作すること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -584,7 +584,7 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
       await user.type(input, '存在しない魚種');
 
       await waitFor(() => {
@@ -597,7 +597,7 @@ describe('FishSpeciesAutocomplete', () => {
     it('フォーカス→入力→選択の一連の流れが動作すること', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
@@ -605,13 +605,13 @@ describe('FishSpeciesAutocomplete', () => {
         />
       );
 
-      const input = await screen.findByRole('combobox');
+      const input = await within(result.container).findByRole('combobox');
 
       // フォーカス
       await user.click(input);
 
       await waitFor(() => {
-        expect(screen.getByRole('listbox')).toBeInTheDocument();
+        expect(within(result.container).getByRole('listbox')).toBeInTheDocument();
       });
 
       // 入力
@@ -619,10 +619,10 @@ describe('FishSpeciesAutocomplete', () => {
 
       // 選択
       await waitFor(() => {
-        expect(screen.getByText('マアジ')).toBeInTheDocument();
+        expect(within(result.container).getByText('マアジ')).toBeInTheDocument();
       });
 
-      await user.click(screen.getByText('マアジ'));
+      await user.click(within(result.container).getByText('マアジ'));
 
       await waitFor(() => {
         expect(mockOnChange).toHaveBeenCalledWith(
