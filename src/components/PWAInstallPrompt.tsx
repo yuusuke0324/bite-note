@@ -1,6 +1,6 @@
 // PWAインストールプロンプトコンポーネント
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { usePWA } from '../hooks/usePWA';
 
 interface PWAInstallPromptProps {
@@ -12,6 +12,8 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
   const [isVisible, setIsVisible] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   // インストール可能になったら表示
   useEffect(() => {
@@ -34,6 +36,98 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
       setIsVisible(false);
     }
   }, []);
+
+  // Tab/Shift+Tabキーでフォーカスを循環（メモ化）
+  const handleTab = useCallback((e: KeyboardEvent) => {
+    if (e.key !== 'Tab' || !modalRef.current) return;
+
+    // モーダル内のフォーカス可能要素を取得（拡張セレクタ）
+    const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), ' +
+      '[href]:not([disabled]), ' +
+      'input:not([disabled]), ' +
+      'select:not([disabled]), ' +
+      'textarea:not([disabled]), ' +
+      '[tabindex]:not([tabindex="-1"]):not([disabled]), ' +
+      'audio[controls], ' +
+      'video[controls], ' +
+      '[contenteditable]:not([contenteditable="false"])'
+    );
+
+    // エッジケース: フォーカス可能要素がない場合
+    if (focusableElements.length === 0) return;
+
+    // エッジケース: 要素が1個しかない場合はTab移動を抑止
+    if (focusableElements.length === 1) {
+      e.preventDefault();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey) {
+      // Shift+Tab: 逆方向
+      if (document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement?.focus();
+      }
+    } else {
+      // Tab: 順方向
+      if (document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
+      }
+    }
+  }, []);
+
+  // Escapeキーでモーダルを閉じる（メモ化）
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setShowIOSInstructions(false);
+    }
+  }, []);
+
+  // フォーカストラップ: iOSモーダル内でキーボードナビゲーションを制御
+  useEffect(() => {
+    if (!showIOSInstructions || !modalRef.current) return;
+
+    // 現在のフォーカス要素を保存
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    // モーダル内のフォーカス可能要素を取得
+    const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), ' +
+      '[href]:not([disabled]), ' +
+      'input:not([disabled]), ' +
+      'select:not([disabled]), ' +
+      'textarea:not([disabled]), ' +
+      '[tabindex]:not([tabindex="-1"]):not([disabled]), ' +
+      'audio[controls], ' +
+      'video[controls], ' +
+      '[contenteditable]:not([contenteditable="false"])'
+    );
+
+    // エッジケース: フォーカス可能要素がない場合は警告ログ
+    if (focusableElements.length === 0) {
+      console.warn('[PWA] No focusable elements in iOS modal');
+      return;
+    }
+
+    // 最初の要素にフォーカス
+    focusableElements[0]?.focus();
+
+    // イベントリスナー登録
+    document.addEventListener('keydown', handleTab);
+    document.addEventListener('keydown', handleEscape);
+
+    // クリーンアップ: フォーカスを元の要素に戻す
+    return () => {
+      document.removeEventListener('keydown', handleTab);
+      document.removeEventListener('keydown', handleEscape);
+      previousFocusRef.current?.focus();
+    };
+  }, [showIOSInstructions, handleTab, handleEscape]);
 
   const handleInstall = async () => {
     if (installState.platform === 'ios') {
@@ -73,6 +167,9 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
     <>
       {/* メインのインストールプロンプト */}
       <div
+        role="dialog"
+        aria-labelledby="install-prompt-title"
+        aria-describedby="install-prompt-description"
         style={{
           position: 'fixed',
           bottom: '1rem',
@@ -104,21 +201,27 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
 
           {/* コンテンツ */}
           <div style={{ flex: 1 }}>
-            <h3 style={{
-              margin: '0 0 0.5rem 0',
-              fontSize: '1.1rem',
-              fontWeight: 'bold',
-              color: '#333'
-            }}>
+            <h3
+              id="install-prompt-title"
+              style={{
+                margin: '0 0 0.5rem 0',
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                color: '#333'
+              }}
+            >
               アプリをインストールしませんか？
             </h3>
 
-            <p style={{
-              margin: '0 0 1rem 0',
-              fontSize: '0.875rem',
-              color: '#666',
-              lineHeight: 1.4
-            }}>
+            <p
+              id="install-prompt-description"
+              style={{
+                margin: '0 0 1rem 0',
+                fontSize: '0.875rem',
+                color: '#5F6368',
+                lineHeight: 1.4
+              }}
+            >
               {installState.platform === 'ios'
                 ? 'ホーム画面に追加して、いつでも簡単にアクセス'
                 : 'デバイスにインストールして、より快適にご利用いただけます'
@@ -196,11 +299,16 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               fontSize: '1.25rem',
               color: '#6c757d',
               cursor: 'pointer',
-              padding: '0.25rem',
+              padding: '0.625rem',
               borderRadius: '4px',
-              flexShrink: 0
+              flexShrink: 0,
+              width: '44px',
+              height: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
-            aria-label="閉じる"
+            aria-label="インストールプロンプトを閉じる"
           >
             ✕
           </button>
@@ -226,6 +334,10 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
           onClick={() => setShowIOSInstructions(false)}
         >
           <div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="ios-modal-title"
             style={{
               backgroundColor: 'white',
               borderRadius: '12px',
@@ -238,12 +350,15 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
           >
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
-              <h2 style={{
-                margin: 0,
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#333'
-              }}>
+              <h2
+                id="ios-modal-title"
+                style={{
+                  margin: 0,
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  color: '#333'
+                }}
+              >
                 {iosInstructions.title}
               </h2>
             </div>
