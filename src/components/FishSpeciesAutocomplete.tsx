@@ -90,10 +90,14 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         <div className="input-wrapper">
           <input
             type="text"
+            role="combobox"
             disabled
             placeholder="読み込み中..."
             className="loading-input"
-            aria-label="魚種名（読み込み中）"
+            aria-label="魚種名"
+            aria-expanded="false"
+            aria-autocomplete="list"
+            aria-controls="fish-species-list"
           />
         </div>
       </div>
@@ -101,8 +105,9 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   }
 
   // 検索結果の計算（派生状態）
-  // Tech-lead分析 (Issue #37): searchEngineがnullでないことを確認済み
+  // Tech-lead分析 (Issue #37): searchEngineがnullでないことを確認済みだが、安全のためnull guardを追加
   const suggestions = useMemo(() => {
+    if (!searchEngine) return [];
     try {
       return searchEngine.search(inputValue, { limit: 10 });
     } catch (error) {
