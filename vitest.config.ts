@@ -29,10 +29,6 @@ export default defineConfig({
     clearMocks: true,
     restoreMocks: true,
     mockReset: true,
-    // スレッドプール再利用を有効化してスタートアップコストを削減
-    poolMatch: {
-      '**/*.test.tsx': 'forks',
-    },
     exclude: [
       '**/node_modules/**',
       '**/dist/**',

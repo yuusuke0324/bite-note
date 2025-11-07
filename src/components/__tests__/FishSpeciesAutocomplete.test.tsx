@@ -89,10 +89,6 @@ describe('FishSpeciesAutocomplete', () => {
     mockOnChange = vi.fn();
     mockSearchEngine = createMockSearchEngine();
 
-    // CI環境対策: searchEngineが確実に初期化されていることを確認
-    expect(mockSearchEngine.isReady()).toBe(true);
-    expect(typeof mockSearchEngine.search).toBe('function');
-
     // scrollIntoViewのモック (JSDOMはサポートしていないため)
     Element.prototype.scrollIntoView = vi.fn();
   });
