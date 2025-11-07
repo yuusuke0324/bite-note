@@ -15,7 +15,7 @@
 
 import React from 'react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { FishSpeciesAutocomplete } from '../FishSpeciesAutocomplete';
@@ -148,7 +148,9 @@ describe('FishSpeciesAutocomplete', () => {
         screen.debug();
       }
 
-      const input = await screen.findByRole('combobox');
+      // CI環境では screen オブジェクトがforks modeで正しく動作しない可能性があるため、
+      // result.containerから直接クエリを実行（Issue #37 fix）
+      const input = await within(result.container).findByRole('combobox');
       expect(input).toHaveAttribute('aria-label', '魚種名');
     });
 
