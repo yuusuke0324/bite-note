@@ -191,12 +191,12 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
     }
   }, [selectedIndex]);
 
-  // ローディング状態: searchEngineがnullの場合
-  // React Hooks修正 (Issue #37): 全てのHooks実行後に条件分岐
-  if (!searchEngine) {
-    return (
-      <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
-        <div className="input-wrapper">
+  // ローディング状態: searchEngineがnullの場合は条件付きレンダリング
+  // React Hooks修正 (Issue #37): 早期returnを削除し、条件付きレンダリングで実装
+  return (
+    <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
+      <div className="input-wrapper">
+        {!searchEngine ? (
           <input
             type="text"
             role="combobox"
@@ -208,36 +208,30 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
             aria-autocomplete="list"
             aria-controls="fish-species-list"
           />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
-      <div className="input-wrapper">
-        <input
-          ref={inputRef}
-          type="text"
-          role="combobox"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          disabled={disabled}
-          required={required}
-          data-testid="fish-species-input"
-          aria-label="魚種名"
-          aria-autocomplete="list"
-          aria-controls="fish-species-list"
-          aria-expanded={isOpen}
-          aria-activedescendant={
-            selectedIndex >= 0 ? `fish-species-${selectedIndex}` : undefined
-          }
-          className={error ? 'error' : ''}
-        />
+        ) : (
+          <input
+            ref={inputRef}
+            type="text"
+            role="combobox"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            placeholder={placeholder}
+            disabled={disabled}
+            required={required}
+            data-testid="fish-species-input"
+            aria-label="魚種名"
+            aria-autocomplete="list"
+            aria-controls="fish-species-list"
+            aria-expanded={isOpen}
+            aria-activedescendant={
+              selectedIndex >= 0 ? `fish-species-${selectedIndex}` : undefined
+            }
+            className={error ? 'error' : ''}
+          />
+        )}
       </div>
 
       {error && (
@@ -246,7 +240,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         </div>
       )}
 
-      {isOpen && suggestions.length > 0 && (
+      {searchEngine && isOpen && suggestions.length > 0 && (
         <ul
           ref={listRef}
           id="fish-species-list"
@@ -281,7 +275,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         </ul>
       )}
 
-      {isOpen && suggestions.length === 0 && inputValue && (
+      {searchEngine && isOpen && suggestions.length === 0 && inputValue && (
         <div className="no-results" role="status" data-testid="fish-species-no-results">
           該当する魚種が見つかりません
         </div>
