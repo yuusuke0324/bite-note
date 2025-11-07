@@ -28,6 +28,31 @@ export default defineWorkspace([
         // 'src/components/__tests__/TideTooltip.test.tsx',
       ],
       setupFiles: ['./src/setupTests.ts'],
+      /**
+       * プール戦略の環境別設定
+       *
+       * 【背景】
+       * FishSpeciesDataServiceがシングルトンパターンを使用しており、
+       * threadsモードでのシリアライゼーション時にクラスインスタンスが正常に
+       * 初期化されない問題が発生（CI環境でのみ再現）。
+       *
+       * 【対策】
+       * - CI環境: threads を明示的に指定
+       *   → クラスインスタンスのシリアライゼーションが安定して動作
+       *   → GitHub Actions環境での確実なテスト実行を保証
+       *
+       * - ローカル環境: undefined（vitest.config.tsから forks を継承）
+       *   → forksモードの方がローカル開発時のパフォーマンスが良好
+       *   → 開発者体験を最適化
+       *
+       * 【検証済み】
+       * - CI=true (threads): 23/23 tests passing
+       * - CI=undefined (forks): 23/23 tests passing
+       *
+       * @see https://github.com/[repo]/issues/37 - CI失敗の根本原因分析
+       * @see src/services/fish-species/FishSpeciesDataService.ts:150 - シングルトンインスタンス
+       */
+      pool: process.env.CI ? 'threads' : undefined,
       testTimeout: 20000,
     },
   },
