@@ -9,6 +9,8 @@
 
 import React from 'react';
 import { ModernCard } from './ui/ModernCard';
+import { TideSummaryGrid } from './TideSummaryGrid';
+import { TideEventsList } from './TideEventsList';
 import type { TideInfo } from '../types/tide';
 
 interface TideSummaryCardProps {
@@ -64,54 +66,63 @@ export const TideSummaryCard: React.FC<TideSummaryCardProps> = ({
   return (
     <div className={`${className} hover:shadow-lg transition-shadow duration-200`}>
       <ModernCard interactive>
-      <div
-        data-testid="summary-card-container"
-        tabIndex={0}
-        className="p-4 md:p-6"
-      >
+        <div
+          data-testid="summary-card-container"
+          tabIndex={0}
+          className="p-4 md:p-6"
+        >
+          {/* カード説明（アクセシビリティ） */}
+          <div
+            data-testid="summary-card-description"
+            className="sr-only"
+            aria-label="潮汐情報サマリー"
+          >
+            潮汐情報サマリー: {tideInfo.tideType}、現在の潮位{tideInfo.currentLevel}cm
+          </div>
 
-        {/* 次の潮汐イベントのみ表示 */}
-        <div className="text-center">
-          {tideInfo.nextEvent ? (
-            <div className="flex items-center justify-center space-x-3">
-              <div className="text-3xl">
-                {tideInfo.nextEvent.type === 'high' ? '🌊' : '🏖️'}
-              </div>
-              <div>
-                <div className="text-lg font-semibold text-gray-800">
-                  次の{tideInfo.nextEvent.type === 'high' ? '満潮' : '干潮'}
-                </div>
-                <div className="text-xl font-bold text-blue-600">
-                  {tideInfo.nextEvent.time.toLocaleTimeString('ja-JP', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </div>
-                <div className="text-sm text-gray-500">
-                  潮位 {tideInfo.nextEvent.level}cm
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-gray-500">
-              次の潮汐イベント情報がありません
+          {/* 4項目グリッド表示 */}
+          <div className="mb-6">
+            <TideSummaryGrid tideInfo={tideInfo} />
+          </div>
+
+          {/* 今日の潮汐イベント一覧 */}
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+              今日の潮汐イベント
+            </h3>
+            <TideEventsList
+              events={tideInfo.events}
+              targetDate={tideInfo.date}
+            />
+          </div>
+
+          {/* データ精度表示 */}
+          <div
+            data-testid="accuracy-indicator"
+            className={`mt-4 text-xs text-center ${
+              tideInfo.accuracy === 'high'
+                ? 'text-green-500'
+                : tideInfo.accuracy === 'low'
+                ? 'text-orange-500'
+                : 'text-blue-500'
+            }`}
+          >
+            精度: {tideInfo.accuracy === 'high' ? '高' : tideInfo.accuracy === 'low' ? '低' : '中'}
+          </div>
+
+          {/* 詳細切り替えボタン */}
+          {onToggleDetails && (
+            <div className="mt-4 text-center">
+              <button
+                data-testid="details-toggle-button"
+                onClick={onToggleDetails}
+                className="text-blue-500 hover:text-blue-600 text-sm font-medium transition-colors duration-200"
+              >
+                詳細を表示 →
+              </button>
             </div>
           )}
         </div>
-
-        {/* 詳細切り替えボタン */}
-        {onToggleDetails && (
-          <div className="mt-4 text-center">
-            <button
-              data-testid="details-toggle-button"
-              onClick={onToggleDetails}
-              className="text-blue-500 hover:text-blue-600 text-sm font-medium transition-colors duration-200"
-            >
-              詳細を表示 →
-            </button>
-          </div>
-        )}
-      </div>
       </ModernCard>
     </div>
   );

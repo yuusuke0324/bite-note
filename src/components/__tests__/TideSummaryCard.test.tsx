@@ -11,6 +11,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TideSummaryCard } from '../TideSummaryCard';
+import { TideSummaryGrid } from '../TideSummaryGrid';
+import { TideEventsList } from '../TideEventsList';
 import type { TideInfo } from '../../types/tide';
 
 // テスト用のモックデータ
@@ -45,9 +47,230 @@ const mockEmptyTideInfo: TideInfo = {
   accuracy: 'medium'
 };
 
+// TASK-202 Step 2: TideSummaryGrid 4項目グリッド表示のテスト
+describe('TASK-202 Step 2: TideSummaryGrid 4項目グリッド表示', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('4項目グリッド表示', () => {
+    it('TC-S001: 潮汐タイプが正しく表示される', () => {
+      render(<TideSummaryGrid tideInfo={mockTideInfo} />);
+
+      const tideTypeSection = screen.getByTestId('tide-type-section');
+      expect(tideTypeSection).toBeInTheDocument();
+      expect(screen.getByText('大潮')).toBeInTheDocument();
+      expect(screen.getByText('潮汐タイプ')).toBeInTheDocument();
+    });
+
+    it('TC-S002: 現在の潮汐状態が表示される', () => {
+      render(<TideSummaryGrid tideInfo={mockTideInfo} />);
+
+      const currentStateSection = screen.getByTestId('current-state-section');
+      expect(currentStateSection).toBeInTheDocument();
+      expect(screen.getByText('上げ潮')).toBeInTheDocument();
+      expect(screen.getByText('120cm')).toBeInTheDocument();
+    });
+
+    it('TC-S003: 次イベント情報が表示される', () => {
+      render(<TideSummaryGrid tideInfo={mockTideInfo} />);
+
+      const nextEventSection = screen.getByTestId('next-event-section');
+      expect(nextEventSection).toBeInTheDocument();
+
+      // グリッド内の次イベント情報をチェック
+      expect(nextEventSection).toHaveTextContent('干潮');
+      expect(nextEventSection).toHaveTextContent('12:30');
+      expect(nextEventSection).toHaveTextContent('45cm');
+    });
+
+    it('TC-S004: 潮汐強度が表示される', () => {
+      render(<TideSummaryGrid tideInfo={mockTideInfo} />);
+
+      const strengthSection = screen.getByTestId('tide-strength-section');
+      expect(strengthSection).toBeInTheDocument();
+      expect(screen.getByText('85%')).toBeInTheDocument();
+      expect(screen.getByText('潮汐強度')).toBeInTheDocument();
+    });
+
+    it('TC-S005: 2×2グリッドレイアウトが適用される', () => {
+      render(<TideSummaryGrid tideInfo={mockTideInfo} />);
+
+      const gridContainer = screen.getByTestId('summary-grid');
+      expect(gridContainer).toBeInTheDocument();
+      // レスポンシブクラスを確認: モバイル(1列) → タブレット(2×2)
+      expect(gridContainer).toHaveClass('grid', 'grid-cols-1', 'md:grid-cols-2');
+
+      const gridItems = screen.getAllByTestId(/.*-section$/);
+      expect(gridItems).toHaveLength(4);
+    });
+
+    it('TC-S006: 次イベントがない場合の表示', () => {
+      render(<TideSummaryGrid tideInfo={mockEmptyTideInfo} />);
+
+      const nextEventSection = screen.getByTestId('next-event-section');
+      expect(nextEventSection).toBeInTheDocument();
+      expect(screen.getByText('データなし')).toBeInTheDocument();
+    });
+  });
+});
+
+// TASK-202 Step 3: TideEventsList 今日の潮汐イベント一覧のテスト
+describe('TASK-202 Step 3: TideEventsList 今日の潮汐イベント一覧', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('今日の潮汐イベント一覧', () => {
+    it('TC-S007: イベントリストが表示される', () => {
+      render(
+        <TideEventsList
+          events={mockTideInfo.events}
+          targetDate={mockTideInfo.date}
+        />
+      );
+
+      const eventsList = screen.getByTestId('tide-events-list');
+      expect(eventsList).toBeInTheDocument();
+    });
+
+    it('TC-S008: 各イベントの詳細が表示される', () => {
+      render(
+        <TideEventsList
+          events={mockTideInfo.events}
+          targetDate={mockTideInfo.date}
+        />
+      );
+
+      const eventItems = screen.getAllByTestId(/tide-event-/);
+      expect(eventItems).toHaveLength(3); // テストデータの日付でフィルタリングされた結果
+
+      // 最初のイベント（満潮）をチェック
+      expect(screen.getByText('06:15')).toBeInTheDocument();
+      expect(screen.getByText('180cm')).toBeInTheDocument();
+    });
+
+    it('TC-S009: 満潮・干潮のアイコンが表示される', () => {
+      render(
+        <TideEventsList
+          events={mockTideInfo.events}
+          targetDate={mockTideInfo.date}
+        />
+      );
+
+      const highTideIcons = screen.getAllByTestId('high-tide-icon');
+      const lowTideIcons = screen.getAllByTestId('low-tide-icon');
+
+      expect(highTideIcons).toHaveLength(2); // 2回の満潮
+      expect(lowTideIcons).toHaveLength(1);  // 1回の干潮
+    });
+
+    it('TC-S010: イベントが空の場合の表示', () => {
+      render(
+        <TideEventsList
+          events={mockEmptyTideInfo.events}
+          targetDate={mockEmptyTideInfo.date}
+        />
+      );
+
+      const emptyState = screen.getByTestId('empty-events-state');
+      expect(emptyState).toBeInTheDocument();
+      expect(screen.getByText('今日の潮汐イベントがありません')).toBeInTheDocument();
+    });
+
+    it('TC-S011: イベント時刻の現在時刻との比較表示', () => {
+      // 現在時刻をモック（12:00）
+      const mockCurrentTime = new Date('2024-01-15T12:00:00');
+
+      render(
+        <TideEventsList
+          events={mockTideInfo.events}
+          targetDate={mockTideInfo.date}
+          currentTime={mockCurrentTime}
+        />
+      );
+
+      // 過去のイベント（06:15）は薄く表示される
+      const pastEvent = screen.getByTestId('tide-event-0');
+      expect(pastEvent).toHaveClass('opacity-50');
+
+      // 未来のイベント（12:30）は通常表示
+      const futureEvent = screen.getByTestId('tide-event-1');
+      expect(futureEvent).not.toHaveClass('opacity-50');
+    });
+  });
+});
+
+// TASK-202 Step 4: TideSummaryCard統合テスト
+describe('TASK-202 Step 4: TideSummaryCard統合テスト', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('アイコン・カラーシステム', () => {
+    it('TC-S012: 潮汐タイプ別のカラー表示', () => {
+      render(<TideSummaryCard tideInfo={mockTideInfo} />);
+
+      const tideTypeIcon = screen.getByTestId('tide-type-icon');
+      expect(tideTypeIcon).toBeInTheDocument();
+    });
+  });
+
+  describe('アクセシビリティ', () => {
+    it('TC-S022: カード全体の説明文', () => {
+      render(<TideSummaryCard tideInfo={mockTideInfo} />);
+
+      const cardDescription = screen.getByTestId('summary-card-description');
+      expect(cardDescription).toBeInTheDocument();
+      expect(cardDescription).toHaveTextContent(/潮汐情報サマリー/);
+    });
+
+    it('TC-S023: キーボードナビゲーション', () => {
+      render(<TideSummaryCard tideInfo={mockTideInfo} />);
+
+      const container = screen.getByTestId('summary-card-container');
+      expect(container).toHaveAttribute('tabIndex', '0');
+
+      fireEvent.keyDown(container, { key: 'Enter' });
+      // キーボード操作のテスト（実装に応じて詳細化）
+    });
+  });
+
+  describe('インタラクション', () => {
+    it('TC-S024: クリック時の詳細表示切り替え', async () => {
+      const onToggleDetails = vi.fn();
+      render(<TideSummaryCard tideInfo={mockTideInfo} onToggleDetails={onToggleDetails} />);
+
+      const toggleButton = screen.getByTestId('details-toggle-button');
+      fireEvent.click(toggleButton);
+
+      expect(onToggleDetails).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('データ精度表示', () => {
+    it('TC-S026: 高精度データのインジケーター', () => {
+      render(<TideSummaryCard tideInfo={mockTideInfo} />);
+
+      const accuracyIndicator = screen.getByTestId('accuracy-indicator');
+      expect(accuracyIndicator).toBeInTheDocument();
+      expect(accuracyIndicator).toHaveClass('text-green-500'); // 高精度は緑
+    });
+
+    it('TC-S027: 低精度データの警告表示', () => {
+      const lowAccuracyInfo = { ...mockTideInfo, accuracy: 'low' as const };
+      render(<TideSummaryCard tideInfo={lowAccuracyInfo} />);
+
+      const accuracyIndicator = screen.getByTestId('accuracy-indicator');
+      expect(accuracyIndicator).toHaveClass('text-orange-500'); // 低精度は橙
+      expect(screen.getByText('精度: 低')).toBeInTheDocument();
+    });
+  });
+});
+
 // TODO: Issue #26 で TASK-202要件（4項目グリッド + イベント一覧）を実装予定
 // 現在の実装は「次イベントのみ表示」のシンプル版のため、テストを一時スキップ
-describe.skip('TASK-202: TideSummaryCardコンポーネント', () => {
+describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテスト）', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
