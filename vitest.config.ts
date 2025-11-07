@@ -13,9 +13,6 @@ export default defineConfig({
     // すべての環境でforksモードを使用（threadsモードはCI環境でグローバルPolyfillとクラスインスタンスの初期化問題あり）
     pool: 'forks',
     poolOptions: {
-      threads: {
-        singleThread: false,
-      },
       forks: {
         singleFork: false, // 複数フォークで並行実行
         execArgv: ['--max-old-space-size=4096'],

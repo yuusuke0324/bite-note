@@ -86,8 +86,18 @@ describe('FishSpeciesAutocomplete', () => {
   let mockSearchEngine: ReturnType<typeof createMockSearchEngine>;
 
   beforeEach(async () => {
-    // JSDOM初期化を待機（CI環境での確実なレンダリング基盤）
-    await new Promise(resolve => setTimeout(resolve, 0));
+    // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #37）
+    if (process.env.CI) {
+      // より長い待機時間とポーリングでbody確認
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    } else {
+      // ローカル環境は高速化のため最小限
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
 
     // 環境診断（CI環境での問題特定用）
     if (process.env.CI) {

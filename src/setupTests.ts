@@ -47,6 +47,18 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 
   // bodyを空にリセット（各テストで綺麗な状態から開始）
   document.body.innerHTML = '';
+
+  // CI環境での追加初期化（Tech-lead recommendation for Issue #37）
+  if (process.env.CI) {
+    // レンダリングコンテナを事前に作成
+    const container = document.createElement('div');
+    container.id = 'root';
+    document.body.appendChild(container);
+
+    // DOMContentLoadedイベントを同期的に発火（React初期化トリガー）
+    const event = new Event('DOMContentLoaded');
+    document.dispatchEvent(event);
+  }
 }
 
 // ============================================================================
