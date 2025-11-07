@@ -5,7 +5,11 @@
  * 魚種オートコンプリートコンポーネントの包括的なテストスイート
  * React Testing Libraryのベストプラクティスに従い、act()の過剰なラッピングを削除
  *
- * @version 4.0.0 - CI環境対応・テストコード簡素化
+ * @version 4.1.0 - CI環境対応：実クラスインスタンス使用、型安全性改善
+ * @changes
+ * - モックを実際のFishSpeciesSearchEngineインスタンスに変更（CI環境安定性向上）
+ * - すべての `as any` 型キャストを削除（型安全性向上）
+ * - vi.spyOn() によるテスト検証機能を維持
  * @since 2025-11-07
  */
 
@@ -16,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { FishSpeciesAutocomplete } from '../FishSpeciesAutocomplete';
 import type { FishSpecies } from '../../types';
+import { FishSpeciesSearchEngine } from '../../services/fish-species';
 
 // テスト用のモックデータ
 const mockSpeciesData: FishSpecies[] = [
@@ -59,19 +64,22 @@ const mockSpeciesData: FishSpecies[] = [
 
 /**
  * モック検索エンジンの作成
+ * CI環境での安定性のため、実際のクラスインスタンスを使用
  */
-const createMockSearchEngine = () => ({
-  search: vi.fn((query: string, options?: { limit?: number }) => {
-    if (!query) return mockSpeciesData.slice(0, options?.limit || 10);
-    const normalized = query.toLowerCase();
-    const results = mockSpeciesData.filter((s) =>
-      s.standardName.toLowerCase().includes(normalized) ||
-      s.aliases.some((a) => a.toLowerCase().includes(normalized))
-    );
-    return results.slice(0, options?.limit || 10);
-  }),
-  isReady: vi.fn(() => true)
-});
+const createMockSearchEngine = () => {
+  const engine = new FishSpeciesSearchEngine(mockSpeciesData, {
+    debug: false,
+    maxPrefixLength: 3,
+    caseInsensitive: true,
+    normalizeKana: true
+  });
+
+  // テスト検証のためにスパイを設定
+  vi.spyOn(engine, 'search');
+  vi.spyOn(engine, 'isReady');
+
+  return engine;
+};
 
 describe('FishSpeciesAutocomplete', () => {
   let mockOnChange: ReturnType<typeof vi.fn>;
@@ -95,7 +103,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -108,7 +116,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value="マアジ"
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -122,7 +130,7 @@ describe('FishSpeciesAutocomplete', () => {
           value=""
           onChange={mockOnChange}
           placeholder="カスタムプレースホルダー"
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -136,7 +144,7 @@ describe('FishSpeciesAutocomplete', () => {
           value=""
           onChange={mockOnChange}
           disabled
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -150,7 +158,7 @@ describe('FishSpeciesAutocomplete', () => {
           value=""
           onChange={mockOnChange}
           error="エラーが発生しました"
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -167,7 +175,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -186,7 +194,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -207,7 +215,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -225,7 +233,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -244,7 +252,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -272,7 +280,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -293,7 +301,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -317,7 +325,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -343,7 +351,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -370,7 +378,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -393,7 +401,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -418,7 +426,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -439,7 +447,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -462,7 +470,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -480,7 +488,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -496,10 +504,12 @@ describe('FishSpeciesAutocomplete', () => {
 
   describe('エッジケース', () => {
     it('大量の候補でもパフォーマンスが維持されること', async () => {
-      const largeMockEngine = {
-        search: vi.fn(() => mockSpeciesData.slice(0, 10)),
-        isReady: vi.fn(() => true)
-      };
+      const largeMockEngine = new FishSpeciesSearchEngine(mockSpeciesData, {
+        debug: false,
+        maxPrefixLength: 3,
+        caseInsensitive: true,
+        normalizeKana: true
+      });
 
       const user = userEvent.setup();
 
@@ -507,7 +517,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={largeMockEngine as any}
+          searchEngine={largeMockEngine}
         />
       );
 
@@ -527,7 +537,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
@@ -548,7 +558,7 @@ describe('FishSpeciesAutocomplete', () => {
         <FishSpeciesAutocomplete
           value=""
           onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
+          searchEngine={mockSearchEngine}
         />
       );
 
