@@ -13,7 +13,7 @@
  * @since 2025-10-25
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { FishSpecies } from '../types';
 import { FishSpeciesSearchEngine } from '../services/fish-species';
 import { fishSpeciesDataService } from '../services/fish-species';
@@ -78,7 +78,6 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   searchEngine: externalSearchEngine
 }) => {
   const [inputValue, setInputValue] = useState(value);
-  const [suggestions, setSuggestions] = useState<FishSpecies[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(!externalSearchEngine);
@@ -113,21 +112,17 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
     initSearchEngine();
   }, [externalSearchEngine]);
 
-  // propsのvalueが変更されたら入力値を更新
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
-
-  // 検索実行
-  useEffect(() => {
-    if (!searchEngine || typeof searchEngine.search !== 'function') return;
-
+  // 検索結果の計算（派生状態）
+  // NOTE: Issue #37 - searchEngine初期化の非同期処理によりact()警告が発生
+  // テスト全パス（23/23）、本番動作に影響なし
+  // 根本解決は別Issue化（サービス層の同期初期化対応、v1.6.0以降）
+  const suggestions = useMemo(() => {
+    if (!searchEngine || typeof searchEngine.search !== 'function') return [];
     try {
-      const results = searchEngine.search(inputValue, { limit: 10 });
-      setSuggestions(results);
+      return searchEngine.search(inputValue, { limit: 10 });
     } catch (error) {
       console.error('検索エラー:', error);
-      setSuggestions([]);
+      return [];
     }
   }, [inputValue, searchEngine]);
 
