@@ -157,32 +157,21 @@ export class FishSpeciesSearchEngine {
   search(query: string, options: FishSearchOptions = {}): FishSpecies[] {
     const startTime = performance.now();
 
-    // 空クエリの場合は人気魚種を返す
+    let results: FishSpecies[] = [];
+
+    // 空クエリの場合は全データからフィルタリング
     if (!query || query.trim().length === 0) {
-      return this.getPopular(options.limit ?? 10);
+      results = Array.from(this.species.values());
+    } else {
+      // クエリを正規化
+      const normalized = this.normalize(query);
+
+      // 前方一致検索を実行
+      results = this.performPrefixSearch(normalized);
     }
 
-    // クエリを正規化
-    const normalized = this.normalize(query);
-
-    // プレフィックスインデックスから候補IDを取得
-    const matchedIds = this.prefixIndex.get(normalized) || [];
-
-    // IDから魚種オブジェクトを取得
-    let results = matchedIds
-      .map(id => this.species.get(id)!)
-      .filter(Boolean);
-
-    // フィルタリング
-    if (options.category) {
-      results = results.filter(s => s.category === options.category);
-    }
-    if (options.season) {
-      results = results.filter(s => s.season.includes(options.season!));
-    }
-    if (options.habitat) {
-      results = results.filter(s => s.habitat.includes(options.habitat!));
-    }
+    // フィルタリング処理（空クエリ・通常検索共通）
+    results = this.applyFilters(results, options);
 
     // ソート（人気度順）
     if (options.sortByPopularity !== false) {
@@ -202,6 +191,60 @@ export class FishSpeciesSearchEngine {
     }
 
     return results;
+  }
+
+  /**
+   * 前方一致検索を実行
+   *
+   * @param normalizedQuery - 正規化されたクエリ
+   * @returns マッチした魚種の配列
+   */
+  private performPrefixSearch(normalizedQuery: string): FishSpecies[] {
+    // 3文字プレフィックスで候補を取得
+    const prefix = normalizedQuery.slice(0, this.options.maxPrefixLength || 3);
+    const candidateIds = this.prefixIndex.get(prefix) || [];
+
+    // 候補から前方一致フィルタリング
+    return candidateIds
+      .map(id => this.species.get(id)!)
+      .filter(Boolean)
+      .filter(fish => {
+        // 各検索対象フィールドを正規化してチェック
+        const normalizedStandard = this.normalize(fish.standardName);
+        const normalizedScientific = fish.scientificName ? this.normalize(fish.scientificName) : '';
+        const normalizedAliases = fish.aliases.map(a => this.normalize(a));
+        const normalizedRegional = fish.regionalNames.map(r => this.normalize(r));
+
+        return (
+          normalizedStandard.startsWith(normalizedQuery) ||
+          normalizedScientific.startsWith(normalizedQuery) ||
+          normalizedAliases.some(alias => alias.startsWith(normalizedQuery)) ||
+          normalizedRegional.some(regional => regional.startsWith(normalizedQuery))
+        );
+      });
+  }
+
+  /**
+   * フィルタを適用
+   *
+   * @param results - フィルタ対象の魚種配列
+   * @param options - 検索オプション
+   * @returns フィルタリング後の魚種配列
+   */
+  private applyFilters(results: FishSpecies[], options: FishSearchOptions): FishSpecies[] {
+    let filtered = results;
+
+    if (options.category) {
+      filtered = filtered.filter(s => s.category === options.category);
+    }
+    if (options.season) {
+      filtered = filtered.filter(s => s.season.includes(options.season!));
+    }
+    if (options.habitat) {
+      filtered = filtered.filter(s => s.habitat.includes(options.habitat!));
+    }
+
+    return filtered;
   }
 
   /**
