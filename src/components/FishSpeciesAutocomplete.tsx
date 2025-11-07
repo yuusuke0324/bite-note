@@ -205,13 +205,11 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
 
   /**
    * ブラーハンドラ
+   * Note: onMouseDownでblurを防ぐため、setTimeoutは不要
    */
   const handleBlur = useCallback(() => {
-    // 少し遅延させてクリックイベントを処理可能にする
-    setTimeout(() => {
-      setIsOpen(false);
-      setSelectedIndex(-1);
-    }, 200);
+    setIsOpen(false);
+    setSelectedIndex(-1);
   }, []);
 
   /**
@@ -284,6 +282,10 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
               className={`suggestion-item ${selectedIndex === index ? 'selected' : ''}`}
               data-testid={`fish-species-option-${species.id}`}
               onClick={() => handleSelect(species)}
+              onMouseDown={(e) => {
+                e.preventDefault(); // blurを防ぐ
+                handleSelect(species);
+              }}
               onMouseEnter={() => setSelectedIndex(index)}
             >
               <div className="species-main">

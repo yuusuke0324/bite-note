@@ -5,13 +5,13 @@
  * 魚種オートコンプリートコンポーネントの包括的なテストスイート
  * 依存性注入パターンによるモック注入で、vi.mock()の問題を完全回避
  *
- * @version 3.0.0 - 完全書き直し
+ * @version 3.1.0 - React act()警告完全対応
  * @since 2025-11-04
  */
 
 import React from 'react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { render, screen, waitFor, cleanup, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { FishSpeciesAutocomplete } from '../FishSpeciesAutocomplete';
@@ -80,6 +80,16 @@ const createMockSearchEngine = () => ({
 const waitForRender = async () => {
   await waitFor(() => {
     expect(screen.getByRole('combobox')).toBeInTheDocument();
+  }, { timeout: 3000 });
+};
+
+/**
+ * useEffectのマイクロタスクをフラッシュするヘルパー
+ * React act()警告を回避
+ */
+const flushMicrotasks = async () => {
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
   });
 };
 
@@ -95,80 +105,101 @@ describe('FishSpeciesAutocomplete', () => {
     Element.prototype.scrollIntoView = vi.fn();
   });
 
+  afterEach(async () => {
+    await flushMicrotasks(); // テスト終了時にマイクロタスクをフラッシュ
+    cleanup(); // DOMのクリーンアップ
+    vi.clearAllMocks(); // モックのリセット
+  });
+
   describe('基本的なレンダリング', () => {
     it('コンポーネントが表示されること', async () => {
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
       expect(input).toHaveAttribute('aria-label', '魚種名');
     });
 
     it('初期値が設定されること', async () => {
-      render(
-        <FishSpeciesAutocomplete
-          value="マアジ"
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value="マアジ"
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox') as HTMLInputElement;
       expect(input.value).toBe('マアジ');
     });
 
     it('プレースホルダーが表示されること', async () => {
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          placeholder="カスタムプレースホルダー"
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            placeholder="カスタムプレースホルダー"
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
       expect(input).toHaveAttribute('placeholder', 'カスタムプレースホルダー');
     });
 
     it('無効化されること', async () => {
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          disabled
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            disabled
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
       expect(input).toBeDisabled();
     });
 
     it('エラーメッセージが表示されること', async () => {
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          error="エラーが発生しました"
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            error="エラーが発生しました"
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       expect(screen.getByRole('alert')).toHaveTextContent('エラーが発生しました');
     });
@@ -176,326 +207,509 @@ describe('FishSpeciesAutocomplete', () => {
 
   describe('入力機能', () => {
     it('テキストを入力できること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.type(input, 'あじ');
 
-      expect(mockOnChange).toHaveBeenCalled();
+      await act(async () => {
+        await user.type(input, 'あじ');
+      });
+      await flushMicrotasks();
+
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalled();
+      });
+
+      await flushMicrotasks();
     });
 
     it('onChange コールバックが呼ばれること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.type(input, 'あ');
 
-      expect(mockOnChange).toHaveBeenCalledWith(null, 'あ');
+      await act(async () => {
+        await user.type(input, 'あ');
+      });
+      await flushMicrotasks();
+
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalledWith(null, 'あ');
+      });
+
+      await flushMicrotasks();
     });
   });
 
   describe('候補の表示', () => {
     it('フォーカス時に候補が表示されること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
       });
+
+      await flushMicrotasks();
     });
 
     it('入力に応じた候補が表示されること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.type(input, 'あじ');
+
+      await act(async () => {
+        await user.type(input, 'あじ');
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByText('マアジ')).toBeInTheDocument();
       });
+
+      await flushMicrotasks();
     });
 
     it('候補をクリックして選択できること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByText('マアジ')).toBeInTheDocument();
       });
 
-      await user.click(screen.getByText('マアジ'));
+      await act(async () => {
+        await user.click(screen.getByText('マアジ'));
+      });
+      await flushMicrotasks();
 
-      expect(mockOnChange).toHaveBeenCalledWith(
-        expect.objectContaining({ standardName: 'マアジ' }),
-        'マアジ'
-      );
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalledWith(
+          expect.objectContaining({ standardName: 'マアジ' }),
+          'マアジ'
+        );
+      });
+
+      await flushMicrotasks();
     });
 
     it('マッチしない場合は「該当する魚種が見つかりません」と表示されること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.type(input, 'xxxxx');
+
+      await act(async () => {
+        await user.type(input, 'xxxxx');
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByText('該当する魚種が見つかりません')).toBeInTheDocument();
       });
+
+      await flushMicrotasks();
     });
   });
 
   describe('キーボード操作', () => {
     it('ArrowDown で次の候補を選択できること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
       });
 
-      await user.keyboard('{ArrowDown}');
+      await act(async () => {
+        await user.keyboard('{ArrowDown}');
+      });
+      await flushMicrotasks();
 
-      const firstOption = screen.getByRole('option', { name: /マアジ/ });
-      expect(firstOption).toHaveAttribute('aria-selected', 'true');
+      await waitFor(() => {
+        const firstOption = screen.getByRole('option', { name: /マアジ/ });
+        expect(firstOption).toHaveAttribute('aria-selected', 'true');
+      });
+
+      await flushMicrotasks();
     });
 
     it('ArrowUp で前の候補を選択できること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
       });
 
-      await user.keyboard('{ArrowDown}');
-      await user.keyboard('{ArrowDown}');
-      await user.keyboard('{ArrowUp}');
+      await act(async () => {
+        await user.keyboard('{ArrowDown}');
+      });
+      await flushMicrotasks();
 
-      const firstOption = screen.getByRole('option', { name: /マアジ/ });
-      expect(firstOption).toHaveAttribute('aria-selected', 'true');
+      await act(async () => {
+        await user.keyboard('{ArrowDown}');
+      });
+      await flushMicrotasks();
+
+      await act(async () => {
+        await user.keyboard('{ArrowUp}');
+      });
+      await flushMicrotasks();
+
+      await waitFor(() => {
+        const firstOption = screen.getByRole('option', { name: /マアジ/ });
+        expect(firstOption).toHaveAttribute('aria-selected', 'true');
+      });
+
+      await flushMicrotasks();
     });
 
     it('Enter で選択した候補を確定できること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
       });
 
-      await user.keyboard('{ArrowDown}');
-      await user.keyboard('{Enter}');
+      await act(async () => {
+        await user.keyboard('{ArrowDown}');
+      });
+      await flushMicrotasks();
 
-      expect(mockOnChange).toHaveBeenCalledWith(
-        expect.objectContaining({ standardName: 'マアジ' }),
-        'マアジ'
-      );
+      await act(async () => {
+        await user.keyboard('{Enter}');
+      });
+      await flushMicrotasks();
+
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalledWith(
+          expect.objectContaining({ standardName: 'マアジ' }),
+          'マアジ'
+        );
+      });
+
+      await flushMicrotasks();
     });
 
     it('Escape で候補リストを閉じられること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
       });
 
-      await user.keyboard('{Escape}');
+      await act(async () => {
+        await user.keyboard('{Escape}');
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
       });
+
+      await flushMicrotasks();
     });
   });
 
   describe('アクセシビリティ', () => {
     it('候補リストが開いているときaria-expandedがtrueになること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
       expect(input).toHaveAttribute('aria-expanded', 'false');
 
-      await user.click(input);
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(input).toHaveAttribute('aria-expanded', 'true');
       });
+
+      await flushMicrotasks();
     });
 
     it('選択した候補のaria-activedescendantが設定されること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
       });
 
-      await user.keyboard('{ArrowDown}');
+      await act(async () => {
+        await user.keyboard('{ArrowDown}');
+      });
+      await flushMicrotasks();
 
-      expect(input).toHaveAttribute('aria-activedescendant', 'fish-species-0');
+      await waitFor(() => {
+        expect(input).toHaveAttribute('aria-activedescendant', 'fish-species-0');
+      });
+
+      await flushMicrotasks();
     });
 
     it('候補リストにrole="listbox"が設定されていること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         const listbox = screen.getByRole('listbox');
         expect(listbox).toBeInTheDocument();
       });
+
+      await flushMicrotasks();
     });
 
     it('候補アイテムにrole="option"が設定されていること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.click(input);
+
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         const options = screen.getAllByRole('option');
         expect(options.length).toBeGreaterThan(0);
       });
+
+      await flushMicrotasks();
     });
   });
 
@@ -506,79 +720,120 @@ describe('FishSpeciesAutocomplete', () => {
         isReady: vi.fn(() => true)
       };
 
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={largeMockEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={largeMockEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.type(input, 'あ');
+
+      await act(async () => {
+        await user.type(input, 'あ');
+      });
+      await flushMicrotasks();
 
       await waitFor(() => {
         const options = screen.getAllByRole('option');
         expect(options.length).toBeLessThanOrEqual(10);
       });
+
+      await flushMicrotasks();
     });
 
     it('存在しない候補を入力しても動作すること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
-      await user.type(input, '存在しない魚種');
 
-      expect(mockOnChange).toHaveBeenCalled();
+      await act(async () => {
+        await user.type(input, '存在しない魚種');
+      });
+      await flushMicrotasks();
+
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalled();
+      });
+
+      await flushMicrotasks();
     });
   });
 
   describe('統合テスト', () => {
     it('フォーカス→入力→選択の一連の流れが動作すること', async () => {
-      const user = userEvent.setup();
-      render(
-        <FishSpeciesAutocomplete
-          value=""
-          onChange={mockOnChange}
-          searchEngine={mockSearchEngine as any}
-        />
-      );
+      const user = userEvent.setup({ delay: null });
+
+      await act(async () => {
+        render(
+          <FishSpeciesAutocomplete
+            value=""
+            onChange={mockOnChange}
+            searchEngine={mockSearchEngine as any}
+          />
+        );
+      });
 
       await waitForRender();
+      await flushMicrotasks();
 
       const input = screen.getByRole('combobox');
 
       // フォーカス
-      await user.click(input);
+      await act(async () => {
+        await user.click(input);
+      });
+      await flushMicrotasks();
+
       await waitFor(() => {
         expect(screen.getByRole('listbox')).toBeInTheDocument();
       });
 
       // 入力
-      await user.type(input, 'あじ');
+      await act(async () => {
+        await user.type(input, 'あじ');
+      });
+      await flushMicrotasks();
 
       // 選択
       await waitFor(() => {
         expect(screen.getByText('マアジ')).toBeInTheDocument();
       });
-      await user.click(screen.getByText('マアジ'));
 
-      expect(mockOnChange).toHaveBeenCalledWith(
-        expect.objectContaining({ standardName: 'マアジ' }),
-        'マアジ'
-      );
+      await act(async () => {
+        await user.click(screen.getByText('マアジ'));
+      });
+      await flushMicrotasks();
+
+      await waitFor(() => {
+        expect(mockOnChange).toHaveBeenCalledWith(
+          expect.objectContaining({ standardName: 'マアジ' }),
+          'マアジ'
+        );
+      });
+
+      await flushMicrotasks();
     });
   });
 });
