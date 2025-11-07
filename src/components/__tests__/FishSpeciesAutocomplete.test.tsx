@@ -116,7 +116,11 @@ describe('FishSpeciesAutocomplete', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    document.body.innerHTML = '';  // クリーンアップ（各テストで綺麗な状態から開始）
+    // CI環境ではsetupTests.tsが作成したroot containerを保持するため、body.innerHTML = ''を実行しない
+    // 非CI環境のみクリーンアップを実施（Issue #37 fix）
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
   });
 
   describe('基本的なレンダリング', () => {
