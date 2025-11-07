@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TideGraph } from '../TideGraph';
 import type { TideGraphData } from '../../types/tide';
@@ -43,13 +43,17 @@ const createMockTideData = (
 
 describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
   describe('X軸（時間軸）ラベル表示テスト', () => {
-    it('TC-AL001: X軸の時間ラベルが正確に表示される（標準サイズ）', () => {
+    it('TC-AL001: X軸の時間ラベルが正確に表示される（標準サイズ）', async () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={800} height={400} />);
 
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByTestId('x-axis-line')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
       // X軸ライン要素の存在確認
       const xAxisLine = screen.getByTestId('x-axis-line');
-      expect(xAxisLine).toBeInTheDocument();
       expect(xAxisLine.tagName.toLowerCase()).toBe('line');
 
       // 4時間間隔の時間ラベルが表示されることを確認
@@ -61,19 +65,28 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       });
     });
 
-    it('TC-AL002: X軸の時間ラベルが正確に表示される（小さいサイズ）', () => {
+    it('TC-AL002: X軸の時間ラベルが正確に表示される（小さいサイズ）', async () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={400} height={200} />);
 
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByText('00:00')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
       // 小さいサイズでも時間ラベルが表示される
-      expect(screen.getByText('00:00')).toBeInTheDocument();
       expect(screen.getByText('12:00')).toBeInTheDocument();
       expect(screen.getByText('20:00')).toBeInTheDocument();
     });
 
-    it('TC-AL003: X軸ラベルがSVGのviewBox内に収まっている', () => {
+    it('TC-AL003: X軸ラベルがSVGのviewBox内に収まっている', async () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={600} height={300} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
+      }, { timeout: 3000 });
 
       const svgElement = screen.getByRole('img', { name: /潮汐グラフ/ });
       const viewBox = svgElement.getAttribute('viewBox');
@@ -91,7 +104,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       });
     });
 
-    it('TC-AL004: フォールバック時間ラベルが機能する', () => {
+    it('TC-AL004: フォールバック時間ラベルが機能する', async () => {
       // データ範囲が不正な場合のテスト
       const invalidData: TideGraphData = {
         points: [],
@@ -106,6 +119,11 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       render(<TideGraph data={invalidData} width={600} height={300} />);
 
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByTestId('tide-graph-error')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
       // 不正データの場合、エラーメッセージが表示される
       const errorElement = screen.getByTestId('tide-graph-error');
       expect(errorElement).toBeInTheDocument();
@@ -114,9 +132,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
   });
 
   describe('Y軸（潮位軸）ラベル表示テスト', () => {
-    it('TC-AL005: Y軸の潮位ラベルが動的スケールで表示される', () => {
+    it('TC-AL005: Y軸の潮位ラベルが動的スケールで表示される', async () => {
       const mockData = createMockTideData(30, 170);
       render(<TideGraph data={mockData} width={800} height={400} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByTestId('y-axis-line')).toBeInTheDocument();
+      }, { timeout: 3000 });
 
       // Y軸ライン要素の存在確認
       const yAxisLine = screen.getByTestId('y-axis-line');
@@ -135,9 +158,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       });
     });
 
-    it('TC-AL006: Y軸ラベルが重複せずに表示される', () => {
+    it('TC-AL006: Y軸ラベルが重複せずに表示される', async () => {
       const mockData = createMockTideData(10, 190);
       render(<TideGraph data={mockData} width={800} height={400} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getAllByText(/\d+cm/).length).toBeGreaterThan(0);
+      }, { timeout: 3000 });
 
       const levelLabels = screen.getAllByText(/\d+cm/);
 
@@ -149,10 +177,15 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       expect(levelLabels.length).toBeLessThanOrEqual(6); // 実際の最大ティック数に合わせて調整
     });
 
-    it('TC-AL007: 極端なデータ範囲でもY軸ラベルが表示される', () => {
+    it('TC-AL007: 極端なデータ範囲でもY軸ラベルが表示される', async () => {
       // 非常に小さい範囲のデータ
       const smallRangeData = createMockTideData(99, 101);
       render(<TideGraph data={smallRangeData} width={600} height={300} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getAllByText(/\d+cm/).length).toBeGreaterThan(0);
+      }, { timeout: 3000 });
 
       const levelLabels = screen.getAllByText(/\d+cm/);
       expect(levelLabels.length).toBeGreaterThanOrEqual(2);
@@ -166,9 +199,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       expect(largeLevelLabels.length).toBeGreaterThanOrEqual(3);
     });
 
-    it('TC-AL008: 負の潮位値でもY軸ラベルが正しく表示される', () => {
+    it('TC-AL008: 負の潮位値でもY軸ラベルが正しく表示される', async () => {
       const negativeData = createMockTideData(-50, 50);
       render(<TideGraph data={negativeData} width={600} height={300} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getAllByText(/-?\d+cm/).length).toBeGreaterThan(0);
+      }, { timeout: 3000 });
 
       // 負の値と正の値の両方が表示される
       const allLabels = screen.getAllByText(/-?\d+cm/);
@@ -181,11 +219,16 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
   });
 
   describe('SVGサイズ・マージンテスト', () => {
-    it('TC-AL009: SVGサイズ不足エラーが発生しない', () => {
+    it('TC-AL009: SVGサイズ不足エラーが発生しない', async () => {
       const mockData = createMockTideData();
 
       // 非常に小さいサイズでテスト
       render(<TideGraph data={mockData} width={200} height={100} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByRole('img', { name: /潮汐グラフ/ })).toBeInTheDocument();
+      }, { timeout: 3000 });
 
       // SVGが描画されている
       const svgElement = screen.getByRole('img', { name: /潮汐グラフ/ });
@@ -198,9 +241,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       expect(xLabels.length + yLabels.length).toBeGreaterThan(0);
     });
 
-    it('TC-AL010: レスポンシブサイズ変更でラベルが再計算される', () => {
+    it('TC-AL010: レスポンシブサイズ変更でラベルが再計算される', async () => {
       const mockData = createMockTideData();
       const { rerender } = render(<TideGraph data={mockData} width={400} height={200} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getAllByText(/\d+cm/).length).toBeGreaterThan(0);
+      }, { timeout: 3000 });
 
       const initialLabels = screen.getAllByText(/\d+cm/);
       const initialLabelCount = initialLabels.length;
@@ -217,7 +265,7 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
   });
 
   describe('異常系・エラーハンドリングテスト', () => {
-    it('TC-AL011: 空データでもエラーメッセージとともに軸構造が残る', () => {
+    it('TC-AL011: 空データでもエラーメッセージとともに軸構造が残る', async () => {
       const emptyData: TideGraphData = {
         points: [],
         dateRange: { start: new Date(), end: new Date() },
@@ -228,13 +276,18 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       render(<TideGraph data={emptyData} width={600} height={300} />);
 
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByTestId('tide-graph-error')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
       // 空データの場合、エラーメッセージが表示される
       const errorElement = screen.getByTestId('tide-graph-error');
       expect(errorElement).toBeInTheDocument();
       expect(screen.getByText('潮汐データがありません')).toBeInTheDocument();
     });
 
-    it('TC-AL012: NaN値を含むデータでも適切にハンドリングされる', () => {
+    it('TC-AL012: NaN値を含むデータでも適切にハンドリングされる', async () => {
       // NaN値を含むデータセット
       const nanData: TideGraphData = {
         points: [
@@ -254,6 +307,11 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
 
       render(<TideGraph data={nanData} width={600} height={300} />);
 
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByTestId('tide-graph-error')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
       // NaN値が含まれる場合もエラーメッセージが表示される
       const errorElement = screen.getByTestId('tide-graph-error');
       expect(errorElement).toBeInTheDocument();
@@ -262,9 +320,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
   });
 
   describe('アクセシビリティテスト', () => {
-    it('TC-AL013: 軸ラベルにアクセシビリティ属性が設定されている', () => {
+    it('TC-AL013: 軸ラベルにアクセシビリティ属性が設定されている', async () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={600} height={300} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByText('00:00')).toBeInTheDocument();
+      }, { timeout: 3000 });
 
       // 時間ラベルの属性確認
       const timeLabel = screen.getByText('00:00');
@@ -277,9 +340,14 @@ describe('TASK-303: TideGraph軸ラベル表示テスト', () => {
       });
     });
 
-    it('TC-AL014: 軸ラベルのコントラストが十分である', () => {
+    it('TC-AL014: 軸ラベルのコントラストが十分である', async () => {
       const mockData = createMockTideData();
       render(<TideGraph data={mockData} width={600} height={300} />);
+
+      // ResizeObserver初期化を待機（CI環境対応）
+      await waitFor(() => {
+        expect(screen.getByText('12:00')).toBeInTheDocument();
+      }, { timeout: 3000 });
 
       // ラベルの色が設定されている
       const timeLabel = screen.getByText('12:00');
