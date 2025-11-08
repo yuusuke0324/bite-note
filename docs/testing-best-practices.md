@@ -473,12 +473,14 @@ it('test 2', () => {
 // package.json
 {
   "scripts": {
-    "test:unit": "vitest run --exclude **/*.{perf,a11y}.test.tsx",
-    "test:perf": "vitest run **/*.performance.test.tsx",
-    "test:a11y": "vitest run **/*.accessibility.test.tsx"
+    "test:unit": "vitest --run --project=unit",
+    "test:perf": "vitest --run --project=performance",
+    "test:a11y": "vitest --run --project=accessibility"
   }
 }
 ```
+
+**NOTE**: `vitest.workspace.ts`でプロジェクトごとに設定を分離し、include/excludeを明示的に管理します。
 
 2. **共通ユーティリティの活用**
 ```typescript

@@ -611,26 +611,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
     }
   }, [chartComponents, components]);
 
-  // 使用するコンポーネント: propsが優先、なければstate
-  const activeComponents = chartComponents || components;
-
-  // コンポーネントがロード中の場合はローディング表示
-  if (!activeComponents) {
-    return (
-      <div
-        className={`tide-chart ${className || ''}`}
-        style={{ width, height, ...style }}
-        data-testid="tide-chart"
-      >
-        <div style={{ textAlign: 'center', paddingTop: '100px' }}>
-          読み込み中...
-        </div>
-      </div>
-    );
-  }
-
-  // 注入されたコンポーネントを取得
-  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = activeComponents;
+  // React Hooks must be called before any early returns (Rules of Hooks)
   const [focusedPointIndex, setFocusedPointIndex] = useState(-1);
   const [navigationState, setNavigationState] =
     useState<KeyboardNavigationState>({
@@ -644,6 +625,12 @@ const TideChartBase: React.FC<TideChartProps> = ({
   const renderStartTime = useRef<number>(0);
   const liveRegionRef = useRef<HTMLDivElement>(null);
   const focusManagerRef = useRef<FocusManager | null>(null);
+
+  // 使用するコンポーネント: propsが優先、なければstate
+  const activeComponents = chartComponents || components;
+
+  // 注入されたコンポーネントを取得（activeComponentsがundefinedでもエラーにならないように）
+  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = activeComponents || {};
 
   // 釣果マーカーのデバッグログ
   useEffect(() => {
@@ -1073,6 +1060,21 @@ const TideChartBase: React.FC<TideChartProps> = ({
     }),
     [currentTheme, colorMode, navigationState.isActive]
   );
+
+  // コンポーネントがロード中の場合はローディング表示（すべてのHooksの後にチェック）
+  if (!activeComponents) {
+    return (
+      <div
+        className={`tide-chart ${className || ''}`}
+        style={{ width, height, ...style }}
+        data-testid="tide-chart"
+      >
+        <div style={{ textAlign: 'center', paddingTop: '100px' }}>
+          読み込み中...
+        </div>
+      </div>
+    );
+  }
 
   try {
     return (

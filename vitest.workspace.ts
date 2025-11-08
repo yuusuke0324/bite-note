@@ -12,6 +12,7 @@ export default defineWorkspace([
         '**/integration.test.{ts,tsx}',
         '**/*.a11y.test.{ts,tsx}',
         '**/*.performance.test.{ts,tsx}',
+        '**/*.red.test.{ts,tsx}', // TDD Red Phase テストを除外
         '**/components/**/*.test.tsx', // コンポーネントは別枠
       ],
     },
@@ -88,6 +89,7 @@ export default defineWorkspace([
         '**/*.a11y.test.tsx',
         '**/*.accessibility.test.tsx',
         '**/*.performance.test.tsx',
+        '**/*.red.test.{ts,tsx}', // TDD Red Phase テストを除外
       ],
       setupFiles: ['./src/setupTests.ts'],
       testTimeout: 20000,
@@ -145,6 +147,35 @@ export default defineWorkspace([
       setupFiles: ['./src/setupTests.ts'],
       environment: 'jsdom',
       testTimeout: 20000,
+    },
+  },
+  // パフォーマンステスト
+  {
+    extends: './vitest.config.ts',
+    test: {
+      name: 'performance',
+      include: [
+        '**/*.performance.test.tsx',
+        '**/*.performance.test.ts',
+      ],
+      // 基本設定のexcludeをオーバーライド（performanceファイルを除外しない）
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/cypress/**',
+        '**/.{idea,git,cache,output,temp}/**',
+        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+        '**/tests/e2e/**',
+        '**/*.accessibility.test.tsx',
+        '**/*.a11y.test.tsx',
+        // TDD Red Phase テスト（最適化未実装を検証）はCI対象外
+        '**/*.red.test.tsx',
+        '**/*.red.test.ts',
+        // NOTE: **/*.performance.test.{ts,tsx} を除外しない
+      ],
+      setupFiles: ['./src/setupTests.ts'],
+      environment: 'jsdom',
+      testTimeout: 30000, // パフォーマンステストは長めのタイムアウト推奨
     },
   },
 ])

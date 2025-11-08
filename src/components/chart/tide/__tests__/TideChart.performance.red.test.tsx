@@ -31,6 +31,9 @@ vi.mock('recharts', () => ({
   ReferenceDot: vi.fn((props) => (
     <div data-testid="reference-dot" {...props} />
   )),
+  ReferenceLine: vi.fn((props) => (
+    <div data-testid="reference-line" {...props} />
+  )),
 }));
 
 // ResizeObserver モック
