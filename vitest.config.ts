@@ -33,7 +33,10 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '**/tests/e2e/**',
-      // NOTE: パフォーマンステストとアクセシビリティテストはworkspaceプロジェクトで管理
+      // パフォーマンステストはデフォルトでスキップ（test:perfで実行）
+      '**/*.performance.test.tsx',
+      // アクセシビリティテストもデフォルトでスキップ（test:a11yで実行）
+      '**/*.accessibility.test.tsx'
     ],
   },
   esbuild: {

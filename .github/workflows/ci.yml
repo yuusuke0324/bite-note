@@ -61,7 +61,7 @@ jobs:
       if: matrix.node-version == 20
 
     - name: Run performance tests
-      run: npm run test:perf
+      run: npm run test:perf -- --run
       env:
         NODE_OPTIONS: '--max-old-space-size=4096'
       timeout-minutes: 5
