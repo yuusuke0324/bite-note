@@ -219,8 +219,9 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
       await user.keyboard('{ArrowLeft}');
 
       await waitFor(() => {
-        const focusedElement = document.activeElement;
-        expect(focusedElement?.getAttribute('data-index')).toBe('0');
+        const focusedDataPoint = screen.getByTestId('data-point-0');
+        expect(focusedDataPoint).toHaveAttribute('data-focused', 'true');
+        expect(focusedDataPoint).toHaveAttribute('data-index', '0');
       });
     });
 
@@ -235,8 +236,9 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
       await user.keyboard('{Home}');
 
       await waitFor(() => {
-        const focusedElement = document.activeElement;
-        expect(focusedElement?.getAttribute('data-index')).toBe('0');
+        const focusedDataPoint = screen.getByTestId('data-point-0');
+        expect(focusedDataPoint).toHaveAttribute('data-focused', 'true');
+        expect(focusedDataPoint).toHaveAttribute('data-index', '0');
       });
     });
 
@@ -249,8 +251,9 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
       await user.keyboard('{End}');
 
       await waitFor(() => {
-        const focusedElement = document.activeElement;
-        expect(focusedElement?.getAttribute('data-index')).toBe('7');
+        const focusedDataPoint = screen.getByTestId('data-point-7');
+        expect(focusedDataPoint).toHaveAttribute('data-focused', 'true');
+        expect(focusedDataPoint).toHaveAttribute('data-index', '7');
       });
     });
   });
@@ -265,9 +268,11 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
       await user.keyboard('{ArrowUp}');
 
       await waitFor(() => {
-        const focusedElement = document.activeElement;
+        const dataPoints = screen.getAllByTestId(/data-point-\d+/);
+        const focused = dataPoints.find(dp => dp.getAttribute('data-focused') === 'true');
+        expect(focused).toBeTruthy();
         const currentValue = parseInt(
-          focusedElement?.getAttribute('data-value') || '0'
+          focused?.getAttribute('data-value') || '0'
         );
         expect(currentValue).toBeGreaterThan(120);
       });
@@ -282,9 +287,11 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
       await user.keyboard('{ArrowDown}');
 
       await waitFor(() => {
-        const focusedElement = document.activeElement;
+        const dataPoints = screen.getAllByTestId(/data-point-\d+/);
+        const focused = dataPoints.find(dp => dp.getAttribute('data-focused') === 'true');
+        expect(focused).toBeTruthy();
         const currentValue = parseInt(
-          focusedElement?.getAttribute('data-value') || '0'
+          focused?.getAttribute('data-value') || '0'
         );
         expect(currentValue).toBeLessThan(120);
       });

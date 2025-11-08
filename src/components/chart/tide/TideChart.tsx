@@ -547,6 +547,7 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
     <g>
       <circle
         ref={ref}
+        id={`data-point-${index}`}
         cx={cx}
         cy={cy}
         r={isFocused ? 6 : 4}
@@ -560,23 +561,38 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
         data-tide-type={payload?.type || 'normal'}
         data-focused={isFocused}
         data-selected={isSelected}
+        aria-selected={isSelected}
         className={isFocused ? 'highlighted' : ''}
         onClick={handleClick}
         tabIndex={-1}
       />
-      {/* Focus indicator */}
+      {/* Focus indicator - Enhanced with double ring and pulse animation */}
       {isFocused && (
-        <circle
-          cx={cx}
-          cy={cy}
-          r={8}
-          fill="none"
-          stroke={theme.focus}
-          strokeWidth={2}
-          strokeDasharray="2,2"
-          className="focus-indicator"
-          data-contrast-ratio={theme.contrastRatios?.focusBg.toFixed(2) || '3.0'}
-        />
+        <>
+          {/* Primary focus indicator - solid ring */}
+          <circle
+            cx={cx}
+            cy={cy}
+            r={9}
+            fill="none"
+            stroke={theme.focus}
+            strokeWidth={3}
+            className="focus-indicator-primary"
+            data-contrast-ratio={theme.contrastRatios?.focusBg.toFixed(2) || '3.0'}
+          />
+          {/* Secondary focus indicator - pulsing dashed ring */}
+          <circle
+            cx={cx}
+            cy={cy}
+            r={12}
+            fill="none"
+            stroke={theme.focus}
+            strokeWidth={2}
+            strokeDasharray="2,2"
+            className="focus-indicator-secondary"
+            style={{ animation: 'pulse 2s ease-in-out infinite' }}
+          />
+        </>
       )}
     </g>
   );
@@ -1002,11 +1018,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }));
           setFocusedPointIndex(nextIndex);
 
-          // Focus the data point element
-          if (dataPointRefsRef.current[nextIndex]) {
-            dataPointRefsRef.current[nextIndex]?.focus();
-          }
-
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
             const point = validatedData.valid[nextIndex];
@@ -1032,11 +1043,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(prevIndex);
-
-          // Focus the data point element
-          if (dataPointRefsRef.current[prevIndex]) {
-            dataPointRefsRef.current[prevIndex]?.focus();
-          }
 
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
@@ -1069,11 +1075,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
               isActive: true,
             }));
             setFocusedPointIndex(higherValueIndex);
-
-            // Focus the data point element
-            if (dataPointRefsRef.current[higherValueIndex]) {
-              dataPointRefsRef.current[higherValueIndex]?.focus();
-            }
           }
           break;
 
@@ -1093,11 +1094,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
               isActive: true,
             }));
             setFocusedPointIndex(lowerValueIndex);
-
-            // Focus the data point element
-            if (dataPointRefsRef.current[lowerValueIndex]) {
-              dataPointRefsRef.current[lowerValueIndex]?.focus();
-            }
           }
           break;
 
@@ -1110,11 +1106,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(0);
-
-          // Focus the first data point element
-          if (dataPointRefsRef.current[0]) {
-            dataPointRefsRef.current[0]?.focus();
-          }
           break;
 
         case 'End':
@@ -1127,11 +1118,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(lastIndex);
-
-          // Focus the last data point element
-          if (dataPointRefsRef.current[lastIndex]) {
-            dataPointRefsRef.current[lastIndex]?.focus();
-          }
           break;
 
         case 'Enter':
@@ -1213,7 +1199,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
       if (currentValue === undefined) return -1;
 
       let bestIndex = -1;
-      let bestValue = direction === 'higher' ? -Infinity : Infinity;
+      let bestValue = direction === 'higher' ? Infinity : -Infinity;
 
       for (let i = 0; i < data.length; i++) {
         if (i === currentIndex) continue;
@@ -1312,6 +1298,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
           aria-label={ariaConfiguration?.label || ariaLabel}
           aria-describedby={
             ariaConfiguration?.describedBy || 'tide-chart-description'
+          }
+          aria-activedescendant={
+            navigationState.isActive && navigationState.mode === 'data-point'
+              ? `data-point-${navigationState.focusedIndex}`
+              : undefined
           }
           tabIndex={0}
           onKeyDown={handleKeyDown}
