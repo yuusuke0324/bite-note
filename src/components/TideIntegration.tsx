@@ -449,7 +449,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
         {/* 潮汐グラフ表示ボタン */}
         {hasCoordinates && (
           <button
-            data-testid="tide-graph-tab"
+            data-testid="tide-graph-toggle-button"
             onClick={toggleExpanded}
             onKeyDown={handleKeyDown}
             disabled={loading}
