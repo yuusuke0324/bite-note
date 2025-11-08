@@ -5,7 +5,7 @@ import { useValidatedForm } from '../hooks/useFormValidation';
 import { createFishingRecordSchema, type CreateFishingRecordFormData } from '../lib/validation';
 import { PhotoUpload } from './PhotoUpload';
 import { FishSpeciesAutocomplete } from './FishSpeciesAutocomplete';
-import { FishSpeciesSearchEngine, fishSpeciesDataService } from '../services/fish-species';
+import { fishSpeciesDataService } from '../services/fish-species';
 import { photoService } from '../lib/photo-service';
 import type { PhotoMetadata, AutoFillData, FishSpecies } from '../types';
 import type { TideInfo } from '../types/tide';
@@ -31,7 +31,6 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
   const [extractedMetadata, setExtractedMetadata] = useState<PhotoMetadata | null>(null);
   const [tideInfo, setTideInfo] = useState<TideInfo | null>(null);
   const [tideLoading, setTideLoading] = useState(false);
-  const [fishSpeciesSearchEngine, setFishSpeciesSearchEngine] = useState<FishSpeciesSearchEngine | null>(null);
 
   const {
     register,
@@ -60,20 +59,6 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
     }
   });
 
-  // 魚種検索エンジンの初期化（Phase 1 Issue #37）
-  React.useEffect(() => {
-    const initSearchEngine = async () => {
-      try {
-        const data = await fishSpeciesDataService.loadSpecies();
-        const engine = new FishSpeciesSearchEngine(data, { debug: false });
-        setFishSpeciesSearchEngine(engine);
-      } catch (error) {
-        console.error('魚種データの読み込みに失敗:', error);
-      }
-    };
-
-    initSearchEngine();
-  }, []);
 
   // 写真ファイル変更ハンドラー
   const handlePhotoChange = useCallback((file: File | undefined) => {
@@ -821,40 +806,16 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           >
             魚種 <span style={{ color: '#dc3545' }} aria-label="必須項目">*</span>
           </label>
-          {fishSpeciesSearchEngine ? (
-            <FishSpeciesAutocomplete
-              value={watch('fishSpecies')}
-              onChange={(_species: FishSpecies | null, inputValue: string) => {
-                setValue('fishSpecies', inputValue, { shouldValidate: true, shouldDirty: true });
-              }}
-              placeholder="魚種を入力（例: あじ、さば）"
-              disabled={isSubmitting || isLoading}
-              error={errors.fishSpecies?.message}
-              required={true}
-              searchEngine={fishSpeciesSearchEngine}
-            />
-          ) : (
-            <div style={{
-              padding: '1rem',
-              backgroundColor: '#f8f9fa',
-              border: '2px solid #e0e0e0',
-              borderRadius: '8px',
-              color: '#6c757d',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              <div style={{
-                width: '16px',
-                height: '16px',
-                border: '2px solid transparent',
-                borderTop: '2px solid #6c757d',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-              }} />
-              魚種データを読み込み中...
-            </div>
-          )}
+          <FishSpeciesAutocomplete
+            value={watch('fishSpecies')}
+            onChange={(_species: FishSpecies | null, inputValue: string) => {
+              setValue('fishSpecies', inputValue, { shouldValidate: true, shouldDirty: true });
+            }}
+            placeholder="魚種を入力（例: あじ、さば）"
+            disabled={isSubmitting || isLoading}
+            error={errors.fishSpecies?.message}
+            required={true}
+          />
           <small
             id="fishSpecies-help"
             style={{
