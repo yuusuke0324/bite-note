@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { usePWA } from '../hooks/usePWA';
+import { colors } from '../theme/colors';
 
 interface PWAInstallPromptProps {
   onDismiss?: () => void;
@@ -12,6 +13,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
   const [isVisible, setIsVisible] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
+  const mainPromptRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -31,9 +33,13 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
 
   // 既に非表示にした場合は表示しない
   useEffect(() => {
-    const dismissed = localStorage.getItem('pwa-install-dismissed');
-    if (dismissed) {
-      setIsVisible(false);
+    try {
+      const dismissed = localStorage.getItem('pwa-install-dismissed');
+      if (dismissed) {
+        setIsVisible(false);
+      }
+    } catch (error) {
+      console.warn('[PWA] Failed to read localStorage:', error);
     }
   }, []);
 
@@ -87,6 +93,54 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
       setShowIOSInstructions(false);
     }
   }, []);
+
+  // Escapeキーでメインプロンプトを閉じる（メモ化）
+  const handleEscapeMain = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      handleDismiss();
+    }
+  }, []);
+
+  // フォーカストラップ: メインプロンプト内でキーボードナビゲーションを制御
+  useEffect(() => {
+    if (!isVisible || !mainPromptRef.current) return;
+
+    // 現在のフォーカス要素を保存
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    // プロンプト内のフォーカス可能要素を取得
+    const focusableElements = mainPromptRef.current.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), ' +
+      '[href]:not([disabled]), ' +
+      'input:not([disabled]), ' +
+      'select:not([disabled]), ' +
+      'textarea:not([disabled]), ' +
+      '[tabindex]:not([tabindex="-1"]):not([disabled]), ' +
+      'audio[controls], ' +
+      'video[controls], ' +
+      '[contenteditable]:not([contenteditable="false"])'
+    );
+
+    // エッジケース: フォーカス可能要素がない場合は警告ログ
+    if (focusableElements.length === 0) {
+      console.warn('[PWA] No focusable elements in main prompt');
+      return;
+    }
+
+    // 最初の要素にフォーカス
+    focusableElements[0]?.focus();
+
+    // イベントリスナー登録
+    document.addEventListener('keydown', handleTab);
+    document.addEventListener('keydown', handleEscapeMain);
+
+    // クリーンアップ: フォーカスを元の要素に戻す
+    return () => {
+      document.removeEventListener('keydown', handleTab);
+      document.removeEventListener('keydown', handleEscapeMain);
+      previousFocusRef.current?.focus();
+    };
+  }, [isVisible, handleTab, handleEscapeMain]);
 
   // フォーカストラップ: iOSモーダル内でキーボードナビゲーションを制御
   useEffect(() => {
@@ -153,7 +207,11 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('pwa-install-dismissed', 'true');
+    try {
+      localStorage.setItem('pwa-install-dismissed', 'true');
+    } catch (error) {
+      console.warn('[PWA] Failed to save dismiss state:', error);
+    }
     onDismiss?.();
   };
 
@@ -167,6 +225,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
     <>
       {/* メインのインストールプロンプト */}
       <div
+        ref={mainPromptRef}
         role="dialog"
         aria-labelledby="install-prompt-title"
         aria-describedby="install-prompt-description"
@@ -207,7 +266,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                 margin: '0 0 0.5rem 0',
                 fontSize: '1.1rem',
                 fontWeight: 'bold',
-                color: '#333'
+                color: colors.text.primary
               }}
             >
               アプリをインストールしませんか？
@@ -218,7 +277,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               style={{
                 margin: '0 0 1rem 0',
                 fontSize: '0.875rem',
-                color: '#5F6368',
+                color: colors.text.secondary,
                 lineHeight: 1.4
               }}
             >
@@ -238,7 +297,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                 onClick={handleInstall}
                 disabled={isInstalling}
                 style={{
-                  backgroundColor: '#007bff',
+                  backgroundColor: colors.primary[500],
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
@@ -255,14 +314,19 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               >
                 {isInstalling ? (
                   <>
-                    <div style={{
-                      width: '16px',
-                      height: '16px',
-                      border: '2px solid transparent',
-                      borderTop: '2px solid white',
-                      borderRadius: '50%',
-                      animation: 'spin 1s linear infinite'
-                    }} />
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid transparent',
+                        borderTop: '2px solid white',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }}
+                    />
+                    <span className="sr-only">インストール中です。しばらくお待ちください。</span>
                     インストール中...
                   </>
                 ) : (
@@ -276,8 +340,8 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                 onClick={handleDismiss}
                 style={{
                   backgroundColor: 'transparent',
-                  color: '#6c757d',
-                  border: '1px solid #dee2e6',
+                  color: colors.text.secondary,
+                  border: `1px solid ${colors.border.light}`,
                   borderRadius: '8px',
                   padding: '0.75rem 1rem',
                   fontSize: '0.875rem',
@@ -297,9 +361,9 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               backgroundColor: 'transparent',
               border: 'none',
               fontSize: '1.25rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               cursor: 'pointer',
-              padding: '0.625rem',
+              padding: '0',
               borderRadius: '4px',
               flexShrink: 0,
               width: '44px',
@@ -356,7 +420,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                   margin: 0,
                   fontSize: '1.5rem',
                   fontWeight: 'bold',
-                  color: '#333'
+                  color: colors.text.primary
                 }}
               >
                 {iosInstructions.title}
@@ -378,7 +442,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                   }}
                 >
                   <div style={{
-                    backgroundColor: '#007bff',
+                    backgroundColor: colors.primary[500],
                     color: 'white',
                     borderRadius: '50%',
                     width: '24px',
@@ -395,7 +459,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                   <p style={{
                     margin: 0,
                     fontSize: '0.875rem',
-                    color: '#333',
+                    color: colors.text.primary,
                     lineHeight: 1.4
                   }}>
                     {step}
@@ -411,7 +475,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               }}
               style={{
                 width: '100%',
-                backgroundColor: '#007bff',
+                backgroundColor: colors.primary[500],
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -451,8 +515,21 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
         }
 
         button:focus {
-          outline: 2px solid #007bff;
+          outline: 2px solid ${colors.primary[500]};
           outline-offset: 2px;
+        }
+
+        /* スクリーンリーダー専用テキスト */
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
         }
 
         /* モバイル対応 */
