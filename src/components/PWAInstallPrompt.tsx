@@ -16,6 +16,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
   const mainPromptRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const isInstallingRef = useRef(false); // 重複クリック防止用フラグ
 
   // インストール可能になったら表示
   useEffect(() => {
@@ -94,12 +95,23 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
     }
   }, []);
 
+  // プロンプトを閉じる処理（メモ化）
+  const handleDismiss = useCallback(() => {
+    setIsVisible(false);
+    try {
+      localStorage.setItem('pwa-install-dismissed', 'true');
+    } catch (error) {
+      console.warn('[PWA] Failed to save dismiss state:', error);
+    }
+    onDismiss?.();
+  }, [onDismiss]);
+
   // Escapeキーでメインプロンプトを閉じる（メモ化）
   const handleEscapeMain = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       handleDismiss();
     }
-  }, []);
+  }, [handleDismiss]);
 
   // フォーカストラップ: メインプロンプト内でキーボードナビゲーションを制御
   useEffect(() => {
@@ -184,8 +196,13 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
   }, [showIOSInstructions, handleTab, handleEscape]);
 
   const handleInstall = async () => {
+    // 重複クリック防止（useRefで即座に反映）
+    if (isInstallingRef.current) return;
+    isInstallingRef.current = true;
+
     if (installState.platform === 'ios') {
       setShowIOSInstructions(true);
+      isInstallingRef.current = false;
       return;
     }
 
@@ -202,17 +219,8 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
       console.error('Install failed:', error);
     } finally {
       setIsInstalling(false);
+      isInstallingRef.current = false;
     }
-  };
-
-  const handleDismiss = () => {
-    setIsVisible(false);
-    try {
-      localStorage.setItem('pwa-install-dismissed', 'true');
-    } catch (error) {
-      console.warn('[PWA] Failed to save dismiss state:', error);
-    }
-    onDismiss?.();
   };
 
   const iosInstructions = getIOSInstallInstructions();
