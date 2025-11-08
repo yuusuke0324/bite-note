@@ -45,10 +45,6 @@ interface AriaConfiguration {
   role: string;
   label: string;
   describedBy: string;
-  live: 'polite' | 'assertive' | 'off';
-  valuemin?: number;
-  valuemax?: number;
-  valuenow?: number;
 }
 
 interface KeyboardNavigationState {
@@ -72,7 +68,6 @@ class AriaManager {
         role: 'img',
         label: '潮汐グラフ: データなし',
         describedBy: 'tide-chart-description',
-        live: 'polite',
       };
     }
 
@@ -80,15 +75,14 @@ class AriaManager {
     const min = Math.min(...tideValues);
     const max = Math.max(...tideValues);
     const current = data[data.length - 1]?.tide;
+    const highTideCount = data.filter(d => d.type === 'high').length;
+    const lowTideCount = data.filter(d => d.type === 'low').length;
 
+    // Embed all numerical information in aria-label (WCAG 4.1.2 compliant for role="img")
     return {
       role: 'img',
-      label: `潮汐グラフ: ${data[0]?.time}から${data[data.length - 1]?.time}までの潮位変化、最高${max}cm、最低${min}cm`,
+      label: `潮汐グラフ: ${data[0]?.time}から${data[data.length - 1]?.time}までの潮位変化、${data.length}個のデータポイント、${highTideCount}回の満潮と${lowTideCount}回の干潮、現在${current}cm、最高${max}cm、最低${min}cm`,
       describedBy: 'tide-chart-description',
-      live: 'polite',
-      valuemin: min,
-      valuemax: max,
-      valuenow: current,
     };
   }
 }
@@ -96,12 +90,20 @@ class AriaManager {
 class ScreenReaderManager {
   static generateContent(data: TideChartData[]): ScreenReaderContent {
     const analysis = this.analyzeTideTrends(data);
+    const tideValues = data.map(d => d.tide);
+    const max = Math.max(...tideValues);
+    const min = Math.min(...tideValues);
+    const highTideCount = data.filter(d => d.type === 'high').length;
+    const lowTideCount = data.filter(d => d.type === 'low').length;
 
+    // Enhanced screen reader content with tide type counts (WCAG 1.3.1, 4.1.2)
     return {
-      chartSummary: `潮汐グラフには${data.length}個のデータポイントが含まれています。`,
-      dataPointDescription: (point: TideChartData, index: number) =>
-        `${index + 1}番目のデータポイント: ${point.time}の潮位は${point.tide}センチメートル`,
-      trendAnalysis: `傾向分析: ${analysis.overallTrend}`,
+      chartSummary: `潮汐グラフには${data.length}個のデータポイントが含まれており、${highTideCount}回の満潮と${lowTideCount}回の干潮があります。`,
+      dataPointDescription: (point: TideChartData, index: number) => {
+        const typeText = point.type === 'high' ? '満潮ポイント' : point.type === 'low' ? '干潮ポイント' : '';
+        return `${index + 1}番目のデータポイント${typeText ? `（${typeText}）` : ''}: ${point.time}の潮位は${point.tide}センチメートル`;
+      },
+      trendAnalysis: `傾向分析: ${analysis.overallTrend}。最高${max}cm、最低${min}cm。`,
       errorMessages: 'データの読み込みに失敗しました。再度お試しください。',
     };
   }
@@ -198,6 +200,92 @@ class FocusManager {
   }
 }
 
+// ============================================================================
+// Contrast Ratio Calculation (WCAG 2.1 Compliance)
+// ============================================================================
+
+/**
+ * WCAG 2.1準拠のコントラスト比計算ユーティリティ
+ *
+ * 【WCAG 2.1 Success Criterion 1.4.3 (Level AA)】
+ * - 通常テキスト: 最低4.5:1
+ * - 大きいテキスト: 最低3:1
+ * - グラフィカルオブジェクト: 最低3:1
+ *
+ * @see https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html
+ */
+
+/**
+ * HEX色をRGBに変換
+ */
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  // Remove # if present
+  const sanitized = hex.replace(/^#/, '');
+
+  // Parse hex values
+  const bigint = parseInt(sanitized, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return { r, g, b };
+}
+
+/**
+ * 相対輝度を計算（WCAG 2.1 formula）
+ * @see https://www.w3.org/WAI/GL/wiki/Relative_luminance
+ */
+function getRelativeLuminance(hex: string): number {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 0;
+
+  // Convert to sRGB
+  const rsRGB = rgb.r / 255;
+  const gsRGB = rgb.g / 255;
+  const bsRGB = rgb.b / 255;
+
+  // Apply gamma correction
+  const r = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4);
+  const g = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4);
+  const b = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4);
+
+  // Calculate relative luminance
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/**
+ * コントラスト比を計算（WCAG 2.1 formula）
+ * @returns コントラスト比（1-21の範囲）
+ */
+function getContrastRatio(foreground: string, background: string): number {
+  const fgLuminance = getRelativeLuminance(foreground);
+  const bgLuminance = getRelativeLuminance(background);
+
+  const lighter = Math.max(fgLuminance, bgLuminance);
+  const darker = Math.min(fgLuminance, bgLuminance);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * WCAG AA準拠を検証
+ * @param ratio コントラスト比
+ * @param level 'AA' | 'AAA'
+ * @param size 'normal' | 'large'
+ * @returns true if compliant
+ */
+function isWCAGCompliant(
+  ratio: number,
+  level: 'AA' | 'AAA' = 'AA',
+  size: 'normal' | 'large' = 'normal'
+): boolean {
+  if (level === 'AAA') {
+    return size === 'large' ? ratio >= 4.5 : ratio >= 7;
+  }
+  // AA level
+  return size === 'large' ? ratio >= 3 : ratio >= 4.5;
+}
+
 // High Contrast Theme System (not currently used but kept for future reference)
 // interface HighContrastTheme {
 //   background: string;
@@ -207,29 +295,57 @@ class FocusManager {
 //   error: string;
 // }
 
-const highContrastThemes = {
-  light: {
+interface HighContrastTheme {
+  background: string;
+  foreground: string;
+  accent: string;
+  focus: string;
+  error: string;
+  // Calculated contrast ratios (WCAG 2.1 compliance)
+  contrastRatios?: {
+    foregroundBg: number;
+    accentBg: number;
+    focusBg: number;
+    errorBg: number;
+  };
+}
+
+// Calculate and store contrast ratios for each theme
+const calculateThemeContrastRatios = (theme: Omit<HighContrastTheme, 'contrastRatios'>): HighContrastTheme => {
+  return {
+    ...theme,
+    contrastRatios: {
+      foregroundBg: getContrastRatio(theme.foreground, theme.background),
+      accentBg: getContrastRatio(theme.accent, theme.background),
+      focusBg: getContrastRatio(theme.focus, theme.background),
+      errorBg: getContrastRatio(theme.error, theme.background),
+    },
+  };
+};
+
+const highContrastThemes: Record<string, HighContrastTheme> = {
+  light: calculateThemeContrastRatios({
     background: '#FFFFFF',
     foreground: '#000000',
     accent: '#0066CC',
     focus: '#FF6600',
     error: '#CC0000',
-  },
-  dark: {
+  }),
+  dark: calculateThemeContrastRatios({
     background: '#000000',
     foreground: '#FFFFFF',
     accent: '#66CCFF',
     focus: '#FFCC00',
     error: '#FF6666',
-  },
-  'high-contrast': {
+  }),
+  'high-contrast': calculateThemeContrastRatios({
     background: '#000000',
     foreground: '#FFFFFF',
     accent: '#FFFF00',
     focus: '#00FF00',
     error: '#FF0000',
-  },
-} as const;
+  }),
+};
 
 // Performance tracking (currently disabled - kept for future use)
 /*
@@ -391,7 +507,7 @@ const CustomTooltip = React.memo(({ active, payload, label }: any) => {
 /**
  * Enhanced Data Point Component with Accessibility（最適化版）
  */
-const DataPoint = React.memo(({
+const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
   cx,
   cy,
   payload,
@@ -400,7 +516,7 @@ const DataPoint = React.memo(({
   focused = false,
   selected = false,
   theme = highContrastThemes.light,
-}: any) => {
+}, ref) => {
   const isFocused = focused;
   const isSelected = selected;
 
@@ -408,24 +524,45 @@ const DataPoint = React.memo(({
     onClick?.(payload, index);
   }, [onClick, payload, index]);
 
+  // Color-blind friendly patterns (WCAG 2.1 1.4.1 Use of Color)
+  const isHighContrast = theme === highContrastThemes['high-contrast'];
+  const patternSuffix = isHighContrast ? '-hc' : '';
+
+  const getFillValue = (): string => {
+    if (isSelected) return theme.accent;
+
+    // Use patterns for high/low tide points
+    if (payload?.type === 'high') {
+      return `url(#high-tide-pattern${patternSuffix})`;
+    }
+    if (payload?.type === 'low') {
+      return `url(#low-tide-pattern${patternSuffix})`;
+    }
+
+    // Default color for regular points
+    return theme.accent || '#0088FE';
+  };
+
   return (
     <g>
       <circle
+        ref={ref}
         cx={cx}
         cy={cy}
         r={isFocused ? 6 : 4}
-        fill={isSelected ? theme.accent : '#0088FE'}
+        fill={getFillValue()}
         stroke={isFocused ? theme.focus : '#fff'}
         strokeWidth={isFocused ? 3 : 2}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'pointer', outline: 'none' }}
         data-testid={`data-point-${index}`}
         data-index={index}
         data-value={payload?.tide}
+        data-tide-type={payload?.type || 'normal'}
         data-focused={isFocused}
         data-selected={isSelected}
         className={isFocused ? 'highlighted' : ''}
         onClick={handleClick}
-        aria-hidden="true"
+        tabIndex={-1}
       />
       {/* Focus indicator */}
       {isFocused && (
@@ -438,12 +575,12 @@ const DataPoint = React.memo(({
           strokeWidth={2}
           strokeDasharray="2,2"
           className="focus-indicator"
-          data-contrast-ratio="3.0"
+          data-contrast-ratio={theme.contrastRatios?.focusBg.toFixed(2) || '3.0'}
         />
       )}
     </g>
   );
-}, (prevProps, nextProps) => {
+}), (prevProps, nextProps) => {
   // カスタム比較関数でパフォーマンス最適化
   return prevProps.cx === nextProps.cx &&
     prevProps.cy === nextProps.cy &&
@@ -625,6 +762,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
   const renderStartTime = useRef<number>(0);
   const liveRegionRef = useRef<HTMLDivElement>(null);
   const focusManagerRef = useRef<FocusManager | null>(null);
+  const dataPointRefsRef = useRef<(SVGCircleElement | null)[]>([]);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
 
   // 使用するコンポーネント: propsが優先、なければstate
   const activeComponents = chartComponents || components;
@@ -733,10 +872,15 @@ const TideChartBase: React.FC<TideChartProps> = ({
     return ariaConfiguration?.label || '潮汐グラフ: データなし';
   }, [ariaConfiguration]);
 
-  // Initialize Focus Manager
+  // Initialize Focus Manager with focus trap (WCAG 2.1.2, 2.4.3)
   useEffect(() => {
     if (focusManagementEnabled && liveRegionRef.current) {
       focusManagerRef.current = new FocusManager(liveRegionRef.current);
+
+      // Enable focus trap on chart container
+      if (chartContainerRef.current) {
+        focusManagerRef.current.trapFocus(chartContainerRef.current);
+      }
     }
     return () => {
       focusManagerRef.current = null;
@@ -748,13 +892,14 @@ const TideChartBase: React.FC<TideChartProps> = ({
     if (liveRegionRef.current && processedData.valid.length > 0) {
       // Announce when data changes
       const announcement = `データが更新されました。${processedData.valid.length}個のデータポイントが表示されています。`;
-      setTimeout(() => {
+      // queueMicrotaskでDOM更新（React 18推奨、WCAG 4.1.3は即座の更新を要求しない）
+      queueMicrotask(() => {
         if (liveRegionRef.current) {
           liveRegionRef.current.textContent = announcement;
         }
-      }, 100); // Small delay to ensure DOM is ready
+      });
     }
-  }, [processedData.valid.length, data]); // Depend on both processed data and original data
+  }, [processedData.valid.length]); // データ長が変わったときのみ発火
 
   // パフォーマンス追跡終了
   useEffect(() => {
@@ -857,6 +1002,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }));
           setFocusedPointIndex(nextIndex);
 
+          // Focus the data point element
+          if (dataPointRefsRef.current[nextIndex]) {
+            dataPointRefsRef.current[nextIndex]?.focus();
+          }
+
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
             const point = validatedData.valid[nextIndex];
@@ -864,7 +1014,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
               point,
               nextIndex
             );
-            liveRegionRef.current.textContent = announcement;
+            queueMicrotask(() => {
+              if (liveRegionRef.current) {
+                liveRegionRef.current.textContent = announcement;
+              }
+            });
           }
           break;
 
@@ -879,6 +1033,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }));
           setFocusedPointIndex(prevIndex);
 
+          // Focus the data point element
+          if (dataPointRefsRef.current[prevIndex]) {
+            dataPointRefsRef.current[prevIndex]?.focus();
+          }
+
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
             const point = validatedData.valid[prevIndex];
@@ -886,7 +1045,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
               point,
               prevIndex
             );
-            liveRegionRef.current.textContent = announcement;
+            queueMicrotask(() => {
+              if (liveRegionRef.current) {
+                liveRegionRef.current.textContent = announcement;
+              }
+            });
           }
           break;
 
@@ -906,6 +1069,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
               isActive: true,
             }));
             setFocusedPointIndex(higherValueIndex);
+
+            // Focus the data point element
+            if (dataPointRefsRef.current[higherValueIndex]) {
+              dataPointRefsRef.current[higherValueIndex]?.focus();
+            }
           }
           break;
 
@@ -925,6 +1093,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
               isActive: true,
             }));
             setFocusedPointIndex(lowerValueIndex);
+
+            // Focus the data point element
+            if (dataPointRefsRef.current[lowerValueIndex]) {
+              dataPointRefsRef.current[lowerValueIndex]?.focus();
+            }
           }
           break;
 
@@ -937,6 +1110,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(0);
+
+          // Focus the first data point element
+          if (dataPointRefsRef.current[0]) {
+            dataPointRefsRef.current[0]?.focus();
+          }
           break;
 
         case 'End':
@@ -949,6 +1127,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(lastIndex);
+
+          // Focus the last data point element
+          if (dataPointRefsRef.current[lastIndex]) {
+            dataPointRefsRef.current[lastIndex]?.focus();
+          }
           break;
 
         case 'Enter':
@@ -959,7 +1142,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
           // Show data point details
           if (liveRegionRef.current) {
             const point = validatedData.valid[currentIndex];
-            liveRegionRef.current.textContent = `詳細表示: ${point.time}の潮位${point.tide}センチメートル`;
+            queueMicrotask(() => {
+              if (liveRegionRef.current) {
+                liveRegionRef.current.textContent = `詳細表示: ${point.time}の潮位${point.tide}センチメートル`;
+              }
+            });
           }
           break;
 
@@ -971,9 +1158,13 @@ const TideChartBase: React.FC<TideChartProps> = ({
           );
           if (liveRegionRef.current) {
             const isSelected = selectedDataPoint === currentIndex;
-            liveRegionRef.current.textContent = isSelected
-              ? '選択解除されました'
-              : '選択されました';
+            queueMicrotask(() => {
+              if (liveRegionRef.current) {
+                liveRegionRef.current.textContent = isSelected
+                  ? '選択解除されました'
+                  : '選択されました';
+              }
+            });
           }
           break;
 
@@ -986,8 +1177,17 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }));
           // Return focus to chart container
           if (liveRegionRef.current) {
-            liveRegionRef.current.textContent =
-              'ナビゲーションモードを終了しました';
+            queueMicrotask(() => {
+              if (liveRegionRef.current) {
+                liveRegionRef.current.textContent =
+                  'ナビゲーションモードを終了しました';
+              }
+            });
+          }
+
+          // Restore focus to previous element (WCAG 2.1.2 No Keyboard Trap)
+          if (focusManagerRef.current) {
+            focusManagerRef.current.restoreFocus();
           }
           break;
       }
@@ -1083,6 +1283,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           潮汐データ可視化チャート
         </h1>
         <div
+          ref={chartContainerRef}
           className={`tide-chart ${theme && `theme-${theme}`} ${colorMode === 'monochrome' ? 'monochrome-mode' : ''} ${responsive ? 'responsive' : ''} ${className || ''}`.trim()}
           style={{
             width: chartConfiguration.actualWidth,
@@ -1100,7 +1301,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
               ? JSON.stringify((window as any).tideChartMetrics)
               : undefined
           }
-          data-contrast-ratio="4.5"
+          data-contrast-ratio={currentTheme.contrastRatios?.foregroundBg.toFixed(2) || '4.5'}
           data-interactive="true"
           data-focus-visible={navigationState.isActive}
           data-history-length={
@@ -1112,7 +1313,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
           aria-describedby={
             ariaConfiguration?.describedBy || 'tide-chart-description'
           }
-          aria-live={ariaConfiguration?.live || 'polite'}
           tabIndex={0}
           onKeyDown={handleKeyDown}
         >
@@ -1298,6 +1498,74 @@ const TideChartBase: React.FC<TideChartProps> = ({
             width={chartConfiguration.actualWidth}
             height={chartConfiguration.actualHeight}
           >
+              {/* Color-blind friendly patterns (WCAG 2.1 1.4.1 Use of Color) */}
+              <defs>
+                {/* High tide pattern - diagonal stripes */}
+                <pattern
+                  id="high-tide-pattern"
+                  patternUnits="userSpaceOnUse"
+                  width="8"
+                  height="8"
+                  patternTransform="rotate(45)"
+                >
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="8"
+                    stroke={currentTheme.accent}
+                    strokeWidth="2"
+                  />
+                </pattern>
+
+                {/* Low tide pattern - dots */}
+                <pattern
+                  id="low-tide-pattern"
+                  patternUnits="userSpaceOnUse"
+                  width="6"
+                  height="6"
+                >
+                  <circle
+                    cx="3"
+                    cy="3"
+                    r="1.5"
+                    fill={currentTheme.accent}
+                  />
+                </pattern>
+
+                {/* High contrast versions for high-contrast mode */}
+                <pattern
+                  id="high-tide-pattern-hc"
+                  patternUnits="userSpaceOnUse"
+                  width="8"
+                  height="8"
+                  patternTransform="rotate(45)"
+                >
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="8"
+                    stroke="#FFFF00"
+                    strokeWidth="3"
+                  />
+                </pattern>
+
+                <pattern
+                  id="low-tide-pattern-hc"
+                  patternUnits="userSpaceOnUse"
+                  width="6"
+                  height="6"
+                >
+                  <circle
+                    cx="3"
+                    cy="3"
+                    r="2"
+                    fill="#FFFF00"
+                  />
+                </pattern>
+              </defs>
+
               <XAxis
                 dataKey="time"
                 axisLine={true}
@@ -1321,6 +1589,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
                 strokeWidth={2}
                 dot={(props: any) => (
                   <DataPoint
+                    ref={(el: SVGCircleElement | null) => {
+                      if (el && props.index !== undefined) {
+                        dataPointRefsRef.current[props.index] = el;
+                      }
+                    }}
                     {...props}
                     onClick={onDataPointClick}
                     focused={props.index === focusedPointIndex}
@@ -1331,7 +1604,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
                 data-testid="line"
               />
               {/* 釣果マーカー */}
-              {fishingTimes.map((time, index) => (
+              {ReferenceLine && fishingTimes.map((time, index) => (
                 <ReferenceLine
                   key={`fishing-${index}`}
                   x={time}
@@ -1348,7 +1621,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
                   data-testid={`fishing-marker-${index}`}
                 />
               ))}
-              {showTooltip && <Tooltip content={<CustomTooltip />} />}
+              {showTooltip && Tooltip && <Tooltip content={<CustomTooltip />} />}
             </LineChart>
 
 
@@ -1359,7 +1632,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
                 key={index}
                 data-readability="8.0"
                 className="large-text"
-                data-contrast-ratio="3.0"
+                data-contrast-ratio={currentTheme.contrastRatios?.foregroundBg.toFixed(2) || '3.0'}
               >
                 {point.time}: {point.tide}cm
               </span>
@@ -1372,7 +1645,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
               <div
                 key={index}
                 className="chart-element"
-                data-contrast-ratio="3.0"
+                data-contrast-ratio={currentTheme.contrastRatios?.accentBg.toFixed(2) || '3.0'}
               />
             ))}
           </div>
