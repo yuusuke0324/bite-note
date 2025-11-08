@@ -10,7 +10,7 @@
  */
 
 // キャッシュ名（バージョン管理）
-const CACHE_VERSION = '1.0.0';
+const CACHE_VERSION = '1.1.0';
 const STATIC_CACHE = `bite-note-static-v${CACHE_VERSION}`;
 const API_CACHE = `bite-note-api-v${CACHE_VERSION}`;
 const IMAGE_CACHE = `bite-note-images-v${CACHE_VERSION}`;
@@ -32,7 +32,7 @@ const MAX_API_CACHE_SIZE = 50; // API レスポンス
 const MAX_IMAGE_CACHE_SIZE = 100; // 画像
 
 // キャッシュの有効期限（ミリ秒）
-const API_CACHE_EXPIRATION = 24 * 60 * 60 * 1000; // 24時間
+const API_CACHE_EXPIRATION = 6 * 60 * 60 * 1000; // 6時間
 const IMAGE_CACHE_EXPIRATION = 7 * 24 * 60 * 60 * 1000; // 7日間
 
 /**
