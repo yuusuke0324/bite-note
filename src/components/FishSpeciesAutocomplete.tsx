@@ -15,7 +15,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { FishSpecies } from '../types';
-import { FishSpeciesSearchEngine } from '../services/fish-species';
+import { fishSpeciesSearchEngine } from '../lib/fish-species-service';
 import './FishSpeciesAutocomplete.css';
 
 interface FishSpeciesAutocompleteProps {
@@ -55,12 +55,6 @@ interface FishSpeciesAutocompleteProps {
    * カスタムクラス名
    */
   className?: string;
-
-  /**
-   * 検索エンジンインスタンス
-   * Tech-lead分析 (Issue #37): null許容に変更（親での非同期初期化対応）
-   */
-  searchEngine: FishSpeciesSearchEngine | null;
 }
 
 /**
@@ -73,8 +67,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   disabled = false,
   error,
   required = false,
-  className = '',
-  searchEngine
+  className = ''
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
@@ -84,16 +77,15 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
   const listRef = useRef<HTMLUListElement>(null);
 
   // 検索結果の計算（派生状態）
-  // React Hooks修正 (Issue #37): 早期returnを削除し、全てのHooksを無条件で実行
+  // Issue #38: グローバルシングルトンを使用してact()警告を解決
   const suggestions = useMemo(() => {
-    if (!searchEngine) return [];
     try {
-      return searchEngine.search(inputValue, { limit: 10 });
+      return fishSpeciesSearchEngine.search(inputValue, { limit: 10 });
     } catch (error) {
       console.error('検索エラー:', error);
       return [];
     }
-  }, [inputValue, searchEngine]);
+  }, [inputValue]);
 
   /**
    * 入力値変更ハンドラ
@@ -191,47 +183,32 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
     }
   }, [selectedIndex]);
 
-  // ローディング状態: searchEngineがnullの場合は条件付きレンダリング
-  // React Hooks修正 (Issue #37): 早期returnを削除し、条件付きレンダリングで実装
+  // Issue #38: グローバルシングルトンを使用してact()警告を解決
   return (
     <div className={`fish-species-autocomplete ${className}`} data-testid="fish-species-autocomplete">
       <div className="input-wrapper">
-        {!searchEngine ? (
-          <input
-            type="text"
-            role="combobox"
-            disabled
-            placeholder="読み込み中..."
-            className="loading-input"
-            aria-label="魚種名"
-            aria-expanded="false"
-            aria-autocomplete="list"
-            aria-controls="fish-species-list"
-          />
-        ) : (
-          <input
-            ref={inputRef}
-            type="text"
-            role="combobox"
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            placeholder={placeholder}
-            disabled={disabled}
-            required={required}
-            data-testid="fish-species-input"
-            aria-label="魚種名"
-            aria-autocomplete="list"
-            aria-controls="fish-species-list"
-            aria-expanded={isOpen}
-            aria-activedescendant={
-              selectedIndex >= 0 ? `fish-species-${selectedIndex}` : undefined
-            }
-            className={error ? 'error' : ''}
-          />
-        )}
+        <input
+          ref={inputRef}
+          type="text"
+          role="combobox"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          data-testid="fish-species-input"
+          aria-label="魚種名"
+          aria-autocomplete="list"
+          aria-controls="fish-species-list"
+          aria-expanded={isOpen}
+          aria-activedescendant={
+            selectedIndex >= 0 ? `fish-species-${selectedIndex}` : undefined
+          }
+          className={error ? 'error' : ''}
+        />
       </div>
 
       {error && (
@@ -240,7 +217,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         </div>
       )}
 
-      {searchEngine && isOpen && suggestions.length > 0 && (
+      {isOpen && suggestions.length > 0 && (
         <ul
           ref={listRef}
           id="fish-species-list"
@@ -275,7 +252,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         </ul>
       )}
 
-      {searchEngine && isOpen && suggestions.length === 0 && inputValue && (
+      {isOpen && suggestions.length === 0 && inputValue && (
         <div className="no-results" role="status" data-testid="fish-species-no-results">
           該当する魚種が見つかりません
         </div>
