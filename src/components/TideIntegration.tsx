@@ -136,9 +136,9 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
         // シンプルな調和解析式による潮位計算（無限ループ回避）
         const level = calculateDirectTideLevel(currentTime, fishingRecord.coordinates);
         const state = determineTideState(currentTime, info);
-        const isEvent = info.events.some(event =>
+        const isEvent = info && info.events ? info.events.some(event =>
           Math.abs(event.time.getTime() - currentTime.getTime()) < 7.5 * 60 * 1000
-        );
+        ) : false;
 
         points.push({
           time: currentTime,
@@ -277,6 +277,9 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
 
   // 潮汐状態判定
   const determineTideState = (time: Date, info: TideInfo): 'rising' | 'falling' | 'high' | 'low' => {
+    if (!info || !info.events) {
+      return 'rising'; // デフォルト値
+    }
     const nextEvent = info.events.find(event => event.time.getTime() > time.getTime());
     if (nextEvent) {
       return nextEvent.type === 'high' ? 'rising' : 'falling';
