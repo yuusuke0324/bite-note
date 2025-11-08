@@ -5,7 +5,6 @@ import { useValidatedForm } from '../hooks/useFormValidation';
 import { createFishingRecordSchema, type CreateFishingRecordFormData } from '../lib/validation';
 import { PhotoUpload } from './PhotoUpload';
 import { FishSpeciesAutocomplete } from './FishSpeciesAutocomplete';
-import { fishSpeciesDataService } from '../services/fish-species';
 import { photoService } from '../lib/photo-service';
 import type { PhotoMetadata, AutoFillData, FishSpecies } from '../types';
 import type { TideInfo } from '../types/tide';

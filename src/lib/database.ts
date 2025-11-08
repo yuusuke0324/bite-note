@@ -3,6 +3,7 @@
 import Dexie, { type Table } from 'dexie';
 import type { FishingRecord, PhotoData } from '../types';
 import type { TideCacheRecord, RegionalDataRecord } from '../types/tide';
+import type { OfflineQueueItem, SyncErrorLog } from '../types/offline-queue';
 
 // ジオコーディングキャッシュのインターフェース
 export interface GeocodeCache {
@@ -24,6 +25,10 @@ export interface FishingRecordDB extends Dexie {
   tide_regional_data: Table<RegionalDataRecord>;
   // ジオコーディングキャッシュテーブル
   geocode_cache: Table<GeocodeCache>;
+  // オフライン書き込みキューテーブル
+  offline_queue: Table<OfflineQueueItem>;
+  // 同期エラーログテーブル
+  sync_error_log: Table<SyncErrorLog>;
 }
 
 // アプリケーション設定のインターフェース
@@ -53,6 +58,10 @@ class FishingDatabase extends Dexie implements FishingRecordDB {
   tide_regional_data!: Table<RegionalDataRecord>;
   // ジオコーディングキャッシュテーブル
   geocode_cache!: Table<GeocodeCache>;
+  // オフライン書き込みキューテーブル
+  offline_queue!: Table<OfflineQueueItem>;
+  // 同期エラーログテーブル
+  sync_error_log!: Table<SyncErrorLog>;
 
   constructor() {
     super('FishingRecordDB');
@@ -97,6 +106,21 @@ class FishingDatabase extends Dexie implements FishingRecordDB {
       tide_regional_data: '++id, regionId, [latitude+longitude], isActive, createdAt',
       // ジオコーディングキャッシュテーブル - キャッシュキーと有効期限でインデックス
       geocode_cache: '++id, &cacheKey, expiresAt, timestamp'
+    });
+
+    // バージョン4: オフライン書き込みキュー追加
+    this.version(4).stores({
+      fishing_records: '&id, date, fishSpecies, location, createdAt, [coordinates.latitude+coordinates.longitude]',
+      photos: '&id, uploadedAt, mimeType, fileSize',
+      app_settings: '&setting_key, updated_at',
+      app_metadata: '&meta_key, updated_at',
+      tide_cache: '++id, cacheKey, createdAt, expiresAt, lastAccessed',
+      tide_regional_data: '++id, regionId, [latitude+longitude], isActive, createdAt',
+      geocode_cache: '++id, &cacheKey, expiresAt, timestamp',
+      // オフライン書き込みキューテーブル - ステータス、作成日時、エンティティタイプでインデックス
+      offline_queue: '++id, status, createdAt, entityType, [entityType+status]',
+      // 同期エラーログテーブル - タイムスタンプ、エンティティタイプ、エラーコードでインデックス
+      sync_error_log: '++id, timestamp, entityType, errorCode'
     });
 
     // データベース初期化時のフック

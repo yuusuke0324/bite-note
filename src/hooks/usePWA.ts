@@ -1,6 +1,7 @@
 // PWA機能管理フック
 
 import { useState, useEffect, useCallback } from 'react';
+import { offlineQueueService } from '../lib/offline-queue-service';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -204,12 +205,41 @@ export const usePWA = () => {
     }
   }, [updateState.registration]);
 
-  // オフライン状態の監視
+  // オフライン状態の監視とオンライン復帰時の同期
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    const handleOnline = async () => {
+      console.log('[PWA] Online - starting offline queue sync');
+      setIsOnline(true);
+
+      // オンライン復帰時にオフラインキューを自動同期
+      try {
+        setIsSyncing(true);
+        const result = await offlineQueueService.syncQueue((synced, total) => {
+          console.log(`[PWA] Syncing: ${synced}/${total}`);
+        });
+
+        if (result.success) {
+          console.log(`[PWA] Sync completed: ${result.syncedCount} items synced`);
+          if (result.failedCount && result.failedCount > 0) {
+            console.warn(`[PWA] Sync failed: ${result.failedCount} items failed`);
+          }
+        } else {
+          console.error('[PWA] Sync failed:', result.error);
+        }
+      } catch (error) {
+        console.error('[PWA] Sync error:', error);
+      } finally {
+        setIsSyncing(false);
+      }
+    };
+
+    const handleOffline = () => {
+      console.log('[PWA] Offline');
+      setIsOnline(false);
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -257,6 +287,7 @@ export const usePWA = () => {
 
     // ネットワーク状態
     isOnline,
+    isSyncing,
 
     // PWA機能
     capabilities,
