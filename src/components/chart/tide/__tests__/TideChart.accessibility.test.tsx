@@ -10,6 +10,7 @@ import {
   suppressPerformanceWarnings,
   AccessibilityTester,
   createLargeTideData,
+  mockChartComponents,
 } from './test-utils';
 
 expect.extend(toHaveNoViolations);
@@ -28,7 +29,7 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
 
   describe('TC-A001-01: 基本ARIA属性設定', () => {
     test('should set role="img" for chart container', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       // waitForを使わず、同期的にチェック（レンダリング後すぐに利用可能）
       const chartContainer = await screen.findByRole('img');
@@ -37,7 +38,7 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
 
     test('should generate dynamic aria-label based on data', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -52,7 +53,7 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
 
     test('should set aria-describedby reference', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -64,7 +65,7 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
 
     test('should configure aria-live for updates', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const liveRegion = document.querySelector('[aria-live]');
@@ -80,7 +81,7 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     // Skipping these tests as they check for invalid ARIA attributes
 
     test('should set aria-valuemin from data minimum', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -89,7 +90,7 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
 
     test('should set aria-valuemax from data maximum', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -98,7 +99,7 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
 
     test('should set aria-valuenow from current selection', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -107,14 +108,14 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
 
     test('should update numeric ARIA attributes when data changes', async () => {
-      const { rerender } = render(<TideChart data={mockTideData} />);
+      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const newData = [
         { time: '00:00', tide: 200, type: 'high' },
         { time: '12:00', tide: 10, type: 'low' },
       ];
 
-      rerender(<TideChart data={newData} />);
+      rerender(<TideChart data={newData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -127,10 +128,10 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
 
   describe('TC-A001-03: ARIA属性動的更新', () => {
     test('should update aria-label when data changes', async () => {
-      const { rerender } = render(<TideChart data={mockTideData} />);
+      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const newData = [{ time: '06:00', tide: 75 }];
-      rerender(<TideChart data={newData} />);
+      rerender(<TideChart data={newData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -142,21 +143,25 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
 
     test('should announce updates through aria-live', async () => {
-      const { rerender } = render(<TideChart data={mockTideData} />);
+      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
+
+      // 初期状態のaria-live内容を確認
+      const liveRegion = screen.getByTestId('screen-reader-announcement');
+      expect(liveRegion).toHaveAttribute('aria-live', 'polite');
 
       const newData = [{ time: '12:00', tide: 200, type: 'high' }];
-      rerender(<TideChart data={newData} />);
+      rerender(<TideChart data={newData} chartComponents={mockChartComponents} />);
 
+      // データ長が変わるまで待機
       await waitFor(() => {
-        const liveRegion = document.querySelector('[aria-live="polite"]');
-        expect(liveRegion).toBeInTheDocument();
-        expect(liveRegion?.textContent).toContain('更新');
+        expect(liveRegion.textContent).toContain('データが更新されました');
+        expect(liveRegion.textContent).toContain('1個のデータポイント');
       });
     });
 
     test('should maintain ARIA consistency during interactions', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
 
@@ -178,7 +183,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
   describe('TC-K001-01: 基本キーナビゲーション', () => {
     test('should focus chart on Tab key', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await user.tab();
 
@@ -190,21 +195,23 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should move to next data point on ArrowRight', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
       await user.keyboard('{ArrowRight}');
 
       await waitFor(() => {
-        const focusedElement = document.activeElement;
-        expect(focusedElement?.getAttribute('data-index')).toBe('1');
+        // data-focused属性で確認（より確実）
+        const focusedDataPoint = screen.getByTestId('data-point-1');
+        expect(focusedDataPoint).toHaveAttribute('data-focused', 'true');
+        expect(focusedDataPoint).toHaveAttribute('data-index', '1');
       });
     });
 
     test('should move to previous data point on ArrowLeft', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -219,7 +226,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should move to first data point on Home', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -235,7 +242,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should move to last data point on End', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -251,7 +258,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
   describe('TC-K001-02: 詳細ナビゲーション', () => {
     test('should focus higher value on ArrowUp', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -268,7 +275,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should focus lower value on ArrowDown', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -285,7 +292,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should show details on Enter key', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -299,7 +306,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should toggle selection on Space key', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -315,7 +322,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should exit navigation on Escape key', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -334,7 +341,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
   describe('TC-K001-03: キーボードナビゲーション状態管理', () => {
     test('should maintain focused index state', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -349,7 +356,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should handle navigation mode transitions', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -371,14 +378,14 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should preserve navigation state during re-render', async () => {
       const user = userEvent.setup();
-      const { rerender } = render(<TideChart data={mockTideData} />);
+      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
       await user.keyboard('{ArrowRight}');
       await user.keyboard('{ArrowRight}');
 
-      rerender(<TideChart data={mockTideData} />);
+      rerender(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const focusedElement = document.activeElement;
@@ -388,7 +395,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 
     test('should reset navigation state on data change', async () => {
       const user = userEvent.setup();
-      const { rerender } = render(<TideChart data={mockTideData} />);
+      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -396,7 +403,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
       await user.keyboard('{ArrowRight}');
 
       const newData = [{ time: '00:00', tide: 100 }];
-      rerender(<TideChart data={newData} />);
+      rerender(<TideChart data={newData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const focusedElement = document.activeElement;
@@ -409,7 +416,7 @@ describe('TideChart Accessibility - TC-K001: キーボードナビゲーショ�
 describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応テスト', () => {
   describe('TC-S001-01: チャート概要読み上げ', () => {
     test('should generate comprehensive chart summary', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const summaryElement = screen.getByTestId('chart-summary');
@@ -420,7 +427,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
     });
 
     test('should include data point count in summary', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const summaryElement = screen.getByTestId('chart-summary');
@@ -429,7 +436,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
     });
 
     test('should describe tide patterns in summary', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const summaryElement = screen.getByTestId('chart-summary');
@@ -438,7 +445,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
     });
 
     test('should announce min/max values in summary', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const summaryElement = screen.getByTestId('chart-summary');
@@ -451,7 +458,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
   describe('TC-S001-02: データポイント詳細読み上げ', () => {
     test('should announce data point position and value', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -468,7 +475,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
 
     test('should identify tide type (high/low) if applicable', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -481,7 +488,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
 
     test('should provide context for current selection', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -495,7 +502,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
 
     test('should announce navigation instructions', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -510,7 +517,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
 
   describe('TC-S001-03: 傾向分析読み上げ', () => {
     test('should analyze and announce tide trends', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const trendAnalysis = screen.getByTestId('trend-analysis');
@@ -519,7 +526,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
     });
 
     test('should identify pattern changes', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const trendAnalysis = screen.getByTestId('trend-analysis');
@@ -528,7 +535,7 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
     });
 
     test('should describe overall tide behavior', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const trendAnalysis = screen.getByTestId('trend-analysis');
@@ -542,7 +549,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
   describe('TC-F001-01: 視覚的フォーカスインジケーター', () => {
     test('should display visible focus outline', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await user.tab();
 
@@ -555,7 +562,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should meet 3:1 contrast ratio for focus indicators', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await user.tab();
 
@@ -569,7 +576,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should highlight focused data point clearly', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -586,7 +593,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should show focus state for interactive elements', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await user.tab();
 
@@ -605,7 +612,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
   describe('TC-F001-02: フォーカス順序とトラップ', () => {
     test('should maintain logical focus order', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await user.tab();
       const firstFocus = document.activeElement;
@@ -619,7 +626,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should trap focus within chart during navigation', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -636,7 +643,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should restore focus after modal interactions', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -653,7 +660,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should handle focus restoration on component unmount', async () => {
       const user = userEvent.setup();
-      const { unmount } = render(<TideChart data={mockTideData} />);
+      const { unmount } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await user.tab();
       const focusedElement = document.activeElement;
@@ -669,7 +676,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
   describe('TC-F001-03: フォーカス状態管理', () => {
     test('should track current focus element', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -682,7 +689,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should maintain focus history stack', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -698,7 +705,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
     test('should handle focus transitions smoothly', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -715,7 +722,7 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 describe('TideChart Accessibility - TC-C001: 高コントラスト対応テスト', () => {
   describe('TC-C001-01: コントラスト比検証', () => {
     test('should meet 4.5:1 contrast for normal text', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const textElements = screen.getAllByText(/\d+cm/);
@@ -726,7 +733,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
     });
 
     test('should meet 3:1 contrast for large text', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const largeTextElements = document.querySelectorAll('.large-text');
@@ -737,7 +744,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
     });
 
     test('should meet 3:1 contrast for non-text elements', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartElements = document.querySelectorAll('.chart-element');
@@ -749,7 +756,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
 
     test('should meet 3:1 contrast for focus states', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await user.tab();
 
@@ -762,7 +769,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
 
   describe('TC-C001-02: 高コントラストテーマ', () => {
     test('should apply light high contrast theme', async () => {
-      render(<TideChart data={mockTideData} theme="light-high-contrast" />);
+      render(<TideChart data={mockTideData} theme="light-high-contrast" chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -771,7 +778,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
     });
 
     test('should apply dark high contrast theme', async () => {
-      render(<TideChart data={mockTideData} theme="dark-high-contrast" />);
+      render(<TideChart data={mockTideData} theme="dark-high-contrast" chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -795,7 +802,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
         <TideChart data={mockTideData} theme="light" />
       );
 
-      rerender(<TideChart data={mockTideData} theme="dark-high-contrast" />);
+      rerender(<TideChart data={mockTideData} theme="dark-high-contrast" chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -806,7 +813,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
 
   describe('TC-C001-03: 色覚多様性対応', () => {
     test('should distinguish elements without relying on color alone', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const highTideElements =
@@ -824,7 +831,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
     });
 
     test('should provide pattern-based differentiation', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const patternElements = document.querySelectorAll('[data-pattern]');
@@ -833,7 +840,7 @@ describe('TideChart Accessibility - TC-C001: 高コントラスト対応テス�
     });
 
     test('should work with monochrome displays', async () => {
-      render(<TideChart data={mockTideData} colorMode="monochrome" />);
+      render(<TideChart data={mockTideData} colorMode="monochrome" chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -849,7 +856,7 @@ describe('TideChart Accessibility - TC-E001: エラーハンドリングテス�
       // Mock ARIA failure
       const mockError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      render(<TideChart data={mockTideData} ariaEnabled={false} />);
+      render(<TideChart data={mockTideData} ariaEnabled={false} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const fallbackElement = screen.getByTestId('aria-fallback');
@@ -860,7 +867,7 @@ describe('TideChart Accessibility - TC-E001: エラーハンドリングテス�
     });
 
     test('should gracefully degrade when screen reader unavailable', async () => {
-      render(<TideChart data={mockTideData} screenReaderAvailable={false} />);
+      render(<TideChart data={mockTideData} screenReaderAvailable={false} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const textFallback = screen.getByTestId('text-table-fallback');
@@ -886,7 +893,7 @@ describe('TideChart Accessibility - TC-E001: エラーハンドリングテス�
     test('should handle focus management errors', async () => {
       const mockError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      render(<TideChart data={mockTideData} focusManagementEnabled={false} />);
+      render(<TideChart data={mockTideData} focusManagementEnabled={false} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const fallbackMessage = screen.getByTestId('focus-fallback-message');
@@ -899,7 +906,7 @@ describe('TideChart Accessibility - TC-E001: エラーハンドリングテス�
 
   describe('TC-E001-02: フォールバック機能', () => {
     test('should provide text table fallback for chart', async () => {
-      render(<TideChart data={mockTideData} enableFallback={true} />);
+      render(<TideChart data={mockTideData} enableFallback={true} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const textTable = screen.getByTestId('text-table-fallback');
@@ -911,7 +918,7 @@ describe('TideChart Accessibility - TC-E001: エラーハンドリングテス�
     });
 
     test('should show keyboard shortcuts when navigation fails', async () => {
-      render(<TideChart data={mockTideData} showKeyboardShortcuts={true} />);
+      render(<TideChart data={mockTideData} showKeyboardShortcuts={true} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const shortcuts = screen.getByTestId('keyboard-shortcuts');
@@ -923,7 +930,7 @@ describe('TideChart Accessibility - TC-E001: エラーハンドリングテス�
     });
 
     test('should offer manual settings when auto-detection fails', async () => {
-      render(<TideChart data={mockTideData} autoDetectionFailed={true} />);
+      render(<TideChart data={mockTideData} autoDetectionFailed={true} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const manualSettings = screen.getByTestId('manual-settings');
@@ -936,10 +943,10 @@ describe('TideChart Accessibility - TC-E001: エラーハンドリングテス�
 describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセシビリティ統合テスト', () => {
   describe('TC-P001-01: 最適化との互換性', () => {
     test('should maintain accessibility with React.memo optimization', async () => {
-      const { rerender } = render(<TideChart data={mockTideData} />);
+      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       // Same props should not trigger re-render
-      rerender(<TideChart data={mockTideData} />);
+      rerender(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -952,7 +959,7 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
       // データサイズを削減（50000 → 1000）してテスト速度を向上
       const largeData = createLargeTideData(1000);
 
-      render(<TideChart data={largeData} />);
+      render(<TideChart data={largeData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -983,7 +990,7 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
   describe('TC-P001-02: レスポンス時間要件', () => {
     test('should respond to keyboard input within 100ms', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -998,11 +1005,11 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
     });
 
     test('should update screen reader content within 200ms', async () => {
-      const { rerender } = render(<TideChart data={mockTideData} />);
+      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const startTime = performance.now();
       const newData = [{ time: '12:00', tide: 100 }];
-      rerender(<TideChart data={newData} />);
+      rerender(<TideChart data={newData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const endTime = performance.now();
@@ -1014,7 +1021,7 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
 
     test('should maintain smooth focus transitions', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -1037,7 +1044,7 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
 describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テスト', () => {
   describe('TC-W001: 知覚可能（Perceivable）', () => {
     test('should provide text alternatives for non-text content', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -1049,7 +1056,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should provide captions and alternatives for time-based media', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const captions = screen.getByTestId('data-captions');
@@ -1058,7 +1065,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should present information without loss of meaning in different layouts', async () => {
-      render(<TideChart data={mockTideData} responsive={true} />);
+      render(<TideChart data={mockTideData} responsive={true} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -1068,7 +1075,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should make it easier to see and hear content', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const result = AccessibilityTester.expectNoA11yViolations(
@@ -1082,7 +1089,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
   describe('TC-W002: 操作可能（Operable）', () => {
     test('should make all functionality available via keyboard', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       // Test all keyboard interactions
       await user.tab();
@@ -1099,7 +1106,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should give users enough time to read content', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const timeoutElements = document.querySelectorAll('[data-timeout]');
@@ -1111,7 +1118,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should not cause seizures or physical reactions', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const flashingElements = document.querySelectorAll('[data-flashing]');
@@ -1120,7 +1127,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should help users navigate and find content', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const navigationAids = screen.getByTestId('navigation-aids');
@@ -1129,7 +1136,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should make it easier to use inputs other than keyboard', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
@@ -1141,7 +1148,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
 
   describe('TC-W003: 理解可能（Understandable）', () => {
     test('should make text readable and understandable', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const textElements = document.querySelectorAll('[data-readability]');
@@ -1156,7 +1163,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
 
     test('should make content appear and operate predictably', async () => {
       const user = userEvent.setup();
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       const chartContainer = screen.getByRole('img');
       await user.click(chartContainer);
@@ -1173,7 +1180,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     });
 
     test('should help users avoid and correct mistakes', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const errorPrevention = screen.getByTestId('error-prevention');
@@ -1184,7 +1191,7 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
 
   describe('TC-W004: 堅牢（Robust）', () => {
     test('should maximize compatibility with assistive technologies', async () => {
-      render(<TideChart data={mockTideData} />);
+      render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(async () => {
         const results = await axe(document.body);

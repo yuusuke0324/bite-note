@@ -5,6 +5,20 @@
 
 import { TideChartData } from '../types';
 import { vi } from 'vitest';
+import * as Recharts from 'recharts';
+
+/**
+ * Rechartsモックコンポーネント
+ * TideChartの非同期ロードを回避し、テストを決定的にする
+ */
+export const mockChartComponents = {
+  LineChart: Recharts.LineChart,
+  XAxis: Recharts.XAxis,
+  YAxis: Recharts.YAxis,
+  Line: Recharts.Line,
+  Tooltip: Recharts.Tooltip,
+  ReferenceLine: Recharts.ReferenceLine,
+};
 
 /**
  * 共通のモックデータ（メモ化して再利用）
