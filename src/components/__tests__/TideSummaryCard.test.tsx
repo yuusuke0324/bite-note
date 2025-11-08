@@ -49,7 +49,20 @@ const mockEmptyTideInfo: TideInfo = {
 
 // TASK-202 Step 2: TideSummaryGrid 4項目グリッド表示のテスト
 describe('TASK-202 Step 2: TideSummaryGrid 4項目グリッド表示', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #45）
+    if (process.env.CI) {
+      // より長い待機時間とポーリングでbody確認
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    } else {
+      // ローカル環境は高速化のため最小限
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
     vi.clearAllMocks();
   });
 
@@ -117,7 +130,20 @@ describe('TASK-202 Step 2: TideSummaryGrid 4項目グリッド表示', () => {
 
 // TASK-202 Step 3: TideEventsList 今日の潮汐イベント一覧のテスト
 describe('TASK-202 Step 3: TideEventsList 今日の潮汐イベント一覧', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #45）
+    if (process.env.CI) {
+      // より長い待機時間とポーリングでbody確認
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    } else {
+      // ローカル環境は高速化のため最小限
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
     vi.clearAllMocks();
   });
 
@@ -203,7 +229,20 @@ describe('TASK-202 Step 3: TideEventsList 今日の潮汐イベント一覧', ()
 
 // TASK-202 Step 4: TideSummaryCard統合テスト
 describe('TASK-202 Step 4: TideSummaryCard統合テスト', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #45）
+    if (process.env.CI) {
+      // より長い待機時間とポーリングでbody確認
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    } else {
+      // ローカル環境は高速化のため最小限
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
     vi.clearAllMocks();
   });
 
@@ -271,7 +310,20 @@ describe('TASK-202 Step 4: TideSummaryCard統合テスト', () => {
 // TODO: Issue #26 で TASK-202要件（4項目グリッド + イベント一覧）を実装予定
 // 現在の実装は「次イベントのみ表示」のシンプル版のため、テストを一時スキップ
 describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテスト）', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #45）
+    if (process.env.CI) {
+      // より長い待機時間とポーリングでbody確認
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    } else {
+      // ローカル環境は高速化のため最小限
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
     vi.clearAllMocks();
   });
 
