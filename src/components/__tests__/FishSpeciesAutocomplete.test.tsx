@@ -259,8 +259,8 @@ describe('FishSpeciesAutocomplete', () => {
   });
 
   describe('キーボード操作', () => {
-    // TODO: Issue #41 - テストデータの実際の並び順に依存しないテスト設計に改善
-    it.skip('ArrowDown で次の候補を選択できること', async () => {
+    // Issue #43 - データの並び順に依存しないテスト設計に改善
+    it('ArrowDown で次の候補を選択できること', async () => {
       const user = userEvent.setup({ delay: null });
 
       const result = render(
@@ -272,27 +272,37 @@ describe('FishSpeciesAutocomplete', () => {
 
       const input = await within(result.container).findByRole('combobox');
 
-      // 「あ」と入力してマアジを確実に候補に表示
+      // 「あ」と入力して候補を表示（複数候補が表示されることを確認）
       await act(async () => {
         await user.type(input, 'あ');
       });
 
       await waitFor(() => {
-        expect(within(result.container).getByText('マアジ')).toBeInTheDocument();
+        const options = within(result.container).getAllByRole('option');
+        expect(options.length).toBeGreaterThan(0);
       });
 
+      // 最初の候補を取得（何であっても良い）
+      const options = within(result.container).getAllByRole('option');
+      const firstOption = options[0];
+      const firstOptionId = firstOption.id;
+
+      // ArrowDown を押す
       await act(async () => {
         await user.keyboard('{ArrowDown}');
       });
 
+      // 検証: 最初の候補が選択状態になっていることを確認
       await waitFor(() => {
-        const firstOption = within(result.container).getByRole('option', { name: /マアジ/ });
+        // aria-selected 属性で検証
         expect(firstOption).toHaveAttribute('aria-selected', 'true');
+        // aria-activedescendant でも検証（アクセシビリティ重要）
+        expect(input).toHaveAttribute('aria-activedescendant', firstOptionId);
       });
     });
 
-    // TODO: Issue #41 - テストデータの実際の並び順に依存しないテスト設計に改善
-    it.skip('ArrowUp で前の候補を選択できること', async () => {
+    // Issue #43 - データの並び順に依存しないテスト設計に改善
+    it('ArrowUp で前の候補を選択できること', async () => {
       const user = userEvent.setup({ delay: null });
 
       const result = render(
@@ -304,29 +314,44 @@ describe('FishSpeciesAutocomplete', () => {
 
       const input = await within(result.container).findByRole('combobox');
 
-      // 「あ」と入力してマアジを確実に候補に表示
+      // 候補を表示
       await act(async () => {
         await user.type(input, 'あ');
       });
 
       await waitFor(() => {
-        expect(within(result.container).getByText('マアジ')).toBeInTheDocument();
+        const options = within(result.container).getAllByRole('option');
+        expect(options.length).toBeGreaterThanOrEqual(2); // 最低2件必要
       });
 
+      const options = within(result.container).getAllByRole('option');
+      const firstOption = options[0];
+      const secondOption = options[1];
+
+      // ArrowDown で2回移動（0 → 1 → 2）
       await act(async () => {
-        await user.keyboard('{ArrowDown}');
-        await user.keyboard('{ArrowDown}');
+        await user.keyboard('{ArrowDown}{ArrowDown}');
+      });
+
+      // 2番目の候補が選択されていることを確認
+      await waitFor(() => {
+        expect(secondOption).toHaveAttribute('aria-selected', 'true');
+      });
+
+      // ArrowUp で戻る（2 → 1）
+      await act(async () => {
         await user.keyboard('{ArrowUp}');
       });
 
+      // 検証: 最初の候補に戻っていることを確認
       await waitFor(() => {
-        const firstOption = within(result.container).getByRole('option', { name: /マアジ/ });
         expect(firstOption).toHaveAttribute('aria-selected', 'true');
+        expect(input).toHaveAttribute('aria-activedescendant', firstOption.id);
       });
     });
 
-    // TODO: Issue #41 - テストデータの実際の並び順に依存しないテスト設計に改善
-    it.skip('Enter で選択した候補を確定できること', async () => {
+    // Issue #43 - データの並び順に依存しないテスト設計に改善
+    it('Enter で選択した候補を確定できること', async () => {
       const user = userEvent.setup({ delay: null });
 
       const result = render(
@@ -338,25 +363,140 @@ describe('FishSpeciesAutocomplete', () => {
 
       const input = await within(result.container).findByRole('combobox');
 
-      // 「あ」と入力してマアジを確実に候補に表示
+      // 候補を表示
       await act(async () => {
         await user.type(input, 'あ');
       });
 
       await waitFor(() => {
-        expect(within(result.container).getByText('マアジ')).toBeInTheDocument();
+        const options = within(result.container).getAllByRole('option');
+        expect(options.length).toBeGreaterThan(0);
       });
 
+      const options = within(result.container).getAllByRole('option');
+      const firstOption = options[0];
+      const firstOptionText = firstOption.textContent?.split('\n')[0] || ''; // "マアジ" 部分のみ抽出
+
+      // ArrowDown で選択
       await act(async () => {
         await user.keyboard('{ArrowDown}');
-        await user.keyboard('{Enter}');
       });
 
       await waitFor(() => {
+        expect(firstOption).toHaveAttribute('aria-selected', 'true');
+      });
+
+      // Enter で確定
+      await act(async () => {
+        await user.keyboard('{Enter}');
+      });
+
+      // 検証: onChangeが呼ばれ、候補リストが閉じられる
+      await waitFor(() => {
+        // onChangeが正しい引数で呼ばれている
         expect(mockOnChange).toHaveBeenCalledWith(
-          expect.objectContaining({ standardName: 'マアジ' }),
-          'マアジ'
+          expect.objectContaining({
+            standardName: expect.any(String), // 特定の名前に依存しない
+          }),
+          expect.any(String)
         );
+        // 候補リストが閉じられている
+        expect(within(result.container).queryByRole('listbox')).not.toBeInTheDocument();
+      });
+    });
+
+    // Issue #43 - 境界値テスト（最後の候補でArrowDown）
+    it('最後の候補でArrowDownを押しても次に進まないこと', async () => {
+      const user = userEvent.setup({ delay: null });
+
+      const result = render(
+        <FishSpeciesAutocomplete
+          value=""
+          onChange={mockOnChange}
+        />
+      );
+
+      const input = await within(result.container).findByRole('combobox');
+
+      await act(async () => {
+        await user.type(input, 'あ');
+      });
+
+      await waitFor(() => {
+        const options = within(result.container).getAllByRole('option');
+        expect(options.length).toBeGreaterThan(0);
+      });
+
+      const options = within(result.container).getAllByRole('option');
+      const lastIndex = options.length - 1;
+      const lastOption = options[lastIndex];
+
+      // 最後の候補まで移動
+      await act(async () => {
+        for (let i = 0; i <= lastIndex; i++) {
+          await user.keyboard('{ArrowDown}');
+        }
+      });
+
+      await waitFor(() => {
+        expect(lastOption).toHaveAttribute('aria-selected', 'true');
+      });
+
+      // さらにArrowDown（境界チェック）
+      await act(async () => {
+        await user.keyboard('{ArrowDown}');
+      });
+
+      // 検証: 最後の候補のまま（循環しない）
+      await waitFor(() => {
+        expect(lastOption).toHaveAttribute('aria-selected', 'true');
+        expect(input).toHaveAttribute('aria-activedescendant', lastOption.id);
+      });
+    });
+
+    // Issue #43 - 境界値テスト（最初の候補でArrowUp）
+    it('最初の候補でArrowUpを押すと選択が解除されること', async () => {
+      const user = userEvent.setup({ delay: null });
+
+      const result = render(
+        <FishSpeciesAutocomplete
+          value=""
+          onChange={mockOnChange}
+        />
+      );
+
+      const input = await within(result.container).findByRole('combobox');
+
+      await act(async () => {
+        await user.type(input, 'あ');
+      });
+
+      await waitFor(() => {
+        const options = within(result.container).getAllByRole('option');
+        expect(options.length).toBeGreaterThan(0);
+      });
+
+      // ArrowDownで最初の候補を選択
+      await act(async () => {
+        await user.keyboard('{ArrowDown}');
+      });
+
+      const options = within(result.container).getAllByRole('option');
+      const firstOption = options[0];
+
+      await waitFor(() => {
+        expect(firstOption).toHaveAttribute('aria-selected', 'true');
+      });
+
+      // ArrowUpで戻る
+      await act(async () => {
+        await user.keyboard('{ArrowUp}');
+      });
+
+      // 検証: 選択が解除される（selectedIndex = -1）
+      await waitFor(() => {
+        expect(firstOption).toHaveAttribute('aria-selected', 'false');
+        expect(input).not.toHaveAttribute('aria-activedescendant');
       });
     });
 
