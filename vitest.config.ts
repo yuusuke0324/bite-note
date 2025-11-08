@@ -26,6 +26,16 @@ export default defineConfig({
     clearMocks: true,
     restoreMocks: true,
     mockReset: true,
+    /**
+     * NOTE: このexclude設定は、vitest.workspace.ts使用時には参照されません。
+     * 各テストプロジェクトのexclude設定は、vitest.workspace.ts内で定義されています。
+     *
+     * - test:fast → すべてのworkspaceプロジェクトを実行（この設定は無視される）
+     * - test:perf → performanceプロジェクトのみ実行
+     * - test:a11y → accessibilityプロジェクトのみ実行
+     *
+     * @see vitest.workspace.ts - 各プロジェクトのexclude設定
+     */
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
@@ -33,10 +43,8 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '**/tests/e2e/**',
-      // パフォーマンステストはデフォルトでスキップ（test:perfで実行）
-      '**/*.performance.test.tsx',
-      // アクセシビリティテストもデフォルトでスキップ（test:a11yで実行）
-      '**/*.accessibility.test.tsx'
+      // NOTE: 特殊テスト（*.performance.test.{ts,tsx}, *.a11y.test.tsx）は
+      // workspace設定で制御されるため、ここでは除外しない
     ],
   },
   esbuild: {
