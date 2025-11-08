@@ -12,6 +12,7 @@ export default defineWorkspace([
         '**/integration.test.{ts,tsx}',
         '**/*.a11y.test.{ts,tsx}',
         '**/*.performance.test.{ts,tsx}',
+        '**/*.red.test.{ts,tsx}', // TDD Red Phase テストを除外
         '**/components/**/*.test.tsx', // コンポーネントは別枠
       ],
     },
@@ -88,6 +89,7 @@ export default defineWorkspace([
         '**/*.a11y.test.tsx',
         '**/*.accessibility.test.tsx',
         '**/*.performance.test.tsx',
+        '**/*.red.test.{ts,tsx}', // TDD Red Phase テストを除外
       ],
       setupFiles: ['./src/setupTests.ts'],
       testTimeout: 20000,
