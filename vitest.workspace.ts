@@ -24,6 +24,7 @@ export default defineWorkspace([
       include: [
         'src/components/__tests__/FishSpeciesAutocomplete.test.tsx',
         'src/components/__tests__/TideSummaryCard.test.tsx',
+        'src/components/__tests__/PWAInstallPrompt.test.tsx',
         // TODO: 将来のIssueでTASK-203実装後に有効化（TideTooltipテストが15分タイムアウトする問題あり）
         // 'src/components/__tests__/TideTooltip.test.tsx',
       ],
