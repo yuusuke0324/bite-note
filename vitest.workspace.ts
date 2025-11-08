@@ -147,4 +147,29 @@ export default defineWorkspace([
       testTimeout: 20000,
     },
   },
+  // パフォーマンステスト
+  {
+    extends: './vitest.config.ts',
+    test: {
+      name: 'performance',
+      include: [
+        '**/*.performance.test.tsx',
+        '**/*.performance.test.ts',
+      ],
+      // 基本設定のexcludeをオーバーライド（performanceファイルを除外しない）
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/cypress/**',
+        '**/.{idea,git,cache,output,temp}/**',
+        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+        '**/tests/e2e/**',
+        '**/*.accessibility.test.tsx',
+        // NOTE: **/*.performance.test.tsx を除外しない
+      ],
+      setupFiles: ['./src/setupTests.ts'],
+      environment: 'jsdom',
+      testTimeout: 30000, // パフォーマンステストは長めのタイムアウト
+    },
+  },
 ])

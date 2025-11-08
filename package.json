@@ -16,7 +16,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:fast": "vitest --run",
-    "test:perf": "vitest --run **/*.performance.test.tsx",
+    "test:perf": "vitest --run --project=performance",
     "test:a11y": "vitest --run --project=accessibility",
     "test:unit": "vitest --run --project=unit",
     "test:components": "npm run test:components:ui && npm run test:components:chart && npm run test:components:complex",
