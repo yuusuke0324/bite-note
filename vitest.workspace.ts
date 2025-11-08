@@ -121,4 +121,29 @@ export default defineWorkspace([
       testTimeout: 30000, // 統合テストは長めのタイムアウト
     },
   },
+  // アクセシビリティテスト
+  {
+    extends: './vitest.config.ts',
+    test: {
+      name: 'accessibility',
+      include: [
+        '**/*.accessibility.test.tsx',
+        '**/*.a11y.test.tsx',
+      ],
+      // 基本設定のexcludeをオーバーライド（accessibilityファイルを除外しない）
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/cypress/**',
+        '**/.{idea,git,cache,output,temp}/**',
+        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+        '**/tests/e2e/**',
+        '**/*.performance.test.tsx',
+        // NOTE: **/*.accessibility.test.tsx を除外しない
+      ],
+      setupFiles: ['./src/setupTests.ts'],
+      environment: 'jsdom',
+      testTimeout: 20000,
+    },
+  },
 ])
