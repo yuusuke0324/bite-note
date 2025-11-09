@@ -142,6 +142,7 @@ class ScreenReaderManager {
 class FocusManager {
   public currentFocus: HTMLElement | null = null;
   public focusHistory: HTMLElement[] = [];
+  public navigationHistory: number[] = []; // Track keyboard navigation history
   private liveRegion: HTMLElement | null = null;
 
   constructor(liveRegion: HTMLElement | null) {
@@ -155,6 +156,10 @@ class FocusManager {
     this.currentFocus = element;
     element.focus();
     this.announceElementToScreenReader(element);
+  }
+
+  addNavigationStep(fromIndex: number): void {
+    this.navigationHistory.push(fromIndex);
   }
 
   restoreFocus(): void {
@@ -343,7 +348,7 @@ const highContrastThemes: Record<string, HighContrastTheme> = {
     background: '#FFFFFF',
     foreground: '#000000',
     accent: '#0066CC',
-    focus: '#FF6600',
+    focus: '#E65C00', // Adjusted to meet 3:1 contrast ratio (was #FF6600 = 2.94)
     error: '#CC0000',
   }),
   dark: calculateThemeContrastRatios({
@@ -574,6 +579,8 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
         data-index={index}
         data-value={payload?.tide}
         data-tide-type={payload?.type || 'normal'}
+        data-type={payload?.type}
+        data-pattern={payload?.type === 'high' ? 'high-tide-pattern' : payload?.type === 'low' ? 'low-tide-pattern' : undefined}
         data-focused={isFocused}
         data-selected={isSelected}
         className={isFocused ? 'highlighted' : ''}
@@ -890,12 +897,16 @@ const TideChartBase: React.FC<TideChartProps> = ({
   }, [processedData.valid, screenReaderAvailable]);
 
   const currentTheme = useMemo(() => {
-    const baseTheme = theme.includes('high-contrast')
-      ? highContrastThemes['high-contrast']
-      : theme.includes('dark')
-        ? highContrastThemes.dark
-        : highContrastThemes.light;
-    return baseTheme;
+    // Match theme string to corresponding theme object
+    if (theme === 'high-contrast' || theme === 'accessibility-high-contrast') {
+      return highContrastThemes['high-contrast'];
+    } else if (theme === 'dark' || theme === 'dark-high-contrast') {
+      return highContrastThemes.dark;
+    } else if (theme === 'light' || theme === 'light-high-contrast') {
+      return highContrastThemes.light;
+    }
+    // Default to light theme
+    return highContrastThemes.light;
   }, [theme]);
 
   // Legacy ARIA label for backward compatibility
@@ -1023,6 +1034,10 @@ const TideChartBase: React.FC<TideChartProps> = ({
       switch (event.key) {
         case 'ArrowRight':
           event.preventDefault();
+          // Record navigation history
+          if (focusManagerRef.current) {
+            focusManagerRef.current.addNavigationStep(currentIndex);
+          }
           const nextIndex =
             currentIndex < dataLength - 1 ? currentIndex + 1 : currentIndex;
           setNavigationState((prev) => ({
@@ -1050,6 +1065,10 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
         case 'ArrowLeft':
           event.preventDefault();
+          // Record navigation history
+          if (focusManagerRef.current) {
+            focusManagerRef.current.addNavigationStep(currentIndex);
+          }
           const prevIndex = currentIndex > 0 ? currentIndex - 1 : currentIndex;
           setNavigationState((prev) => ({
             ...prev,
@@ -1310,7 +1329,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           data-interactive="true"
           data-focus-visible={isFocusVisible}
           data-history-length={
-            focusManagerRef.current?.focusHistory?.length || 0
+            focusManagerRef.current?.navigationHistory?.length || 0
           }
           data-current-focus={navigationState.focusedIndex}
           role={ariaConfiguration?.role || 'img'}
@@ -1404,6 +1423,34 @@ const TideChartBase: React.FC<TideChartProps> = ({
               }}
             >
               ARIA機能が無効です。基本機能のみ利用可能です。
+            </div>
+          )}
+
+          {!keyboardNavigationEnabled && (
+            <div
+              data-testid="fallback-controls"
+              style={{
+                padding: '10px',
+                backgroundColor: currentTheme.error,
+                color: currentTheme.background,
+                marginTop: '10px',
+              }}
+            >
+              キーボードナビゲーションが無効です。マウスまたはタッチ操作をご利用ください。
+            </div>
+          )}
+
+          {!focusManagementEnabled && (
+            <div
+              data-testid="focus-fallback-message"
+              style={{
+                padding: '10px',
+                backgroundColor: currentTheme.error,
+                color: currentTheme.background,
+                marginTop: '10px',
+              }}
+            >
+              フォーカス管理が無効です。基本的な操作のみ利用可能です。
             </div>
           )}
 
