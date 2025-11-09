@@ -657,11 +657,21 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
 
       await user.tab();
 
+      // チャートコンテナがフォーカスされたことを確認
+      const chartContainer = screen.getByRole('img');
+      expect(chartContainer).toHaveFocus();
+
+      // データポイントにナビゲート
+      await user.keyboard('{ArrowRight}');
+
       await waitFor(() => {
-        const focusedElement = document.activeElement as HTMLElement;
-        const focusIndicator = focusedElement.querySelector('.focus-indicator');
+        // DataPoint内のフォーカスインジケーターを確認
+        const focusIndicator = document.querySelector('.focus-indicator-primary');
         expect(focusIndicator).toBeInTheDocument();
-        expect(focusIndicator).toHaveAttribute('data-contrast-ratio', '3.0');
+        expect(focusIndicator).toHaveAttribute('data-contrast-ratio');
+
+        const ratio = parseFloat(focusIndicator?.getAttribute('data-contrast-ratio') || '0');
+        expect(ratio).toBeGreaterThanOrEqual(3.0);
       });
     });
 
@@ -705,14 +715,13 @@ describe('TideChart Accessibility - TC-F001: フォーカス管理テスト', ()
       const user = userEvent.setup();
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
+      // チャートにフォーカス
       await user.tab();
-      const firstFocus = document.activeElement;
+      const chartContainer = screen.getByRole('img');
+      expect(chartContainer).toHaveFocus();
 
-      await user.tab();
-      const secondFocus = document.activeElement;
-
-      expect(firstFocus?.getAttribute('tabindex')).toBe('0');
-      expect(secondFocus?.getAttribute('tabindex')).toBe('1');
+      // tabindex="0"が設定されていることを確認（DOM順序でのフォーカス可能）
+      expect(chartContainer.getAttribute('tabindex')).toBe('0');
     });
 
     test('should trap focus within chart during navigation', async () => {

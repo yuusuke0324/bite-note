@@ -1,0 +1,40 @@
+/**
+ * TideChart.module.css - フォーカススタイル定義
+ * WCAG 2.4.7 (Focus Visible) Level AA準拠
+ */
+
+.tide-chart {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  transition: outline 200ms ease-in-out,
+              outline-offset 200ms ease-in-out,
+              box-shadow 200ms ease-in-out;
+}
+
+/* 基本フォーカス（Tabキーで表示） */
+.tide-chart:focus {
+  outline: var(--base-focus-width, 2px) solid var(--focus-color, #2196F3);
+  outline-offset: var(--base-focus-offset, 2px);
+}
+
+/* アクティブナビゲーションフォーカス（矢印キー使用時） */
+.tide-chart[data-navigation-active="true"]:focus {
+  outline: var(--active-focus-width, 3px) solid var(--focus-color, #2196F3);
+  outline-offset: var(--active-focus-offset, 4px);
+  /* オプション: グローエフェクトで強調 */
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
+}
+
+/* マウス操作時はフォーカスアウトラインを控えめに（:focus-visibleサポート時） */
+.tide-chart:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ナビゲーション中は常に表示 */
+.tide-chart[data-navigation-active="true"]:focus:not(:focus-visible) {
+  outline: var(--active-focus-width, 3px) solid var(--focus-color, #2196F3);
+  outline-offset: var(--active-focus-offset, 4px);
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
+}

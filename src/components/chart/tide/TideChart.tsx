@@ -15,6 +15,7 @@ import React, {
 } from 'react';
 // CRITICAL: Rechartsを条件付きimportに変更（テスト時の依存性注入を可能にする）
 import type { TideChartProps, TideChartData, ChartComponents } from './types';
+import styles from './TideChart.module.css';
 
 // Lazy Recharts import（プロダクション用）
 // テスト時は chartComponents props でモックを注入
@@ -788,6 +789,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
   const [selectedDataPoint, setSelectedDataPoint] = useState<number | null>(
     null
   );
+  const [isFocusVisible, setIsFocusVisible] = useState(false);
   const renderStartTime = useRef<number>(0);
   const liveRegionRef = useRef<HTMLDivElement>(null);
   const focusManagerRef = useRef<FocusManager | null>(null);
@@ -1240,6 +1242,10 @@ const TideChartBase: React.FC<TideChartProps> = ({
     []
   );
 
+  // Focus handler for WCAG 2.4.7 compliance
+  const handleFocus = useCallback(() => {
+    setIsFocusVisible(true);
+  }, []);
 
   // Theme CSS styling with focus support
   const themeStyles = useMemo(
@@ -1249,15 +1255,15 @@ const TideChartBase: React.FC<TideChartProps> = ({
       '--accent-color': currentTheme.accent,
       '--focus-color': currentTheme.focus,
       '--error-color': currentTheme.error,
-      outline: navigationState.isActive
-        ? `2px solid ${currentTheme.focus}`
-        : 'none',
-      outlineOffset: '2px',
+      '--base-focus-width': '2px',
+      '--base-focus-offset': '2px',
+      '--active-focus-width': '3px',
+      '--active-focus-offset': '4px',
       ...(colorMode === 'monochrome' && {
         filter: 'grayscale(100%)',
       }),
     }),
-    [currentTheme, colorMode, navigationState.isActive]
+    [currentTheme, colorMode]
   );
 
   // コンポーネントがロード中の場合はローディング表示（すべてのHooksの後にチェック）
@@ -1283,7 +1289,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
         </h1>
         <div
           ref={chartContainerRef}
-          className={`tide-chart ${theme && `theme-${theme}`} ${colorMode === 'monochrome' ? 'monochrome-mode' : ''} ${responsive ? 'responsive' : ''} ${className || ''}`.trim()}
+          className={`${styles.tideChart} tide-chart ${theme && `theme-${theme}`} ${colorMode === 'monochrome' ? 'monochrome-mode' : ''} ${responsive ? 'responsive' : ''} ${className || ''}`.trim()}
           style={{
             width: chartConfiguration.actualWidth,
             height: chartConfiguration.actualHeight,
@@ -1302,7 +1308,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }
           data-contrast-ratio={currentTheme.contrastRatios?.foregroundBg.toFixed(2) || '4.5'}
           data-interactive="true"
-          data-focus-visible={navigationState.isActive}
+          data-focus-visible={isFocusVisible}
           data-history-length={
             focusManagerRef.current?.focusHistory?.length || 0
           }
@@ -1318,6 +1324,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
               : undefined
           }
           tabIndex={0}
+          onFocus={handleFocus}
           onKeyDown={handleKeyDown}
         >
           {/* Accessibility Content */}
