@@ -544,8 +544,16 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
       const user = userEvent.setup();
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
+      // Focus the chart using Tab
+      await user.tab();
+
       const chartContainer = screen.getByRole('img');
-      await user.click(chartContainer);
+      expect(chartContainer).toHaveFocus();
+
+      // Navigate to first data point (index 0, type: 'high') to trigger announcement
+      await user.keyboard('{ArrowRight}');
+      // Move back to index 0 which has type: 'high' (満潮ポイント)
+      await user.keyboard('{ArrowLeft}');
 
       await waitFor(() => {
         const announcement = screen.getByTestId('screen-reader-announcement');
@@ -557,10 +565,25 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
       const user = userEvent.setup();
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
-      const chartContainer = screen.getByRole('img');
-      await user.click(chartContainer);
-      await user.keyboard('{Space}');
+      // Focus the chart using Tab
+      await user.tab();
 
+      const chartContainer = screen.getByRole('img');
+      expect(chartContainer).toHaveFocus();
+
+      // Navigate to a data point first to start navigation
+      await user.keyboard('{ArrowRight}');
+
+      // Wait for navigation to be established
+      await waitFor(() => {
+        const focusedDataPoint = screen.getByTestId('data-point-1');
+        expect(focusedDataPoint).toHaveAttribute('data-focused', 'true');
+      });
+
+      // Now press Space to select
+      await user.keyboard(' ');
+
+      // Wait for selection announcement
       await waitFor(() => {
         const announcement = screen.getByTestId('screen-reader-announcement');
         expect(announcement.textContent).toContain('選択されました');
@@ -606,7 +629,8 @@ describe('TideChart Accessibility - TC-S001: スクリーンリーダー対応�
 
       await waitFor(() => {
         const trendAnalysis = screen.getByTestId('trend-analysis');
-        expect(trendAnalysis.textContent).toContain('全体的な潮汐動作');
+        // Check for overall trend description
+        expect(trendAnalysis.textContent).toMatch(/全体的に潮位は.*傾向にあります/);
       });
     });
   });

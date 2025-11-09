@@ -98,18 +98,20 @@ class ScreenReaderManager {
 
     // Enhanced screen reader content with tide type counts (WCAG 1.3.1, 4.1.2)
     return {
-      chartSummary: `潮汐グラフには${data.length}個のデータポイントが含まれており、${highTideCount}回の満潮と${lowTideCount}回の干潮があります。`,
+      chartSummary: `潮汐グラフには${data.length}個のデータポイントが含まれており、${highTideCount}回の満潮と${lowTideCount}回の干潮があります。最高${max}cm、最低${min}cm。`,
       dataPointDescription: (point: TideChartData, index: number) => {
         const typeText = point.type === 'high' ? '満潮ポイント' : point.type === 'low' ? '干潮ポイント' : '';
         return `${index + 1}番目のデータポイント${typeText ? `（${typeText}）` : ''}: ${point.time}の潮位は${point.tide}センチメートル`;
       },
-      trendAnalysis: `傾向分析: ${analysis.overallTrend}。最高${max}cm、最低${min}cm。`,
+      trendAnalysis: `傾向分析: ${analysis.overallTrend}。パターン: ${analysis.patternDescription}。最高${max}cm、最低${min}cm。`,
       errorMessages: 'データの読み込みに失敗しました。再度お試しください。',
     };
   }
 
   private static analyzeTideTrends(data: TideChartData[]) {
     let overallTrend = '潮位は周期的に変化しています';
+    let patternDescription = '満潮と干潮を繰り返す周期的パターン';
+
     if (data.length > 1) {
       const first = data[0].tide;
       const last = data[data.length - 1].tide;
@@ -118,9 +120,21 @@ class ScreenReaderManager {
       } else if (last < first) {
         overallTrend = '全体的に潮位は下降傾向にあります';
       }
+
+      // Analyze pattern based on tide types
+      const highTides = data.filter(d => d.type === 'high');
+      const lowTides = data.filter(d => d.type === 'low');
+
+      if (highTides.length > 0 && lowTides.length > 0) {
+        patternDescription = '満潮と干潮を繰り返す周期的パターン';
+      } else if (highTides.length > 0) {
+        patternDescription = '満潮を中心とした上昇パターン';
+      } else if (lowTides.length > 0) {
+        patternDescription = '干潮を中心とした下降パターン';
+      }
     }
 
-    return { overallTrend };
+    return { overallTrend, patternDescription };
   }
 }
 
