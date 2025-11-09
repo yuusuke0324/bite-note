@@ -98,18 +98,20 @@ class ScreenReaderManager {
 
     // Enhanced screen reader content with tide type counts (WCAG 1.3.1, 4.1.2)
     return {
-      chartSummary: `潮汐グラフには${data.length}個のデータポイントが含まれており、${highTideCount}回の満潮と${lowTideCount}回の干潮があります。`,
+      chartSummary: `潮汐グラフには${data.length}個のデータポイントが含まれており、${highTideCount}回の満潮と${lowTideCount}回の干潮があります。最高${max}cm、最低${min}cm。`,
       dataPointDescription: (point: TideChartData, index: number) => {
         const typeText = point.type === 'high' ? '満潮ポイント' : point.type === 'low' ? '干潮ポイント' : '';
         return `${index + 1}番目のデータポイント${typeText ? `（${typeText}）` : ''}: ${point.time}の潮位は${point.tide}センチメートル`;
       },
-      trendAnalysis: `傾向分析: ${analysis.overallTrend}。最高${max}cm、最低${min}cm。`,
+      trendAnalysis: `傾向分析: ${analysis.overallTrend}。パターン: ${analysis.patternDescription}。最高${max}cm、最低${min}cm。`,
       errorMessages: 'データの読み込みに失敗しました。再度お試しください。',
     };
   }
 
   private static analyzeTideTrends(data: TideChartData[]) {
     let overallTrend = '潮位は周期的に変化しています';
+    let patternDescription = '満潮と干潮を繰り返す周期的パターン';
+
     if (data.length > 1) {
       const first = data[0].tide;
       const last = data[data.length - 1].tide;
@@ -118,9 +120,21 @@ class ScreenReaderManager {
       } else if (last < first) {
         overallTrend = '全体的に潮位は下降傾向にあります';
       }
+
+      // Analyze pattern based on tide types
+      const highTides = data.filter(d => d.type === 'high');
+      const lowTides = data.filter(d => d.type === 'low');
+
+      if (highTides.length > 0 && lowTides.length > 0) {
+        patternDescription = '満潮と干潮を繰り返す周期的パターン';
+      } else if (highTides.length > 0) {
+        patternDescription = '満潮を中心とした上昇パターン';
+      } else if (lowTides.length > 0) {
+        patternDescription = '干潮を中心とした下降パターン';
+      }
     }
 
-    return { overallTrend };
+    return { overallTrend, patternDescription };
   }
 }
 
@@ -547,6 +561,7 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
     <g>
       <circle
         ref={ref}
+        id={`data-point-${index}`}
         cx={cx}
         cy={cy}
         r={isFocused ? 6 : 4}
@@ -564,19 +579,33 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
         onClick={handleClick}
         tabIndex={-1}
       />
-      {/* Focus indicator */}
+      {/* Focus indicator - Enhanced with double ring and pulse animation */}
       {isFocused && (
-        <circle
-          cx={cx}
-          cy={cy}
-          r={8}
-          fill="none"
-          stroke={theme.focus}
-          strokeWidth={2}
-          strokeDasharray="2,2"
-          className="focus-indicator"
-          data-contrast-ratio={theme.contrastRatios?.focusBg.toFixed(2) || '3.0'}
-        />
+        <>
+          {/* Primary focus indicator - solid ring */}
+          <circle
+            cx={cx}
+            cy={cy}
+            r={9}
+            fill="none"
+            stroke={theme.focus}
+            strokeWidth={3}
+            className="focus-indicator-primary"
+            data-contrast-ratio={theme.contrastRatios?.focusBg.toFixed(2) || '3.0'}
+          />
+          {/* Secondary focus indicator - pulsing dashed ring */}
+          <circle
+            cx={cx}
+            cy={cy}
+            r={12}
+            fill="none"
+            stroke={theme.focus}
+            strokeWidth={2}
+            strokeDasharray="2,2"
+            className="focus-indicator-secondary"
+            style={{ animation: 'pulse 2s ease-in-out infinite' }}
+          />
+        </>
       )}
     </g>
   );
@@ -1002,11 +1031,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }));
           setFocusedPointIndex(nextIndex);
 
-          // Focus the data point element
-          if (dataPointRefsRef.current[nextIndex]) {
-            dataPointRefsRef.current[nextIndex]?.focus();
-          }
-
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
             const point = validatedData.valid[nextIndex];
@@ -1032,11 +1056,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(prevIndex);
-
-          // Focus the data point element
-          if (dataPointRefsRef.current[prevIndex]) {
-            dataPointRefsRef.current[prevIndex]?.focus();
-          }
 
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
@@ -1069,11 +1088,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
               isActive: true,
             }));
             setFocusedPointIndex(higherValueIndex);
-
-            // Focus the data point element
-            if (dataPointRefsRef.current[higherValueIndex]) {
-              dataPointRefsRef.current[higherValueIndex]?.focus();
-            }
           }
           break;
 
@@ -1093,11 +1107,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
               isActive: true,
             }));
             setFocusedPointIndex(lowerValueIndex);
-
-            // Focus the data point element
-            if (dataPointRefsRef.current[lowerValueIndex]) {
-              dataPointRefsRef.current[lowerValueIndex]?.focus();
-            }
           }
           break;
 
@@ -1110,11 +1119,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(0);
-
-          // Focus the first data point element
-          if (dataPointRefsRef.current[0]) {
-            dataPointRefsRef.current[0]?.focus();
-          }
           break;
 
         case 'End':
@@ -1127,11 +1131,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             isActive: true,
           }));
           setFocusedPointIndex(lastIndex);
-
-          // Focus the last data point element
-          if (dataPointRefsRef.current[lastIndex]) {
-            dataPointRefsRef.current[lastIndex]?.focus();
-          }
           break;
 
         case 'Enter':
@@ -1213,7 +1212,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
       if (currentValue === undefined) return -1;
 
       let bestIndex = -1;
-      let bestValue = direction === 'higher' ? -Infinity : Infinity;
+      let bestValue = direction === 'higher' ? Infinity : -Infinity;
 
       for (let i = 0; i < data.length; i++) {
         if (i === currentIndex) continue;
@@ -1312,6 +1311,11 @@ const TideChartBase: React.FC<TideChartProps> = ({
           aria-label={ariaConfiguration?.label || ariaLabel}
           aria-describedby={
             ariaConfiguration?.describedBy || 'tide-chart-description'
+          }
+          aria-activedescendant={
+            navigationState.isActive && navigationState.mode === 'data-point'
+              ? `data-point-${navigationState.focusedIndex}`
+              : undefined
           }
           tabIndex={0}
           onKeyDown={handleKeyDown}
