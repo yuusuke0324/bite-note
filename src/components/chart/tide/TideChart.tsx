@@ -561,7 +561,6 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
         data-tide-type={payload?.type || 'normal'}
         data-focused={isFocused}
         data-selected={isSelected}
-        aria-selected={isSelected}
         className={isFocused ? 'highlighted' : ''}
         onClick={handleClick}
         tabIndex={-1}
