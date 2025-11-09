@@ -91,21 +91,27 @@ describe('RetryService', () => {
   });
 
   it('should apply exponential backoff', async () => {
+    vi.useFakeTimers();
+
     const retryService = new RetryService();
     const mockOperation = vi.fn()
       .mockRejectedValueOnce(new Error('Fail'))
       .mockResolvedValue('Success');
 
-    const startTime = Date.now();
-    await retryService.execute(mockOperation, {
+    const executePromise = retryService.execute(mockOperation, {
       maxRetries: 1,
       delay: 100,
       backoff: 'exponential'
     });
-    const duration = Date.now() - startTime;
 
-    expect(duration).toBeGreaterThanOrEqual(100);
+    // タイマーを進める（attempt=0の場合、100 * 2^0 = 100ms）
+    await vi.advanceTimersByTimeAsync(100);
+
+    await executePromise;
+
     expect(mockOperation).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
   });
 });
 
