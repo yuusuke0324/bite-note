@@ -26,6 +26,52 @@ export default defineConfig({
     clearMocks: true,
     restoreMocks: true,
     mockReset: true,
+    // カバレッジ設定（Issue #17 - PR #1）
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'text-summary', 'html', 'lcov', 'json'],
+      reportsDirectory: './coverage',
+
+      // PR #1では閾値を設定しない（測定のみ）
+      // PR #2以降で段階的に有効化
+      // thresholds: {
+      //   global: {
+      //     lines: 70,
+      //     branches: 65,
+      //     functions: 75,
+      //     statements: 70,
+      //   },
+      // },
+
+      include: [
+        'src/**/*.{ts,tsx}',
+      ],
+
+      exclude: [
+        'node_modules/',
+        'dist/',
+        '**/*.config.{ts,js,mjs}',
+        '**/*.d.ts',
+        '**/*.test.{ts,tsx}',
+        '**/*.spec.{ts,tsx}',
+        '**/__tests__/**',
+        'src/setupTests.ts',
+        'src/**/__mocks__/**',
+        'src/types/**',
+        'src/**/*.types.ts',
+        'src/constants/**',
+        'src/dev/**',
+        'scripts/**',
+        'tests/e2e/**',
+        'playwright.config.ts',
+        '**/*.performance.test.{ts,tsx}',
+        '**/*.a11y.test.{ts,tsx}',
+        '**/*.red.test.{ts,tsx}',
+      ],
+
+      all: true,
+      excludeAfterRemap: true,
+    },
     /**
      * NOTE: このexclude設定は、vitest.workspace.ts使用時には参照されません。
      * 各テストプロジェクトのexclude設定は、vitest.workspace.ts内で定義されています。
