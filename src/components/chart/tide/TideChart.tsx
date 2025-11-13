@@ -1321,6 +1321,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
           data-navigation-mode={navigationState.mode}
           data-navigation-active={navigationState.isActive}
           data-focus-manager={focusManagementEnabled ? 'enabled' : 'disabled'}
+          data-touch-enabled="true"
+          data-voice-enabled="true"
           data-performance={
             enablePerformanceMonitoring && (window as any).tideChartMetrics
               ? JSON.stringify((window as any).tideChartMetrics)
