@@ -1208,11 +1208,8 @@ describe('TideChart Accessibility - TC-W001-W004: WCAG 2.1 AA準拠検証テス�
     test('should make it easier to see and hear content', async () => {
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
-      await waitFor(() => {
-        const result = AccessibilityTester.expectNoA11yViolations(
-          document.body
-        );
-        expect(result).resolves.toBeTruthy();
+      await waitFor(async () => {
+        await AccessibilityTester.expectNoA11yViolations(document.body);
       });
     });
   });
