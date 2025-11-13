@@ -1,6 +1,7 @@
 // 釣果記録データアクセスサービス
 
 import { v4 as uuidv4 } from 'uuid';
+import Dexie from 'dexie';
 import { db } from './database';
 import type {
   FishingRecord,
@@ -93,31 +94,33 @@ export class FishingRecordService {
   // 釣果記録の一覧取得
   async getRecords(params: GetRecordsParams = {}): Promise<DatabaseResult<FishingRecord[]>> {
     try {
-      let query = db.fishing_records.orderBy(params.sortBy || 'date');
+      let collection;
+
+      // フィルタリングの適用（where句を先に適用）
+      if (params.filter) {
+        const whereFiltered = this.applyWhereFilter(db.fishing_records, params.filter);
+        collection = this.applyJsFilter(whereFiltered, params.filter);
+      } else {
+        collection = db.fishing_records.toCollection();
+      }
+
+      // ソート（sortByを使用してメモリ上でソート）
+      const sortedRecords = await collection.sortBy(params.sortBy || 'date');
 
       // ソート順の設定
       if (params.sortOrder === 'desc') {
-        query = query.reverse();
+        sortedRecords.reverse();
       }
 
-      // フィルタリングの適用
-      if (params.filter) {
-        query = this.applyFilter(query as any, params.filter) as any;
-      }
-
-      // ページネーション
-      if (params.offset) {
-        query = query.offset(params.offset);
-      }
-      if (params.limit) {
-        query = query.limit(params.limit);
-      }
-
-      const records = await query.toArray();
+      // ページネーション（JavaScriptのsliceを使用）
+      const { offset = 0, limit } = params;
+      const paginatedRecords = limit
+        ? sortedRecords.slice(offset, offset + limit)
+        : sortedRecords.slice(offset);
 
       return {
         success: true,
-        data: records
+        data: paginatedRecords
       };
     } catch (error) {
       return {
@@ -308,34 +311,58 @@ export class FishingRecordService {
     }
   }
 
-  // プライベートメソッド: フィルタリングの適用
-  private applyFilter(query: any, filter: RecordFilter): any {
+  // プライベートメソッド: Dexieのwhere句を使うフィルタリング
+  private applyWhereFilter(
+    table: Dexie.Table<FishingRecord, any>,
+    filter: RecordFilter
+  ): Dexie.Collection<FishingRecord, any> {
+    let collection: Dexie.Collection<FishingRecord, any> = table.toCollection();
+
     // 日付範囲フィルター
     if (filter.dateRange) {
-      query = query.where('date').between(filter.dateRange.start, filter.dateRange.end, true, true);
+      collection = table
+        .where('date')
+        .between(filter.dateRange.start, filter.dateRange.end, true, true);
     }
 
     // 魚種フィルター
     if (filter.fishSpecies && filter.fishSpecies.length > 0) {
-      query = query.where('fishSpecies').anyOf(filter.fishSpecies);
+      // 日付範囲フィルターと併用する場合は、JavaScriptフィルターにフォールバック
+      if (filter.dateRange) {
+        collection = collection.filter((record: FishingRecord) =>
+          filter.fishSpecies!.includes(record.fishSpecies)
+        );
+      } else {
+        collection = table.where('fishSpecies').anyOf(filter.fishSpecies);
+      }
     }
+
+    return collection;
+  }
+
+  // プライベートメソッド: JavaScriptのfilterを使うフィルタリング
+  private applyJsFilter(
+    collection: Dexie.Collection<FishingRecord, any>,
+    filter: RecordFilter
+  ): Dexie.Collection<FishingRecord, any> {
+    let result = collection;
 
     // 場所フィルター（部分一致）
     if (filter.location) {
-      query = query.filter((record: FishingRecord) =>
+      result = result.filter((record: FishingRecord) =>
         record.location.toLowerCase().includes(filter.location!.toLowerCase())
       );
     }
 
     // サイズ範囲フィルター
     if (filter.sizeRange) {
-      query = query.filter((record: FishingRecord) => {
+      result = result.filter((record: FishingRecord) => {
         if (!record.size) return false;
         return record.size >= filter.sizeRange!.min && record.size <= filter.sizeRange!.max;
       });
     }
 
-    return query;
+    return result;
   }
 
   // プライベートメソッド: 作成フォームのバリデーション
