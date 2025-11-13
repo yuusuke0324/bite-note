@@ -232,6 +232,191 @@ Refs #YY
 
 ---
 
+## 🔍 PR作成後のCI確認プロセス（必須）
+
+### 基本フロー
+
+PR作成後、**ユーザーへの完了報告前に必ずCI結果を確認する**:
+
+```bash
+# Step 1: PR作成
+gh pr create --title "..." --body "..."
+
+# Step 2: CI実行状況を確認（必須）
+gh pr checks <PR番号>
+
+# Step 3: CI結果に応じた判断
+```
+
+### CI結果に応じた判断フロー
+
+#### ✅ 全CI成功の場合
+
+```markdown
+**アクション**: 即座にマージ可能判断、ユーザーに完了報告
+
+**報告例**:
+---
+## ✅ タスク完了報告
+
+### PR情報
+- PR #XX: [PR タイトル]
+- CI結果: ✅ 全チェックパス
+
+### CI実行結果
+✅ Lint Check
+✅ Type Check
+✅ Unit Tests
+✅ Build
+
+### マージ準備完了
+すべてのCI検証が成功しました。いつでもマージ可能です。
+---
+```
+
+#### ❌ CI失敗の場合
+
+**Step 1**: 失敗原因を分析
+
+```bash
+# CI失敗詳細を確認
+gh pr checks <PR番号> --watch
+
+# 失敗したジョブのログを確認
+gh run view <run-id> --log-failed
+```
+
+**Step 2**: 失敗原因の分類
+
+##### ケース1: PRの変更範囲内の失敗
+
+**アクション**: 修正してCI再実行
+
+```bash
+# 1. 問題を修正
+# 2. 追加コミット
+git add .
+git commit -m "fix(ci): resolve CI failure in [component]"
+git push
+
+# 3. CI再実行を確認
+gh pr checks <PR番号> --watch
+
+# 4. CI成功後、ユーザーに完了報告
+```
+
+**報告例**:
+```markdown
+## ✅ タスク完了報告（CI修正済み）
+
+### PR情報
+- PR #XX: [PR タイトル]
+- CI結果: ✅ 全チェックパス（修正後）
+
+### CI修正履歴
+❌ 初回CI: Type Check失敗（修正前）
+✅ 修正コミット追加
+✅ 2回目CI: 全チェックパス
+
+### マージ準備完了
+CI失敗を修正し、すべての検証が成功しました。
+```
+
+##### ケース2: PRの変更範囲外の失敗（既存の問題）
+
+**アクション**: 別Issue作成、状況説明、現PRはマージ可能判断
+
+```bash
+# 1. 失敗原因を詳細に調査
+# 例: TideChartコンポーネントの型エラー（PR範囲外）
+
+# 2. 新規Issue作成
+gh issue create \
+  --title "fix(tide): resolve type error in TideChart component" \
+  --body "$(cat <<'EOF'
+## 🐛 問題
+PR #74のCI実行時に、TideChartコンポーネントで型エラーが検出されました。
+この問題はPR #74の変更範囲外の既存コードに起因します。
+
+## 🔍 エラー内容
+```
+src/components/TideChart.tsx:42:15
+Type 'number | undefined' is not assignable to type 'number'
+```
+
+## 📋 タスク
+- TideChartコンポーネントの型定義を修正
+- 関連するテストケースを追加
+- CI実行で型チェックがパスすることを確認
+
+## 🔗 関連PR
+- 検出元: PR #74
+EOF
+)"
+
+# 3. Issue番号を記録（例: #75）
+```
+
+**報告例**:
+```markdown
+## ✅ タスク完了報告（既存問題を分離）
+
+### PR情報
+- PR #74: feat(test): add comprehensive tests for photo-service
+- PR自体の品質: ✅ 完璧（変更範囲内は問題なし）
+- CI結果: ❌ Type Check失敗（既存コードの問題）
+
+### CI失敗の分析
+**失敗箇所**: TideChartコンポーネント（PR範囲外）
+**原因**: 既存コードの型定義不足
+**判断**: PR #74の変更は完璧なため、マージ可能
+
+### 対応状況
+✅ Issue #75を作成: "fix(tide): resolve type error in TideChart component"
+✅ 既存問題を分離し、別タスクとして管理
+
+### マージ判断
+**PR #74はマージ可能です**。
+既存の型エラーはIssue #75で別途対応します。
+
+---
+
+### 次のアクション
+Issue #75のタスク実施をご希望の場合はお知らせください。
+```
+
+### ⚠️ 重要な注意事項
+
+1. **CI確認は必須**
+   - PR作成直後に `gh pr checks` で確認
+   - ユーザーへの完了報告前に必ず実行
+
+2. **失敗原因の正確な分類**
+   - 自分のPR範囲内 → 修正してCI再実行
+   - PR範囲外（既存問題） → Issue分離、マージ可能判断
+
+3. **透明性のある報告**
+   - CI結果を必ず報告に含める
+   - 失敗した場合は原因と対応を明記
+
+4. **既存問題の適切な管理**
+   - Issue作成で追跡可能にする
+   - 現PRと混同しない
+
+### 📊 CI確認チェックリスト
+
+PR作成後、以下を確認:
+
+- [ ] `gh pr checks <PR番号>` を実行
+- [ ] CI実行状況を確認（pending/success/failure）
+- [ ] 失敗がある場合、原因を分析
+- [ ] PR範囲内の失敗 → 修正
+- [ ] PR範囲外の失敗 → Issue作成
+- [ ] CI結果をユーザーに報告
+- [ ] マージ可能判断を明示
+
+---
+
 ## 📏 PRサイズのベストプラクティス
 
 ### 小さく保つ
