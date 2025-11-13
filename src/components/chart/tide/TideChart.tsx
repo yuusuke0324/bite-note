@@ -757,6 +757,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
   screenReaderAvailable = true,
   keyboardNavigationEnabled = true,
   focusManagementEnabled = true,
+  enableFallback = false,
   showKeyboardShortcuts = false,
   autoDetectionFailed = false,
   colorMode = 'normal',
@@ -1454,7 +1455,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
             </div>
           )}
 
-          {!screenReaderAvailable && (
+          {(enableFallback || !screenReaderAvailable) && (
             <div data-testid="text-table-fallback">
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
