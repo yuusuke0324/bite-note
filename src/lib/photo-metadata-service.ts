@@ -409,8 +409,8 @@ export class PhotoMetadataService {
         return null;
       }
 
-      // 度分秒形式 "DD° MM' SS.SS\"" の処理
-      const dmsMatch = coordStr.match(/(\d+)°?\s*(\d+)'?\s*([\d.]+)\"?/);
+      // 度分秒形式 "DD° MM' SS.SS\"" の処理（記号必須）
+      const dmsMatch = coordStr.match(/(\d+)°\s*(\d+)'\s*([\d.]+)\"/);
       if (dmsMatch) {
         const degrees = parseInt(dmsMatch[1]);
         const minutes = parseInt(dmsMatch[2]);
@@ -418,8 +418,8 @@ export class PhotoMetadataService {
         return degrees + minutes / 60 + seconds / 3600;
       }
 
-      // 度分形式 "DD° MM.MMM'" の処理
-      const dmMatch = coordStr.match(/(\d+)°?\s*([\d.]+)'?/);
+      // 度分形式 "DD° MM.MMM'" の処理（記号必須）
+      const dmMatch = coordStr.match(/(\d+)°\s*([\d.]+)'/);
       if (dmMatch) {
         const degrees = parseInt(dmMatch[1]);
         const minutes = parseFloat(dmMatch[2]);
