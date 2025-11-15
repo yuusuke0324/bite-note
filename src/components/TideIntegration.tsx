@@ -55,6 +55,9 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
   const contentRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<Animation | null>(null);
 
+  // 座標の有無チェック（useEffectより前に定義）
+  const hasCoordinates = fishingRecord.coordinates !== undefined;
+
   // レスポンシブ対応の判定（window resizeに対応）
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== 'undefined' ? window.innerWidth : 1024
@@ -71,11 +74,16 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // initialExpanded対応: 初期展開時に潮汐データを計算（TC-I010対策）
+  useEffect(() => {
+    if (initialExpanded && !tideInfo && hasCoordinates) {
+      calculateTideData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialExpanded, hasCoordinates]); // calculateTideDataは安定しているため依存配列から除外
+
   const isMobile = useMemo(() => windowWidth <= 768, [windowWidth]);
   const isTablet = useMemo(() => windowWidth > 768 && windowWidth <= 1024, [windowWidth]);
-
-  // 座標の有無チェック
-  const hasCoordinates = fishingRecord.coordinates !== undefined;
 
   // TideGraphData から TideChartData への変換関数
   const convertToTideChartData = useCallback((graphData: TideGraphData): TideChartData[] => {
