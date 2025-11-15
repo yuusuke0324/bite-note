@@ -882,5 +882,259 @@ describe('PhotoService', () => {
       expect(result.success).toBe(true);
       expect(result.data).toBe('data:image/jpeg;base64,test-data');
     });
+
+    it('存在しない写真の場合はエラーを返す（P0-3-1）', async () => {
+      const mockDb = await import('../lib/database');
+      vi.mocked(mockDb.db.photos.get).mockResolvedValue(undefined);
+
+      const result = await service.getPhotoDataUrl('non-existent-id');
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('NOT_FOUND');
+    });
+
+    it('FileReaderエラー時はGET_DATAURL_FAILEDエラーを返す（P0-3-2）', async () => {
+      const mockPhoto = {
+        id: 'test-id',
+        filename: 'test.jpg',
+        mimeType: 'image/jpeg',
+        fileSize: 1000,
+        blob: new Blob(['test'], { type: 'image/jpeg' }),
+        thumbnailBlob: new Blob(['thumb'], { type: 'image/jpeg' }),
+        uploadedAt: new Date(),
+        width: 1920,
+        height: 1080,
+        compressionQuality: 0.8
+      };
+
+      const mockDb = await import('../lib/database');
+      vi.mocked(mockDb.db.photos.get).mockResolvedValue(mockPhoto);
+
+      // FileReaderエラーのモック
+      const originalFileReader = global.FileReader;
+      global.FileReader = class MockFileReaderWithError {
+        result: any = null;
+        onload: any = null;
+        onerror: any = null;
+
+        readAsDataURL() {
+          setTimeout(() => {
+            if (this.onerror) this.onerror(new Error('FileReader error'));
+          }, 0);
+        }
+      } as any;
+
+      const result = await service.getPhotoDataUrl('test-id');
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('GET_DATAURL_FAILED');
+      expect(result.error?.message).toContain('Failed to convert photo to data URL');
+
+      // Cleanup
+      global.FileReader = originalFileReader;
+    });
+  });
+
+  describe('getPhotoMetadata', () => {
+    it('写真のメタデータ（Blob除外）を取得できる（P0-1-1）', async () => {
+      const mockPhoto = {
+        id: 'test-id',
+        filename: 'test.jpg',
+        mimeType: 'image/jpeg',
+        fileSize: 1000,
+        blob: new Blob(['test'], { type: 'image/jpeg' }),
+        thumbnailBlob: new Blob(['thumb'], { type: 'image/jpeg' }),
+        uploadedAt: new Date('2024-01-15T10:00:00'),
+        width: 1920,
+        height: 1080,
+        compressionQuality: 0.8
+      };
+
+      const mockDb = await import('../lib/database');
+      vi.mocked(mockDb.db.photos.get).mockResolvedValue(mockPhoto);
+
+      const result = await service.getPhotoMetadata('test-id');
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBeDefined();
+      if (result.data) {
+        expect(result.data.id).toBe('test-id');
+        expect(result.data.filename).toBe('test.jpg');
+        expect(result.data.mimeType).toBe('image/jpeg');
+        expect(result.data.fileSize).toBe(1000);
+        expect(result.data.width).toBe(1920);
+        expect(result.data.height).toBe(1080);
+        expect(result.data.compressionQuality).toBe(0.8);
+        expect(result.data.uploadedAt).toEqual(new Date('2024-01-15T10:00:00'));
+        // Blobが除外されていることを確認
+        expect(result.data).not.toHaveProperty('blob');
+        expect(result.data).not.toHaveProperty('thumbnailBlob');
+      }
+    });
+
+    it('存在しない写真の場合はNOT_FOUNDエラーを返す（P0-1-2）', async () => {
+      const mockDb = await import('../lib/database');
+      vi.mocked(mockDb.db.photos.get).mockResolvedValue(undefined);
+
+      const result = await service.getPhotoMetadata('non-existent-id');
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('NOT_FOUND');
+      expect(result.error?.message).toContain('not found');
+    });
+
+    it('IndexedDB例外発生時はGET_METADATA_FAILEDエラーを返す（P0-1-3）', async () => {
+      const mockDb = await import('../lib/database');
+      vi.mocked(mockDb.db.photos.get).mockRejectedValue(new Error('Database connection error'));
+
+      const result = await service.getPhotoMetadata('test-id');
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('GET_METADATA_FAILED');
+      expect(result.error?.message).toContain('Failed to get photo metadata');
+      expect(result.error?.details).toBeDefined();
+    });
+  });
+
+  describe('getPhotosMetadata', () => {
+    it('全写真のメタデータ一覧（Blob除外）を取得できる（P0-2-1）', async () => {
+      const mockPhotos = [
+        {
+          id: 'photo-1',
+          filename: 'photo1.jpg',
+          mimeType: 'image/jpeg',
+          fileSize: 1000,
+          blob: new Blob(['test1'], { type: 'image/jpeg' }),
+          thumbnailBlob: new Blob(['thumb1'], { type: 'image/jpeg' }),
+          uploadedAt: new Date('2024-01-15'),
+          width: 1920,
+          height: 1080,
+          compressionQuality: 0.8
+        },
+        {
+          id: 'photo-2',
+          filename: 'photo2.jpg',
+          mimeType: 'image/jpeg',
+          fileSize: 2000,
+          blob: new Blob(['test2'], { type: 'image/jpeg' }),
+          thumbnailBlob: new Blob(['thumb2'], { type: 'image/jpeg' }),
+          uploadedAt: new Date('2024-01-14'),
+          width: 1920,
+          height: 1080,
+          compressionQuality: 0.8
+        },
+        {
+          id: 'photo-3',
+          filename: 'photo3.jpg',
+          mimeType: 'image/jpeg',
+          fileSize: 1500,
+          blob: new Blob(['test3'], { type: 'image/jpeg' }),
+          thumbnailBlob: new Blob(['thumb3'], { type: 'image/jpeg' }),
+          uploadedAt: new Date('2024-01-13'),
+          width: 1920,
+          height: 1080,
+          compressionQuality: 0.8
+        }
+      ];
+
+      const mockDb = await import('../lib/database');
+      const mockToArray = vi.fn().mockResolvedValue(mockPhotos);
+      const mockReverse = vi.fn(() => ({ toArray: mockToArray }));
+      const mockOrderBy = vi.fn(() => ({ reverse: mockReverse }));
+      vi.mocked(mockDb.db.photos.orderBy).mockImplementation(mockOrderBy);
+
+      const result = await service.getPhotosMetadata();
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBeDefined();
+      expect(result.data?.length).toBe(3);
+
+      // 各メタデータのBlobが除外されていることを確認
+      result.data?.forEach((metadata, index) => {
+        expect(metadata.id).toBe(`photo-${index + 1}`);
+        expect(metadata.filename).toBe(`photo${index + 1}.jpg`);
+        expect(metadata).not.toHaveProperty('blob');
+        expect(metadata).not.toHaveProperty('thumbnailBlob');
+      });
+
+      expect(mockOrderBy).toHaveBeenCalledWith('uploadedAt');
+    });
+
+    it('limit指定でメタデータ一覧を取得できる（P0-2-2）', async () => {
+      const mockPhotos = [
+        {
+          id: 'photo-1',
+          filename: 'photo1.jpg',
+          mimeType: 'image/jpeg',
+          fileSize: 1000,
+          blob: new Blob(['test1'], { type: 'image/jpeg' }),
+          thumbnailBlob: new Blob(['thumb1'], { type: 'image/jpeg' }),
+          uploadedAt: new Date('2024-01-15'),
+          width: 1920,
+          height: 1080,
+          compressionQuality: 0.8
+        },
+        {
+          id: 'photo-2',
+          filename: 'photo2.jpg',
+          mimeType: 'image/jpeg',
+          fileSize: 2000,
+          blob: new Blob(['test2'], { type: 'image/jpeg' }),
+          thumbnailBlob: new Blob(['thumb2'], { type: 'image/jpeg' }),
+          uploadedAt: new Date('2024-01-14'),
+          width: 1920,
+          height: 1080,
+          compressionQuality: 0.8
+        }
+      ];
+
+      const mockDb = await import('../lib/database');
+      const mockToArray = vi.fn().mockResolvedValue(mockPhotos);
+      const mockLimit = vi.fn(() => ({ toArray: mockToArray }));
+      const mockReverse = vi.fn(() => ({ limit: mockLimit }));
+      const mockOrderBy = vi.fn(() => ({ reverse: mockReverse }));
+      vi.mocked(mockDb.db.photos.orderBy).mockImplementation(mockOrderBy);
+
+      const result = await service.getPhotosMetadata(2);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.length).toBe(2);
+      expect(mockLimit).toHaveBeenCalledWith(2);
+
+      // Blobが除外されていることを確認
+      result.data?.forEach(metadata => {
+        expect(metadata).not.toHaveProperty('blob');
+        expect(metadata).not.toHaveProperty('thumbnailBlob');
+      });
+    });
+
+    it('空のデータベースの場合は空配列を返す（P0-2-3）', async () => {
+      const mockDb = await import('../lib/database');
+      const mockToArray = vi.fn().mockResolvedValue([]);
+      const mockReverse = vi.fn(() => ({ toArray: mockToArray }));
+      const mockOrderBy = vi.fn(() => ({ reverse: mockReverse }));
+      vi.mocked(mockDb.db.photos.orderBy).mockImplementation(mockOrderBy);
+
+      const result = await service.getPhotosMetadata();
+
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual([]);
+      expect(result.data?.length).toBe(0);
+    });
+
+    it('IndexedDB例外発生時はGET_METADATA_LIST_FAILEDエラーを返す（P0-2-4）', async () => {
+      const mockDb = await import('../lib/database');
+      const mockOrderBy = vi.fn(() => {
+        throw new Error('Database query failed');
+      });
+      vi.mocked(mockDb.db.photos.orderBy).mockImplementation(mockOrderBy);
+
+      const result = await service.getPhotosMetadata();
+
+      expect(result.success).toBe(false);
+      expect(result.error?.code).toBe('GET_METADATA_LIST_FAILED');
+      expect(result.error?.message).toContain('Failed to get photos metadata');
+      expect(result.error?.details).toBeDefined();
+    });
   });
 });
