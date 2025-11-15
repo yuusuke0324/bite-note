@@ -101,6 +101,12 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
 
     try {
       const info = await onCalculateTide(fishingRecord.coordinates, fishingRecord.date);
+
+      // nullチェック: onCalculateTideがundefinedを返した場合のエラーハンドリング
+      if (!info || !info.events) {
+        throw new Error('潮汐情報の取得に失敗しました');
+      }
+
       setTideInfo(info);
 
       // グラフデータの生成（24時間表示）
@@ -345,7 +351,11 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
     const content = contentRef.current;
     const currentHeight = content.scrollHeight;
 
-    if (!isExpanded) {
+    // 状態を先に更新（テスト時の非同期処理改善）
+    const willBeExpanded = !isExpanded;
+    setIsExpanded(willBeExpanded);
+
+    if (willBeExpanded) {
       // 展開時は先にデータを計算
       if (!tideInfo && hasCoordinates) {
         await calculateTideData();
@@ -384,8 +394,6 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
       content.style.height = '0px';
       // overflow は hidden のまま維持
     }
-
-    setIsExpanded(!isExpanded);
   }, [isExpanded, tideInfo, hasCoordinates, calculateTideData]);
 
   // キーボードイベント処理
@@ -428,7 +436,12 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
     <div
       data-testid="tide-integration-section"
       className={containerClasses}
+      aria-label="潮汐情報セクション"
     >
+      {/* スクリーンリーダー用の説明 */}
+      <div className="sr-only" data-testid="tide-integration-description">
+        潮汐情報セクション。釣果記録と潮汐データの関係を表示します。
+      </div>
 
       {/* セクションヘッダー */}
       <div className="mb-4">
@@ -518,7 +531,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
 
           {/* 潮汐データ表示 */}
           {tideInfo && !loading && !error && (
-            <div className="space-y-6">
+            <div className="space-y-6" data-testid="tide-summary-card">
 
               {/* 潮汐グラフ (recharts版) */}
               {tideGraphData && (() => {
