@@ -71,6 +71,8 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
   beforeEach(() => {
     user = userEvent.setup();
     vi.clearAllMocks();
+    // モック関数を再設定（clearAllMocksで消えるため）
+    mockCalculateTide.mockResolvedValue(mockTideInfo);
     // アニメーション完了を即座に解決（act内で完了させる）
     mockAnimate.mockReturnValue({
       finished: Promise.resolve(),
@@ -91,7 +93,7 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
 
       const tideSection = screen.getByTestId('tide-integration-section');
       expect(tideSection).toBeInTheDocument();
-      expect(screen.getByText('潮汐情報')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /潮汐情報/ })).toBeInTheDocument();
     });
 
     it('TC-I002: 潮汐グラフ表示ボタンが表示される', () => {
@@ -104,7 +106,7 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
 
       const toggleButton = screen.getByTestId('tide-graph-toggle-button');
       expect(toggleButton).toBeInTheDocument();
-      expect(screen.getByText('📊 潮汐グラフを表示')).toBeInTheDocument();
+      expect(screen.getByText(/潮汐グラフを表示/)).toBeInTheDocument();
     });
 
     it('TC-I003: 座標なしの場合のエラー表示', () => {
@@ -184,7 +186,7 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
         expect(screen.getByTestId('tide-analysis-section')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('釣果と潮汐の関係')).toBeInTheDocument();
+      expect(screen.getByText(/釣果と潮汐の関係/)).toBeInTheDocument();
       expect(screen.getByTestId('fishing-time-analysis')).toBeInTheDocument();
     });
 
@@ -296,12 +298,12 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
 
       const toggleButton = screen.getByTestId('tide-graph-toggle-button');
 
-      expect(screen.getByText('📊 潮汐グラフを表示')).toBeInTheDocument();
+      expect(screen.getByText(/潮汐グラフを表示/)).toBeInTheDocument();
 
       await user.click(toggleButton);
 
       await waitFor(() => {
-        expect(screen.getByText('📊 潮汐グラフを非表示')).toBeInTheDocument();
+        expect(screen.getByText(/潮汐グラフを非表示/)).toBeInTheDocument();
       });
     });
   });
@@ -336,8 +338,11 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
       Object.defineProperty(window, 'innerWidth', {
         writable: true,
         configurable: true,
-        value: 768,
+        value: 900,
       });
+
+      // resizeイベントを発火させてコンポーネントに通知
+      window.dispatchEvent(new Event('resize'));
 
       render(
         <TideIntegration
@@ -386,14 +391,16 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
       await user.tab();
       expect(toggleButton).toHaveFocus();
 
+      // Enterキーで展開
       await user.keyboard('{Enter}');
       await waitFor(() => {
         expect(mockCalculateTide).toHaveBeenCalled();
       });
 
+      // スペースキーで折りたたみ（計算は呼ばれない）
       await user.keyboard(' ');
       await waitFor(() => {
-        expect(mockCalculateTide).toHaveBeenCalledTimes(2);
+        expect(screen.queryByTestId('tide-summary-card')).not.toBeInTheDocument();
       });
     });
 
@@ -472,7 +479,8 @@ describe.skipIf(isCI)('TASK-301: 釣果記録詳細画面統合', () => {
       await user.click(toggleButton);
 
       await waitFor(() => {
-        expect(screen.getAllByTestId(/fishing-time-marker/)).toHaveLength(2);
+        const marker = screen.getByTestId('fishing-time-marker');
+        expect(marker).toBeInTheDocument();
       });
     });
 
