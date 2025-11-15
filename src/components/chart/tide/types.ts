@@ -9,6 +9,7 @@
 export interface TideChartData {
   time: string; // "HH:mm" 形式
   tide: number; // 潮位 (cm)
+  type?: 'high' | 'low' | 'normal'; // 潮汐タイプ（満潮・干潮・通常） ※現在は天気APIから提供されないためundefined
 }
 
 /**
