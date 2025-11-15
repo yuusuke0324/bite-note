@@ -895,9 +895,9 @@ describe('ExportImportService', () => {
       const result = await service.importRecordsFromExcel(mockArrayBuffer);
 
       expect(result.success).toBe(true);
-      expect(result.data?.importedRecords).toBe(2); // record-2 is skipped
-      expect(result.data?.skippedItems).toBe(0); // 空行なのでスキップカウントされない
-      expect(result.data?.errors).toHaveLength(0);
+      expect(result.data?.importedRecords).toBe(2); // record-2 is silently skipped (empty date)
+      expect(result.data?.skippedItems).toBe(0); // Empty rows don't increment skippedItems counter
+      expect(result.data?.errors).toHaveLength(0); // Empty rows don't generate error messages
     });
 
     it('無効な数値フィールドの行はスキップされる', async () => {
