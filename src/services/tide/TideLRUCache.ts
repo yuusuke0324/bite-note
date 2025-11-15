@@ -171,7 +171,7 @@ export class TideLRUCache {
       }
 
       // 期限チェック
-      if (node.expiresAt < new Date()) {
+      if (node.expiresAt.getTime() < Date.now()) {
         this.removeNode(node);
         this.cache.delete(cacheKey);
         await this.removeFromIndexedDB(cacheKey);
@@ -258,7 +258,7 @@ export class TideLRUCache {
 
       request.onsuccess = () => {
         const result = request.result as TideCacheRecord | undefined;
-        if (result && new Date(result.expiresAt) > new Date()) {
+        if (result && new Date(result.expiresAt).getTime() > Date.now()) {
           try {
             const tideInfo = JSON.parse(result.tideData) as TideInfo;
             resolve(tideInfo);
@@ -417,11 +417,11 @@ export class TideLRUCache {
    * 期限切れエントリの定期クリーンアップ
    */
   async cleanupExpired(): Promise<void> {
-    const now = new Date();
+    const now = Date.now();
     const expiredKeys: string[] = [];
 
     for (const [key, node] of this.cache) {
-      if (node.expiresAt < now) {
+      if (node.expiresAt.getTime() < now) {
         expiredKeys.push(key);
       }
     }

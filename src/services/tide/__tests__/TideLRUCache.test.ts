@@ -309,16 +309,54 @@ describe('TASK-105: LRUキャッシュシステム', () => {
       const key = { latitude: 35.67, longitude: 139.65, date: '2024-01-01' };
       const tideInfo = createTestTideInfo(1);
 
-      // 期限を過去に設定（テスト用の短期間）
-      const expiredCache = new TideLRUCache(100, 1); // 1ms で期限切れ
+      // 期限を100msに設定（処理時間を考慮）
+      const expiredCache = new TideLRUCache(100, 100);
       await expiredCache.set(key, tideInfo);
 
-      // 少し待つ
-      await new Promise(resolve => setTimeout(resolve, 5));
+      // 期限内は取得できる
+      const resultBeforeExpiry = await expiredCache.get(key);
+      expect(resultBeforeExpiry).not.toBeNull();
+      expect(resultBeforeExpiry?.currentLevel).toBe(101);
+
+      // 期限切れまで確実に待機（余裕を持って150ms）
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // 期限切れチェック
-      const result = await expiredCache.get(key);
-      expect(result).toBeNull(); // 期限切れで取得できない
+      const resultAfterExpiry = await expiredCache.get(key);
+      expect(resultAfterExpiry).toBeNull(); // 期限切れで取得できない
+    });
+
+    it('TC-L019: cleanupExpired() で期限切れエントリが一括削除される', async () => {
+      const smallCache = new TideLRUCache(10, 100); // 100ms TTL
+
+      // 複数のエントリを追加
+      const keys = [];
+      for (let i = 1; i <= 5; i++) {
+        const key = { latitude: 35.67 + i * 0.01, longitude: 139.65, date: '2024-01-01' };
+        keys.push(key);
+        await smallCache.set(key, createTestTideInfo(i));
+      }
+
+      expect(smallCache.size()).toBe(5);
+
+      // 期限内は全て存在する
+      for (const key of keys) {
+        const result = await smallCache.get(key);
+        expect(result).not.toBeNull();
+      }
+
+      // 期限切れまで待機（余裕を持って150ms）
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      // クリーンアップ実行
+      await smallCache.cleanupExpired();
+
+      // すべて削除されている
+      expect(smallCache.size()).toBe(0);
+
+      const stats = smallCache.getStats();
+      expect(stats.totalEntries).toBe(0);
+      expect(stats.memoryUsage).toBe(0);
     });
   });
 
