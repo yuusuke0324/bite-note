@@ -287,24 +287,15 @@ function getContrastRatio(foreground: string, background: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/**
- * WCAG AA準拠を検証
- * @param ratio コントラスト比
- * @param level 'AA' | 'AAA'
- * @param size 'normal' | 'large'
- * @returns true if compliant
- */
-function isWCAGCompliant(
-  ratio: number,
-  level: 'AA' | 'AAA' = 'AA',
-  size: 'normal' | 'large' = 'normal'
-): boolean {
-  if (level === 'AAA') {
-    return size === 'large' ? ratio >= 4.5 : ratio >= 7;
-  }
-  // AA level
-  return size === 'large' ? ratio >= 3 : ratio >= 4.5;
-}
+// ============================================================================
+// Unused Utilities (Kept for Future Reference)
+// ============================================================================
+
+// WCAG Compliance Utility (removed to fix TS6133 error)
+// The isWCAGCompliant function was removed as it's not currently used.
+// If needed in the future, it can validate contrast ratios against WCAG standards:
+// - AA level: normal text >= 4.5:1, large text >= 3:1
+// - AAA level: normal text >= 7:1, large text >= 4.5:1
 
 // High Contrast Theme System (not currently used but kept for future reference)
 // interface HighContrastTheme {
@@ -808,7 +799,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
   const activeComponents = chartComponents || components;
 
   // 注入されたコンポーネントを取得（activeComponentsがundefinedでもエラーにならないように）
-  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = activeComponents || {};
+  // Type assertion is safe here because we check for activeComponents existence before rendering
+  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = (activeComponents || {}) as ChartComponents;
 
   // 釣果マーカーのデバッグログ
   useEffect(() => {
@@ -899,7 +891,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
   const currentTheme = useMemo(() => {
     // Match theme string to corresponding theme object
-    if (theme === 'high-contrast' || theme === 'accessibility-high-contrast') {
+    if (theme === 'accessibility-high-contrast') {
       return highContrastThemes['high-contrast'];
     } else if (theme === 'dark' || theme === 'dark-high-contrast') {
       return highContrastThemes.dark;
