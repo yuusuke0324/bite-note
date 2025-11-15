@@ -21,6 +21,8 @@ describe('FishingRecordService', () => {
     // IndexedDBをクリア（fake-indexeddbを使用）
     await db.fishing_records.clear();
     await db.app_metadata.clear();
+    // タイマーを実際のものにリセット（他のテストのfake timersの影響を回避）
+    vi.useRealTimers();
   });
 
   // ============================================================================
