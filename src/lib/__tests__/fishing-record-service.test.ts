@@ -266,8 +266,8 @@ describe('FishingRecordService', () => {
       const createResult = await service.createRecord(createForm);
       const recordId = createResult.data!.id;
 
-      // 10ms待機してupdatedAtが異なることを保証（CI環境考慮）
-      await new Promise(resolve => setTimeout(resolve, 10));
+      // 100ms待機してupdatedAtが異なることを保証（CI環境のクロック精度考慮）
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // 更新
       const updateForm: UpdateFishingRecordForm = {
