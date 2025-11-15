@@ -256,6 +256,12 @@ describe('FishingRecordService', () => {
 
   describe('updateRecord', () => {
     it('正常系: 記録を更新できる', async () => {
+      // Fake timersを使用して時刻を制御（CI環境での不安定性を回避）
+      // Dateのみをモック、他の非同期処理は実際のタイマーを使用
+      vi.useFakeTimers({ toFake: ['Date'] });
+      const createTime = new Date('2024-01-15T10:00:00Z');
+      vi.setSystemTime(createTime);
+
       // テストデータ作成
       const createForm: CreateFishingRecordForm = {
         date: new Date('2024-01-15'),
@@ -266,8 +272,9 @@ describe('FishingRecordService', () => {
       const createResult = await service.createRecord(createForm);
       const recordId = createResult.data!.id;
 
-      // 100ms待機してupdatedAtが異なることを保証（CI環境のクロック精度考慮）
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // 時刻を1秒進める（確実に異なる時刻にする）
+      const updateTime = new Date('2024-01-15T10:00:01Z');
+      vi.setSystemTime(updateTime);
 
       // 更新
       const updateForm: UpdateFishingRecordForm = {
@@ -284,6 +291,10 @@ describe('FishingRecordService', () => {
       expect(result.data?.notes).toBe('追記');
       expect(result.data?.location).toBe('東京湾'); // 更新されていないフィールドは維持
       expect(result.data?.updatedAt.getTime()).toBeGreaterThan(createResult.data!.createdAt.getTime());
+      expect(result.data?.createdAt.getTime()).toBe(createTime.getTime());
+      expect(result.data?.updatedAt.getTime()).toBe(updateTime.getTime());
+
+      vi.useRealTimers(); // Fake timersを元に戻す
     });
 
     it('異常系: 存在しないIDの場合NOT_FOUNDエラーを返す', async () => {
