@@ -1,0 +1,300 @@
+
+ RUN  v1.6.1 /Users/nakagawayuusuke/dev/personal/fish/bite-note
+      Coverage enabled with v8
+
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > isImageFile > image/jpeg: サポート形式として受け入れられる
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > isImageFile > image/jpg: サポート形式として受け入れられる
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > isImageFile > image/png: サポート形式として受け入れられる
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > isImageFile > image/webp: サポート形式として受け入れられる
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > isImageFile > image/gif: サポート外形式として拒否される
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > isImageFile > application/pdf: 非画像形式として拒否される
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > isImageFile > 空文字列のMIMEタイプ: 拒否される
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 有効な座標（東京: 35.6812, 139.7671）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 赤道・本初子午線（0, 0）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 負の座標（南緯・西経: -33.8688, -151.2093）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 境界値: 緯度90（北極）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 境界値: 緯度-90（南極）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 境界値: 緯度90.000001（範囲外）→ false
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 境界値: 緯度-90.000001（範囲外）→ false
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 境界値: 経度180（日付変更線）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 境界値: 経度-180（日付変更線）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > NaN座標: { latitude: NaN, longitude: 0 } → false
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > Infinity: { latitude: Infinity, longitude: 0 } → false
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > validateCoordinates > 範囲外: { latitude: 91, longitude: 200 } → false
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 標準形式: "35° 41' 22.2\"" → 35.6895
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > スペースあり: "35 ° 41 ' 22.2 \"" → parseFloatで処理（35）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 記号なし: "35 41 22.2" → parseFloatで処理（NaN）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 秒=0: "35° 41' 0\"" → 35.6833...
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 秒=59.99: "35° 41' 59.99\"" → 35.6999...
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 標準形式: "35° 41.5'" → 35.6916...
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 小数点3桁: "35° 41.370'" → 35.6895
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 分=0: "35° 0'" → 35.0
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 小数点形式: "35.6812" → 35.6812
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 負の値: "-33.8688" → -33.8688
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 整数: "35" → 35.0
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 数値型: 35.6812 → 35.6812
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 不正な文字列: "abc" → null
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > 空文字列: "" → null
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > parseCoordinate > null入力: null → null
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > 標準的なGPS情報（description形式）: 座標を正しく抽出
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > value形式のGPS情報: 座標を正しく抽出
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > 南緯（latRef="S"）: 負の緯度を返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > 西経（lngRef="W"）: 負の経度を返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > accuracy情報あり: accuracyプロパティが設定される
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > accuracyなし: accuracyはundefinedのまま
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > latRef="South", lngRef="West": 両方負の座標
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > lat未設定: nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > lng未設定: nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > parseCoordinate失敗（lat）: nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > parseCoordinate失敗（lng）: nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractGPSCoordinates > エラー発生: nullを返す（console.error呼び出し確認）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > DateTimeOriginal存在: 最優先で返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > DateTimeのみ存在: 返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > DateTimeDigitizedのみ: 返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > CreateDateのみ: 返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > 複数存在: 優先順位順（DateTimeOriginal優先）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > value形式: パース成功
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > 正しい日時形式 "2024:01:18 10:30:45": Date返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > 月末日付 "2024:02:29 23:59:59": 閏年対応
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > すべてのフィールド未設定: nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > 不正な形式 "2024-01-18 10:30:45": nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > 不正な日付 "2024:aa:bb 10:30:45": nullを返す（isNaNチェック）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractDateTime > エラー発生: nullを返す（console.error呼び出し確認）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > すべてのフィールド設定: 完全なCameraInfo
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > Make/Modelのみ: 最小限のCameraInfo
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > FNumber優先: aperture設定（ApertureValueより優先）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > ApertureValueのみ: aperture設定
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > ExposureTime優先: shutterSpeed設定（ShutterSpeedValueより優先）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > ShutterSpeedValueのみ: shutterSpeed設定
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > ISOSpeedRatings/ISO両方: iso設定（ISOSpeedRatings優先）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > すべて未設定: nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > 空のオブジェクト: nullを返す
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractCameraInfo > エラー発生: nullを返す（console.error呼び出し確認）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > 完全なEXIFデータ: success + すべてのメタデータ返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > GPS座標のみ: success + coordinatesのみ設定
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > 撮影日時のみ: success + datetimeのみ設定
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > カメラ情報のみ: success + cameraのみ設定
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > 不正なファイル形式: INVALID_FILE error
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > EXIFなし（ExifReader.load返すnull）: NO_EXIF error
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > GPS座標が不正（validateCoordinates false）: GPS座標は含まれない
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > ExifReader.loadがエラー: PROCESSING_ERROR
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > extractGPSCoordinatesが内部エラー: エラーログ、coordinatesなし
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > extractDateTimeが内部エラー: エラーログ、datetimeなし
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > GPS座標のみvalid: coordinatesのみ設定
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > GPS座標invalid: coordinatesなし
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > すべてnull（EXIFあるがデータなし）: success + 空のmetadata
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > description/value両形式混在: 正常動作
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > extractMetadata > ExifReader.loadの呼び出し確認
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > キャッシュヒット（有効期限内）: キャッシュから返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > キャッシュミス: API呼び出し、キャッシュ保存
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > API成功（県・市レベル住所）: 正しい住所返却
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > display_nameのみ: フォールバック処理
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > キャッシュ期限切れ: API再呼び出し
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > cacheKey丸め（小数点4桁）: 正しいキャッシュヒット
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > 複数のaddressフィールド組み合わせ: 正しい優先順位
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > API 404エラー: NO_ADDRESS error（APIは成功するがdisplay_nameなし）
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > API 500エラー: NOMINATIM_FAILED error
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > display_name未設定: NO_ADDRESS error
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > fetchエラー: NOMINATIM_FAILED error
+ ✓ src/__tests__/photo-metadata-service.test.ts > PhotoMetadataService > getLocationFromCoordinates / getNominatimAddress > IndexedDB エラー: NOMINATIM_FAILED error（try-catchでキャッチ）
+
+ Test Files  1 passed (1)
+      Tests  95 passed (95)
+   Start at  23:48:11
+   Duration  808ms (transform 118ms, setup 73ms, collect 112ms, tests 26ms, environment 267ms, prepare 53ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |    1.31 |    42.75 |    7.31 |    1.31 |                   
+ src               |       0 |        0 |       0 |       0 |                   
+  App.tsx          |       0 |        0 |       0 |       0 | 1-566             
+  ModernApp.tsx    |       0 |        0 |       0 |       0 | 1-1929            
+  main.tsx         |       0 |        0 |       0 |       0 | 1-21              
+ src/components    |       0 |        0 |       0 |       0 |                   
+  ...rchFilter.tsx |       0 |        0 |       0 |       0 | 1-488             
+  ...portModal.tsx |       0 |        0 |       0 |       0 | 1-391             
+  ...portModal.tsx |       0 |        0 |       0 |       0 | 1-411             
+  ...firmModal.tsx |       0 |        0 |       0 |       0 | 1-260             
+  EmptyState.tsx   |       0 |        0 |       0 |       0 | 1-174             
+  ...rBoundary.tsx |       0 |        0 |       0 |       0 | 1-147             
+  ...backToast.tsx |       0 |        0 |       0 |       0 | 1-222             
+  ...ocomplete.tsx |       0 |        0 |       0 |       0 | 1-262             
+  ...ecordCard.tsx |       0 |        0 |       0 |       0 | 1-360             
+  ...ordDetail.tsx |       0 |        0 |       0 |       0 | 1-759             
+  ...EditModal.tsx |       0 |        0 |       0 |       0 | 1-213             
+  ...ecordForm.tsx |       0 |        0 |       0 |       0 | 1-1377            
+  ...ecordList.tsx |       0 |        0 |       0 |       0 | 1-664             
+  ...tionInput.tsx |       0 |        0 |       0 |       0 | 1-378             
+  LazyImage.tsx    |       0 |        0 |       0 |       0 | 1-222             
+  ...onDisplay.tsx |       0 |        0 |       0 |       0 | 1-123             
+  ...allBanner.tsx |       0 |        0 |       0 |       0 | 1-238             
+  ...allPrompt.tsx |       0 |        0 |       0 |       0 | 1-562             
+  ...ification.tsx |       0 |        0 |       0 |       0 | 1-101             
+  ...ecordCard.tsx |       0 |        0 |       0 |       0 | 1-392             
+  PhotoUpload.tsx  |       0 |        0 |       0 |       0 | 1-353             
+  ...bleAction.tsx |       0 |        0 |       0 |       0 | 1-176             
+  ...chManager.tsx |       0 |        0 |       0 |       0 | 1-478             
+  ...ingsModal.tsx |       0 |        0 |       0 |       0 | 1-816             
+  ...PhotoList.tsx |       0 |        0 |       0 |       0 | 1-186             
+  ...Dashboard.tsx |       0 |        0 |       0 |       0 | 1-756             
+  ...ventsList.tsx |       0 |        0 |       0 |       0 | 1-104             
+  TideGraph.tsx    |       0 |        0 |       0 |       0 | 1-694             
+  ...tegration.tsx |       0 |        0 |       0 |       0 | 1-668             
+  ...mmaryCard.tsx |       0 |        0 |       0 |       0 | 1-129             
+  ...mmaryGrid.tsx |       0 |        0 |       0 |       0 | 1-144             
+  TideTooltip.tsx  |       0 |        0 |       0 |       0 | 1-464             
+  UserGuidance.tsx |       0 |        0 |       0 |       0 | 1-348             
+  ...ecordList.tsx |       0 |        0 |       0 |       0 | 1-135             
+ ...mponents/chart |       0 |        0 |       0 |       0 |                   
+  TrendChart.tsx   |       0 |        0 |       0 |       0 | 1-218             
+ ...s/chart/config |       0 |        0 |       0 |       0 |                   
+  ...figManager.ts |       0 |        0 |       0 |       0 | 1-541             
+  index.ts         |       0 |        0 |       0 |       0 | 1-22              
+ ...hart/container |       0 |        0 |       0 |       0 |                   
+  ...Container.tsx |       0 |        0 |       0 |       0 | 1-222             
+  index.ts         |       0 |        0 |       0 |       0 | 1-12              
+ ...nts/chart/tide |       0 |        0 |       0 |       0 |                   
+  TideChart.tsx    |       0 |        0 |       0 |       0 | 1-1738            
+  index.ts         |       0 |        0 |       0 |       0 | 1-8               
+  types.ts         |       0 |        0 |       0 |       0 | 1-87              
+ ...ponents/common |       0 |        0 |       0 |       0 |                   
+  ...Indicator.tsx |       0 |        0 |       0 |       0 | 1-109             
+ ...ponents/errors |       0 |        0 |       0 |       0 |                   
+  ErrorDisplay.tsx |       0 |        0 |       0 |       0 | 1-104             
+  ErrorModal.tsx   |       0 |        0 |       0 |       0 | 1-290             
+  ErrorToast.tsx   |       0 |        0 |       0 |       0 | 1-219             
+  index.ts         |       0 |        0 |       0 |       0 | 1-11              
+ ...omponents/home |       0 |        0 |       0 |       0 |                   
+  ...ecordCard.tsx |       0 |        0 |       0 |       0 | 1-261             
+  ...ngSection.tsx |       0 |        0 |       0 |       0 | 1-202             
+  ...dsSection.tsx |       0 |        0 |       0 |       0 | 1-154             
+  ...rtSection.tsx |       0 |        0 |       0 |       0 | 1-383             
+  ...csSection.tsx |       0 |        0 |       0 |       0 | 1-487             
+ ...mponents/icons |       0 |        0 |       0 |       0 |                   
+  Icons.tsx        |       0 |        0 |       0 |       0 | 1-93              
+ ...ponents/layout |       0 |        0 |       0 |       0 |                   
+  AppLayout.tsx    |       0 |        0 |       0 |       0 | 1-124             
+  ModernHeader.tsx |       0 |        0 |       0 |       0 | 1-140             
+  ...nsiveGrid.tsx |       0 |        0 |       0 |       0 | 1-102             
+  ...AppLayout.tsx |       0 |        0 |       0 |       0 | 1-52              
+ ...components/map |       0 |        0 |       0 |       0 |                   
+  FishingMap.tsx   |       0 |        0 |       0 |       0 | 1-879             
+ ...nts/navigation |       0 |        0 |       0 |       0 |                   
+  ...avigation.tsx |       0 |        0 |       0 |       0 | 1-124             
+ src/components/ui |       0 |        0 |       0 |       0 |                   
+  Button.tsx       |       0 |        0 |       0 |       0 | 1-199             
+  ...ionButton.tsx |       0 |        0 |       0 |       0 | 1-189             
+  ModernCard.tsx   |       0 |        0 |       0 |       0 | 1-163             
+  Skeleton.tsx     |       0 |        0 |       0 |       0 | 1-240             
+ ...nts/validation |       0 |        0 |       0 |       0 |                   
+  ...aValidator.ts |       0 |        0 |       0 |       0 | 1-353             
+  index.ts         |       0 |        0 |       0 |       0 | 1-18              
+ ...error-handling |       0 |        0 |       0 |       0 |                   
+  ...rorHandler.ts |       0 |        0 |       0 |       0 | 1-302             
+  index.ts         |       0 |        0 |       0 |       0 | 1-13              
+ ...lidation/types |       0 |        0 |       0 |       0 |                   
+  ...tionResult.ts |       0 |        0 |       0 |       0 | 1-84              
+  index.ts         |       0 |        0 |       0 |       0 | 1-15              
+ ...lidation/utils |       0 |        0 |       0 |       0 |                   
+  ...ategorizer.ts |       0 |        0 |       0 |       0 | 1-131             
+  ...gGenerator.ts |       0 |        0 |       0 |       0 | 1-133             
+ src/data          |       0 |        0 |       0 |       0 |                   
+  ...-tide-data.ts |       0 |        0 |       0 |       0 | 1-676             
+ src/hooks         |       0 |        0 |       0 |       0 |                   
+  ...ncedSearch.ts |       0 |        0 |       0 |       0 | 1-358             
+  ...Validation.ts |       0 |        0 |       0 |       0 | 1-266             
+  ...lineStatus.ts |       0 |        0 |       0 |       0 | 1-39              
+  usePWA.ts        |       0 |        0 |       0 |       0 | 1-298             
+  ...zeObserver.ts |       0 |        0 |       0 |       0 | 1-84              
+ src/lib           |    7.63 |    77.63 |      30 |    7.63 |                   
+  ...cs-service.ts |       0 |        0 |       0 |       0 | 1-443             
+  ...on-service.ts |       0 |        0 |       0 |       0 | 1-425             
+  ...on-service.ts |       0 |        0 |       0 |       0 | 1-530             
+  database.ts      |   57.51 |      100 |   22.22 |   57.51 | ...49-251,255-262 
+  error-handler.ts |       0 |        0 |       0 |       0 | 1-133             
+  ...rt-service.ts |       0 |        0 |       0 |       0 | 1-837             
+  ...ck-service.ts |       0 |        0 |       0 |       0 | 1-160             
+  ...es-service.ts |       0 |        0 |       0 |       0 | 1-34              
+  ...rd-service.ts |       0 |        0 |       0 |       0 | 1-480             
+  ...on-service.ts |       0 |        0 |       0 |       0 | 1-321             
+  ...-optimizer.ts |       0 |        0 |       0 |       0 | 1-370             
+  ...processing.ts |       0 |        0 |       0 |       0 | 1-208             
+  ...ue-service.ts |       0 |        0 |       0 |       0 | 1-330             
+  ...ce-monitor.ts |       0 |        0 |       0 |       0 | 1-282             
+  ...ta-service.ts |   96.85 |    89.92 |     100 |   96.85 | ...80-186,438-440 
+  photo-service.ts |       0 |        0 |       0 |       0 | 1-359             
+  retry-service.ts |       0 |        0 |       0 |       0 | 1-121             
+  ...gs-service.ts |       0 |        0 |       0 |       0 | 1-334             
+  ...cs-service.ts |       0 |        0 |       0 |       0 | 1-418             
+  tide-helpers.ts  |       0 |        0 |       0 |       0 | 1-146             
+  ...ce-service.ts |       0 |        0 |       0 |       0 | 1-248             
+  validation.ts    |       0 |        0 |       0 |       0 | 1-218             
+  ...er-service.ts |       0 |        0 |       0 |       0 | 1-545             
+ src/lib/errors    |       0 |        0 |       0 |       0 |                   
+  ErrorLogger.ts   |       0 |        0 |       0 |       0 | 1-322             
+  ErrorManager.ts  |       0 |        0 |       0 |       0 | 1-269             
+  ErrorTypes.ts    |       0 |        0 |       0 |       0 | 1-381             
+  index.ts         |       0 |        0 |       0 |       0 | 1-14              
+ ...s/fish-species |       0 |        0 |       0 |       0 |                   
+  ...ataService.ts |       0 |        0 |       0 |       0 | 1-150             
+  ...archEngine.ts |       0 |        0 |       0 |       0 | 1-396             
+  ...sValidator.ts |       0 |        0 |       0 |       0 | 1-221             
+  index.ts         |       0 |        0 |       0 |       0 | 1-13              
+ src/services/tide |       0 |        0 |       0 |       0 |                   
+  ...Calculator.ts |       0 |        0 |       0 |       0 | 1-490             
+  ...deLRUCache.ts |       0 |        0 |       0 |       0 | 1-750             
+  ...ysisEngine.ts |       0 |        0 |       0 |       0 | 1-458             
+  ...tionEngine.ts |       0 |        0 |       0 |       0 | 1-518             
+  ...ataService.ts |       0 |        0 |       0 |       0 | 1-468             
+  ...yGenerator.ts |       0 |        0 |       0 |       0 | 1-228             
+  ...ionService.ts |       0 |        0 |       0 |       0 | 1-287             
+  ...tionEngine.ts |       0 |        0 |       0 |       0 | 1-210             
+  TideLRUCache.ts  |       0 |        0 |       0 |       0 | 1-444             
+ ...tide/constants |       0 |        0 |       0 |       0 |                   
+  ...-constants.ts |       0 |        0 |       0 |       0 | 1-207             
+  ...nstituents.ts |       0 |        0 |       0 |       0 | 1-216             
+ ...ces/tide/utils |       0 |        0 |       0 |       0 |                   
+  ...tial-utils.ts |       0 |        0 |       0 |       0 | 1-77              
+  geo-utils.ts     |       0 |        0 |       0 |       0 | 1-323             
+ src/stores        |       0 |        0 |       0 |       0 |                   
+  app-store.ts     |       0 |        0 |       0 |       0 | 1-242             
+  form-store.ts    |       0 |        0 |       0 |       0 | 1-321             
+ src/theme         |       0 |        0 |       0 |       0 |                   
+  colors.ts        |       0 |        0 |       0 |       0 | 1-196             
+  typography.ts    |       0 |        0 |       0 |       0 | 1-274             
+ src/utils         |       0 |        0 |       0 |       0 |                   
+  responsive.ts    |       0 |        0 |       0 |       0 | 1-157             
+ ...utils/analysis |       0 |        0 |       0 |       0 |                   
+  ...rnAnalyzer.ts |       0 |        0 |       0 |       0 | 1-245             
+  TideDebugger.ts  |       0 |        0 |       0 |       0 | 1-357             
+  ...ctMeasurer.ts |       0 |        0 |       0 |       0 | 1-277             
+ ...analysis/cache |       0 |        0 |       0 |       0 |                   
+  TTLLRUCache.ts   |       0 |        0 |       0 |       0 | 1-235             
+ ...alysis/helpers |       0 |        0 |       0 |       0 |                   
+  ...Calculator.ts |       0 |        0 |       0 |       0 | 1-275             
+  SafeExecutor.ts  |       0 |        0 |       0 |       0 | 1-315             
+ ...ils/responsive |       0 |        0 |       0 |       0 |                   
+  ...Calculator.ts |       0 |        0 |       0 |       0 | 1-135             
+  ...Calculator.ts |       0 |        0 |       0 |       0 | 1-181             
+  ...rtDetector.ts |       0 |        0 |       0 |       0 | 1-117             
+  index.ts         |       0 |        0 |       0 |       0 | 1-32              
+  types.ts         |       0 |        0 |       0 |       0 | 1-193             
+ src/utils/scale   |       0 |        0 |       0 |       0 |                   
+  ...Calculator.ts |       0 |        0 |       0 |       0 | 1-285             
+  ScaleRenderer.ts |       0 |        0 |       0 |       0 | 1-180             
+ ...ils/validation |       0 |        0 |       0 |       0 |                   
+  ...ransformer.ts |       0 |        0 |       0 |       0 | 1-53              
+  ...aValidator.ts |       0 |        0 |       0 |       0 | 1-118             
+  errors.ts        |       0 |        0 |       0 |       0 | 1-84              
+  index.ts         |       0 |        0 |       0 |       0 | 1-29              
+  types.ts         |       0 |        0 |       0 |       0 | 1-132             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 1.31% ( 584/44382 )
+Branches     : 42.75% ( 118/276 )
+Functions    : 7.31% ( 12/164 )
+Lines        : 1.31% ( 584/44382 )
+================================================================================
