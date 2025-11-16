@@ -302,7 +302,7 @@ if (typeof window !== 'undefined') {
         parentRule: null,
         cssText: '',
         cssFloat: '',
-      } as CSSStyleDeclaration;
+      } as unknown as CSSStyleDeclaration;
     }
 
     // pseudoElement が指定されていない場合は元の実装を呼び出す
