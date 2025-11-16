@@ -234,6 +234,17 @@ if (typeof Element !== 'undefined') {
 }
 
 /**
+ * Element.scrollIntoView Polyfill
+ * JSDOM doesn't implement scrollIntoView API
+ * Required for FishSpeciesAutocomplete keyboard navigation (Issue #95)
+ */
+if (typeof Element !== 'undefined') {
+  Element.prototype.scrollIntoView = vi?.fn(() => {}) || function() {
+    // No-op implementation for JSDOM environment
+  };
+}
+
+/**
  * HTMLCanvasElement.getContext Polyfill
  * JSDOM doesn't implement Canvas API
  * This enhanced stub provides a more complete Canvas 2D context mock
