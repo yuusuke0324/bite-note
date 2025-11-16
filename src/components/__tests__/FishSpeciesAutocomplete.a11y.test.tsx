@@ -21,7 +21,7 @@ import { FishSpeciesAutocomplete } from '../FishSpeciesAutocomplete';
 // jest-axeのカスタムマッチャーを追加
 expect.extend(toHaveNoViolations);
 
-describe.skip('FishSpeciesAutocomplete アクセシビリティテスト', () => {
+describe('FishSpeciesAutocomplete アクセシビリティテスト', () => {
   const mockOnChange = vi.fn();
 
   beforeEach(() => {
