@@ -245,6 +245,72 @@ if (typeof Element !== 'undefined') {
 }
 
 /**
+ * window.getComputedStyle Polyfill (pseudoElement support)
+ * JSDOM doesn't implement getComputedStyle(element, pseudoElement)
+ * Required for axe-core color-contrast checks in accessibility tests (Issue #99)
+ *
+ * 【背景】
+ * FishSpeciesAutocomplete.a11y.test.tsx の高コントラストモードテストで
+ * axe-core が color-contrast 検証時に getComputedStyle(element, pseudoElement) を呼び出すが、
+ * jsdom では pseudoElement パラメータが未実装のためエラーが発生
+ *
+ * 【実装方針】
+ * - pseudoElement が指定された場合は、高コントラストのデフォルトスタイルを返す
+ * - それ以外は元の getComputedStyle を呼び出す
+ * - axe-core の color-contrast ルールが正常に動作するために必要な最小限のプロパティを提供
+ *
+ * @see https://github.com/jsdom/jsdom/issues/1895
+ * @see FishSpeciesAutocomplete.a11y.test.tsx L452-468
+ */
+if (typeof window !== 'undefined') {
+  const originalGetComputedStyle = window.getComputedStyle;
+
+  window.getComputedStyle = function(element: Element, pseudoElement?: string | null): CSSStyleDeclaration {
+    // pseudoElement が指定された場合は簡易実装を返す
+    if (pseudoElement) {
+      // axe-core の color-contrast チェックに必要な最小限のプロパティ
+      return {
+        color: 'rgb(255, 255, 255)',           // 白文字（高コントラスト）
+        backgroundColor: 'rgb(0, 0, 0)',       // 黒背景（高コントラスト）
+        fontSize: '16px',
+        fontFamily: 'sans-serif',
+        fontWeight: '400',
+        lineHeight: '1.5',
+        opacity: '1',
+        visibility: 'visible',
+        display: 'block',
+        // その他のプロパティはデフォルト値
+        getPropertyValue: (prop: string) => {
+          const props: Record<string, string> = {
+            'color': 'rgb(255, 255, 255)',
+            'background-color': 'rgb(0, 0, 0)',
+            'font-size': '16px',
+            'font-family': 'sans-serif',
+            'font-weight': '400',
+            'line-height': '1.5',
+            'opacity': '1',
+            'visibility': 'visible',
+            'display': 'block',
+          };
+          return props[prop] || '';
+        },
+        getPropertyPriority: () => '',
+        setProperty: () => {},
+        removeProperty: () => '',
+        item: () => '',
+        length: 0,
+        parentRule: null,
+        cssText: '',
+        cssFloat: '',
+      } as unknown as CSSStyleDeclaration;
+    }
+
+    // pseudoElement が指定されていない場合は元の実装を呼び出す
+    return originalGetComputedStyle.call(this, element, pseudoElement);
+  };
+}
+
+/**
  * HTMLCanvasElement.getContext Polyfill
  * JSDOM doesn't implement Canvas API
  * This enhanced stub provides a more complete Canvas 2D context mock
