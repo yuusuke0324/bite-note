@@ -34,3 +34,7 @@ test-output.txt
 *.sln
 *.sw?
 coverage/
+
+# Test coverage output files
+*-coverage.txt
+*-coverage-result.txt

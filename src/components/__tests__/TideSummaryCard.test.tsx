@@ -308,8 +308,8 @@ describe('TASK-202 Step 4: TideSummaryCard統合テスト', () => {
 });
 
 // TODO: Issue #26 で TASK-202要件（4項目グリッド + イベント一覧）を実装予定
-// 現在の実装は「次イベントのみ表示」のシンプル版のため、テストを一時スキップ
-describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテスト）', () => {
+// 現在の実装は「次イベントのみ表示」のシンプル版
+describe('TASK-202: TideSummaryCardコンポーネント（残りのテスト）', () => {
   beforeEach(async () => {
     // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #45）
     if (process.env.CI) {
@@ -367,7 +367,7 @@ describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテス�
       expect(screen.getByText('潮汐強度')).toBeInTheDocument();
     });
 
-    it('TC-S005: 2×2グリッドレイアウトが適用される', () => {
+    it.skip('TC-S005: 2×2グリッドレイアウトが適用される', () => {
       render(<TideSummaryCard tideInfo={mockTideInfo} />);
 
       const gridContainer = screen.getByTestId('summary-grid');
@@ -424,7 +424,7 @@ describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテス�
       expect(screen.getByText('今日の潮汐イベントがありません')).toBeInTheDocument();
     });
 
-    it('TC-S011: イベント時刻の現在時刻との比較表示', () => {
+    it.skip('TC-S011: イベント時刻の現在時刻との比較表示', () => {
       // 現在時刻をモック（12:00）
       vi.spyOn(Date, 'now').mockImplementation(() => new Date('2024-01-15T12:00:00').getTime());
 
@@ -441,7 +441,7 @@ describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテス�
   });
 
   describe('アイコン・カラーシステム', () => {
-    it('TC-S012: 潮汐タイプ別のカラー表示', () => {
+    it.skip('TC-S012: 潮汐タイプ別のカラー表示', () => {
       render(<TideSummaryCard tideInfo={mockTideInfo} />);
 
       const tideTypeIcon = screen.getByTestId('tide-type-icon');
@@ -455,7 +455,7 @@ describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテス�
       expect(stateIcon).toBeInTheDocument();
     });
 
-    it('TC-S014: 強度レベルに応じた進捗バー表示', () => {
+    it.skip('TC-S014: 強度レベルに応じた進捗バー表示', () => {
       render(<TideSummaryCard tideInfo={mockTideInfo} />);
 
       const strengthProgress = screen.getByTestId('strength-progress');
@@ -464,7 +464,7 @@ describe.skip('TASK-202: TideSummaryCardコンポーネント（残りのテス�
       expect(progressBar).toHaveStyle('width: 85%');
     });
 
-    it('TC-S015: 小潮の場合のカラー表示', () => {
+    it.skip('TC-S015: 小潮の場合のカラー表示', () => {
       const neapTideInfo = { ...mockTideInfo, tideType: 'neap' as const };
       render(<TideSummaryCard tideInfo={neapTideInfo} />);
 

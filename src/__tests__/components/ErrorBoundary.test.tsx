@@ -13,7 +13,7 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>正常なコンポーネント</div>;
 };
 
-describe.skip('ErrorBoundary', () => {
+describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境でのprocess.env変更問題）
   // コンソールエラーをモックして、テスト時のノイズを防ぐ
   const originalError = console.error;
 
@@ -57,23 +57,28 @@ describe.skip('ErrorBoundary', () => {
     expect(reloadButton).toBeInTheDocument();
   });
 
-  it('開発環境でエラー詳細が表示される', () => {
-    // NODE_ENVをdevelopmentに設定
+  describe('開発環境でのエラー詳細表示', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
 
-    render(
-      <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
-    );
+    beforeEach(() => {
+      process.env.NODE_ENV = 'development';
+    });
 
-    // 開発環境でのエラー詳細表示を確認
-    expect(screen.getByText('エラー詳細（開発用）')).toBeInTheDocument();
-    expect(screen.getByText(/Test error/)).toBeInTheDocument();
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv;
+    });
 
-    // 元の環境変数を復元
-    process.env.NODE_ENV = originalEnv;
+    it('開発環境でエラー詳細が表示される', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowError shouldThrow={true} />
+        </ErrorBoundary>
+      );
+
+      // 開発環境でのエラー詳細表示を確認
+      expect(screen.getByText('エラー詳細（開発用）')).toBeInTheDocument();
+      expect(screen.getByText(/Test error/)).toBeInTheDocument();
+    });
   });
 
   it('複数の子コンポーネントがある場合も正常に動作する', () => {
