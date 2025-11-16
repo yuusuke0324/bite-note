@@ -48,10 +48,9 @@ export class TideDataValidator {
       ...options
     };
 
-    // タイムアウト処理
+    // タイムアウト処理（バグ修正: 実際の経過時間を測定）
     if (validationOptions.timeoutMs) {
-      const timeoutStart = Date.now();
-      if (Date.now() - timeoutStart > validationOptions.timeoutMs) {
+      if (performance.now() - startTime > validationOptions.timeoutMs) {
         return this.createTimeoutResult(rawData, performance.now() - startTime);
       }
     }
@@ -128,7 +127,10 @@ export class TideDataValidator {
 
       // データ変換実行（エラーデータを除外）
       let transformedData: TideChartData[] = [];
-      const validData = this.filterValidData(dataToProcess, categorizedErrors);
+      // パフォーマンス最適化: エラー0件の場合、フィルタリングスキップ
+      const validData = categorizedErrors.length === 0
+        ? dataToProcess
+        : this.filterValidData(dataToProcess, categorizedErrors);
 
       if (validData.length > 0) {
         try {
@@ -142,8 +144,8 @@ export class TideDataValidator {
         }
       }
 
-      // 警告生成
-      const warnings = validationOptions.enableWarnings
+      // 警告生成（performanceModeでスキップ）
+      const warnings = validationOptions.enableWarnings && !validationOptions.performanceMode
         ? WarningGenerator.generate(validData)
         : [];
 
@@ -260,7 +262,18 @@ export class TideDataValidator {
    * 有効データのフィルタリング
    */
   private filterValidData(__data: RawTideData[], errors: any[]): RawTideData[] {
-    const errorIndices = new Set(errors.map(e => e.index).filter(i => i !== undefined));
+    // 早期リターン最適化: エラーが0件の場合、フィルタリング不要
+    if (errors.length === 0) {
+      return __data;
+    }
+
+    const errorIndices = new Set<number>();
+    for (const error of errors) {
+      if (error.index !== undefined) {
+        errorIndices.add(error.index);
+      }
+    }
+
     return __data.filter((_, index) => !errorIndices.has(index));
   }
 
