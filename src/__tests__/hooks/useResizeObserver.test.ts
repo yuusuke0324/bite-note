@@ -72,7 +72,7 @@ class MockResizeObserver {
   }
 }
 
-describe.skip('useResizeObserver', () => {
+describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObserverモック改善必要）
   let mockResizeObserver: MockResizeObserver;
   let originalResizeObserver: typeof ResizeObserver;
 
