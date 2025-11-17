@@ -1230,7 +1230,7 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
       });
     });
 
-    test('should maintain smooth focus transitions', async () => {
+    test('TC-P001-02-03: should maintain smooth focus transitions (average < 50ms local, < 60ms CI)', async () => {
       const user = userEvent.setup();
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
@@ -1247,7 +1247,22 @@ describe('TideChart Accessibility - TC-P001: パフォーマンス・アクセ�
 
       const averageTime =
         transitions.reduce((a, b) => a + b) / transitions.length;
-      expect(averageTime).toBeLessThan(50); // Smooth transition requirement
+      const stdDev = Math.sqrt(
+        transitions.reduce((sum, t) => sum + Math.pow(t - averageTime, 2), 0) /
+          transitions.length
+      );
+
+      // Environment-specific thresholds (same pattern as TC-H025)
+      // - Target: 50ms (imperceptible delay - Jakob Nielsen's response time limits)
+      // - CI tolerance: 60ms (accounts for resource constraints)
+      // - Upper limit: 100ms (instant response perception threshold)
+      const isCI = process.env.CI === 'true';
+      const threshold = isCI ? 60 : 50;
+
+      expect(averageTime).toBeLessThan(threshold);
+
+      // Statistical stability check (standard deviation < 30% of average)
+      expect(stdDev).toBeLessThan(averageTime * 0.3);
     });
   });
 });
