@@ -1,7 +1,20 @@
-// ErrorBoundaryコンポーネントの単体テスト
+/**
+ * ErrorBoundaryコンポーネントの単体テスト (Issue #115対応版)
+ *
+ * @description
+ * エラーバウンダリコンポーネントの包括的なテストスイート
+ * React Testing Libraryのベストプラクティスに従い、CI環境でのDOM参照問題を解消
+ *
+ * @version 2.0.0 - Issue #115対応：screen → within(container)、vi.spyOn()パターン採用
+ * @changes
+ * - `screen` → `within(result.container)` に置換（CI環境での<body />empty問題を解決）
+ * - console.error モックを vi.spyOn() パターンに変更（より堅牢なモック管理）
+ * - describe.skip を削除（テストを復活）
+ * @since 2025-11-17
+ */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
 
@@ -13,7 +26,7 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>正常なコンポーネント</div>;
 };
 
-describe.skip('ErrorBoundary', () => { // TODO: Issue #XXX - CI-specific rendering failure (works locally, other components pass)
+describe('ErrorBoundary', () => {
   beforeEach(async () => {
     // CI環境でのJSDOM初期化待機（FishSpeciesAutocompleteパターン）
     if (process.env.CI) {
@@ -38,72 +51,69 @@ describe.skip('ErrorBoundary', () => { // TODO: Issue #XXX - CI-specific renderi
   });
 
   it('エラーが発生しない場合は子コンポーネントを正常に表示する', () => {
-    render(
+    const result = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={false} />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText('正常なコンポーネント')).toBeInTheDocument();
+    expect(within(result.container).getByText('正常なコンポーネント')).toBeInTheDocument();
   });
 
   it('エラーが発生した場合はエラーメッセージを表示する', () => {
-    // console.errorをrender前にモック（React内部処理の後）
-    const originalError = console.error;
-    console.error = vi.fn();
+    // vi.spyOn()パターンでconsole.errorをモック（より堅牢なモック管理）
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(
+    const result = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText('エラーが発生しました')).toBeInTheDocument();
-    expect(screen.getByText(/予期しないエラーが発生しました/)).toBeInTheDocument();
+    expect(within(result.container).getByText('エラーが発生しました')).toBeInTheDocument();
+    expect(within(result.container).getByText(/予期しないエラーが発生しました/)).toBeInTheDocument();
 
-    console.error = originalError;
+    consoleErrorSpy.mockRestore();
   });
 
   it('エラー発生時にリロードボタンが表示される', () => {
-    const originalError = console.error;
-    console.error = vi.fn();
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(
+    const result = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
-    const reloadButton = screen.getByRole('button', { name: 'ページ再読み込み' });
+    const reloadButton = within(result.container).getByRole('button', { name: 'ページ再読み込み' });
     expect(reloadButton).toBeInTheDocument();
 
-    console.error = originalError;
+    consoleErrorSpy.mockRestore();
   });
 
   describe('開発環境でのエラー詳細表示', () => {
     it('開発環境でエラー詳細が表示される', () => {
-      const originalError = console.error;
-      console.error = vi.fn();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       // vi.stubEnv()を使用してNODE_ENVを安全に変更（CI環境での後続テストへの影響を防ぐ）
       vi.stubEnv('NODE_ENV', 'development');
 
-      render(
+      const result = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
         </ErrorBoundary>
       );
 
       // 開発環境でのエラー詳細表示を確認
-      expect(screen.getByText('エラー詳細（開発用）')).toBeInTheDocument();
-      expect(screen.getByText(/Test error/)).toBeInTheDocument();
+      expect(within(result.container).getByText('エラー詳細（開発用）')).toBeInTheDocument();
+      expect(within(result.container).getByText(/Test error/)).toBeInTheDocument();
 
-      console.error = originalError;
+      consoleErrorSpy.mockRestore();
     });
   });
 
   it('複数の子コンポーネントがある場合も正常に動作する', () => {
-    render(
+    const result = render(
       <ErrorBoundary>
         <div>コンポーネント1</div>
         <ThrowError shouldThrow={false} />
@@ -111,16 +121,15 @@ describe.skip('ErrorBoundary', () => { // TODO: Issue #XXX - CI-specific renderi
       </ErrorBoundary>
     );
 
-    expect(screen.getByText('コンポーネント1')).toBeInTheDocument();
-    expect(screen.getByText('正常なコンポーネント')).toBeInTheDocument();
-    expect(screen.getByText('コンポーネント3')).toBeInTheDocument();
+    expect(within(result.container).getByText('コンポーネント1')).toBeInTheDocument();
+    expect(within(result.container).getByText('正常なコンポーネント')).toBeInTheDocument();
+    expect(within(result.container).getByText('コンポーネント3')).toBeInTheDocument();
   });
 
   it('ネストしたErrorBoundaryでも正常に動作する', () => {
-    const originalError = console.error;
-    console.error = vi.fn();
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(
+    const result = render(
       <ErrorBoundary>
         <div>外側のコンポーネント</div>
         <ErrorBoundary>
@@ -129,9 +138,9 @@ describe.skip('ErrorBoundary', () => { // TODO: Issue #XXX - CI-specific renderi
       </ErrorBoundary>
     );
 
-    expect(screen.getByText('外側のコンポーネント')).toBeInTheDocument();
-    expect(screen.getByText('エラーが発生しました')).toBeInTheDocument();
+    expect(within(result.container).getByText('外側のコンポーネント')).toBeInTheDocument();
+    expect(within(result.container).getByText('エラーが発生しました')).toBeInTheDocument();
 
-    console.error = originalError;
+    consoleErrorSpy.mockRestore();
   });
 });
