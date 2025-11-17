@@ -44,11 +44,11 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
         const chartContainer = screen.getByRole('img');
         const ariaLabel = AccessibilityTester.getAriaLabel(chartContainer);
 
+        // aria-labelは簡潔版（現在値、最低値、最高値）
         expect(ariaLabel).toContain('潮汐グラフ');
-        expect(ariaLabel).toContain('00:00');
-        expect(ariaLabel).toContain('21:00');
-        expect(ariaLabel).toContain('最高150cm');
-        expect(ariaLabel).toContain('最低30cm');
+        expect(ariaLabel).toMatch(/現在\d+cm/);
+        expect(ariaLabel).toMatch(/最低\d+cm/);
+        expect(ariaLabel).toMatch(/最高\d+cm/);
       });
     });
 
@@ -75,38 +75,115 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
   });
 
-  describe.skip('TC-A001-02: 数値範囲ARIA属性', () => {
-    // Note: aria-valuemin/max/now are not allowed on role="img"
-    // These attributes are only valid for specific roles like slider, scrollbar, etc.
-    // Skipping these tests as they check for invalid ARIA attributes
+  describe('TC-A001-02: 数値情報のアクセシビリティ', () => {
+    // Numerical information is provided via aria-label and aria-describedby
+    // instead of aria-valuemin/max/now (which are invalid for role="img")
 
-    test('should set aria-valuemin from data minimum', async () => {
+    test('aria-labelに現在値、最高値、最低値が含まれる', async () => {
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
-        expect(chartContainer.getAttribute('aria-valuemin')).toBe('30');
+        const ariaLabel = chartContainer.getAttribute('aria-label');
+
+        expect(ariaLabel).toMatch(/現在\d+cm/);
+        expect(ariaLabel).toMatch(/最低\d+cm/);
+        expect(ariaLabel).toMatch(/最高\d+cm/);
+        expect(ariaLabel).toMatch(/潮汐グラフ/);
       });
     });
 
-    test('should set aria-valuemax from data maximum', async () => {
+    test('aria-describedbyで詳細情報が提供される', async () => {
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
-        expect(chartContainer.getAttribute('aria-valuemax')).toBe('150');
+        const describedBy = chartContainer.getAttribute('aria-describedby');
+
+        expect(describedBy).toContain('tide-chart-description');
+
+        const descriptionElement = document.getElementById('tide-chart-description');
+        expect(descriptionElement).toBeInTheDocument();
+        expect(descriptionElement?.textContent).toMatch(/\d+個のデータポイント/);
+        expect(descriptionElement?.textContent).toMatch(/満潮\d+回/);
+        expect(descriptionElement?.textContent).toMatch(/干潮\d+回/);
       });
     });
 
-    test('should set aria-valuenow from current selection', async () => {
+    test('aria-labelは簡潔である（100文字以内）', async () => {
       render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
       await waitFor(() => {
         const chartContainer = screen.getByRole('img');
-        expect(chartContainer.getAttribute('aria-valuenow')).toBe('110');
+        const ariaLabel = chartContainer.getAttribute('aria-label');
+
+        expect(ariaLabel?.length).toBeLessThanOrEqual(100);
       });
     });
 
+    test('極端に大きい潮位値でもaria-labelは簡潔である', async () => {
+      const extremeData = [{ time: '00:00', tide: 999999 }];
+      render(<TideChart data={extremeData} chartComponents={mockChartComponents} />);
+
+      await waitFor(() => {
+        const chartContainer = screen.getByRole('img');
+        const ariaLabel = chartContainer.getAttribute('aria-label');
+
+        expect(ariaLabel?.length).toBeLessThanOrEqual(100);
+        expect(ariaLabel).toContain('999999cm');
+        expect(ariaLabel).toContain('潮汐グラフ');
+      });
+    });
+
+    test('マイナスの潮位値でもaria-labelは正しく表示される', async () => {
+      const negativeData = [{ time: '00:00', tide: -50 }];
+      render(<TideChart data={negativeData} chartComponents={mockChartComponents} />);
+
+      await waitFor(() => {
+        const chartContainer = screen.getByRole('img');
+        const ariaLabel = chartContainer.getAttribute('aria-label');
+
+        expect(ariaLabel).toContain('-50cm');
+        expect(ariaLabel).toContain('潮汐グラフ');
+      });
+    });
+
+    test('潮位が0の場合でもaria-labelは正しく表示される', async () => {
+      const zeroData = [{ time: '00:00', tide: 0 }];
+      render(<TideChart data={zeroData} chartComponents={mockChartComponents} />);
+
+      await waitFor(() => {
+        const chartContainer = screen.getByRole('img');
+        const ariaLabel = chartContainer.getAttribute('aria-label');
+
+        expect(ariaLabel).toContain('0cm');
+        expect(ariaLabel).toContain('潮汐グラフ');
+      });
+    });
+
+    test('全データポイントが同じ潮位の場合でもaria-labelは正しい', async () => {
+      const uniformData = [
+        { time: '00:00', tide: 100 },
+        { time: '06:00', tide: 100 },
+        { time: '12:00', tide: 100 },
+      ];
+      render(<TideChart data={uniformData} chartComponents={mockChartComponents} />);
+
+      await waitFor(() => {
+        const chartContainer = screen.getByRole('img');
+        const ariaLabel = chartContainer.getAttribute('aria-label');
+
+        expect(ariaLabel).toContain('現在100cm');
+        expect(ariaLabel).toContain('最低100cm');
+        expect(ariaLabel).toContain('最高100cm');
+        expect(ariaLabel).toContain('潮汐グラフ');
+      });
+    });
+  });
+
+  describe.skip('TC-A001-03: 動的ARIA属性更新（Future Enhancement）', () => {
+    // This test checks for dynamic aria-value* updates which are not implemented
+    // since role="img" doesn't support aria-value* attributes
     test('should update numeric ARIA attributes when data changes', async () => {
       const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
 
@@ -137,8 +214,11 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
         const chartContainer = screen.getByRole('img');
         const ariaLabel = AccessibilityTester.getAriaLabel(chartContainer);
 
-        expect(ariaLabel).toContain('06:00');
-        expect(ariaLabel).toContain('75cm');
+        // aria-labelは簡潔版（現在値、最低値、最高値）
+        expect(ariaLabel).toContain('潮汐グラフ');
+        expect(ariaLabel).toContain('現在75cm');
+        expect(ariaLabel).toContain('最低75cm');
+        expect(ariaLabel).toContain('最高75cm');
       });
     });
 
