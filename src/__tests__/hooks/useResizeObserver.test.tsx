@@ -36,13 +36,12 @@ const TestComponent = ({
 };
 
 describe('useResizeObserver', () => {
-  let originalGetBoundingClientRect: typeof Element.prototype.getBoundingClientRect;
+  // テストスイート全体で元の実装を保持
+  const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
 
   beforeEach(() => {
     // 各テスト前にDOMをクリア
     document.body.innerHTML = '';
-    // Element.prototype.getBoundingClientRect の元の実装を保存
-    originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
   });
 
   afterEach(() => {
