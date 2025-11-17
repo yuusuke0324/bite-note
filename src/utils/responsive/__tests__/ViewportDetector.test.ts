@@ -141,6 +141,9 @@ describe('ViewportDetector', () => {
   describe('viewport change detection', () => {
     beforeEach(() => {
       vi.useFakeTimers();
+      // フェイクタイマー環境でdetectorを再作成
+      detector = new ViewportDetector();
+      mockWindowSize(1024, 768);
     });
 
     afterEach(() => {
