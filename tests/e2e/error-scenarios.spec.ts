@@ -6,7 +6,7 @@ test.describe('エラーシナリオとリカバリー', () => {
   });
 
   test('GPS取得エラーのハンドリング', async ({ page }) => {
-    await page.click('[data-tab="form"]');
+    await page.click('[data-testid="nav-form"]');
 
     // GPS許可を拒否
     await page.context().grantPermissions([], { origin: 'http://localhost:5173' });
@@ -26,7 +26,7 @@ test.describe('エラーシナリオとリカバリー', () => {
   });
 
   test('写真アップロードエラーのハンドリング', async ({ page }) => {
-    await page.click('[data-tab="form"]');
+    await page.click('[data-testid="nav-form"]');
 
     // 無効なファイルをアップロード（大きすぎるファイルをシミュレート）
     await page.route('**/upload', route => {
@@ -61,7 +61,7 @@ test.describe('エラーシナリオとリカバリー', () => {
   });
 
   test('ネットワークエラーからのリカバリー', async ({ page }) => {
-    await page.click('[data-tab="form"]');
+    await page.click('[data-testid="nav-form"]');
 
     // フォームに入力
     await page.fill('[data-testid="date-input"]', '2024-01-15');
@@ -94,7 +94,7 @@ test.describe('エラーシナリオとリカバリー', () => {
   });
 
   test('オフライン状態の処理', async ({ page }) => {
-    await page.click('[data-tab="form"]');
+    await page.click('[data-testid="nav-form"]');
 
     // オフライン状態をシミュレート
     await page.context().setOffline(true);
@@ -128,7 +128,7 @@ test.describe('エラーシナリオとリカバリー', () => {
   });
 
   test('無効なデータ入力のハンドリング', async ({ page }) => {
-    await page.click('[data-tab="form"]');
+    await page.click('[data-testid="nav-form"]');
 
     // 無効な日付を入力
     await page.fill('[data-testid="date-input"]', '2030-12-31'); // 未来の日付
@@ -161,7 +161,7 @@ test.describe('エラーシナリオとリカバリー', () => {
       };
     });
 
-    await page.click('[data-tab="form"]');
+    await page.click('[data-testid="nav-form"]');
 
     // 大きなメモデータを入力
     const largeText = 'x'.repeat(200);
@@ -234,7 +234,7 @@ test.describe('エラーシナリオとリカバリー', () => {
       });
     });
 
-    await page.click('[data-tab="list"]');
+    await page.click('[data-testid="nav-list"]');
 
     // 認証エラーメッセージが表示されることを確認
     await expect(page.locator('[data-testid="auth-error"]')).toBeVisible();

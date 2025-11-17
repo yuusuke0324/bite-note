@@ -65,7 +65,7 @@ test.describe('パフォーマンス・アクセシビリティテスト', () =>
 
     // 一覧ページの読み込み時間を計測
     const startTime = Date.now();
-    await page.click('[data-tab="list"]');
+    await page.click('[data-testid="nav-list"]');
     await expect(page.locator('[data-testid="record-list"]')).toBeVisible();
     const loadTime = Date.now() - startTime;
 
@@ -93,9 +93,9 @@ test.describe('パフォーマンス・アクセシビリティテスト', () =>
 
     // 大量の操作を実行
     for (let i = 0; i < 10; i++) {
-      await page.click('[data-tab="form"]');
+      await page.click('[data-testid="nav-form"]');
       await page.fill('[data-testid="memo-input"]', `テストメモ${i}`.repeat(100));
-      await page.click('[data-tab="list"]');
+      await page.click('[data-testid="nav-list"]');
       await page.waitForTimeout(100);
     }
 
@@ -278,7 +278,7 @@ test.describe('パフォーマンス・アクセシビリティテスト', () =>
 
   test('エラーメッセージのアクセシビリティ', async ({ page }) => {
     await page.goto('/');
-    await page.click('[data-tab="form"]');
+    await page.click('[data-testid="nav-form"]');
 
     // 無効な入力でエラーを発生させる
     await page.click('[data-testid="save-button"]');
