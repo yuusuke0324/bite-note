@@ -99,7 +99,7 @@ export class ViewportDetector implements IViewportDetector {
       clearTimeout(this.resizeTimeout);
     }
 
-    this.resizeTimeout = window.setTimeout(() => {
+    this.resizeTimeout = setTimeout(() => {
       const viewport = this.getCurrentViewport();
 
       // 全てのコールバックに通知
