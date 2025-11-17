@@ -112,6 +112,6 @@ export class ViewportDetector implements IViewportDetector {
       });
 
       this.resizeTimeout = null;
-    }, 100); // 100msデバウンス
+    }, 100) as unknown as number; // 100msデバウンス
   }
 }
