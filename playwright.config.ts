@@ -21,7 +21,17 @@ export default defineConfig({
     baseURL: 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
+
+    /* PWAテスト用のパーミッション設定 (Issue #85) */
+    permissions: ['geolocation', 'notifications'],
+    geolocation: { latitude: 35.6762, longitude: 139.6503 },
+
+    /* Service Worker有効化（重要！） */
+    serviceWorkers: 'allow',
+
+    /* ビデオ録画（CI環境のみ） */
+    video: process.env.CI ? 'on-first-retry' : 'off',
   },
 
   /* Configure projects for major browsers */
@@ -49,6 +59,16 @@ export default defineConfig({
     {
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },
+    },
+
+    /* PWA E2Eテスト専用プロジェクト (Issue #85) */
+    {
+      name: 'pwa-chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome', // 実際のChromeを使用
+      },
+      testMatch: /pwa-.*\.spec\.ts/, // pwa-*.spec.tsファイルのみ実行
     },
 
     /* Test against branded browsers. */
