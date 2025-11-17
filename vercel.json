@@ -4,7 +4,6 @@
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "framework": "vite",
-  "functions": {},
   "rewrites": [
     {
       "source": "/(.*)",
