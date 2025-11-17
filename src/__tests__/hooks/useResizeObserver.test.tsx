@@ -36,14 +36,20 @@ const TestComponent = ({
 };
 
 describe('useResizeObserver', () => {
+  let originalGetBoundingClientRect: typeof Element.prototype.getBoundingClientRect;
+
   beforeEach(() => {
     // 各テスト前にDOMをクリア
     document.body.innerHTML = '';
+    // Element.prototype.getBoundingClientRect の元の実装を保存
+    originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
   });
 
   afterEach(() => {
     // 各テスト後にモックをリセット
     vi.restoreAllMocks();
+    // Element.prototype.getBoundingClientRect を確実に復元
+    Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
   });
 
   describe('basic functionality', () => {
@@ -77,7 +83,6 @@ describe('useResizeObserver', () => {
       const onResize = vi.fn();
 
       // getBoundingClientRectをモックして、コンテナが375px幅を返すようにする
-      const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
       Element.prototype.getBoundingClientRect = function(this: Element) {
         if (this.getAttribute('data-testid') === 'resize-container-mobile') {
           return {
@@ -106,16 +111,12 @@ describe('useResizeObserver', () => {
       expect(lastCall.deviceType).toBe('mobile');
       expect(lastCall.width).toBe(375);
       expect(lastCall.height).toBe(667);
-
-      // cleanup
-      Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
     });
 
     it('should return tablet for width 768-1023', async () => {
       const onResize = vi.fn();
 
       // getBoundingClientRectをモックして、コンテナが768px幅を返すようにする
-      const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
       Element.prototype.getBoundingClientRect = function(this: Element) {
         if (this.getAttribute('data-testid') === 'resize-container-tablet') {
           return {
@@ -144,16 +145,12 @@ describe('useResizeObserver', () => {
       expect(lastCall.deviceType).toBe('tablet');
       expect(lastCall.width).toBe(768);
       expect(lastCall.height).toBe(1024);
-
-      // cleanup
-      Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
     });
 
     it('should return desktop for width >= 1024', async () => {
       const onResize = vi.fn();
 
       // getBoundingClientRectをモックして、コンテナが1200px幅を返すようにする
-      const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
       Element.prototype.getBoundingClientRect = function(this: Element) {
         if (this.getAttribute('data-testid') === 'resize-container-desktop') {
           return {
@@ -182,9 +179,6 @@ describe('useResizeObserver', () => {
       expect(lastCall.deviceType).toBe('desktop');
       expect(lastCall.width).toBe(1200);
       expect(lastCall.height).toBe(800);
-
-      // cleanup
-      Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
     });
   });
 
@@ -194,7 +188,6 @@ describe('useResizeObserver', () => {
       let currentWidth = 1200;
 
       // 動的にサイズを変更できるgetBoundingClientRectモック
-      const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
       Element.prototype.getBoundingClientRect = function(this: Element) {
         if (this.getAttribute('data-testid') === 'resize-container-dynamic') {
           return {
@@ -230,9 +223,6 @@ describe('useResizeObserver', () => {
       // この部分は実際のResizeObserverの動作とは異なるため、
       // 実際のアプリケーションでは動作するが、テスト環境では制限がある
       // そのため、基本的な初期化のテストのみを行う
-
-      // cleanup
-      Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
     });
   });
 
