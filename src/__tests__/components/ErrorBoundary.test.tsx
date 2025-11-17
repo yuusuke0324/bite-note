@@ -13,7 +13,7 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>正常なコンポーネント</div>;
 };
 
-describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境でのprocess.env変更問題）
+describe('ErrorBoundary', () => {
   // コンソールエラーをモックして、テスト時のノイズを防ぐ
   const originalError = console.error;
 
@@ -23,6 +23,7 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
 
   afterEach(() => {
     console.error = originalError;
+    vi.unstubAllEnvs(); // 環境変数のスタブをクリーンアップ
   });
 
   it('エラーが発生しない場合は子コンポーネントを正常に表示する', () => {
@@ -58,17 +59,10 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
   });
 
   describe('開発環境でのエラー詳細表示', () => {
-    const originalEnv = process.env.NODE_ENV;
-
-    beforeEach(() => {
-      process.env.NODE_ENV = 'development';
-    });
-
-    afterEach(() => {
-      process.env.NODE_ENV = originalEnv;
-    });
-
     it('開発環境でエラー詳細が表示される', () => {
+      // vi.stubEnv()を使用してNODE_ENVを安全に変更（CI環境での後続テストへの影響を防ぐ）
+      vi.stubEnv('NODE_ENV', 'development');
+
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
