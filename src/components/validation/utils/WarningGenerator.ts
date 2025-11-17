@@ -15,9 +15,10 @@ export class WarningGenerator {
   /**
    * データから警告を生成する
    * @param data 潮汐データ
+   * @param strictMode 厳密モード（デフォルト: false）
    * @returns 警告一覧
    */
-  static generate(data: RawTideData[]): ValidationWarning[] {
+  static generate(data: RawTideData[], strictMode = false): ValidationWarning[] {
     if (!data || data.length === 0) {
       return [];
     }
@@ -33,6 +34,11 @@ export class WarningGenerator {
     // データ密度警告
     warnings.push(...this.checkDataDensity(data));
 
+    // 厳密モード: 小さな変化の検出
+    if (strictMode) {
+      warnings.push(...this.checkSmallVariations(data));
+    }
+
     return warnings;
   }
 
@@ -45,8 +51,8 @@ export class WarningGenerator {
 
     data.forEach((item, index) => {
       if (typeof item.tide === 'number' && !isNaN(item.tide)) {
-        // 上限近く
-        if (item.tide > TIDE_VALIDATION.MAX_TIDE - warningThreshold) {
+        // 上限近く（>= に変更し、境界値ちょうども警告対象に）
+        if (item.tide >= TIDE_VALIDATION.MAX_TIDE - warningThreshold) {
           warnings.push({
             type: WarningType.DATA_QUALITY,
             message: `潮位値 ${item.tide}m が上限値 ${TIDE_VALIDATION.MAX_TIDE}m に近すぎます`,
@@ -55,8 +61,8 @@ export class WarningGenerator {
             suggestion: '測定値の精度を確認してください'
           });
         }
-        // 下限近く
-        else if (item.tide < TIDE_VALIDATION.MIN_TIDE + warningThreshold) {
+        // 下限近く（<= に変更し、境界値ちょうども警告対象に）
+        else if (item.tide <= TIDE_VALIDATION.MIN_TIDE + warningThreshold) {
           warnings.push({
             type: WarningType.DATA_QUALITY,
             message: `潮位値 ${item.tide}m が下限値 ${TIDE_VALIDATION.MIN_TIDE}m に近すぎます`,
@@ -124,6 +130,38 @@ export class WarningGenerator {
           field: 'time',
           index: i,
           suggestion: 'データの取得頻度を確認してください'
+        });
+      }
+    }
+
+    return warnings;
+  }
+
+  /**
+   * 小さな潮位変化をチェック（strictMode専用）
+   */
+  private static checkSmallVariations(data: RawTideData[]): ValidationWarning[] {
+    const warnings: ValidationWarning[] = [];
+
+    if (data.length < 2) {
+      return warnings;
+    }
+
+    const minVariationThreshold = 0.2; // 0.2m未満の変化で警告
+
+    for (let i = 1; i < data.length; i++) {
+      const prevTide = data[i - 1].tide;
+      const currentTide = data[i].tide;
+      const variation = Math.abs(currentTide - prevTide);
+
+      // 完全に同じ値は除外、小さな変化のみ警告
+      if (variation > 0 && variation < minVariationThreshold) {
+        warnings.push({
+          type: WarningType.DATA_QUALITY,
+          message: `連続データの変化が ${variation.toFixed(2)}m と小さすぎます（厳密モード）`,
+          field: 'tide',
+          index: i,
+          suggestion: 'データの精度や測定間隔を確認してください'
         });
       }
     }

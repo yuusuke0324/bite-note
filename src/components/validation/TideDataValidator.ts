@@ -144,9 +144,9 @@ export class TideDataValidator {
         }
       }
 
-      // 警告生成（performanceModeでスキップ）
+      // 警告生成（performanceModeでスキップ、strictMode対応）
       const warnings = validationOptions.enableWarnings && !validationOptions.performanceMode
-        ? WarningGenerator.generate(validData)
+        ? WarningGenerator.generate(validData, validationOptions.strictMode)
         : [];
 
       // 結果作成
