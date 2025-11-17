@@ -169,9 +169,13 @@ describe('ViewportDetector', () => {
       console.log('[Test Debug] Resize event fired');
 
       // リサイズイベントのデバウンス待機（100ms）
-      console.log('[Test Debug] Before advance timers, callback calls:', callback.mock.calls.length);
-      await vi.advanceTimersByTimeAsync(100);
-      console.log('[Test Debug] After advance timers, callback calls:', callback.mock.calls.length);
+      console.log('[Test Debug] Before timers, callback calls:', callback.mock.calls.length);
+      console.log('[Test Debug] Pending timers:', vi.getTimerCount());
+
+      // CI環境ではadvanceTimersByTimeAsyncが動作しないため、runAllTimersAsyncを使用
+      await vi.runAllTimersAsync();
+
+      console.log('[Test Debug] After timers, callback calls:', callback.mock.calls.length);
 
       // Then: コールバックが呼ばれる
       expect(callback).toHaveBeenCalledWith({
@@ -195,7 +199,7 @@ describe('ViewportDetector', () => {
       fireResizeEvent();
 
       // デバウンス待機（100ms）
-      await vi.advanceTimersByTimeAsync(100);
+      await vi.runAllTimersAsync();
 
       expect(callback).not.toHaveBeenCalled();
     });
