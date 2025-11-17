@@ -10,12 +10,14 @@ export default defineConfig({
     setupFiles: ['./src/setupTests.ts'],
     css: true,
     // メモリ制限とパフォーマンス改善（最適化版）
-    // すべての環境でforksモードを使用（threadsモードはCI環境でグローバルPolyfillとクラスインスタンスの初期化問題あり）
+    // forksモードを使用してvi.useFakeTimers()のCI環境での安定性を確保（Issue #127対応）
+    // threadsモードではfake timersがワーカースレッド全体でグローバルになり、
+    // 並列実行時に他テストと競合する問題が発生するため、プロセス分離を採用
     pool: 'forks',
     poolOptions: {
       forks: {
-        singleFork: false, // 複数フォークで並行実行
-        execArgv: ['--max-old-space-size=4096'],
+        singleFork: false, // 並列実行を維持
+        execArgv: ['--max-old-space-size=4096'], // メモリ最適化
       },
     },
     maxConcurrency: process.env.CI ? 4 : 8, // CI環境でも並列度を上げる

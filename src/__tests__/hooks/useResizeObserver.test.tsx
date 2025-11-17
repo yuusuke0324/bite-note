@@ -186,7 +186,7 @@ describe('useResizeObserver', () => {
   describe('resize updates', () => {
     it('should update dimensions on resize', async () => {
       const onResize = vi.fn();
-      let currentWidth = 1200;
+      const currentWidth = 1200;
 
       // 動的にサイズを変更できるgetBoundingClientRectモック
       Element.prototype.getBoundingClientRect = function(this: Element) {
@@ -213,7 +213,7 @@ describe('useResizeObserver', () => {
         expect(onResize).toHaveBeenCalled();
       });
 
-      let lastCall = onResize.mock.calls[onResize.mock.calls.length - 1][0] as ResizeObserverEntry;
+      const lastCall = onResize.mock.calls[onResize.mock.calls.length - 1][0] as ResizeObserverEntry;
       expect(lastCall.width).toBe(1200);
       expect(lastCall.deviceType).toBe('desktop');
 

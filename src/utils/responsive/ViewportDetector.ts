@@ -16,7 +16,7 @@ import { VIEWPORT_BREAKPOINTS } from './types';
  */
 export class ViewportDetector implements IViewportDetector {
   private callbacks: Set<(viewport: ViewportInfo) => void> = new Set();
-  private resizeTimeout: number | null = null;
+  private resizeTimeout: ReturnType<typeof setTimeout> | null = null;
   private isListening = false;
 
   constructor() {
@@ -99,7 +99,7 @@ export class ViewportDetector implements IViewportDetector {
       clearTimeout(this.resizeTimeout);
     }
 
-    this.resizeTimeout = window.setTimeout(() => {
+    this.resizeTimeout = setTimeout(() => {
       const viewport = this.getCurrentViewport();
 
       // 全てのコールバックに通知
