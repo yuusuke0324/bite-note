@@ -1,8 +1,21 @@
-# 釣果記録アプリ (Bite Note)
+# 🎣 釣果記録アプリ (Bite Note)
 
-**Version 1.0.0** - 初版リリース (2025年10月30日)
+[![Build Status](https://github.com/yuusuke0324/bite-note/workflows/CI/badge.svg)](https://github.com/yuusuke0324/bite-note/actions)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yuusuke0324/bite-note/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+**Version 1.0.0** - 初版リリース (2024年10月30日)
 
 個人用釣果記録PWAアプリケーション。釣った魚を簡単に記録・振り返ることができます。
+
+## 🌐 デモサイト
+
+**Live Demo**: [https://bite-note.vercel.app](https://bite-note.vercel.app)
+
+<!-- TODO: スクリーンショット追加予定 -->
+<!-- ![ホーム画面](docs/screenshots/home.png) -->
+<!-- ![釣果記録画面](docs/screenshots/record.png) -->
+<!-- ![潮汐グラフ](docs/screenshots/tide-graph.png) -->
 
 ## 特徴
 
@@ -28,6 +41,47 @@
 - **Photo Metadata**: ExifReader
 - **Geocoding**: OpenStreetMap Nominatim API
 - **Weather**: OpenWeatherMap API
+
+## ⚡ Quick Start
+
+### ユーザー向け（アプリを使う）
+
+1. **デモサイトにアクセス**
+   ```
+   https://bite-note.vercel.app
+   ```
+
+2. **PWAとしてインストール**（オプション）
+   - **iOS**: Safari → 共有ボタン → 「ホーム画面に追加」
+   - **Android**: Chrome → メニュー → 「アプリをインストール」
+
+3. **釣果を記録**
+   - 「記録登録」タブで魚種、サイズ、場所を入力
+   - 写真を追加すると位置・日時を自動抽出
+   - 「記録を保存」をクリック
+
+詳細な使い方は [ユーザーガイド](docs/user-guide.md) を参照してください。
+
+### 開発者向け（ローカルで開発）
+
+```bash
+# 1. リポジトリをクローン
+git clone https://github.com/yuusuke0324/bite-note.git
+cd bite-note
+
+# 2. 依存関係をインストール
+npm install
+
+# 3. 開発サーバー起動
+npm run dev
+# → デフォルトでは http://localhost:5173
+# （ポートが使用中の場合は自動的に 5174、5175... を使用）
+
+# 4. テスト実行
+npm run test:fast
+```
+
+詳細な開発環境構築は [開発者向けガイド](docs/GETTING-STARTED.md) を参照してください。
 
 ## セットアップ
 
@@ -314,3 +368,76 @@ src/
 | 1 | カラー・タイポグラフィ統一 | 1-2週 | 🔥 即効性 |
 | 2 | ナビゲーション刷新 | 2-3週 | 🔥 ユーザビリティ大幅向上 |
 | 3 | カード・フォーム再設計 | 3-4週 | ⚡ エンゲージメント向上 |
+
+---
+
+## 📚 ドキュメント
+
+### ユーザー向け
+- [ユーザーガイド](docs/user-guide.md) - アプリの使い方、PWAインストール方法
+- [トラブルシューティング](docs/troubleshooting.md) - よくある問題と解決方法
+
+### 開発者向け
+- [開発者向けガイド](docs/GETTING-STARTED.md) - 5分クイックスタート
+- [デプロイガイド](docs/DEPLOYMENT.md) - Vercel/Netlifyへのデプロイ方法
+- [アーキテクチャ設計](docs/ARCHITECTURE.md) - システム設計の詳細
+- [API仕様](docs/API.md) - サービス層API仕様
+- [テストガイド](docs/testing-best-practices.md) - テスト実行方法とベストプラクティス
+
+### 設計ドキュメント
+- [UI/UX改善計画](docs/design/ui-ux-improvement-plan.md)
+- [潮汐システム設計](docs/design/tide-system-master-spec.md)
+- [技術仕様](docs/technical-specifications.md)
+
+---
+
+## 🤝 コントリビューション
+
+このプロジェクトは個人開発プロジェクトですが、フィードバックやバグ報告を歓迎します。
+
+1. このリポジトリをフォーク
+2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
+
+詳細は [Issue駆動開発ガイド](ai-rules/TASK_CYCLES.md) を参照してください。
+
+---
+
+## 📄 ライセンス
+
+MIT License
+
+Copyright (c) 2025 Bite Note
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## 🙏 謝辞
+
+このプロジェクトは以下のオープンソースプロジェクトを使用しています：
+
+- [React](https://reactjs.org/) - UIライブラリ
+- [Vite](https://vitejs.dev/) - ビルドツール
+- [Dexie.js](https://dexie.org/) - IndexedDBラッパー
+- [Zustand](https://github.com/pmndrs/zustand) - 状態管理
+- [OpenWeatherMap](https://openweathermap.org/) - 天気情報API
+- [OpenStreetMap Nominatim](https://nominatim.org/) - ジオコーディングAPI
