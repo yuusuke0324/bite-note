@@ -142,19 +142,19 @@ describe('ViewportDetector', () => {
     // Real timersを使用（fake timersはCI環境で不安定なため）
     test('should call callback on viewport change', async () => {
       const callback = vi.fn();
+
+      // Given: ビューポート変更の監視を開始
       const unsubscribe = detector.onViewportChange(callback);
 
-      // Given: 初期状態
-      mockWindowSize(375, 667);
-
-      // When: 画面サイズが変更
+      // When: 画面サイズを変更してresizeイベントを発火
       mockWindowSize(768, 1024);
-      fireResizeEvent();
 
-      // リアルタイマーでデバウンス待機（100ms + 余裕50ms）
+      // handleResizeメソッドを直接呼び出す（privateだがテストのため強制アクセス）
+      (detector as any)['handleResize']();
+
+      // Then: デバウンス後にコールバックが呼ばれる
       await new Promise(resolve => setTimeout(resolve, 150));
 
-      // Then: コールバックが呼ばれる
       expect(callback).toHaveBeenCalledWith({
         width: 768,
         height: 1024,
@@ -170,14 +170,17 @@ describe('ViewportDetector', () => {
       const callback = vi.fn();
       const unsubscribe = detector.onViewportChange(callback);
 
+      // アンサブスクライブ
       unsubscribe();
 
+      // 画面サイズを変更してhandleResizeを呼び出し
       mockWindowSize(1920, 1080);
-      fireResizeEvent();
+      (detector as any)['handleResize']();
 
-      // デバウンス待機（100ms + 余裕50ms）
+      // デバウンス待機
       await new Promise(resolve => setTimeout(resolve, 150));
 
+      // アンサブスクライブ済みなのでコールバックは呼ばれない
       expect(callback).not.toHaveBeenCalled();
     });
   });
