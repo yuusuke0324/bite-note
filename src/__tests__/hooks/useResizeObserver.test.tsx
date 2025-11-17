@@ -14,7 +14,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { vi } from 'vitest';
 import { useResizeObserver, ResizeObserverEntry } from '../../hooks/useResizeObserver';
 
@@ -45,6 +45,8 @@ describe('useResizeObserver', () => {
   });
 
   afterEach(() => {
+    // Testing Library のクリーンアップを明示的に実行
+    cleanup();
     // 各テスト後にモックをリセット
     vi.restoreAllMocks();
     // Element.prototype.getBoundingClientRect を確実に復元
