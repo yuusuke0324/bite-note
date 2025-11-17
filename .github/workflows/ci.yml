@@ -141,7 +141,7 @@ jobs:
 
     - name: Run E2E tests (Sharded)
       run: |
-        TOTAL_SHARDS=${{ github.event_name == 'pull_request' && 3 || 5 }}
+        TOTAL_SHARDS=5
         npx playwright test --shard=${{ matrix.shard }}/${TOTAL_SHARDS}
       env:
         NODE_OPTIONS: '--max-old-space-size=4096'

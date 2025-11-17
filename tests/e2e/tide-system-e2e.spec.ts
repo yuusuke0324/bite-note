@@ -23,18 +23,20 @@ class TideSystemE2EHelper {
   }) {
     await this.page.goto('/fishing-records/new');
 
-    await this.page.fill('[data-testid="location-input"]', recordData.location);
-    await this.page.fill('[data-testid="fish-species-input"]', recordData.fishSpecies);
+    await this.page.fill('[data-testid="location-name"]', recordData.location);
+    // FishSpeciesAutocompleteはTestIds.FISH_SPECIESを使用していないため、placeholderで特定
+    await this.page.fill('input[placeholder*="魚種"]', recordData.fishSpecies);
 
     if (recordData.size) {
-      await this.page.fill('[data-testid="size-input"]', recordData.size.toString());
+      await this.page.fill('[data-testid="fish-size"]', recordData.size.toString());
     }
 
-    if (recordData.useGPS) {
-      await this.page.click('[data-testid="use-gps-button"]');
-      // GPS取得のシミュレーション（位置情報許可を想定）
-      await this.page.waitForTimeout(1000);
-    }
+    // GPS使用はフォーム送信時にuseGPS=trueとして処理される
+    // use-gps-buttonは存在しないため、この処理は不要
+    // if (recordData.useGPS) {
+    //   await this.page.click('[data-testid="use-gps-button"]');
+    //   await this.page.waitForTimeout(1000);
+    // }
 
     await this.page.click('[data-testid="save-record-button"]');
     await this.page.waitForURL('/fishing-records');
