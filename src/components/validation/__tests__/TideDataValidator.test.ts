@@ -82,8 +82,7 @@ describe('TideDataValidator', () => {
       expect(result.summary.totalRecords).toBe(5000);
     });
 
-    test.skip('should generate warnings for unusual but valid data', () => {
-      // TODO: 警告生成機能実装後に有効化
+    test('should generate warnings for unusual but valid data', () => {
       const dataWithWarnings: RawTideData[] = [
         { time: '2025-01-29T06:00:00Z', tide: 4.9 }, // 境界値（警告対象）
         { time: '2025-01-29T12:00:00Z', tide: 2.0 },
@@ -233,8 +232,7 @@ describe('TideDataValidator', () => {
       expect(result.warnings).toHaveLength(0); // 警告無効化
     });
 
-    test.skip('should apply strict mode validation', () => {
-      // TODO: strictMode機能実装後に有効化
+    test('should apply strict mode validation', () => {
       const borderlineData: RawTideData[] = [
         { time: '2025-01-29T06:00:00Z', tide: 3.0 },
         { time: '2025-01-29T08:00:00Z', tide: 3.1 } // 小さな変化（厳密モードで警告）
@@ -248,6 +246,51 @@ describe('TideDataValidator', () => {
       const result = validator.validateInStages(borderlineData, options);
 
       expect(result.warnings.length).toBeGreaterThan(0);
+      expect(result.warnings.some(w => w.message.includes('小さすぎます（厳密モード）'))).toBe(true);
+    });
+
+    test('should NOT warn for small variations when strictMode is disabled', () => {
+      const borderlineData: RawTideData[] = [
+        { time: '2025-01-29T06:00:00Z', tide: 3.0 },
+        { time: '2025-01-29T08:00:00Z', tide: 3.1 } // 小さな変化（0.1m）
+      ];
+      const options: ValidationOptions = {
+        enableWarnings: true,
+        strictMode: false, // 無効
+        performanceMode: false
+      };
+
+      const result = validator.validateInStages(borderlineData, options);
+
+      // 小さな変化の警告が生成されないことを確認
+      const smallVariationWarnings = result.warnings.filter(
+        w => w.message.includes('小さすぎます（厳密モード）')
+      );
+      expect(smallVariationWarnings).toHaveLength(0);
+    });
+
+    test('should NOT generate warnings for values just inside safe zone', () => {
+      const safeZoneData: RawTideData[] = [
+        { time: '2025-01-29T06:00:00Z', tide: 4.8 }, // 4.9未満（警告なし）
+        { time: '2025-01-29T12:00:00Z', tide: -2.8 } // -2.9より高い（警告なし）
+      ];
+
+      const result = validator.validateComprehensively(safeZoneData);
+
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    test('should generate warnings for values slightly beyond boundary (inside warning zone)', () => {
+      const slightlyBeyondData: RawTideData[] = [
+        { time: '2025-01-29T06:00:00Z', tide: 4.95 }, // 4.9より高い（警告対象）
+        { time: '2025-01-29T12:00:00Z', tide: -2.95 } // -2.9より低い（警告対象）
+      ];
+
+      const result = validator.validateComprehensively(slightlyBeyondData);
+
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toHaveLength(2);
     });
 
     test('should limit records when maxRecords specified', () => {
