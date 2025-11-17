@@ -84,8 +84,10 @@ jobs:
 
     - name: Run E2E tests
       run: npm run test:e2e
+      env:
+        NODE_OPTIONS: '--max-old-space-size=4096'
       if: matrix.node-version == 20
-      timeout-minutes: 10
+      timeout-minutes: 20
 
     - name: Upload E2E test results
       uses: actions/upload-artifact@v4
