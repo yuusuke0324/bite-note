@@ -14,6 +14,7 @@ export default defineWorkspace([
         '**/*.performance.test.{ts,tsx}',
         '**/*.red.test.{ts,tsx}', // TDD Red Phase テストを除外
         '**/components/**/*.test.tsx', // コンポーネントは別枠
+        'src/__tests__/components/**/*.test.tsx', // src/__tests__/components/ も除外
       ],
     },
   },
@@ -26,8 +27,7 @@ export default defineWorkspace([
         'src/components/__tests__/FishSpeciesAutocomplete.test.tsx',
         'src/components/__tests__/TideSummaryCard.test.tsx',
         'src/components/__tests__/PWAInstallPrompt.test.tsx',
-        // TODO: Phase 2で修正後に追加（CI環境でのprocess.env変更問題）
-        // 'src/__tests__/components/ErrorBoundary.test.tsx',
+        'src/__tests__/components/ErrorBoundary.test.tsx',
         // TODO: 将来のIssueでTASK-203実装後に有効化（TideTooltipテストが15分タイムアウトする問題あり）
         // 'src/components/__tests__/TideTooltip.test.tsx',
       ],

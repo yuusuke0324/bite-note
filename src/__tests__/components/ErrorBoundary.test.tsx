@@ -1,7 +1,7 @@
 // ErrorBoundaryコンポーネントの単体テスト
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
 
@@ -13,16 +13,28 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>正常なコンポーネント</div>;
 };
 
-describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境でのprocess.env変更問題）
-  // コンソールエラーをモックして、テスト時のノイズを防ぐ
-  const originalError = console.error;
-
-  beforeEach(() => {
-    console.error = vi.fn();
+describe.skip('ErrorBoundary', () => { // TODO: Issue #XXX - CI-specific rendering failure (works locally, other components pass)
+  beforeEach(async () => {
+    // CI環境でのJSDOM初期化待機（FishSpeciesAutocompleteパターン）
+    if (process.env.CI) {
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    } else {
+      // ローカル環境は高速化のため最小限
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
   });
 
   afterEach(() => {
-    console.error = originalError;
+    vi.unstubAllEnvs(); // 環境変数のスタブをクリーンアップ
+
+    // CI環境ではroot containerを保持（FishSpeciesAutocompleteパターン）
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
   });
 
   it('エラーが発生しない場合は子コンポーネントを正常に表示する', () => {
@@ -36,6 +48,10 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
   });
 
   it('エラーが発生した場合はエラーメッセージを表示する', () => {
+    // console.errorをrender前にモック（React内部処理の後）
+    const originalError = console.error;
+    console.error = vi.fn();
+
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -44,9 +60,14 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
 
     expect(screen.getByText('エラーが発生しました')).toBeInTheDocument();
     expect(screen.getByText(/予期しないエラーが発生しました/)).toBeInTheDocument();
+
+    console.error = originalError;
   });
 
   it('エラー発生時にリロードボタンが表示される', () => {
+    const originalError = console.error;
+    console.error = vi.fn();
+
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -55,20 +76,18 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
 
     const reloadButton = screen.getByRole('button', { name: 'ページ再読み込み' });
     expect(reloadButton).toBeInTheDocument();
+
+    console.error = originalError;
   });
 
   describe('開発環境でのエラー詳細表示', () => {
-    const originalEnv = process.env.NODE_ENV;
-
-    beforeEach(() => {
-      process.env.NODE_ENV = 'development';
-    });
-
-    afterEach(() => {
-      process.env.NODE_ENV = originalEnv;
-    });
-
     it('開発環境でエラー詳細が表示される', () => {
+      const originalError = console.error;
+      console.error = vi.fn();
+
+      // vi.stubEnv()を使用してNODE_ENVを安全に変更（CI環境での後続テストへの影響を防ぐ）
+      vi.stubEnv('NODE_ENV', 'development');
+
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
@@ -78,6 +97,8 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
       // 開発環境でのエラー詳細表示を確認
       expect(screen.getByText('エラー詳細（開発用）')).toBeInTheDocument();
       expect(screen.getByText(/Test error/)).toBeInTheDocument();
+
+      console.error = originalError;
     });
   });
 
@@ -96,6 +117,9 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
   });
 
   it('ネストしたErrorBoundaryでも正常に動作する', () => {
+    const originalError = console.error;
+    console.error = vi.fn();
+
     render(
       <ErrorBoundary>
         <div>外側のコンポーネント</div>
@@ -107,5 +131,7 @@ describe.skip('ErrorBoundary', () => { // TODO: Phase 2で修正（CI環境で�
 
     expect(screen.getByText('外側のコンポーネント')).toBeInTheDocument();
     expect(screen.getByText('エラーが発生しました')).toBeInTheDocument();
+
+    console.error = originalError;
   });
 });

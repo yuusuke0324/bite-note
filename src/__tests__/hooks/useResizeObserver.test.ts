@@ -72,25 +72,24 @@ class MockResizeObserver {
   }
 }
 
-describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObserverモック改善必要）
+describe.skip('useResizeObserver', () => { // TODO: 別Issueで修正（useEffectの依存配列問題でモック設定が複雑）
   let mockResizeObserver: MockResizeObserver;
-  let originalResizeObserver: typeof ResizeObserver;
-
-  beforeAll(() => {
-    originalResizeObserver = global.ResizeObserver;
-    global.ResizeObserver = MockResizeObserver as any;
-  });
-
-  afterAll(() => {
-    global.ResizeObserver = originalResizeObserver;
-  });
+  let mockResizeObserverInstance: MockResizeObserver | null = null;
 
   beforeEach(() => {
-    mockResizeObserver = new MockResizeObserver(() => {});
-    global.ResizeObserver = vi.fn().mockImplementation((callback) => {
-      mockResizeObserver = new MockResizeObserver(callback);
-      return mockResizeObserver;
-    });
+    // setupTests.tsのpolyfillを完全に上書きするため、新しいモック実装を作成
+    mockResizeObserverInstance = null;
+
+    global.ResizeObserver = vi.fn().mockImplementation((callback: ResizeObserverCallback) => {
+      mockResizeObserverInstance = new MockResizeObserver(callback);
+      return mockResizeObserverInstance;
+    }) as any;
+  });
+
+  afterEach(() => {
+    // 各テスト後にモックをリセット
+    vi.restoreAllMocks();
+    mockResizeObserverInstance = null;
   });
 
   describe('basic functionality', () => {
@@ -102,7 +101,7 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
       expect(result.current[1]).toBeNull();
     });
 
-    it('should detect initial container width when element is present', () => {
+    it('should detect initial container width when element is present', async () => {
       const mockElement = document.createElement('div');
       Object.defineProperty(mockElement, 'getBoundingClientRect', {
         value: () => ({
@@ -127,13 +126,18 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
         }
       });
 
-      // ResizeObserverコンストラクタが呼ばれることを確認
-      expect(global.ResizeObserver).toHaveBeenCalled();
+      // useLayoutEffect と useEffect の実行を待つ
+      await waitFor(() => {
+        // ResizeObserverコンストラクタが呼ばれることを確認
+        expect(global.ResizeObserver).toHaveBeenCalled();
+        // 初期値が設定されることを確認
+        expect(result.current[1]).not.toBeNull();
+      });
     });
   });
 
   describe('device type detection', () => {
-    it('should return mobile for width < 768', () => {
+    it('should return mobile for width < 768', async () => {
       const mockElement = document.createElement('div');
 
       const { result } = renderHook(() => useResizeObserver<HTMLDivElement>());
@@ -144,15 +148,21 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
         }
       });
 
-      act(() => {
-        mockResizeObserver.mockResize({ width: 375, height: 667 });
+      await waitFor(() => {
+        expect(mockResizeObserverInstance).not.toBeNull();
       });
 
-      expect(result.current[1]?.deviceType).toBe('mobile');
-      expect(result.current[1]?.width).toBe(375);
+      act(() => {
+        mockResizeObserverInstance!.mockResize({ width: 375, height: 667 });
+      });
+
+      await waitFor(() => {
+        expect(result.current[1]?.deviceType).toBe('mobile');
+        expect(result.current[1]?.width).toBe(375);
+      });
     });
 
-    it('should return tablet for width 768-1023', () => {
+    it('should return tablet for width 768-1023', async () => {
       const mockElement = document.createElement('div');
 
       const { result } = renderHook(() => useResizeObserver<HTMLDivElement>());
@@ -163,15 +173,21 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
         }
       });
 
-      act(() => {
-        mockResizeObserver.mockResize({ width: 768, height: 1024 });
+      await waitFor(() => {
+        expect(mockResizeObserverInstance).not.toBeNull();
       });
 
-      expect(result.current[1]?.deviceType).toBe('tablet');
-      expect(result.current[1]?.width).toBe(768);
+      act(() => {
+        mockResizeObserverInstance!.mockResize({ width: 768, height: 1024 });
+      });
+
+      await waitFor(() => {
+        expect(result.current[1]?.deviceType).toBe('tablet');
+        expect(result.current[1]?.width).toBe(768);
+      });
     });
 
-    it('should return desktop for width >= 1024', () => {
+    it('should return desktop for width >= 1024', async () => {
       const mockElement = document.createElement('div');
 
       const { result } = renderHook(() => useResizeObserver<HTMLDivElement>());
@@ -182,12 +198,18 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
         }
       });
 
-      act(() => {
-        mockResizeObserver.mockResize({ width: 1200, height: 800 });
+      await waitFor(() => {
+        expect(mockResizeObserverInstance).not.toBeNull();
       });
 
-      expect(result.current[1]?.deviceType).toBe('desktop');
-      expect(result.current[1]?.width).toBe(1200);
+      act(() => {
+        mockResizeObserverInstance!.mockResize({ width: 1200, height: 800 });
+      });
+
+      await waitFor(() => {
+        expect(result.current[1]?.deviceType).toBe('desktop');
+        expect(result.current[1]?.width).toBe(1200);
+      });
     });
   });
 
@@ -203,17 +225,23 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
         }
       });
 
-      // 初期サイズ
-      act(() => {
-        mockResizeObserver.mockResize({ width: 1200, height: 675 });
+      await waitFor(() => {
+        expect(mockResizeObserverInstance).not.toBeNull();
       });
 
-      expect(result.current[1]?.width).toBe(1200);
-      expect(result.current[1]?.deviceType).toBe('desktop');
+      // 初期サイズ
+      act(() => {
+        mockResizeObserverInstance!.mockResize({ width: 1200, height: 675 });
+      });
+
+      await waitFor(() => {
+        expect(result.current[1]?.width).toBe(1200);
+        expect(result.current[1]?.deviceType).toBe('desktop');
+      });
 
       // サイズ変更
       act(() => {
-        mockResizeObserver.mockResize({ width: 768, height: 1024 });
+        mockResizeObserverInstance!.mockResize({ width: 768, height: 1024 });
       });
 
       await waitFor(() => {
@@ -224,9 +252,8 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
   });
 
   describe('fallback behavior', () => {
-    it('should use window.resize when ResizeObserver is unavailable', () => {
+    it('should use window.resize when ResizeObserver is unavailable', async () => {
       // ResizeObserverを一時的に無効化
-      const originalResizeObserver = global.ResizeObserver;
       (global as any).ResizeObserver = undefined;
 
       const mockElement = document.createElement('div');
@@ -255,20 +282,31 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
       });
 
       // window.resize イベントリスナーが登録されることを確認
-      expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+      await waitFor(() => {
+        expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+      });
 
       // cleanup
       addEventListenerSpy.mockRestore();
-      global.ResizeObserver = originalResizeObserver;
     });
   });
 
   describe('cleanup', () => {
-    it('should disconnect observer on unmount', () => {
+    it('should disconnect observer on unmount', async () => {
       const disconnectSpy = vi.spyOn(MockResizeObserver.prototype, 'disconnect');
       const mockElement = document.createElement('div');
 
-      const { unmount } = renderHook(() => useResizeObserver<HTMLDivElement>());
+      const { result, unmount } = renderHook(() => useResizeObserver<HTMLDivElement>());
+
+      act(() => {
+        if (result.current[0]) {
+          (result.current[0] as any).current = mockElement;
+        }
+      });
+
+      await waitFor(() => {
+        expect(mockResizeObserverInstance).not.toBeNull();
+      });
 
       unmount();
 
@@ -276,22 +314,34 @@ describe.skip('useResizeObserver', () => { // TODO: Phase 2で修正（ResizeObs
       disconnectSpy.mockRestore();
     });
 
-    it('should remove resize listener on unmount when using fallback', () => {
+    it('should remove resize listener on unmount when using fallback', async () => {
       // ResizeObserverを一時的に無効化
-      const originalResizeObserver = global.ResizeObserver;
       (global as any).ResizeObserver = undefined;
 
       const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+      const mockElement = document.createElement('div');
 
-      const { unmount } = renderHook(() => useResizeObserver<HTMLDivElement>());
+      const { result, unmount } = renderHook(() => useResizeObserver<HTMLDivElement>());
+
+      act(() => {
+        if (result.current[0]) {
+          (result.current[0] as any).current = mockElement;
+        }
+      });
+
+      // useEffect の実行を待つ
+      await waitFor(() => {
+        expect(result.current[1]).not.toBeNull();
+      });
 
       unmount();
 
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+      await waitFor(() => {
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+      });
 
       // cleanup
       removeEventListenerSpy.mockRestore();
-      global.ResizeObserver = originalResizeObserver;
     });
   });
 });
