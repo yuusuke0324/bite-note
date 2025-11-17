@@ -10,8 +10,8 @@ test.describe('アプリケーション基本ナビゲーション', () => {
     // アプリケーションコンテナが表示されることを確認
     await expect(page.locator('#root')).toBeVisible();
 
-    // ヘッダーが表示されることを確認
-    await expect(page.locator('h1')).toContainText('釣果記録アプリ');
+    // ヘッダーが表示されることを確認（ホーム画面では「釣果記録」のみ表示）
+    await expect(page.locator('h1')).toContainText('釣果記録');
   });
 
   test('タブナビゲーションが正常に動作する', async ({ page }) => {
@@ -73,10 +73,10 @@ test.describe('アプリケーション基本ナビゲーション', () => {
 
     // アプリケーションが読み込まれることを確認
     await expect(page.locator('#root')).toBeVisible();
-    await expect(page.locator('h1')).toContainText('釣果記録アプリ');
+    await expect(page.locator('h1')).toContainText('釣果記録');
 
-    // 基本的なUIエレメントが存在することを確認
-    await expect(page.locator('text=記録登録')).toBeVisible();
-    await expect(page.locator('text=記録一覧')).toBeVisible();
+    // 基本的なUIエレメントが存在することを確認（BottomNavigation）
+    await expect(page.locator('text=ホーム')).toBeVisible();
+    await expect(page.locator('text=新規記録')).toBeVisible();
   });
 });
