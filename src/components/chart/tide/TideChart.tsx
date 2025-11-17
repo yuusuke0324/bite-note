@@ -17,6 +17,9 @@ import React, {
 import type { TideChartProps, TideChartData, ChartComponents } from './types';
 import styles from './TideChart.module.css';
 
+// ARIA accessibility constants
+const ARIA_DESCRIPTION_ID = 'tide-chart-description';
+
 // Lazy Recharts import（プロダクション用）
 // テスト時は chartComponents props でモックを注入
 const loadRecharts = async () => {
@@ -75,15 +78,14 @@ class AriaManager {
     const tideValues = data.map((d) => d.tide);
     const min = Math.min(...tideValues);
     const max = Math.max(...tideValues);
-    const current = data[data.length - 1]?.tide;
-    const highTideCount = data.filter(d => d.type === 'high').length;
-    const lowTideCount = data.filter(d => d.type === 'low').length;
+    const current = data[0]?.tide ?? 0;
 
-    // Embed all numerical information in aria-label (WCAG 4.1.2 compliant for role="img")
+    // Concise aria-label for efficient screen reader navigation (WCAG 2.4.6, 4.1.2)
+    // Detailed information is provided via aria-describedby element
     return {
       role: 'img',
-      label: `潮汐グラフ: ${data[0]?.time}から${data[data.length - 1]?.time}までの潮位変化、${data.length}個のデータポイント、${highTideCount}回の満潮と${lowTideCount}回の干潮、現在${current}cm、最高${max}cm、最低${min}cm`,
-      describedBy: 'tide-chart-description',
+      label: `潮汐グラフ、現在${current}cm、最低${min}cm、最高${max}cm`,
+      describedBy: ARIA_DESCRIPTION_ID,
     };
   }
 }
@@ -1299,6 +1301,17 @@ const TideChartBase: React.FC<TideChartProps> = ({
         <h1 id="chart-title" style={{ position: 'absolute', left: '-9999px' }}>
           潮汐データ可視化チャート
         </h1>
+        {/* Screen reader only: Detailed description for aria-describedby */}
+        <div id={ARIA_DESCRIPTION_ID} style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}>
+          {validatedData.valid.length > 0 && (
+            <>
+              潮位変化の詳細: {validatedData.valid[0]?.time}から{validatedData.valid[validatedData.valid.length - 1]?.time}まで、
+              {validatedData.valid.length}個のデータポイント。
+              満潮{validatedData.valid.filter(d => d.type === 'high').length}回、
+              干潮{validatedData.valid.filter(d => d.type === 'low').length}回。
+            </>
+          )}
+        </div>
         <div
           ref={chartContainerRef}
           className={`${styles.tideChart} tide-chart ${theme && `theme-${theme}`} ${colorMode === 'monochrome' ? 'monochrome-mode' : ''} ${responsive ? 'responsive' : ''} ${className || ''}`.trim()}
@@ -1330,7 +1343,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           role={ariaConfiguration?.role || 'img'}
           aria-label={ariaConfiguration?.label || ariaLabel}
           aria-describedby={
-            ariaConfiguration?.describedBy || 'tide-chart-description'
+            ariaConfiguration?.describedBy || ARIA_DESCRIPTION_ID
           }
           aria-activedescendant={
             navigationState.isActive && navigationState.mode === 'data-point'
