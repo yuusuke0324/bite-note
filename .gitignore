@@ -38,3 +38,5 @@ coverage/
 # Test coverage output files
 *-coverage.txt
 *-coverage-result.txt
+playwright-report/
+test-results/
