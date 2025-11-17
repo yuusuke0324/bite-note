@@ -367,12 +367,13 @@ describe('TASK-202: TideSummaryCardコンポーネント（残りのテスト）
       expect(screen.getByText('潮汐強度')).toBeInTheDocument();
     });
 
-    it.skip('TC-S005: 2×2グリッドレイアウトが適用される', () => {
+    it('TC-S005: 2×2グリッドレイアウトが適用される', () => {
       render(<TideSummaryCard tideInfo={mockTideInfo} />);
 
       const gridContainer = screen.getByTestId('summary-grid');
       expect(gridContainer).toBeInTheDocument();
-      expect(gridContainer).toHaveClass('grid-cols-2');
+      // レスポンシブクラス: モバイル(1列) → タブレット以上(2×2)
+      expect(gridContainer).toHaveClass('grid', 'grid-cols-1', 'md:grid-cols-2');
 
       const gridItems = screen.getAllByTestId(/.*-section$/);
       expect(gridItems).toHaveLength(4);
@@ -424,28 +425,42 @@ describe('TASK-202: TideSummaryCardコンポーネント（残りのテスト）
       expect(screen.getByText('今日の潮汐イベントがありません')).toBeInTheDocument();
     });
 
-    it.skip('TC-S011: イベント時刻の現在時刻との比較表示', () => {
-      // 現在時刻をモック（12:00）
-      vi.spyOn(Date, 'now').mockImplementation(() => new Date('2024-01-15T12:00:00').getTime());
+    it('TC-S011: イベント時刻の現在時刻との比較表示', () => {
+      // 現在時刻をモック（12:00）- TideEventsListのデフォルトcurrentTimeはnew Date()
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2024-01-15T12:00:00'));
 
-      render(<TideSummaryCard tideInfo={mockTideInfo} />);
+      try {
+        render(<TideSummaryCard tideInfo={mockTideInfo} />);
 
-      // 過去のイベント（06:15）は薄く表示される
-      const pastEvent = screen.getByTestId('tide-event-0');
-      expect(pastEvent).toHaveClass('opacity-50');
+        // TideEventsListにcurrentTimeを渡すため、TideSummaryCardを直接テストではなく
+        // TideEventsListで既にテストされているため、ここでは統合的に確認
+        const eventsList = screen.getByTestId('tide-events-list');
+        expect(eventsList).toBeInTheDocument();
 
-      // 未来のイベント（12:30）は通常表示
-      const futureEvent = screen.getByTestId('tide-event-1');
-      expect(futureEvent).not.toHaveClass('opacity-50');
+        // 過去のイベント（06:15）は薄く表示される
+        const pastEvent = screen.getByTestId('tide-event-0');
+        expect(pastEvent).toHaveClass('opacity-50');
+
+        // 未来のイベント（12:30）は通常表示
+        const futureEvent = screen.getByTestId('tide-event-1');
+        expect(futureEvent).not.toHaveClass('opacity-50');
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
   describe('アイコン・カラーシステム', () => {
-    it.skip('TC-S012: 潮汐タイプ別のカラー表示', () => {
+    it('TC-S012: 潮汐タイプ別のカラー表示', () => {
       render(<TideSummaryCard tideInfo={mockTideInfo} />);
 
+      const tideTypeSection = screen.getByTestId('tide-type-section');
+      // Designer仕様（Issue #119）: 大潮は emerald-700（緑）+ bg-emerald-50
+      expect(tideTypeSection).toHaveClass('text-emerald-700', 'bg-emerald-50');
+
       const tideTypeIcon = screen.getByTestId('tide-type-icon');
-      expect(tideTypeIcon).toHaveClass('text-red-500'); // 大潮は赤
+      expect(tideTypeIcon).toBeInTheDocument();
     });
 
     it('TC-S013: 潮汐状態別のアイコン表示', () => {
@@ -455,21 +470,36 @@ describe('TASK-202: TideSummaryCardコンポーネント（残りのテスト）
       expect(stateIcon).toBeInTheDocument();
     });
 
-    it.skip('TC-S014: 強度レベルに応じた進捗バー表示', () => {
+    it('TC-S014: 強度レベルに応じた進捗バー表示', () => {
       render(<TideSummaryCard tideInfo={mockTideInfo} />);
 
       const strengthProgress = screen.getByTestId('strength-progress');
       expect(strengthProgress).toBeInTheDocument();
-      const progressBar = strengthProgress.querySelector('div');
-      expect(progressBar).toHaveStyle('width: 85%');
+
+      // ARIA属性の検証（Designer仕様 - Issue #119）
+      expect(strengthProgress).toHaveAttribute('role', 'progressbar');
+      expect(strengthProgress).toHaveAttribute('aria-valuenow', '85');
+      expect(strengthProgress).toHaveAttribute('aria-valuemin', '0');
+      expect(strengthProgress).toHaveAttribute('aria-valuemax', '100');
+      expect(strengthProgress).toHaveAttribute('aria-label', '潮の強度: 85%');
+
+      // 進捗バーの幅を検証
+      const progressBarOuter = strengthProgress.querySelector('div');
+      expect(progressBarOuter).toBeInTheDocument();
+      const progressBarInner = progressBarOuter?.querySelector('div');
+      expect(progressBarInner).toHaveStyle({ width: '85%' });
     });
 
-    it.skip('TC-S015: 小潮の場合のカラー表示', () => {
+    it('TC-S015: 小潮の場合のカラー表示', () => {
       const neapTideInfo = { ...mockTideInfo, tideType: 'neap' as const };
       render(<TideSummaryCard tideInfo={neapTideInfo} />);
 
+      const tideTypeSection = screen.getByTestId('tide-type-section');
+      // Designer仕様（Issue #119）: 小潮は slate-600（グレー）+ bg-slate-50
+      expect(tideTypeSection).toHaveClass('text-slate-600', 'bg-slate-50');
+
       const tideTypeIcon = screen.getByTestId('tide-type-icon');
-      expect(tideTypeIcon).toHaveClass('text-blue-500'); // 小潮は青
+      expect(tideTypeIcon).toBeInTheDocument();
     });
   });
 
