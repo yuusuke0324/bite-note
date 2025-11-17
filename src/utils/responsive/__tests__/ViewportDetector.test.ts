@@ -139,23 +139,9 @@ describe('ViewportDetector', () => {
   });
 
   describe('viewport change detection', () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-      // フェイクタイマー環境でdetectorを再作成
-      detector = new ViewportDetector();
-      mockWindowSize(1024, 768);
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
+    // Real timersを使用（fake timersはCI環境で不安定なため）
     test('should call callback on viewport change', async () => {
       const callback = vi.fn();
-
-      // デバッグ: タイマーの状態を確認
-      console.log('[Test Debug] Fake timers active:', Date.now === vi.getMockedSystemTime);
-
       const unsubscribe = detector.onViewportChange(callback);
 
       // Given: 初期状態
@@ -163,19 +149,10 @@ describe('ViewportDetector', () => {
 
       // When: 画面サイズが変更
       mockWindowSize(768, 1024);
-      console.log('[Test Debug] Window size set to:', window.innerWidth, window.innerHeight);
-
       fireResizeEvent();
-      console.log('[Test Debug] Resize event fired');
 
-      // リサイズイベントのデバウンス待機（100ms）
-      console.log('[Test Debug] Before timers, callback calls:', callback.mock.calls.length);
-      console.log('[Test Debug] Pending timers:', vi.getTimerCount());
-
-      // CI環境ではadvanceTimersByTimeAsyncが動作しないため、runAllTimersAsyncを使用
-      await vi.runAllTimersAsync();
-
-      console.log('[Test Debug] After timers, callback calls:', callback.mock.calls.length);
+      // リアルタイマーでデバウンス待機（100ms + 余裕50ms）
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       // Then: コールバックが呼ばれる
       expect(callback).toHaveBeenCalledWith({
@@ -198,8 +175,8 @@ describe('ViewportDetector', () => {
       mockWindowSize(1920, 1080);
       fireResizeEvent();
 
-      // デバウンス待機（100ms）
-      await vi.runAllTimersAsync();
+      // デバウンス待機（100ms + 余裕50ms）
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       expect(callback).not.toHaveBeenCalled();
     });
