@@ -14,9 +14,6 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
 };
 
 describe('ErrorBoundary', () => {
-  // コンソールエラーをモックして、テスト時のノイズを防ぐ
-  const originalError = console.error;
-
   beforeEach(async () => {
     // CI環境でのJSDOM初期化待機（FishSpeciesAutocompleteパターン）
     if (process.env.CI) {
@@ -29,12 +26,9 @@ describe('ErrorBoundary', () => {
       // ローカル環境は高速化のため最小限
       await new Promise(resolve => setTimeout(resolve, 0));
     }
-
-    console.error = vi.fn();
   });
 
   afterEach(() => {
-    console.error = originalError;
     vi.unstubAllEnvs(); // 環境変数のスタブをクリーンアップ
 
     // CI環境ではroot containerを保持（FishSpeciesAutocompleteパターン）
@@ -54,6 +48,10 @@ describe('ErrorBoundary', () => {
   });
 
   it('エラーが発生した場合はエラーメッセージを表示する', () => {
+    // console.errorをrender前にモック（React内部処理の後）
+    const originalError = console.error;
+    console.error = vi.fn();
+
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -62,9 +60,14 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByText('エラーが発生しました')).toBeInTheDocument();
     expect(screen.getByText(/予期しないエラーが発生しました/)).toBeInTheDocument();
+
+    console.error = originalError;
   });
 
   it('エラー発生時にリロードボタンが表示される', () => {
+    const originalError = console.error;
+    console.error = vi.fn();
+
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -73,10 +76,15 @@ describe('ErrorBoundary', () => {
 
     const reloadButton = screen.getByRole('button', { name: 'ページ再読み込み' });
     expect(reloadButton).toBeInTheDocument();
+
+    console.error = originalError;
   });
 
   describe('開発環境でのエラー詳細表示', () => {
     it('開発環境でエラー詳細が表示される', () => {
+      const originalError = console.error;
+      console.error = vi.fn();
+
       // vi.stubEnv()を使用してNODE_ENVを安全に変更（CI環境での後続テストへの影響を防ぐ）
       vi.stubEnv('NODE_ENV', 'development');
 
@@ -89,6 +97,8 @@ describe('ErrorBoundary', () => {
       // 開発環境でのエラー詳細表示を確認
       expect(screen.getByText('エラー詳細（開発用）')).toBeInTheDocument();
       expect(screen.getByText(/Test error/)).toBeInTheDocument();
+
+      console.error = originalError;
     });
   });
 
@@ -107,6 +117,9 @@ describe('ErrorBoundary', () => {
   });
 
   it('ネストしたErrorBoundaryでも正常に動作する', () => {
+    const originalError = console.error;
+    console.error = vi.fn();
+
     render(
       <ErrorBoundary>
         <div>外側のコンポーネント</div>
@@ -118,5 +131,7 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByText('外側のコンポーネント')).toBeInTheDocument();
     expect(screen.getByText('エラーが発生しました')).toBeInTheDocument();
+
+    console.error = originalError;
   });
 });
