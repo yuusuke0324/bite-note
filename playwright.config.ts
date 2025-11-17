@@ -136,7 +136,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? 'npm run preview'  // CI: ビルド済み成果物を使用
+      ? 'npm run preview -- --port 3000'  // CI: ビルド済み成果物を port 3000 で起動
       : 'npm run dev',  // ローカル: 開発サーバー
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
