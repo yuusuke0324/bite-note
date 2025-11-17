@@ -18,38 +18,43 @@ import {
 import type { TideEvent } from '../../types/tide';
 
 describe('getTideTypeColor', () => {
-  it('大潮（spring）の場合、bg-blue-700を返す', () => {
+  it('大潮（spring）の場合、emerald-700 + bg-emerald-50を返す（WCAG 2.1 AA準拠）', () => {
     const result = getTideTypeColor('spring');
-    expect(result.bg).toBe('bg-blue-700');
-    expect(result.text).toBe('text-white');
+    expect(result.bg).toBe('bg-emerald-50');
+    expect(result.text).toBe('text-emerald-700');
+    expect(result.icon).toBe('🌊');
     expect(result.label).toBe('大潮');
   });
 
-  it('中潮（medium）の場合、bg-blue-500を返す', () => {
+  it('中潮（medium）の場合、sky-700 + bg-sky-50を返す（WCAG 2.1 AA準拠）', () => {
     const result = getTideTypeColor('medium');
-    expect(result.bg).toBe('bg-blue-500');
-    expect(result.text).toBe('text-white');
+    expect(result.bg).toBe('bg-sky-50');
+    expect(result.text).toBe('text-sky-700');
+    expect(result.icon).toBe('〰️');
     expect(result.label).toBe('中潮');
   });
 
-  it('小潮（neap）の場合、bg-blue-300を返す', () => {
+  it('小潮（neap）の場合、slate-600 + bg-slate-50を返す（WCAG 2.1 AA準拠）', () => {
     const result = getTideTypeColor('neap');
-    expect(result.bg).toBe('bg-blue-300');
-    expect(result.text).toBe('text-gray-800');
+    expect(result.bg).toBe('bg-slate-50');
+    expect(result.text).toBe('text-slate-600');
+    expect(result.icon).toBe('💧');
     expect(result.label).toBe('小潮');
   });
 
-  it('長潮（long）の場合、bg-gray-400を返す', () => {
+  it('長潮（long）の場合、gray-600 + bg-gray-50を返す', () => {
     const result = getTideTypeColor('long');
-    expect(result.bg).toBe('bg-gray-400');
-    expect(result.text).toBe('text-gray-800');
+    expect(result.bg).toBe('bg-gray-50');
+    expect(result.text).toBe('text-gray-600');
+    expect(result.icon).toBe('➖');
     expect(result.label).toBe('長潮');
   });
 
-  it('若潮（young）の場合、bg-gray-400を返す', () => {
+  it('若潮（young）の場合、gray-600 + bg-gray-50を返す', () => {
     const result = getTideTypeColor('young');
-    expect(result.bg).toBe('bg-gray-400');
-    expect(result.text).toBe('text-gray-800');
+    expect(result.bg).toBe('bg-gray-50');
+    expect(result.text).toBe('text-gray-600');
+    expect(result.icon).toBe('🔵');
     expect(result.label).toBe('若潮');
   });
 });
