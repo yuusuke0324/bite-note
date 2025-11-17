@@ -1,7 +1,7 @@
 // ErrorBoundaryコンポーネントの単体テスト
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
 
@@ -17,13 +17,30 @@ describe('ErrorBoundary', () => {
   // コンソールエラーをモックして、テスト時のノイズを防ぐ
   const originalError = console.error;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // CI環境でのJSDOM初期化待機（FishSpeciesAutocompleteパターン）
+    if (process.env.CI) {
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    } else {
+      // ローカル環境は高速化のため最小限
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
     console.error = vi.fn();
   });
 
   afterEach(() => {
     console.error = originalError;
     vi.unstubAllEnvs(); // 環境変数のスタブをクリーンアップ
+
+    // CI環境ではroot containerを保持（FishSpeciesAutocompleteパターン）
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
   });
 
   it('エラーが発生しない場合は子コンポーネントを正常に表示する', () => {
