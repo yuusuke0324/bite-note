@@ -14,6 +14,7 @@ export default defineWorkspace([
         '**/*.performance.test.{ts,tsx}',
         '**/*.red.test.{ts,tsx}', // TDD Red Phase テストを除外
         '**/components/**/*.test.tsx', // コンポーネントは別枠
+        'src/__tests__/components/**/*.test.tsx', // src/__tests__/components/ も除外
       ],
     },
   },
