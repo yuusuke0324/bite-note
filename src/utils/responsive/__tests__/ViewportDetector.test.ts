@@ -152,6 +152,10 @@ describe('ViewportDetector', () => {
 
     test('should call callback on viewport change', async () => {
       const callback = vi.fn();
+
+      // デバッグ: タイマーの状態を確認
+      console.log('[Test Debug] Fake timers active:', Date.now === vi.getMockedSystemTime);
+
       const unsubscribe = detector.onViewportChange(callback);
 
       // Given: 初期状態
@@ -159,10 +163,15 @@ describe('ViewportDetector', () => {
 
       // When: 画面サイズが変更
       mockWindowSize(768, 1024);
+      console.log('[Test Debug] Window size set to:', window.innerWidth, window.innerHeight);
+
       fireResizeEvent();
+      console.log('[Test Debug] Resize event fired');
 
       // リサイズイベントのデバウンス待機（100ms）
+      console.log('[Test Debug] Before advance timers, callback calls:', callback.mock.calls.length);
       await vi.advanceTimersByTimeAsync(100);
+      console.log('[Test Debug] After advance timers, callback calls:', callback.mock.calls.length);
 
       // Then: コールバックが呼ばれる
       expect(callback).toHaveBeenCalledWith({
