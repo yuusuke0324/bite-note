@@ -23,13 +23,16 @@ export interface TideTypeColorInfo {
 /**
  * 潮汐タイプに応じたカラー情報を取得
  *
- * Designer仕様:
- * - 大潮（spring）: bg-blue-700（濃い青） + 白文字
- * - 中潮（medium）: bg-blue-500（通常の青） + 白文字
- * - 小潮（neap）: bg-blue-300（薄い青） + 灰色文字
- * - 長潮/若潮: bg-gray-400（グレー） + 灰色文字
+ * Designer仕様（Issue #119 - WCAG 2.1 AA準拠）:
+ * - 大潮（spring）: emerald-700（緑 - 活発・好機） + bg-emerald-50
+ * - 中潮（medium）: sky-700（空色 - 中間） + bg-sky-50
+ * - 小潮（neap）: slate-600（グレー - 穏やか） + bg-slate-50
+ * - 長潮/若潮: gray-600（グレー） + bg-gray-50
  *
- * WCAG 2.1 AA準拠のコントラスト比を確保
+ * アクセシビリティ対応:
+ * - カラーコントラスト比: WCAG 2.1 AA基準（4.5:1以上）を満たす
+ * - 色のみに依存しない: アイコン + ラベル + 背景色の組み合わせ
+ * - 色覚多様性対応: 各タイプで異なるアイコンを使用
  *
  * @param tideType - 潮汐タイプ
  * @returns カラー情報（背景色、テキスト色、アイコン、ラベル）
@@ -37,33 +40,33 @@ export interface TideTypeColorInfo {
 export function getTideTypeColor(tideType: TideType): TideTypeColorInfo {
   const colorMap: Record<TideType, TideTypeColorInfo> = {
     spring: {
-      bg: 'bg-blue-700',
-      text: 'text-white',
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-700',
       icon: '🌊',
       label: '大潮'
     },
     medium: {
-      bg: 'bg-blue-500',
-      text: 'text-white',
-      icon: '🌊',
+      bg: 'bg-sky-50',
+      text: 'text-sky-700',
+      icon: '〰️',
       label: '中潮'
     },
     neap: {
-      bg: 'bg-blue-300',
-      text: 'text-gray-800',
-      icon: '🌊',
+      bg: 'bg-slate-50',
+      text: 'text-slate-600',
+      icon: '💧',
       label: '小潮'
     },
     long: {
-      bg: 'bg-gray-400',
-      text: 'text-gray-800',
-      icon: '🌊',
+      bg: 'bg-gray-50',
+      text: 'text-gray-600',
+      icon: '➖',
       label: '長潮'
     },
     young: {
-      bg: 'bg-gray-400',
-      text: 'text-gray-800',
-      icon: '🌊',
+      bg: 'bg-gray-50',
+      text: 'text-gray-600',
+      icon: '🔵',
       label: '若潮'
     }
   };

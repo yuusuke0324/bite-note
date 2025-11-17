@@ -129,7 +129,15 @@ export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) =>
           >
             {tideInfo.tideStrength}%
           </div>
-          <div data-testid="strength-progress" className="mt-2">
+          <div
+            role="progressbar"
+            aria-valuenow={tideInfo.tideStrength}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`潮の強度: ${tideInfo.tideStrength}%`}
+            data-testid="strength-progress"
+            className="mt-2"
+          >
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
                 className={`${strengthColor} h-2 rounded-full transition-all duration-300`}
