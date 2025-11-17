@@ -5,13 +5,14 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * CI環境の最適化 (Issue #129):
  * - タイムアウト: 30秒（テスト）、10秒（アサーション）
- * - ワーカー数: 2（CI）、unlimited（ローカル）
- * - ブラウザ: chromium + PWA（CI）、全ブラウザ（ローカル）
+ * - ワーカー数: 4（CI）、unlimited（ローカル）
+ * - ブラウザ: chromium（CI・PR時）、chromium + PWA（CI・main時）、全ブラウザ（ローカル）
+ * - テスト分類: PR時はSmoke testsのみ、main merge時はFull suite
  * - レポート: html + github + list（CI）、html（ローカル）
  * - スクリーンショット・ビデオ: 失敗時のみ（CI）
  *
- * テスト数: 約255個（CI）、約1,107個（ローカル）
- * 推定実行時間: 5-7分（CI）
+ * テスト数: 約20個（PR時）、約255個（main merge時）、約1,107個（ローカル）
+ * 推定実行時間: 4-5分（PR時）、10-12分（main merge時）
  *
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -19,10 +20,10 @@ export default defineConfig({
   testDir: './tests/e2e',
 
   /* タイムアウト設定を明示 (Issue #129) */
-  timeout: 60000,  // 各テスト: 60秒（CI環境を考慮）
+  timeout: 30000,  // 各テスト: 30秒
 
   expect: {
-    timeout: 15000,  // アサーション: 15秒（CI環境を考慮）
+    timeout: 10000,  // アサーション: 10秒
   },
 
   /* Run tests in files in parallel */
@@ -30,9 +31,9 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* CI環境でも並列化（1 → 2ワーカー） (Issue #129) */
-  workers: process.env.CI ? 2 : undefined,
+  retries: process.env.CI ? 1 : 0,  // 2 → 1に削減
+  /* CI環境でワーカー数を4に増加 (Issue #129) */
+  workers: process.env.CI ? 4 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI
     ? [['html'], ['github'], ['list']]
@@ -60,21 +61,40 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  /* CI環境ではchromium + PWAのみ (Issue #129) */
+  /* CI環境: PR時はSmoke tests、main merge時はFull suite (Issue #129) */
   projects: process.env.CI
     ? [
-        {
-          name: 'chromium',
-          use: { ...devices['Desktop Chrome'] },
-        },
-        {
-          name: 'pwa-chromium',
-          use: {
-            ...devices['Desktop Chrome'],
-            channel: 'chrome',
-          },
-          testMatch: /pwa-.*\.spec\.ts/,
-        },
+        // PR時: Smoke tests（重要なテストのみ）
+        ...(process.env.GITHUB_EVENT_NAME === 'pull_request'
+          ? [
+              {
+                name: 'smoke',
+                testMatch: [
+                  '**/app-navigation.spec.ts',
+                  '**/record-creation-flow.spec.ts',
+                  '**/record-list-operations.spec.ts',
+                ],
+                testIgnore: '**/performance-*.spec.ts',
+                use: { ...devices['Desktop Chrome'] },
+              },
+            ]
+          : [
+              // main merge時: Full suite
+              {
+                name: 'chromium',
+                testMatch: '**/*.spec.ts',
+                testIgnore: '**/performance-*.spec.ts',
+                use: { ...devices['Desktop Chrome'] },
+              },
+              {
+                name: 'pwa-chromium',
+                testMatch: /pwa-.*\.spec\.ts/,
+                use: {
+                  ...devices['Desktop Chrome'],
+                  channel: 'chrome',
+                },
+              },
+            ]),
       ]
     : [
         // ローカル環境: 全ブラウザ
@@ -113,5 +133,6 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   },
 });
