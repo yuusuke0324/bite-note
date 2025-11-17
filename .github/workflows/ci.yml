@@ -78,25 +78,96 @@ jobs:
     - name: Build application
       run: npm run build
 
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
+    # ビルド成果物をキャッシュして E2E テストで再利用
+    - name: Cache build artifacts
+      uses: actions/cache@v4
       if: matrix.node-version == 20
+      with:
+        path: dist
+        key: build-${{ github.sha }}-${{ matrix.node-version }}
+        restore-keys: |
+          build-${{ github.sha }}-
 
-    - name: Run E2E tests
-      run: npm run test:e2e
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: test
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # PR時: 3並列、main merge時: 5並列
+        shard: ${{ github.event_name == 'pull_request' && fromJSON('[1, 2, 3]') || fromJSON('[1, 2, 3, 4, 5]') }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: node-modules-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          node-modules-
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Restore build artifacts
+      uses: actions/cache@v4
+      with:
+        path: dist
+        key: build-${{ github.sha }}-20
+        restore-keys: |
+          build-${{ github.sha }}-
+
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      id: playwright-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          playwright-
+
+    - name: Install Playwright browsers
+      run: npx playwright install chromium --with-deps
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+    - name: Install Playwright dependencies only
+      run: npx playwright install-deps chromium
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+
+    - name: Run E2E tests (Sharded)
+      run: |
+        TOTAL_SHARDS=${{ github.event_name == 'pull_request' && 3 || 5 }}
+        npx playwright test --shard=${{ matrix.shard }}/${TOTAL_SHARDS}
       env:
         NODE_OPTIONS: '--max-old-space-size=4096'
         GITHUB_EVENT_NAME: ${{ github.event_name }}
-      if: matrix.node-version == 20
-      timeout-minutes: 15
+      timeout-minutes: 5
 
     - name: Upload E2E test results
       uses: actions/upload-artifact@v4
       if: failure()
       with:
-        name: playwright-report-${{ matrix.node-version }}
+        name: playwright-report-shard-${{ matrix.shard }}
         path: playwright-report/
         retention-days: 30
+
+    - name: Upload E2E test trace
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-trace-shard-${{ matrix.shard }}
+        path: test-results/
+        retention-days: 7
 
   lighthouse:
     runs-on: ubuntu-latest

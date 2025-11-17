@@ -3,24 +3,29 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Playwright E2E Test Configuration
  *
- * CI環境の最適化 (Issue #129):
- * - タイムアウト: 30秒（テスト）、10秒（アサーション）
- * - ワーカー数: 4（CI）、unlimited（ローカル）
+ * CI環境の最適化 (Issue #129 - Sharding Strategy):
+ * - タイムアウト: 20秒（テスト）、10秒（アサーション）
+ * - ワーカー数: 8（CI）、unlimited（ローカル）
+ * - Sharding: PR時3並列、main merge時5並列
  * - ブラウザ: chromium（CI・PR時）、chromium + PWA（CI・main時）、全ブラウザ（ローカル）
  * - テスト分類: PR時はSmoke testsのみ、main merge時はFull suite
  * - レポート: html + github + list（CI）、html（ローカル）
  * - スクリーンショット・ビデオ: 失敗時のみ（CI）
+ * - webServer: 本番ビルド（CI）、開発サーバー（ローカル）
  *
  * テスト数: 約20個（PR時）、約255個（main merge時）、約1,107個（ローカル）
- * 推定実行時間: 4-5分（PR時）、10-12分（main merge時）
+ * 推定実行時間: 2-3分（PR時）、8-10分（main merge時）
  *
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
   testDir: './tests/e2e',
 
-  /* タイムアウト設定を明示 (Issue #129) */
-  timeout: 30000,  // 各テスト: 30秒
+  /* Global setup for test environment initialization (Issue #129) */
+  globalSetup: './tests/e2e/global-setup.ts',
+
+  /* タイムアウト設定を最適化 (Issue #129 - Sharding) */
+  timeout: 20000,  // 各テスト: 20秒（30秒 → 20秒に短縮）
 
   expect: {
     timeout: 10000,  // アサーション: 10秒
@@ -30,10 +35,10 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 1 : 0,  // 2 → 1に削減
-  /* CI環境でワーカー数を4に増加 (Issue #129) */
-  workers: process.env.CI ? 4 : undefined,
+  /* Retry on CI only - リトライなしで高速化 (Issue #129) */
+  retries: 0,  // 1 → 0に削減（Sharding導入により不要）
+  /* CI環境でワーカー数を8に増加 (Issue #129 - Sharding) */
+  workers: process.env.CI ? 8 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI
     ? [['html'], ['github'], ['list']]
@@ -130,9 +135,11 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: process.env.CI
+      ? 'npm run build && npm run preview'  // CI: 本番ビルド（起動30-60%削減）
+      : 'npm run dev',  // ローカル: 開発サーバー
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: process.env.CI ? 180000 : 120000,  // CI: 3分（ビルド時間考慮）、ローカル: 2分
   },
 });
