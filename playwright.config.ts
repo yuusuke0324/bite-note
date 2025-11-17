@@ -136,10 +136,10 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? 'npm run build && npm run preview'  // CI: 本番ビルド（起動30-60%削減）
+      ? 'test -d dist && npm run preview || (npm run build && npm run preview)'  // CI: ビルド成果物があれば再利用
       : 'npm run dev',  // ローカル: 開発サーバー
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: process.env.CI ? 180000 : 120000,  // CI: 3分（ビルド時間考慮）、ローカル: 2分
+    timeout: process.env.CI ? 60000 : 120000,  // CI: 1分（ビルド済み想定）、ローカル: 2分
   },
 });
