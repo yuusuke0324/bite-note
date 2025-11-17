@@ -139,6 +139,14 @@ describe('ViewportDetector', () => {
   });
 
   describe('viewport change detection', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
     test('should call callback on viewport change', async () => {
       const callback = vi.fn();
       const unsubscribe = detector.onViewportChange(callback);
@@ -150,8 +158,8 @@ describe('ViewportDetector', () => {
       mockWindowSize(768, 1024);
       fireResizeEvent();
 
-      // リサイズイベントのデバウンス待機
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // リサイズイベントのデバウンス待機（100ms）
+      await vi.advanceTimersByTimeAsync(100);
 
       // Then: コールバックが呼ばれる
       expect(callback).toHaveBeenCalledWith({
@@ -174,8 +182,8 @@ describe('ViewportDetector', () => {
       mockWindowSize(1920, 1080);
       fireResizeEvent();
 
-      // デバウンス待機
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // デバウンス待機（100ms）
+      await vi.advanceTimersByTimeAsync(100);
 
       expect(callback).not.toHaveBeenCalled();
     });
