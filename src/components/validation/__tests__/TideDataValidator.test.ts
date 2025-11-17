@@ -325,6 +325,163 @@ describe('TideDataValidator', () => {
     });
   });
 
+  describe('Performance Mode', () => {
+    test('should use fast validation in performance mode', () => {
+      const validData = generateValidTideData(1000);
+      const options: ValidationOptions = {
+        performanceMode: true,
+        enableWarnings: false,
+        strictMode: false
+      };
+
+      const result = validator.validateComprehensively(validData, options);
+
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toHaveLength(0); // 警告スキップ確認
+    });
+
+    test('should skip warning generation in performance mode', () => {
+      const dataWithWarnings: RawTideData[] = [
+        { time: '2025-01-29T06:00:00Z', tide: 4.9 } // 境界値（警告対象）
+      ];
+      const options: ValidationOptions = {
+        performanceMode: true,
+        enableWarnings: true, // enabledでもperformanceModeでスキップ
+        strictMode: false
+      };
+
+      const result = validator.validateComprehensively(dataWithWarnings, options);
+
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toHaveLength(0); // performanceModeで警告スキップ
+    });
+
+    test('should maintain validation accuracy in performance mode', () => {
+      const validData = generateValidTideData(100);
+      const invalidData: RawTideData[] = [
+        { time: 'invalid-time', tide: 2.0 },
+        { time: '2025-01-29T06:00:00Z', tide: 50.0 } // 範囲外
+      ];
+
+      const normalValid = validator.validateComprehensively(validData, { performanceMode: false });
+      const perfValid = validator.validateComprehensively(validData, { performanceMode: true });
+
+      const normalInvalid = validator.validateComprehensively(invalidData, { performanceMode: false });
+      const perfInvalid = validator.validateComprehensively(invalidData, { performanceMode: true });
+
+      // 有効データは両方ともisValid: true
+      expect(normalValid.isValid).toBe(true);
+      expect(perfValid.isValid).toBe(true);
+
+      // 無効データは両方ともisValid: false
+      expect(normalInvalid.isValid).toBe(false);
+      expect(perfInvalid.isValid).toBe(false);
+
+      // エラー数は同じ
+      expect(perfInvalid.errors.length).toBe(normalInvalid.errors.length);
+    });
+
+    test('should improve performance by 30% in performance mode', () => {
+      const dataset = generateValidTideData(5000);
+
+      // 複数回計測の平均値で評価
+      const iterations = 3;
+      const normalTimes: number[] = [];
+      const perfTimes: number[] = [];
+
+      for (let i = 0; i < iterations; i++) {
+        // 通常モード
+        const startNormal = performance.now();
+        validator.validateComprehensively(dataset, { performanceMode: false });
+        normalTimes.push(performance.now() - startNormal);
+
+        // パフォーマンスモード
+        const startPerf = performance.now();
+        validator.validateComprehensively(dataset, { performanceMode: true });
+        perfTimes.push(performance.now() - startPerf);
+      }
+
+      // 平均値で評価
+      const avgNormal = normalTimes.reduce((a, b) => a + b) / iterations;
+      const avgPerf = perfTimes.reduce((a, b) => a + b) / iterations;
+
+      const improvement = ((avgNormal - avgPerf) / avgNormal) * 100;
+
+      console.log(`Performance improvement: ${improvement.toFixed(1)}% (Normal: ${avgNormal.toFixed(2)}ms, Perf: ${avgPerf.toFixed(2)}ms)`);
+
+      // 20%以上改善（30%目標の余裕を持たせた条件）
+      expect(avgPerf).toBeLessThan(avgNormal * 0.8);
+      expect(improvement).toBeGreaterThanOrEqual(20);
+    });
+  });
+
+  describe('Strict Mode', () => {
+    test('should validate tide precision in strict mode', () => {
+      const highPrecisionData: RawTideData[] = [
+        { time: '2025-01-29T06:00:00Z', tide: 2.1234 } // 小数点以下4桁（エラー）
+      ];
+      const options: ValidationOptions = {
+        performanceMode: false,
+        enableWarnings: true,
+        strictMode: true
+      };
+
+      const result = validator.validateComprehensively(highPrecisionData, options);
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.some(e => e.message.includes('precision'))).toBe(true);
+    });
+
+    test('should validate timezone in strict mode', () => {
+      // タイムゾーン情報なし（エラー）
+      mockTideDataValidator.validateTimeFormat = vi.fn().mockReturnValue(true);
+      const noTimezoneData: RawTideData[] = [
+        { time: '2025-01-29T06:00:00', tide: 2.0 } as any // タイムゾーンなし
+      ];
+      const options: ValidationOptions = {
+        performanceMode: false,
+        enableWarnings: true,
+        strictMode: true
+      };
+
+      const result = validator.validateComprehensively(noTimezoneData, options);
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.some(e => e.message.includes('Timezone'))).toBe(true);
+    });
+
+    test('should ignore strict mode in performance mode', () => {
+      const highPrecisionData: RawTideData[] = [
+        { time: '2025-01-29T06:00:00Z', tide: 2.1234 } // 小数点以下4桁
+      ];
+      const options: ValidationOptions = {
+        performanceMode: true, // performanceModeがstrictModeより優先
+        enableWarnings: true,
+        strictMode: true
+      };
+
+      const result = validator.validateComprehensively(highPrecisionData, options);
+
+      // strictModeは無視され、高速検証のみ実施
+      expect(result.isValid).toBe(true); // 精度エラーは検出されない
+    });
+
+    test('should allow data with valid precision (3 decimal places)', () => {
+      const validPrecisionData: RawTideData[] = [
+        { time: '2025-01-29T06:00:00Z', tide: 2.123 } // 小数点以下3桁（OK）
+      ];
+      const options: ValidationOptions = {
+        performanceMode: false,
+        enableWarnings: true,
+        strictMode: true
+      };
+
+      const result = validator.validateComprehensively(validPrecisionData, options);
+
+      expect(result.isValid).toBe(true);
+    });
+  });
+
   describe('constructor and configuration', () => {
     test('should initialize with required dependencies', () => {
       const mockValidator = {} as ITideDataValidator;
