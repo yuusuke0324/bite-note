@@ -78,6 +78,7 @@ export default defineConfig({
                   '**/app-navigation.spec.ts',
                   '**/record-creation-flow.spec.ts',
                   '**/record-list-operations.spec.ts',
+                  '**/tide-system-e2e.spec.ts',  // #136: CI品質ゲート強化
                 ],
                 testIgnore: '**/performance-*.spec.ts',
                 use: { ...devices['Desktop Chrome'] },
