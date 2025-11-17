@@ -1,7 +1,13 @@
 // Test setup file
 import '@testing-library/jest-dom';
 import 'fake-indexeddb/auto';  // IndexedDB polyfill for testing
+import { expect } from 'vitest';
 import { vi } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+
+// Extend Vitest's expect with @testing-library/jest-dom matchers
+// This resolves TypeScript errors for matchers like toBeInTheDocument, toHaveAttribute, etc.
+expect.extend(matchers);
 
 // Global test utilities and mocks can be added here
 
