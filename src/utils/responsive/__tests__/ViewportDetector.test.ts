@@ -4,18 +4,6 @@
  */
 
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-
-// createTimer をモック（importの前に定義）
-vi.mock('../timer-utils', () => ({
-  createTimer: (callback: () => void, ms: number) => {
-    const id = setTimeout(callback, ms);
-    return {
-      id,
-      clear: () => clearTimeout(id as NodeJS.Timeout),
-    };
-  },
-}));
-
 import { ViewportDetector } from '../ViewportDetector';
 import type { ViewportInfo, DeviceType } from '../types';
 

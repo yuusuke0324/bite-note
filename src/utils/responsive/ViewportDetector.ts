@@ -10,14 +10,13 @@ import type {
   IViewportDetector
 } from './types';
 import { VIEWPORT_BREAKPOINTS } from './types';
-import { createTimer, type TimerHandle } from './timer-utils';
 
 /**
  * ビューポート検出・監視クラス
  */
 export class ViewportDetector implements IViewportDetector {
   private callbacks: Set<(viewport: ViewportInfo) => void> = new Set();
-  private resizeTimeout: TimerHandle | null = null;
+  private resizeTimeout: ReturnType<typeof setTimeout> | null = null;
   private isListening = false;
 
   constructor() {
@@ -65,7 +64,7 @@ export class ViewportDetector implements IViewportDetector {
         this.isListening = false;
 
         if (this.resizeTimeout) {
-          this.resizeTimeout.clear();
+          clearTimeout(this.resizeTimeout);
           this.resizeTimeout = null;
         }
       }
@@ -97,10 +96,10 @@ export class ViewportDetector implements IViewportDetector {
    */
   private handleResize(): void {
     if (this.resizeTimeout) {
-      this.resizeTimeout.clear();
+      clearTimeout(this.resizeTimeout);
     }
 
-    this.resizeTimeout = createTimer(() => {
+    this.resizeTimeout = setTimeout(() => {
       const viewport = this.getCurrentViewport();
 
       // 全てのコールバックに通知
