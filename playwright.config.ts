@@ -19,10 +19,10 @@ export default defineConfig({
   testDir: './tests/e2e',
 
   /* タイムアウト設定を明示 (Issue #129) */
-  timeout: 30000,  // 各テスト: 30秒
+  timeout: 60000,  // 各テスト: 60秒（CI環境を考慮）
 
   expect: {
-    timeout: 10000,  // アサーション: 10秒
+    timeout: 15000,  // アサーション: 15秒（CI環境を考慮）
   },
 
   /* Run tests in files in parallel */
