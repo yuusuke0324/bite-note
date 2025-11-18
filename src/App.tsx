@@ -127,8 +127,12 @@ function App() {
       try {
         await testDatabase();
         await testStores();
+        // E2Eテスト用: 初期化完了フラグを設定
+        document.body.setAttribute('data-app-initialized', 'true');
       } catch (error) {
         setAppError(`アプリ初期化エラー: ${error instanceof Error ? error.message : String(error)}`);
+        // エラー時もフラグを設定（エラー表示が出ている状態）
+        document.body.setAttribute('data-app-initialized', 'error');
       }
     };
 

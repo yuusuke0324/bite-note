@@ -379,17 +379,16 @@ export async function setupCleanPage(page: Page) {
     }
   });
 
-  // 🟢 改善1: IndexedDB削除完了を確実に確認
+  // 🟢 改善1: IndexedDB削除完了を確認（最大5秒）
   await page.evaluate(async () => {
     if (typeof indexedDB !== 'undefined') {
-      // 削除完了を確認（最大20回、150msごとにチェック、最大3秒）
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 50; i++) {
         const dbs = await indexedDB.databases();
         const hasFishingRecordDB = dbs.some(db => db.name === 'FishingRecordDB');
         if (!hasFishingRecordDB) {
           return; // 削除完了
         }
-        await new Promise(resolve => setTimeout(resolve, 150));
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
     }
   });
@@ -397,20 +396,34 @@ export async function setupCleanPage(page: Page) {
   // 🟢 改善2: goto()で再初期化（reload()より確実）
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  // 🟢 改善3: waitForTimeoutではなく、実際のUIが表示されるまで待機（CI環境考慮で30秒）
+  // 🟢 改善3: App.tsx初期化完了を待機（最大60秒、CI環境考慮、リトライあり）
+  const maxAttempts = 2;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const initialized = await page.waitForSelector('body[data-app-initialized="true"]', {
+      timeout: 30000,
+      state: 'attached'
+    }).catch(() => null);
+
+    if (initialized) {
+      break; // 初期化成功
+    }
+
+    // 初期化失敗時はリロード
+    if (attempt < maxAttempts - 1) {
+      console.warn(`⚠️ App initialization timeout (attempt ${attempt + 1}/${maxAttempts}), forcing reload...`);
+      await page.reload({ waitUntil: 'domcontentloaded' });
+    } else {
+      throw new Error('❌ App initialization failed after 2 attempts');
+    }
+  }
+
+  // 🟢 改善4: UIが表示されるまで待機（初期化完了後は高速）
   await page.waitForSelector(
     `[data-testid="${TestIds.FORM_TAB}"]`,
-    { timeout: 30000, state: 'visible' }
+    { timeout: 10000, state: 'visible' }
   );
 
-  // 🟢 改善4: タブUIが操作可能か確認
+  // 🟢 改善5: タブUIが操作可能か確認
   const formTab = page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
   await expect(formTab).toBeEnabled();
-
-  // 🟢 改善5: App.tsx初期化が完了したことを確認（エラー表示がないこと）
-  const errorDisplay = page.locator('[data-testid="error-message"]');
-  const errorCount = await errorDisplay.count();
-  if (errorCount > 0) {
-    await expect(errorDisplay).not.toBeVisible({ timeout: 1000 });
-  }
 }
