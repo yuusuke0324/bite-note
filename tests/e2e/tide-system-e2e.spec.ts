@@ -207,6 +207,9 @@ class TideSystemE2EHelper {
   async verifyTideTooltipInteraction() {
     const graphCanvas = this.page.locator('[data-testid="tide-graph-canvas"]');
 
+    // グラフが表示されるまで待機（Rechartsの動的レンダリング対応）
+    await graphCanvas.waitFor({ state: 'visible', timeout: 10000 });
+
     // マウスオーバーでトゥールチップ表示
     await graphCanvas.hover({ position: { x: 100, y: 100 } });
     const tooltip = this.page.locator('[data-testid="tide-tooltip"]');
