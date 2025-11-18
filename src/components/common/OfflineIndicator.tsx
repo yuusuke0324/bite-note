@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { offlineQueueService } from '../../lib/offline-queue-service';
+import { TestIds } from '../../constants/testIds';
 
 interface OfflineIndicatorProps {
   isOnline: boolean;
@@ -36,6 +37,7 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
       {/* オフラインバナー（最上部） */}
       {!isOnline && (
         <div
+          data-testid={TestIds.OFFLINE_INDICATOR}
           role="alert"
           aria-live="polite"
           aria-label="インターネット接続が切断されました。オフラインモードです。"
@@ -46,7 +48,7 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
           </span>
           <span className="font-semibold text-base">オフライン</span>
           {pendingCount > 0 && (
-            <span className="ml-2 px-2 py-1 bg-white bg-opacity-20 rounded-full text-xs">
+            <span data-testid={TestIds.OFFLINE_BADGE} className="ml-2 px-2 py-1 bg-white bg-opacity-20 rounded-full text-xs">
               未同期: {pendingCount}件
             </span>
           )}
@@ -56,6 +58,7 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
       {/* オンラインだが未同期データがある場合 */}
       {isOnline && pendingCount > 0 && (
         <div
+          data-testid={TestIds.SYNC_STATUS}
           role="status"
           aria-live="polite"
           aria-label={`未同期データ ${pendingCount}件`}
