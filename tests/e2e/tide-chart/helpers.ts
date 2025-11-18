@@ -342,57 +342,30 @@ export async function ensureNoConsoleErrors(page: Page) {
  * ```
  */
 export async function setupCleanPage(page: Page) {
-  // LocalStorageアクセスエラーを回避するため、実際のページにアクセスしてからクリア
-  await page.goto('/');
-  await page.waitForLoadState('domcontentloaded');
+  // テスト用の一意なDB名を生成（タイムスタンプ + ランダム値）
+  const testDbName = `FishingRecordDB_Test_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-  // LocalStorage/sessionStorage/IndexedDBを完全にクリア
-  await page.evaluate(async () => {
-    try {
-      // LocalStorage/sessionStorageクリア
-      if (typeof Storage !== 'undefined') {
-        localStorage.clear();
-        sessionStorage.clear();
-      }
+  // ブラウザコンテキストにDB名を注入（ページロード前）
+  await page.addInitScript((dbName) => {
+    globalThis.__TEST_DB_NAME__ = dbName;
+  }, testDbName);
 
-      // IndexedDBクリア（BiteNoteDBを削除）
-      if (typeof indexedDB !== 'undefined') {
-        const databases = ['BiteNoteDB'];
-        // IndexedDB削除を非同期で実行し、完了を待機
-        const deletePromises = databases.map(dbName => {
-          return new Promise<void>((resolve) => {
-            const request = indexedDB.deleteDatabase(dbName);
-            request.onsuccess = () => resolve();
-            request.onerror = () => resolve(); // エラーでも続行
-            request.onblocked = () => {
-              console.log(`IndexedDB ${dbName} deletion blocked`);
-              // ブロックされても一定時間後に続行
-              setTimeout(() => resolve(), 1000);
-            };
-          });
-        });
-        await Promise.all(deletePromises);
-      }
-    } catch (e) {
-      // アクセスができない場合は無視
-      console.log('Storage clear skipped:', e);
-    }
+  // ページアクセス（IndexedDB削除不要 → 高速化）
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  // App.tsx初期化完了を待機（Desktop Chromeでも余裕を持たせて25秒）
+  await page.waitForSelector('body[data-app-initialized="true"]', {
+    timeout: 25000,
+    state: 'attached'
   });
 
-  // IndexedDB削除が完了するまで追加待機
-  await page.waitForTimeout(1000);
+  // UIが表示されるまで待機 (ModernApp.tsx: nav-form パターン)
+  await page.waitForSelector(
+    `[data-testid="nav-form"]`,
+    { timeout: 5000, state: 'visible' }
+  );
 
-  // ページをリロードして初期化を確実に実行
-  await page.reload();
-  await page.waitForLoadState('domcontentloaded');
-
-  // アプリ初期化完了まで追加待機
-  await page.waitForTimeout(2000);
-
-  // アプリが正常に初期化されるまで待機（最大20秒）
-  // タブUIが表示されることを確認
-  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"], [data-testid="${TestIds.FISHING_RECORDS_LINK}"]`, {
-    timeout: 20000,
-    state: 'visible'
-  });
+  // タブUIが操作可能か確認
+  const formTab = page.locator(`[data-testid="nav-form"]`);
+  await expect(formTab).toBeEnabled();
 }

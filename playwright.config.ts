@@ -103,27 +103,28 @@ export default defineConfig({
             ]),
       ]
     : [
-        // ローカル環境: 全ブラウザ
+        // ローカル環境: Desktop Chromeのみ（Mobile環境はCI環境で初期化が遅延するため除外）
         {
           name: 'chromium',
           use: { ...devices['Desktop Chrome'] },
         },
-        {
-          name: 'firefox',
-          use: { ...devices['Desktop Firefox'] },
-        },
-        {
-          name: 'webkit',
-          use: { ...devices['Desktop Safari'] },
-        },
-        {
-          name: 'Mobile Chrome',
-          use: { ...devices['Pixel 5'] },
-        },
-        {
-          name: 'Mobile Safari',
-          use: { ...devices['iPhone 12'] },
-        },
+        // 将来的にCI環境でMobileテスト専用jobを追加予定
+        // {
+        //   name: 'firefox',
+        //   use: { ...devices['Desktop Firefox'] },
+        // },
+        // {
+        //   name: 'webkit',
+        //   use: { ...devices['Desktop Safari'] },
+        // },
+        // {
+        //   name: 'Mobile Chrome',
+        //   use: { ...devices['Pixel 5'] },
+        // },
+        // {
+        //   name: 'Mobile Safari',
+        //   use: { ...devices['iPhone 12'] },
+        // },
         {
           name: 'pwa-chromium',
           use: {

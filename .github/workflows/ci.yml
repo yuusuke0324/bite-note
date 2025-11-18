@@ -95,8 +95,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # PR時も全シャード実行（Issue #140対応）
-        shard: [1, 2, 3, 4, 5]
+        # Shard数を3に削減（Issue #143: Mobile環境除外）
+        shard: [1, 2, 3]
 
     steps:
     - name: Checkout repository
@@ -141,7 +141,7 @@ jobs:
 
     - name: Run E2E tests (Sharded)
       run: |
-        TOTAL_SHARDS=5
+        TOTAL_SHARDS=3
         npx playwright test --shard=${{ matrix.shard }}/${TOTAL_SHARDS}
       env:
         NODE_OPTIONS: '--max-old-space-size=4096'

@@ -34,6 +34,9 @@ import { FishingMap } from './components/map/FishingMap';
 // アイコン
 import Icons from './components/icons/Icons';
 
+// テスト用定数
+import { TestIds } from './constants/testIds';
+
 // サービス
 import { photoService } from './lib/photo-service';
 import { fishingRecordService } from './lib/fishing-record-service';
@@ -186,8 +189,12 @@ function ModernApp() {
       try {
         setIsLoading(true);
         await appActions.initialize();
+        // E2Eテスト用: 初期化完了フラグを設定
+        document.body.setAttribute('data-app-initialized', 'true');
       } catch (error) {
         console.error('App initialization failed:', error);
+        // エラー時もフラグを設定（エラー表示が出ている状態）
+        document.body.setAttribute('data-app-initialized', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -307,6 +314,7 @@ function ModernApp() {
       label: 'ホーム',
       icon: <Icons.Home />,
       active: activeTab === 'home',
+      testId: TestIds.HOME_TAB,
     },
     {
       id: 'list',
@@ -314,6 +322,7 @@ function ModernApp() {
       icon: <Icons.List />,
       active: activeTab === 'list',
       badge: records.length,
+      testId: TestIds.LIST_TAB,
     },
     {
       id: 'map',
@@ -321,18 +330,21 @@ function ModernApp() {
       icon: <Icons.Location />,
       active: activeTab === 'map',
       badge: records.filter(r => r.coordinates).length,
+      testId: TestIds.MAP_TAB,
     },
     {
       id: 'form',
       label: '新規記録',
       icon: <Icons.Add />,
       active: activeTab === 'form',
+      testId: TestIds.FORM_TAB,
     },
     {
       id: 'debug',
       label: '設定',
       icon: <Icons.Settings />,
       active: activeTab === 'debug',
+      testId: TestIds.DEBUG_TAB,
     },
   ];
 
@@ -943,6 +955,7 @@ function ModernApp() {
         loading={photoLoading}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        data-testid={TestIds.RECORD_ITEM(record.id)}
       >
         {/* 写真表示 + オーバーレイ */}
         <div

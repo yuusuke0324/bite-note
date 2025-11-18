@@ -127,8 +127,12 @@ function App() {
       try {
         await testDatabase();
         await testStores();
+        // E2Eテスト用: 初期化完了フラグを設定
+        document.body.setAttribute('data-app-initialized', 'true');
       } catch (error) {
         setAppError(`アプリ初期化エラー: ${error instanceof Error ? error.message : String(error)}`);
+        // エラー時もフラグを設定（エラー表示が出ている状態）
+        document.body.setAttribute('data-app-initialized', 'error');
       }
     };
 
@@ -174,7 +178,7 @@ function App() {
     };
 
     initializeApp();
-  }, [appActions, formActions, records.length, settings.theme]);
+  }, [appActions, formActions]); // records.length, settings.theme を削除（再レンダリングループ防止）
 
   // 型安全なTestIDsマッピング
   const TAB_TEST_IDS: Record<'form' | 'list' | 'tide-chart' | 'debug', string> = {

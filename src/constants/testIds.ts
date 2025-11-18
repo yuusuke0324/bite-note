@@ -8,12 +8,15 @@ export const TestIds = {
   FISHING_RECORDS_LINK: 'fishing-records-link',
   FORM_TAB: 'form-tab',
   DEBUG_TAB: 'debug-tab',
+  HOME_TAB: 'home-tab',
+  LIST_TAB: 'list-tab',
+  MAP_TAB: 'map-tab',
 
   // Record List
   FISHING_RECORDS_LIST: 'fishing-records-list',
   FISHING_RECORDS_CONTAINER: 'fishing-records-container',
   ADD_RECORD_BUTTON: 'add-record-button',
-  RECORD_ITEM: (id: string) => `record-${id}`,
+  RECORD_ITEM: (id: string) => `record-item-${id}`,
 
   // Record Form
   LOCATION_NAME: 'location-name',
