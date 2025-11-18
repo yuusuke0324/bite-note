@@ -463,71 +463,20 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
   });
 
   test.describe('エラーハンドリング', () => {
-    // SKIP: TC-E006とTC-E007は現在の実装と矛盾
+    // Note: TC-E006（APIエラーの再試行）とTC-E007（ネットワークエラー時の動作）は削除
+    //
+    // 削除理由:
     // アプリケーションは完全にローカルで潮汐計算を行うため、
-    // APIモックやネットワークオフライン設定は効果がない
-    // 将来的に実装に即したエラーケースのテストを追加予定
-    test.skip('TC-E006: 潮汐計算エラーの再試行', async ({ page }) => {
-      // モック関数で計算エラーをシミュレート
-      await page.route('**/api/tide/**', route => {
-        route.abort('failed');
-      });
-
-      // 1. GPS付き記録作成
-      await helper.createFishingRecord({
-        location: '駿河湾',
-        fishSpecies: 'イワシ',
-        size: 15,
-        useGPS: true
-      });
-
-      // 2. 詳細ページで潮汐グラフ展開試行
-      await helper.goToRecordDetail();
-      await page.click('[data-testid="tide-graph-toggle-button"]');
-
-      // 3. エラー表示確認
-      await expect(page.locator('[data-testid="tide-error"]')).toBeVisible();
-      await expect(page.locator('[data-testid="tide-error"]')).toContainText('潮汐情報の取得に失敗しました');
-
-      // 4. 再試行ボタン確認
-      await expect(page.locator('[data-testid="tide-retry-button"]')).toBeVisible();
-
-      // モックを解除して再試行
-      await page.unroute('**/api/tide/**');
-      await page.click('[data-testid="tide-retry-button"]');
-
-      // 5. 再試行後の正常表示確認
-      await helper.waitForTideDataLoad();
-      await helper.verifyTideSummaryVisible();
-    });
-
-    test.skip('TC-E007: ネットワークエラー時の動作', async ({ page }) => {
-      // 1. GPS付き記録作成
-      await helper.createFishingRecord({
-        location: '仙台湾',
-        fishSpecies: 'ヒラメ',
-        size: 40,
-        useGPS: true
-      });
-
-      // 2. ネットワークを切断
-      await page.context().setOffline(true);
-
-      // 3. 詳細ページで潮汐グラフ展開試行
-      await helper.goToRecordDetail();
-      await page.click('[data-testid="tide-graph-toggle-button"]');
-
-      // 4. ネットワークエラー表示確認
-      await expect(page.locator('[data-testid="tide-error"]')).toBeVisible();
-
-      // 5. ネットワーク復旧
-      await page.context().setOffline(false);
-      await page.click('[data-testid="tide-retry-button"]');
-
-      // 6. 復旧後の正常動作確認
-      await helper.waitForTideDataLoad();
-      await helper.verifyTideSummaryVisible();
-    });
+    // APIモックやネットワークオフライン設定は無意味でテストとして成立しない
+    //
+    // 将来的に追加すべきエラーケースのテスト:
+    // - 座標データ不正時のエラー表示
+    // - 地域データ取得失敗時のフォールバック動作
+    // - データ検証エラー時の段階的フォールバック
+    // - 初期化失敗時のエラーハンドリング
+    //
+    // 削除経緯: Issue #145対応時に実装との矛盾を発見（2025-11-18）
+    // 詳細: PR #146のコミット履歴参照
   });
 
   test.describe('レスポンシブ対応', () => {
