@@ -3,6 +3,7 @@
 import React, { Component, type ReactNode } from 'react';
 import { errorManager } from '../lib/errors/ErrorManager';
 import { AppError, ErrorSeverity, ErrorCategory } from '../lib/errors/ErrorTypes';
+import { TestIds } from '../constants/testIds';
 
 interface Props {
   children: ReactNode;
@@ -73,6 +74,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div
+          data-testid={TestIds.ERROR_BOUNDARY}
           style={{
             padding: '2rem',
             textAlign: 'center',
@@ -86,7 +88,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <h2 style={{ color: '#dc3545', marginBottom: '1rem' }}>
             エラーが発生しました
           </h2>
-          <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+          <p data-testid={TestIds.ERROR_BOUNDARY_MESSAGE} style={{ color: '#666', marginBottom: '1.5rem' }}>
             予期しないエラーが発生しました。ページを再読み込みするか、しばらく時間をおいてから再度お試しください。
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -105,6 +107,7 @@ export class ErrorBoundary extends Component<Props, State> {
               リロード
             </button>
             <button
+              data-testid={TestIds.ERROR_BOUNDARY_RELOAD}
               onClick={() => window.location.reload()}
               style={{
                 padding: '0.75rem 1.5rem',

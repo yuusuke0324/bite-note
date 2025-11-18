@@ -85,7 +85,17 @@ export const TestIds = {
 
   // Axis Elements
   X_AXIS_LINE: 'x-axis-line',
-  Y_AXIS_LINE: 'y-axis-line'
+  Y_AXIS_LINE: 'y-axis-line',
+
+  // Error Handling
+  ERROR_BOUNDARY: 'error-boundary',
+  ERROR_BOUNDARY_MESSAGE: 'error-boundary-message',
+  ERROR_BOUNDARY_RELOAD: 'error-boundary-reload',
+
+  // Offline Features
+  OFFLINE_INDICATOR: 'offline-indicator',
+  OFFLINE_BADGE: 'offline-badge',
+  SYNC_STATUS: 'sync-status'
 } as const;
 
 export type TestId = typeof TestIds[keyof typeof TestIds];
