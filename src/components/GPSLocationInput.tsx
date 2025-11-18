@@ -2,6 +2,8 @@
 
 import React, { useState, useCallback } from 'react';
 import { LocationDisplay } from './LocationDisplay';
+import { useToastStore } from '../stores/toast-store';
+import { TestIds } from '../constants/TestIds';
 import type { Coordinates } from '../types';
 
 interface GPSLocationInputProps {
@@ -29,10 +31,20 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
     longitude: value?.longitude?.toString() || ''
   });
 
+  // トースト通知
+  const showError = useToastStore(state => state.showError);
+  const showSuccess = useToastStore(state => state.showSuccess);
+
   // GPS位置取得
   const handleGetCurrentLocation = useCallback(async () => {
     if (!navigator.geolocation) {
-      alert('このブラウザはGPSに対応していません');
+      showError('このブラウザはGPSに対応していません', [
+        {
+          label: '手動入力する',
+          handler: () => setManualMode(true),
+          primary: true
+        }
+      ]);
       return;
     }
 
@@ -43,7 +55,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
           reject,
           {
             enableHighAccuracy: true,
-            timeout: 10000,
+            timeout: 15000, // 15秒タイムアウト（product-manager推奨）
             maximumAge: 300000
           }
         );
@@ -56,29 +68,24 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
       };
 
       onChange(coordinates);
-      alert('GPS位置を取得しました');
+      showSuccess('GPS位置を取得しました');
 
     } catch (error) {
       console.error('GPS取得エラー:', error);
 
-      let errorMessage = 'GPS位置の取得に失敗しました';
-      if (error instanceof GeolocationPositionError) {
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'GPS位置情報の使用が拒否されました';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'GPS位置情報が利用できません';
-            break;
-          case error.TIMEOUT:
-            errorMessage = 'GPS位置取得がタイムアウトしました';
-            break;
-        }
-      }
-
-      alert(errorMessage);
+      // product-manager決定版のエラーメッセージを使用
+      showError(
+        '位置情報を取得できませんでした。\n手動で場所を入力するか、ブラウザの設定で位置情報を許可してください。',
+        [
+          {
+            label: '手動入力する',
+            handler: () => setManualMode(true),
+            primary: true
+          }
+        ]
+      );
     }
-  }, [onChange]);
+  }, [onChange, showError, showSuccess, setManualMode]);
 
   // 手動入力の適用
   const handleApplyManualInput = useCallback(() => {
@@ -86,17 +93,17 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
     const lng = parseFloat(manualInput.longitude);
 
     if (isNaN(lat) || isNaN(lng)) {
-      alert('有効な緯度・経度を入力してください');
+      showError('有効な緯度・経度を入力してください');
       return;
     }
 
     if (lat < -90 || lat > 90) {
-      alert('緯度は-90から90の間で入力してください');
+      showError('緯度は-90から90の間で入力してください');
       return;
     }
 
     if (lng < -180 || lng > 180) {
-      alert('経度は-180から180の間で入力してください');
+      showError('経度は-180から180の間で入力してください');
       return;
     }
 
@@ -107,7 +114,8 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
 
     onChange(coordinates);
     setManualMode(false);
-  }, [manualInput, onChange]);
+    showSuccess('手動で位置情報を設定しました');
+  }, [manualInput, onChange, showError, showSuccess]);
 
   // 位置情報をクリア
   const handleClearLocation = useCallback(() => {
@@ -154,8 +162,10 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
           <div style={{ marginBottom: '1rem' }}>
             <button
               type="button"
+              data-testid={TestIds.GPS_BUTTON}
               onClick={handleGetCurrentLocation}
               disabled={disabled || isLoading}
+              aria-label="現在位置を取得"
               style={{
                 padding: '0.75rem 1rem',
                 backgroundColor: disabled || isLoading ? '#6c757d' : '#007bff',
