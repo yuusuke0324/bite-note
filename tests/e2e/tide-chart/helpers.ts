@@ -379,20 +379,38 @@ export async function setupCleanPage(page: Page) {
     }
   });
 
-  // IndexedDB削除が完了するまで追加待機
-  await page.waitForTimeout(1000);
-
-  // ページをリロードして初期化を確実に実行
-  await page.reload();
-  await page.waitForLoadState('domcontentloaded');
-
-  // アプリ初期化完了まで追加待機
-  await page.waitForTimeout(2000);
-
-  // アプリが正常に初期化されるまで待機（最大20秒）
-  // タブUIが表示されることを確認
-  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"], [data-testid="${TestIds.FISHING_RECORDS_LINK}"]`, {
-    timeout: 20000,
-    state: 'visible'
+  // 🟢 改善1: IndexedDB削除完了を確実に確認
+  await page.evaluate(async () => {
+    if (typeof indexedDB !== 'undefined') {
+      // 削除完了を確認（最大10回、100msごとにチェック）
+      for (let i = 0; i < 10; i++) {
+        const dbs = await indexedDB.databases();
+        const hasBiteNoteDB = dbs.some(db => db.name === 'BiteNoteDB');
+        if (!hasBiteNoteDB) {
+          return; // 削除完了
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
   });
+
+  // 🟢 改善2: goto()で再初期化（reload()より確実）
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  // 🟢 改善3: waitForTimeoutではなく、実際のUIが表示されるまで待機
+  await page.waitForSelector(
+    `[data-testid="${TestIds.FORM_TAB}"]`,
+    { timeout: 20000, state: 'visible' }
+  );
+
+  // 🟢 改善4: タブUIが操作可能か確認
+  const formTab = page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
+  await expect(formTab).toBeEnabled();
+
+  // 🟢 改善5: App.tsx初期化が完了したことを確認（エラー表示がないこと）
+  const errorDisplay = page.locator('[data-testid="error-message"]');
+  const errorCount = await errorDisplay.count();
+  if (errorCount > 0) {
+    await expect(errorDisplay).not.toBeVisible({ timeout: 1000 });
+  }
 }
