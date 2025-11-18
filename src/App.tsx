@@ -178,7 +178,7 @@ function App() {
     };
 
     initializeApp();
-  }, [appActions, formActions, records.length, settings.theme]);
+  }, [appActions, formActions]); // records.length, settings.theme を削除（再レンダリングループ防止）
 
   // 型安全なTestIDsマッピング
   const TAB_TEST_IDS: Record<'form' | 'list' | 'tide-chart' | 'debug', string> = {

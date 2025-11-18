@@ -353,9 +353,9 @@ export async function setupCleanPage(page: Page) {
   // ページアクセス（IndexedDB削除不要 → 高速化）
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  // App.tsx初期化完了を待機（IndexedDB削除待機が不要 → 15秒に短縮）
+  // App.tsx初期化完了を待機（Desktop Chromeでも余裕を持たせて25秒）
   await page.waitForSelector('body[data-app-initialized="true"]', {
-    timeout: 15000,
+    timeout: 25000,
     state: 'attached'
   });
 
