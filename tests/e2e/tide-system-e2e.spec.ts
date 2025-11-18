@@ -205,10 +205,21 @@ class TideSystemE2EHelper {
 
   // 潮汐トゥールチップの動作確認
   async verifyTideTooltipInteraction() {
-    const graphCanvas = this.page.locator('[data-testid="tide-graph-canvas"]');
+    // Rechartsは内部的にSVGを生成するため、より柔軟なセレクターを使用
+    // 1. data-testid経由で探す
+    let graphCanvas = this.page.locator('[data-testid="tide-graph-canvas"]');
 
-    // グラフが表示されるまで待機（Rechartsの動的レンダリング対応）
-    await graphCanvas.waitFor({ state: 'visible', timeout: 10000 });
+    // 2. フォールバック: SVG要素で探す（Recharts特有の構造）
+    const svgGraph = this.page.locator('.recharts-wrapper svg').first();
+
+    // どちらかが表示されるまで待機
+    try {
+      await graphCanvas.waitFor({ state: 'visible', timeout: 5000 });
+    } catch {
+      // data-testidで見つからない場合、SVGで探す
+      await svgGraph.waitFor({ state: 'visible', timeout: 5000 });
+      graphCanvas = svgGraph;
+    }
 
     // マウスオーバーでトゥールチップ表示
     await graphCanvas.hover({ position: { x: 100, y: 100 } });
