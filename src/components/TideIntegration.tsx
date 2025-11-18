@@ -496,6 +496,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
       {hasCoordinates && (
         <div
           id="tide-content-section"
+          data-testid="tide-content-section"
           ref={contentRef}
           className="overflow-hidden"
           style={{ height: isExpanded ? 'auto' : '0px' }}

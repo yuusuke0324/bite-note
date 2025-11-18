@@ -1560,7 +1560,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           <LineChart
             data={validatedData.valid}
             margin={chartConfiguration.margin}
-            data-testid="line-chart"
+            data-testid="tide-graph-canvas"
             width={chartConfiguration.actualWidth}
             height={chartConfiguration.actualHeight}
           >
