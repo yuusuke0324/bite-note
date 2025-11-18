@@ -382,8 +382,21 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
       });
 
       await animationRef.current.finished;
-      content.style.height = 'auto';
-      content.style.overflow = 'visible';
+
+      // 確実にoverflowを変更（二重ガード）
+      requestAnimationFrame(() => {
+        if (content) {
+          content.style.height = 'auto';
+          content.style.overflow = 'visible';
+
+          // CI環境対策: さらに次のフレームでも適用
+          requestAnimationFrame(() => {
+            if (content) {
+              content.style.overflow = 'visible';
+            }
+          });
+        }
+      });
 
     } else {
       // 折りたたみアニメーション
@@ -496,8 +509,9 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
       {hasCoordinates && (
         <div
           id="tide-content-section"
+          data-testid="tide-content-section"
           ref={contentRef}
-          className="overflow-hidden"
+          className={isExpanded ? '' : 'overflow-hidden'}
           style={{ height: isExpanded ? 'auto' : '0px' }}
         >
           {/* ローディング状態 */}

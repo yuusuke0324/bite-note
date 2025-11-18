@@ -499,7 +499,7 @@ const CustomTooltip = React.memo(({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div
-        data-testid="tooltip"
+        data-testid="tide-tooltip"
         className="custom-tooltip"
         style={{
           backgroundColor: 'white',
@@ -509,8 +509,8 @@ const CustomTooltip = React.memo(({ active, payload, label }: any) => {
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}
       >
-        <p>{`時刻: ${label}`}</p>
-        <p>{`潮位: ${payload[0].value}cm`}</p>
+        <p data-testid="tooltip-time">{`時刻: ${label}`}</p>
+        <p data-testid="tooltip-level">{`潮位: ${payload[0].value}cm`}</p>
       </div>
     );
   }
@@ -1557,13 +1557,13 @@ const TideChartBase: React.FC<TideChartProps> = ({
             </div>
           )}
 
-          <LineChart
-            data={validatedData.valid}
-            margin={chartConfiguration.margin}
-            data-testid="line-chart"
-            width={chartConfiguration.actualWidth}
-            height={chartConfiguration.actualHeight}
-          >
+          <div data-testid="tide-graph-canvas">
+            <LineChart
+              data={validatedData.valid}
+              margin={chartConfiguration.margin}
+              width={chartConfiguration.actualWidth}
+              height={chartConfiguration.actualHeight}
+            >
               {/* Color-blind friendly patterns (WCAG 2.1 1.4.1 Use of Color) */}
               <defs>
                 {/* High tide pattern - diagonal stripes */}
@@ -1689,7 +1689,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
               ))}
               {showTooltip && Tooltip && <Tooltip content={<CustomTooltip />} />}
             </LineChart>
-
+          </div>
 
           {/* Additional WCAG compliance elements */}
           <div style={{ position: 'absolute', left: '-9999px' }}>
