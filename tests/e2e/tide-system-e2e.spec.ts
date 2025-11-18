@@ -21,7 +21,15 @@ class TideSystemE2EHelper {
     size?: number;
     useGPS?: boolean;
   }) {
-    await this.page.goto('/fishing-records/new');
+    // アプリはタブベースのSPAなので、/にアクセスしてformタブをクリック
+    await this.page.goto('/');
+    await this.page.waitForLoadState('domcontentloaded');
+
+    // formタブに切り替え
+    const formTab = this.page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
+    await formTab.waitFor({ state: 'visible', timeout: 5000 });
+    await formTab.click();
+    await this.page.waitForTimeout(500); // タブ切り替えアニメーション待機
 
     await this.page.fill('[data-testid="location-name"]', recordData.location);
     // FishSpeciesAutocompleteはTestIds.FISH_SPECIESを使用していないため、placeholderで特定
@@ -39,18 +47,27 @@ class TideSystemE2EHelper {
     // }
 
     await this.page.click('[data-testid="save-record-button"]');
-    await this.page.waitForURL('/fishing-records');
+    // タブベースアプリなのでURLは変わらない。一覧タブに自動切り替わることを待機
+    await this.page.waitForTimeout(1000); // フォーム送信後の一覧表示待機
   }
 
   // 釣果記録詳細ページに移動
   async goToRecordDetail(recordId?: string) {
-    if (recordId) {
-      await this.page.goto(`/fishing-records/${recordId}`);
-    } else {
-      // 最新記録の詳細ページに移動
-      await this.page.goto('/fishing-records');
-      await this.page.click('[data-testid^="record-item-"]:first-child [data-testid="view-detail-button"]');
-    }
+    // アプリはタブベースのSPAなので、listタブに切り替えてから詳細を表示
+    await this.page.goto('/');
+    await this.page.waitForLoadState('domcontentloaded');
+
+    // listタブに切り替え
+    const listTab = this.page.locator(`[data-testid="${TestIds.FISHING_RECORDS_LINK}"]`);
+    await listTab.waitFor({ state: 'visible', timeout: 5000 });
+    await listTab.click();
+    await this.page.waitForTimeout(500); // タブ切り替えアニメーション待機
+
+    // 最新記録の詳細を表示（recordId指定は現状未サポート）
+    const firstRecord = this.page.locator('[data-testid^="record-item-"]').first();
+    await firstRecord.waitFor({ state: 'visible', timeout: 5000 });
+    await firstRecord.click();
+    await this.page.waitForTimeout(500); // 詳細モーダル表示待機
   }
 
   // 潮汐グラフの表示を確認
