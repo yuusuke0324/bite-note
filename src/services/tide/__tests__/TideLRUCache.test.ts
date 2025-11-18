@@ -306,27 +306,38 @@ describe('TASK-105: LRUキャッシュシステム', () => {
     });
 
     it('TC-L015: 期限切れエントリが自動削除される', async () => {
+      // Fake Timersを使用してCI環境でのタイマー精度問題を根本解決
+      vi.useFakeTimers();
+      const baseTime = new Date('2024-01-01T00:00:00Z').getTime();
+      vi.setSystemTime(baseTime);
+
       const key = { latitude: 35.67, longitude: 139.65, date: '2024-01-01' };
       const tideInfo = createTestTideInfo(1);
+      const expiredCache = new TideLRUCache(100, 100); // 100ms TTL
 
-      // 期限を100msに設定（処理時間を考慮）
-      const expiredCache = new TideLRUCache(100, 100);
       await expiredCache.set(key, tideInfo);
 
-      // 期限内は取得できる
+      // 期限内チェック
       const resultBeforeExpiry = await expiredCache.get(key);
       expect(resultBeforeExpiry).not.toBeNull();
       expect(resultBeforeExpiry?.currentLevel).toBe(101);
 
-      // 期限切れまで確実に待機（余裕を持って150ms）
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // システム時刻を150ms進める（Date.now()も進む）
+      vi.setSystemTime(baseTime + 150);
 
       // 期限切れチェック
       const resultAfterExpiry = await expiredCache.get(key);
       expect(resultAfterExpiry).toBeNull(); // 期限切れで取得できない
+
+      vi.useRealTimers(); // 必ず元に戻す
     });
 
     it('TC-L019: cleanupExpired() で期限切れエントリが一括削除される', async () => {
+      // Fake Timersを使用してCI環境でのタイマー精度問題を根本解決
+      vi.useFakeTimers();
+      const baseTime = new Date('2024-01-01T00:00:00Z').getTime();
+      vi.setSystemTime(baseTime);
+
       const smallCache = new TideLRUCache(10, 100); // 100ms TTL
 
       // 複数のエントリを追加
@@ -345,8 +356,8 @@ describe('TASK-105: LRUキャッシュシステム', () => {
         expect(result).not.toBeNull();
       }
 
-      // 期限切れまで待機（余裕を持って150ms）
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // システム時刻を150ms進める（Date.now()も進む）
+      vi.setSystemTime(baseTime + 150);
 
       // クリーンアップ実行
       await smallCache.cleanupExpired();
@@ -357,6 +368,8 @@ describe('TASK-105: LRUキャッシュシステム', () => {
       const stats = smallCache.getStats();
       expect(stats.totalEntries).toBe(0);
       expect(stats.memoryUsage).toBe(0);
+
+      vi.useRealTimers(); // 必ず元に戻す
     });
   });
 
