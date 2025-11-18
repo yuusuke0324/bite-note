@@ -64,7 +64,9 @@ class FishingDatabase extends Dexie implements FishingRecordDB {
   sync_error_log!: Table<SyncErrorLog>;
 
   constructor() {
-    super('FishingRecordDB');
+    // テスト環境では一意なDB名を使用、本番では固定名
+    const dbName = globalThis.__TEST_DB_NAME__ || 'FishingRecordDB';
+    super(dbName);
 
     // バージョン1のスキーマ定義
     this.version(1).stores({

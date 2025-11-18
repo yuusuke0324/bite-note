@@ -342,88 +342,30 @@ export async function ensureNoConsoleErrors(page: Page) {
  * ```
  */
 export async function setupCleanPage(page: Page) {
-  // LocalStorageアクセスエラーを回避するため、実際のページにアクセスしてからクリア
-  await page.goto('/');
-  await page.waitForLoadState('domcontentloaded');
+  // テスト用の一意なDB名を生成（タイムスタンプ + ランダム値）
+  const testDbName = `FishingRecordDB_Test_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-  // LocalStorage/sessionStorage/IndexedDBを完全にクリア
-  await page.evaluate(async () => {
-    try {
-      // LocalStorage/sessionStorageクリア
-      if (typeof Storage !== 'undefined') {
-        localStorage.clear();
-        sessionStorage.clear();
-      }
+  // ブラウザコンテキストにDB名を注入（ページロード前）
+  await page.addInitScript((dbName) => {
+    globalThis.__TEST_DB_NAME__ = dbName;
+  }, testDbName);
 
-      // IndexedDBクリア（FishingRecordDBを削除）
-      if (typeof indexedDB !== 'undefined') {
-        const databases = ['FishingRecordDB'];
-        // IndexedDB削除を非同期で実行し、完了を待機
-        const deletePromises = databases.map(dbName => {
-          return new Promise<void>((resolve) => {
-            const request = indexedDB.deleteDatabase(dbName);
-            request.onsuccess = () => resolve();
-            request.onerror = () => resolve(); // エラーでも続行
-            request.onblocked = () => {
-              console.log(`IndexedDB ${dbName} deletion blocked`);
-              // ブロックされても一定時間後に続行
-              setTimeout(() => resolve(), 1000);
-            };
-          });
-        });
-        await Promise.all(deletePromises);
-      }
-    } catch (e) {
-      // アクセスができない場合は無視
-      console.log('Storage clear skipped:', e);
-    }
-  });
-
-  // 🟢 改善1: IndexedDB削除完了を確認（最大5秒）
-  await page.evaluate(async () => {
-    if (typeof indexedDB !== 'undefined') {
-      for (let i = 0; i < 50; i++) {
-        const dbs = await indexedDB.databases();
-        const hasFishingRecordDB = dbs.some(db => db.name === 'FishingRecordDB');
-        if (!hasFishingRecordDB) {
-          return; // 削除完了
-        }
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    }
-  });
-
-  // 🟢 改善2: goto()で再初期化（reload()より確実）
+  // ページアクセス（IndexedDB削除不要 → 高速化）
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  // 🟢 改善3: App.tsx初期化完了を待機（最大60秒、CI環境考慮、リトライあり）
-  const maxAttempts = 2;
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const initialized = await page.waitForSelector('body[data-app-initialized="true"]', {
-      timeout: 30000,
-      state: 'attached'
-    }).catch(() => null);
+  // App.tsx初期化完了を待機（IndexedDB削除待機が不要 → 15秒に短縮）
+  await page.waitForSelector('body[data-app-initialized="true"]', {
+    timeout: 15000,
+    state: 'attached'
+  });
 
-    if (initialized) {
-      break; // 初期化成功
-    }
-
-    // 初期化失敗時はリロード
-    if (attempt < maxAttempts - 1) {
-      console.warn(`⚠️ App initialization timeout (attempt ${attempt + 1}/${maxAttempts}), forcing reload...`);
-      await page.reload({ waitUntil: 'domcontentloaded' });
-    } else {
-      throw new Error('❌ App initialization failed after 2 attempts');
-    }
-  }
-
-  // 🟢 改善4: UIが表示されるまで待機（初期化完了後は高速）
+  // UIが表示されるまで待機
   await page.waitForSelector(
     `[data-testid="${TestIds.FORM_TAB}"]`,
-    { timeout: 10000, state: 'visible' }
+    { timeout: 5000, state: 'visible' }
   );
 
-  // 🟢 改善5: タブUIが操作可能か確認
+  // タブUIが操作可能か確認
   const formTab = page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
   await expect(formTab).toBeEnabled();
 }

@@ -222,10 +222,9 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
   let helper: TideSystemE2EHelper;
 
   test.beforeEach(async ({ page }) => {
-    // ⚠️ 重要: テスト間の状態分離のため、クリーンな環境を保証
-    // LocalStorage/sessionStorage/IndexedDBをクリア
-    // CI環境でのIndexedDB削除完了を考慮し、タイムアウトを60秒に延長
-    test.setTimeout(60000);
+    // ⚠️ 重要: テスト間の状態分離のため、一意なDB名を使用
+    // IndexedDB削除不要 → タイムアウトを30秒に短縮
+    test.setTimeout(30000);
     await setupCleanPage(page);
 
     helper = new TideSystemE2EHelper(page);
@@ -233,6 +232,24 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
     // モック位置情報を設定
     await page.context().grantPermissions(['geolocation']);
     await page.context().setGeolocation({ latitude: 35.6762, longitude: 139.6503 });
+  });
+
+  // テスト完了後にDB削除（クリーンアップ）
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(async () => {
+      const dbName = globalThis.__TEST_DB_NAME__;
+      if (dbName && typeof indexedDB !== 'undefined') {
+        try {
+          await new Promise<void>((resolve) => {
+            const request = indexedDB.deleteDatabase(dbName);
+            request.onsuccess = () => resolve();
+            request.onerror = () => resolve(); // エラーでも続行
+          });
+        } catch (e) {
+          console.log('DB cleanup skipped:', e);
+        }
+      }
+    });
   });
 
   test.describe('基本フロー', () => {
