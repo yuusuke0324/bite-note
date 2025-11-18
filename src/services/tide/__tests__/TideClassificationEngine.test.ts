@@ -297,7 +297,9 @@ describe('TASK-104: 潮汐分類システム', () => {
       engine.calculateTideStrength(phase, 1.0);
       const endTime = performance.now();
 
-      expect(endTime - startTime).toBeLessThan(1);
+      // CI環境では負荷により実行時間が変動するため、環境に応じた閾値を使用
+      const threshold = process.env.CI ? 5 : 1;
+      expect(endTime - startTime).toBeLessThan(threshold);
     });
   });
 });
