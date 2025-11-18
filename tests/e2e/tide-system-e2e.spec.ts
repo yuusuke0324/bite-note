@@ -221,8 +221,25 @@ class TideSystemE2EHelper {
       graphCanvas = svgGraph;
     }
 
-    // マウスオーバーでトゥールチップ表示
-    await graphCanvas.hover({ position: { x: 100, y: 100 } });
+    // Rechartsのラインパス要素に直接hoverして確実にtooltipを表示
+    // .recharts-line-curveはRechartsが自動生成する実際のライン要素
+    const lineCurve = this.page.locator('.recharts-line-curve').first();
+    await lineCurve.waitFor({ state: 'visible', timeout: 5000 });
+
+    // ラインの中央付近にhover（より確実にtooltipが表示される）
+    const boundingBox = await lineCurve.boundingBox();
+    if (boundingBox) {
+      await lineCurve.hover({
+        position: {
+          x: boundingBox.width / 2,
+          y: boundingBox.height / 2
+        }
+      });
+    } else {
+      // bounding boxが取れない場合は相対位置でhover
+      await lineCurve.hover();
+    }
+
     const tooltip = this.page.locator('[data-testid="tide-tooltip"]');
     await tooltip.waitFor({ state: 'visible', timeout: 3000 });
 
@@ -230,8 +247,16 @@ class TideSystemE2EHelper {
     await expect(this.page.locator('[data-testid="tooltip-time"]')).toContainText(/\d{1,2}:\d{2}/);
     await expect(this.page.locator('[data-testid="tooltip-level"]')).toContainText(/\d+cm/);
 
-    // マウス移動でトゥールチップが追従（waitForTimeoutの代わりにtooltipの位置変化を確認）
-    await graphCanvas.hover({ position: { x: 200, y: 100 } });
+    // マウス移動でトゥールチップが追従
+    // 別の位置のラインにhover
+    if (boundingBox) {
+      await lineCurve.hover({
+        position: {
+          x: boundingBox.width * 0.7,
+          y: boundingBox.height / 2
+        }
+      });
+    }
     await expect(tooltip).toBeVisible();
 
     // マウスアウトでトゥールチップ消失
