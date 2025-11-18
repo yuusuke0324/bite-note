@@ -205,6 +205,14 @@ class TideSystemE2EHelper {
 
   // 潮汐トゥールチップの動作確認
   async verifyTideTooltipInteraction() {
+    // グラフ展開の完了を待つ（tide-content-sectionが完全に表示されるまで）
+    const contentSection = this.page.locator('[data-testid="tide-content-section"]');
+    await contentSection.waitFor({ state: 'visible', timeout: 5000 });
+
+    // 展開アニメーション完了を待つ（TideIntegrationのアニメーション時間は250ms）
+    // overflow: hidden → visible への変更完了を確実にするため500ms待機
+    await this.page.waitForTimeout(500);
+
     // Rechartsは内部的にSVGを生成するため、より柔軟なセレクターを使用
     // 1. data-testid経由で探す
     let graphCanvas = this.page.locator('[data-testid="tide-graph-canvas"]');
