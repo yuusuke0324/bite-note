@@ -214,69 +214,52 @@ class TideSystemE2EHelper {
     // CI環境ではアニメーション処理が遅延する可能性があるため余裕を持たせる
     await this.page.waitForTimeout(1000);
 
-    // Rechartsは内部的にSVGを生成するため、より柔軟なセレクターを使用
-    // 1. data-testid経由で探す
-    let graphCanvas = this.page.locator('[data-testid="tide-graph-canvas"]');
+    // グラフコンテナを取得
+    const graphCanvas = this.page.locator('[data-testid="tide-graph-canvas"]');
+    await graphCanvas.waitFor({ state: 'visible', timeout: 5000 });
 
-    // 2. フォールバック: SVG要素で探す（Recharts特有の構造）
-    const svgGraph = this.page.locator('.recharts-wrapper svg').first();
+    // mouse.move を使用してグラフ領域に直接カーソルを移動
+    // これによりoverflow:hiddenの影響を回避
+    const boundingBox = await graphCanvas.boundingBox();
 
-    // どちらかが表示されるまで待機
-    try {
-      await graphCanvas.waitFor({ state: 'visible', timeout: 5000 });
-    } catch {
-      // data-testidで見つからない場合、SVGで探す
-      await svgGraph.waitFor({ state: 'visible', timeout: 5000 });
-      graphCanvas = svgGraph;
-    }
-
-    // Rechartsのラインパス要素に直接hoverして確実にtooltipを表示
-    // .recharts-line-curveはRechartsが自動生成する実際のライン要素
-    const lineCurve = this.page.locator('.recharts-line-curve').first();
-
-    // CI環境では親要素の overflow: hidden が解除されるまでに時間がかかるため
-    // DOMに存在することのみを確認（attached状態）し、force: true でhoverを実行
-    await lineCurve.waitFor({ state: 'attached', timeout: 5000 });
-
-    // ラインの中央付近にhover（より確実にtooltipが表示される）
-    // force: true を使用してvisibilityチェックを回避
-    const boundingBox = await lineCurve.boundingBox();
     if (boundingBox) {
-      await lineCurve.hover({
-        position: {
-          x: boundingBox.width / 2,
-          y: boundingBox.height / 2
-        },
-        force: true
-      });
+      // グラフの中央にマウスを移動してtooltipを表示
+      await this.page.mouse.move(
+        boundingBox.x + boundingBox.width / 2,
+        boundingBox.y + boundingBox.height / 2
+      );
+
+      // tooltipが表示されるまで少し待機
+      await this.page.waitForTimeout(500);
+
+      // 複数の位置でtooltipを確認するため、別の位置にも移動
+      await this.page.mouse.move(
+        boundingBox.x + boundingBox.width * 0.3,
+        boundingBox.y + boundingBox.height * 0.5
+      );
+
+      // tooltipの表示を確認
+      const tooltip = this.page.locator('[data-testid="tide-tooltip"]');
+      await tooltip.waitFor({ state: 'visible', timeout: 3000 });
+
+      // トゥールチップ内容確認
+      await expect(this.page.locator('[data-testid="tooltip-time"]')).toContainText(/\d{1,2}:\d{2}/);
+      await expect(this.page.locator('[data-testid="tooltip-level"]')).toContainText(/\d+cm/);
+
+      // マウス移動でトゥールチップが追従（別の位置に移動）
+      await this.page.mouse.move(
+        boundingBox.x + boundingBox.width * 0.7,
+        boundingBox.y + boundingBox.height * 0.5
+      );
+      await expect(tooltip).toBeVisible();
+
+      // マウスをグラフ外に移動してtooltipが消えることを確認
+      await this.page.mouse.move(0, 0);
+      await expect(tooltip).not.toBeVisible({ timeout: 3000 });
     } else {
-      // bounding boxが取れない場合は相対位置でhover
-      await lineCurve.hover({ force: true });
+      // boundingBoxが取得できない場合はテストをスキップ
+      throw new Error('Unable to get graph bounding box for interaction test');
     }
-
-    const tooltip = this.page.locator('[data-testid="tide-tooltip"]');
-    await tooltip.waitFor({ state: 'visible', timeout: 3000 });
-
-    // トゥールチップ内容確認
-    await expect(this.page.locator('[data-testid="tooltip-time"]')).toContainText(/\d{1,2}:\d{2}/);
-    await expect(this.page.locator('[data-testid="tooltip-level"]')).toContainText(/\d+cm/);
-
-    // マウス移動でトゥールチップが追従
-    // 別の位置のラインにhover
-    if (boundingBox) {
-      await lineCurve.hover({
-        position: {
-          x: boundingBox.width * 0.7,
-          y: boundingBox.height / 2
-        },
-        force: true
-      });
-    }
-    await expect(tooltip).toBeVisible();
-
-    // マウスアウトでトゥールチップ消失
-    await this.page.locator('body').hover({ position: { x: 0, y: 0 } });
-    await expect(tooltip).not.toBeVisible({ timeout: 3000 });
   }
 
   // 潮汐統合セクションの展開・折りたたみ確認
