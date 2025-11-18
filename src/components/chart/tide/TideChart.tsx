@@ -1557,13 +1557,13 @@ const TideChartBase: React.FC<TideChartProps> = ({
             </div>
           )}
 
-          <LineChart
-            data={validatedData.valid}
-            margin={chartConfiguration.margin}
-            data-testid="tide-graph-canvas"
-            width={chartConfiguration.actualWidth}
-            height={chartConfiguration.actualHeight}
-          >
+          <div data-testid="tide-graph-canvas">
+            <LineChart
+              data={validatedData.valid}
+              margin={chartConfiguration.margin}
+              width={chartConfiguration.actualWidth}
+              height={chartConfiguration.actualHeight}
+            >
               {/* Color-blind friendly patterns (WCAG 2.1 1.4.1 Use of Color) */}
               <defs>
                 {/* High tide pattern - diagonal stripes */}
@@ -1689,7 +1689,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
               ))}
               {showTooltip && Tooltip && <Tooltip content={<CustomTooltip />} />}
             </LineChart>
-
+          </div>
 
           {/* Additional WCAG compliance elements */}
           <div style={{ position: 'absolute', left: '-9999px' }}>
