@@ -259,6 +259,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
     };
   }, [photoPreview]);
 
+  // E2Eテスト用: GPS座標の有無を判定
+  const watchedCoordinates = watch('coordinates');
+  const hasCoordinates = !!watchedCoordinates;
+
   return (
     <div className="form-container" style={{
       maxWidth: '700px',
@@ -278,7 +282,12 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         🎣 釣果記録フォーム
       </h2>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} noValidate>
+      <form
+        data-testid="fishing-record-form"
+        data-has-coordinates={hasCoordinates.toString()}
+        onSubmit={handleSubmit(handleFormSubmit)}
+        noValidate
+      >
         {/* 写真アップロード（メタデータ自動入力のため先頭に配置） */}
         <div style={{ marginBottom: '2rem' }}>
           <PhotoUpload
