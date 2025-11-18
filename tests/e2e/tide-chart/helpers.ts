@@ -355,9 +355,9 @@ export async function setupCleanPage(page: Page) {
         sessionStorage.clear();
       }
 
-      // IndexedDBクリア（BiteNoteDBを削除）
+      // IndexedDBクリア（FishingRecordDBを削除）
       if (typeof indexedDB !== 'undefined') {
-        const databases = ['BiteNoteDB'];
+        const databases = ['FishingRecordDB'];
         // IndexedDB削除を非同期で実行し、完了を待機
         const deletePromises = databases.map(dbName => {
           return new Promise<void>((resolve) => {
@@ -382,14 +382,14 @@ export async function setupCleanPage(page: Page) {
   // 🟢 改善1: IndexedDB削除完了を確実に確認
   await page.evaluate(async () => {
     if (typeof indexedDB !== 'undefined') {
-      // 削除完了を確認（最大10回、100msごとにチェック）
-      for (let i = 0; i < 10; i++) {
+      // 削除完了を確認（最大20回、150msごとにチェック、最大3秒）
+      for (let i = 0; i < 20; i++) {
         const dbs = await indexedDB.databases();
-        const hasBiteNoteDB = dbs.some(db => db.name === 'BiteNoteDB');
-        if (!hasBiteNoteDB) {
+        const hasFishingRecordDB = dbs.some(db => db.name === 'FishingRecordDB');
+        if (!hasFishingRecordDB) {
           return; // 削除完了
         }
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 150));
       }
     }
   });
@@ -397,10 +397,10 @@ export async function setupCleanPage(page: Page) {
   // 🟢 改善2: goto()で再初期化（reload()より確実）
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  // 🟢 改善3: waitForTimeoutではなく、実際のUIが表示されるまで待機
+  // 🟢 改善3: waitForTimeoutではなく、実際のUIが表示されるまで待機（CI環境考慮で30秒）
   await page.waitForSelector(
     `[data-testid="${TestIds.FORM_TAB}"]`,
-    { timeout: 20000, state: 'visible' }
+    { timeout: 30000, state: 'visible' }
   );
 
   // 🟢 改善4: タブUIが操作可能か確認
