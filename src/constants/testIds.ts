@@ -40,7 +40,8 @@ export const TestIds = {
   FISHING_MARKER: (index: number) => `fishing-marker-${index}`,
 
   // Tide Integration
-  TIDE_GRAPH_TAB: 'tide-graph-tab',
+  TIDE_GRAPH_TAB: 'tide-graph-tab', // Navigation: Bottom tab for tide graph page
+  TIDE_GRAPH_TOGGLE_BUTTON: 'tide-graph-toggle-button', // Toggle: Button to expand/collapse tide graph section
   TIDE_INTEGRATION_SECTION: 'tide-integration-section',
   TIDE_ERROR: 'tide-error',
   TIDE_RETRY_BUTTON: 'tide-retry-button',
