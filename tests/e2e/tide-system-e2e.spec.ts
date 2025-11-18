@@ -9,6 +9,7 @@
  */
 
 import { test, expect, Page } from '@playwright/test';
+import { TestIds } from '../../src/constants/testIds';
 
 // テスト用ヘルパー関数
 class TideSystemE2EHelper {
