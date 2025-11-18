@@ -95,8 +95,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # PR時: 3並列、main merge時: 5並列
-        shard: ${{ github.event_name == 'pull_request' && fromJSON('[1, 2, 3]') || fromJSON('[1, 2, 3, 4, 5]') }}
+        # PR時も全シャード実行（Issue #140対応）
+        shard: [1, 2, 3, 4, 5]
 
     steps:
     - name: Checkout repository
