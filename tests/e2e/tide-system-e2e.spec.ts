@@ -10,6 +10,7 @@
 
 import { test, expect, Page } from '@playwright/test';
 import { TestIds } from '../../src/constants/testIds';
+import { setupCleanPage } from './tide-chart/helpers';
 
 // テスト用ヘルパー関数
 class TideSystemE2EHelper {
@@ -22,13 +23,10 @@ class TideSystemE2EHelper {
     size?: number;
     useGPS?: boolean;
   }) {
-    // アプリはタブベースのSPAなので、/にアクセスしてformタブをクリック
-    await this.page.goto('/');
-    await this.page.waitForLoadState('domcontentloaded');
-
-    // formタブに切り替え
+    // ⚠️ setupCleanPage()で既にページアクセス済みなので、goto()は不要
+    // タブUIが表示されていることを確認してから操作
     const formTab = this.page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
-    await formTab.waitFor({ state: 'visible', timeout: 5000 });
+    await formTab.waitFor({ state: 'visible', timeout: 10000 });
     await formTab.click();
     await this.page.waitForTimeout(500); // タブ切り替えアニメーション待機
 
@@ -54,13 +52,10 @@ class TideSystemE2EHelper {
 
   // 釣果記録詳細ページに移動
   async goToRecordDetail(recordId?: string) {
-    // アプリはタブベースのSPAなので、listタブに切り替えてから詳細を表示
-    await this.page.goto('/');
-    await this.page.waitForLoadState('domcontentloaded');
-
+    // ⚠️ setupCleanPage()で既にページアクセス済みなので、goto()は不要
     // listタブに切り替え
     const listTab = this.page.locator(`[data-testid="${TestIds.FISHING_RECORDS_LINK}"]`);
-    await listTab.waitFor({ state: 'visible', timeout: 5000 });
+    await listTab.waitFor({ state: 'visible', timeout: 10000 });
     await listTab.click();
     await this.page.waitForTimeout(500); // タブ切り替えアニメーション待機
 
@@ -158,6 +153,10 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
   let helper: TideSystemE2EHelper;
 
   test.beforeEach(async ({ page }) => {
+    // ⚠️ 重要: テスト間の状態分離のため、クリーンな環境を保証
+    // LocalStorage/sessionStorage/IndexedDBをクリア
+    await setupCleanPage(page);
+
     helper = new TideSystemE2EHelper(page);
 
     // モック位置情報を設定

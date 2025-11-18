@@ -328,21 +328,54 @@ export async function ensureNoConsoleErrors(page: Page) {
   };
 }
 
+/**
+ * テスト前にクリーンな状態を保証するヘルパー関数
+ * - LocalStorage/sessionStorageをクリア
+ * - IndexedDBをクリア
+ * - アプリケーション初期化を待機
+ *
+ * **使用例**:
+ * ```typescript
+ * test.beforeEach(async ({ page }) => {
+ *   await setupCleanPage(page);
+ * });
+ * ```
+ */
 export async function setupCleanPage(page: Page) {
   // LocalStorageアクセスエラーを回避するため、実際のページにアクセスしてからクリア
   await page.goto('/');
   await page.waitForLoadState('domcontentloaded');
 
-  // LocalStorageクリアをより安全に実行
+  // LocalStorage/sessionStorage/IndexedDBを完全にクリア
   await page.evaluate(() => {
     try {
+      // LocalStorage/sessionStorageクリア
       if (typeof Storage !== 'undefined') {
         localStorage.clear();
         sessionStorage.clear();
       }
+
+      // IndexedDBクリア（BiteNoteDBを削除）
+      if (typeof indexedDB !== 'undefined') {
+        const databases = ['BiteNoteDB'];
+        databases.forEach(dbName => {
+          indexedDB.deleteDatabase(dbName);
+        });
+      }
     } catch (e) {
-      // LocalStorageアクセスができない場合は無視
+      // アクセスができない場合は無視
       console.log('Storage clear skipped:', e);
     }
+  });
+
+  // ページをリロードして初期化を確実に実行
+  await page.reload();
+  await page.waitForLoadState('domcontentloaded');
+
+  // アプリが正常に初期化されるまで待機（最大10秒）
+  // タブUIが表示されることを確認
+  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"], [data-testid="${TestIds.FISHING_RECORDS_LINK}"]`, {
+    timeout: 10000,
+    state: 'visible'
   });
 }
