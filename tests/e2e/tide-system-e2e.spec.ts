@@ -321,8 +321,8 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
 
   test.describe('レスポンシブ対応', () => {
     test('TC-E008: モバイル表示での潮汐システム', async ({ page }) => {
-      // モバイルビューポート設定
-      await page.setViewportSize({ width: 375, height: 667 });
+      // モバイルビューポート設定 (iPhone 14 サイズ)
+      await page.setViewportSize({ width: 390, height: 844 });
 
       // 1. GPS付き記録作成
       await helper.createFishingRecord({
@@ -335,6 +335,7 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
       // 2. 詳細ページで潮汐情報表示
       await helper.goToRecordDetail();
       await page.click('[data-testid="tide-graph-toggle-button"]');
+      await page.waitForLoadState('networkidle');
       await page.waitForTimeout(2000);
 
       // 3. モバイル向けレイアウト確認
@@ -389,14 +390,14 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
 
       // 3. キーボード操作での潮汐グラフ展開
       await page.keyboard.press('Tab'); // 潮汐ボタンにフォーカス
-      await expect(page.locator('[data-testid="tide-graph-toggle-button"]')).toBeFocused();
+      await expect(page.locator('[data-testid="tide-graph-toggle-button"]')).toBeFocused({ timeout: 1000 });
 
       await page.keyboard.press('Enter'); // Enterキーで展開
-      await page.waitForTimeout(2000);
+      await page.waitForSelector('[data-testid="tide-content-section"]', { state: 'visible', timeout: 5000 });
 
       // 4. スペースキーでの操作確認
       await page.keyboard.press('Space'); // Spaceキーで折りたたみ
-      await page.waitForTimeout(350);
+      await page.waitForSelector('[data-testid="tide-content-section"]', { state: 'hidden', timeout: 5000 });
     });
 
     test('TC-E011: スクリーンリーダー対応', async ({ page }) => {
@@ -428,6 +429,10 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
 
   test.describe('パフォーマンス', () => {
     test('TC-E012: 潮汐データ読み込みパフォーマンス', async ({ page }) => {
+      // 環境別閾値設定
+      const isCI = process.env.CI === 'true';
+      const threshold = isCI ? 5000 : 3000;
+
       // 1. GPS付き記録作成
       await helper.createFishingRecord({
         location: '紀伊水道',
@@ -443,12 +448,12 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
       const startTime = Date.now();
 
       await page.click('[data-testid="tide-graph-toggle-button"]');
-      await page.waitForSelector('[data-testid="tide-summary-card"]', { timeout: 5000 });
+      await page.waitForSelector('[data-testid="tide-summary-card"]', { timeout: 10000 });
 
       const loadTime = Date.now() - startTime;
 
-      // 4. パフォーマンス基準確認（5秒以内）
-      expect(loadTime).toBeLessThan(5000);
+      // 4. パフォーマンス基準確認
+      expect(loadTime).toBeLessThan(threshold);
 
       // 5. アニメーションの滑らかさ確認（300ms以内で完了）
       await page.waitForTimeout(350);

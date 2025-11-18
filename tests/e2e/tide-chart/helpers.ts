@@ -1,5 +1,6 @@
 // E2E Test Helpers for TideChart Component
 import { Page, expect } from '@playwright/test';
+import { TestIds } from '../../../src/constants/testIds';
 
 // Test Data Sets
 export const validTideData = [
@@ -32,7 +33,7 @@ export class TideChartPage {
     await this.page.waitForLoadState('domcontentloaded');
 
     // ModernAppなので、ボトムナビゲーションから潮汐グラフタブをクリック
-    const tideChartTab = this.page.locator('button:has-text("潮汐グラフ")');
+    const tideChartTab = this.page.locator(`[data-testid="${TestIds.TIDE_GRAPH_TAB}"]`);
     await tideChartTab.waitFor({ state: 'visible', timeout: 10000 });
     await tideChartTab.click();
 
@@ -259,9 +260,17 @@ export class VisualRegressionHelper {
   }
 
   async compareScreenshot(name: string) {
-    await this.page.waitForSelector('[data-testid="tide-chart"]');
+    await this.page.waitForSelector('[data-testid="tide-chart"]', { timeout: 30000 });
     await this.page.waitForLoadState('networkidle');
-    await expect(this.page).toHaveScreenshot(`${name}.png`);
+
+    // CI環境での閾値調整
+    const isCI = process.env.CI === 'true';
+    const config = {
+      threshold: isCI ? 0.2 : 0.1,
+      animations: 'disabled' as const,
+    };
+
+    await expect(this.page).toHaveScreenshot(`${name}.png`, config);
   }
 }
 
