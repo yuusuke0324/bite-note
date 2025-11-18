@@ -95,7 +95,29 @@ export const TestIds = {
   // Offline Features
   OFFLINE_INDICATOR: 'offline-indicator',
   OFFLINE_BADGE: 'offline-badge',
-  SYNC_STATUS: 'sync-status'
+  SYNC_STATUS: 'sync-status',
+
+  // GPS Feature (Phase 3-1)
+  GPS_BUTTON: 'gps-button',
+  GPS_ERROR_TOAST: 'gps-error-toast',
+  MANUAL_INPUT_GUIDANCE: 'manual-input-guidance',
+
+  // Photo Upload (Phase 3-1)
+  PHOTO_INPUT: 'photo-input',
+  PHOTO_UPLOAD_ERROR: 'photo-upload-error',
+  RETRY_UPLOAD_BUTTON: 'retry-upload-button',
+
+  // Form Validation (Phase 3-1)
+  VALIDATION_ERROR: 'validation-error',
+  FIELD_ERROR: (fieldName: string) => `${fieldName}-error`,
+
+  // Toast Components (Phase 3-1)
+  TOAST_ERROR: 'toast-error',
+  TOAST_WARNING: 'toast-warning',
+  TOAST_INFO: 'toast-info',
+  TOAST_SUCCESS: 'toast-success',
+  TOAST_CLOSE_BUTTON: 'toast-close-button',
+  TOAST_ACTION_BUTTON: 'toast-action-button'
 } as const;
 
 export type TestId = typeof TestIds[keyof typeof TestIds];

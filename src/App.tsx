@@ -15,6 +15,7 @@ import { PWAUpdateNotification } from './components/PWAUpdateNotification'
 import { TideChart } from './components/chart/tide/TideChart'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ErrorDisplay } from './components/errors'
+import { ToastContainer } from './components/ToastContainer'
 import Button from './components/ui/Button'
 import { colors } from './theme/colors'
 import { textStyles, typography } from './theme/typography'
@@ -571,6 +572,9 @@ function App() {
 
       {/* エラー表示システム */}
       <ErrorDisplay />
+
+      {/* トースト通知システム */}
+      <ToastContainer />
     </ErrorBoundary>
   )
 }

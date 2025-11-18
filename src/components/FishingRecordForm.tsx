@@ -505,6 +505,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           {errors.date && (
             <p
               id="date-error"
+              data-testid={TestIds.FIELD_ERROR('date')}
               role="alert"
               style={{
                 color: '#dc3545',

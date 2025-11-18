@@ -4,6 +4,8 @@ import React, { useCallback, useState } from 'react';
 import { customValidationRules } from '../hooks/useFormValidation';
 import { photoMetadataService } from '../lib/photo-metadata-service';
 import { weatherService } from '../lib/weather-service';
+import { useToastStore } from '../stores/toast-store';
+import { TestIds } from '../constants/testIds';
 import { Skeleton } from './ui/Skeleton';
 import type { PhotoMetadata, AutoFillData } from '../types';
 
@@ -34,7 +36,12 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
 }) => {
   const [dragOver, setDragOver] = useState(false);
   const [extractingMetadata, setExtractingMetadata] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const processingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // トースト通知
+  const showError = useToastStore(state => state.showError);
 
   // メタデータ抽出とファイル処理
   const processFileWithMetadata = useCallback(async (file: File) => {
@@ -109,6 +116,9 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
       clearTimeout(processingTimeoutRef.current);
     }
 
+    // エラーをクリア
+    setUploadError(null);
+
     if (!file) {
       onChange(undefined);
       return;
@@ -117,14 +127,37 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
     // ファイルサイズ検証
     const sizeValidation = customValidationRules.maxFileSize(maxSizeMB)(file);
     if (sizeValidation !== true) {
-      alert(sizeValidation);
+      // product-manager決定版のエラーメッセージ
+      const errorMessage = `画像サイズが大きすぎます（上限: ${maxSizeMB}MB）\nより小さいファイルを選択してください。`;
+      setUploadError(errorMessage);
+      showError(errorMessage, [
+        {
+          label: '画像を選び直す',
+          handler: () => {
+            setUploadError(null);
+            fileInputRef.current?.click();
+          },
+          primary: true
+        }
+      ]);
       return;
     }
 
     // ファイル形式検証
     const typeValidation = customValidationRules.imageFileType(file);
     if (typeValidation !== true) {
-      alert(typeValidation);
+      const errorMessage = typeValidation;
+      setUploadError(errorMessage);
+      showError(errorMessage, [
+        {
+          label: '画像を選び直す',
+          handler: () => {
+            setUploadError(null);
+            fileInputRef.current?.click();
+          },
+          primary: true
+        }
+      ]);
       return;
     }
 
@@ -136,7 +169,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
         processFileWithMetadata(file);
       }, 300);
     }
-  }, [onChange, maxSizeMB, onMetadataExtracted, onAutoFillRequested, processFileWithMetadata]);
+  }, [onChange, maxSizeMB, onMetadataExtracted, onAutoFillRequested, processFileWithMetadata, showError]);
 
   // ファイル入力変更ハンドラー
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,15 +329,13 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
 
           {/* 隠しファイル入力 */}
           <input
-            ref={(input) => {
-              if (input) {
-                (input as HTMLInputElement & { openFileDialog?: () => void }).openFileDialog = () => input.click();
-              }
-            }}
+            ref={fileInputRef}
+            data-testid={TestIds.PHOTO_INPUT}
             type="file"
             accept={accept}
             onChange={handleInputChange}
             disabled={disabled || isUploading}
+            aria-label="写真をアップロード"
             style={{
               display: 'none'
             }}
@@ -335,10 +366,47 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
       )}
 
       {/* エラー表示 */}
-      {error && (
-        <p style={{ color: '#dc3545', fontSize: '0.8rem', marginTop: '0.5rem' }}>
-          {error}
-        </p>
+      {(error || uploadError) && (
+        <div
+          data-testid={TestIds.PHOTO_UPLOAD_ERROR}
+          style={{
+            marginTop: '1rem',
+            padding: '0.75rem',
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            border: '1px solid #f5c6cb',
+            borderRadius: '4px',
+            fontSize: '0.9rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem'
+          }}
+        >
+          <span>⚠️ {error || uploadError}</span>
+          {uploadError && (
+            <button
+              type="button"
+              data-testid={TestIds.RETRY_UPLOAD_BUTTON}
+              onClick={() => {
+                setUploadError(null);
+                fileInputRef.current?.click();
+              }}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#721c24',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              画像を選び直す
+            </button>
+          )}
+        </div>
       )}
 
       {/* CSS アニメーション */}
