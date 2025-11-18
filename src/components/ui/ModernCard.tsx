@@ -12,6 +12,7 @@ interface ModernCardProps {
   onMouseLeave?: () => void;
   className?: string;
   style?: React.CSSProperties;
+  'data-testid'?: string;
 }
 
 export const ModernCard: React.FC<ModernCardProps> = ({
@@ -24,7 +25,8 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   onMouseEnter,
   onMouseLeave,
   className = '',
-  style = {}
+  style = {},
+  'data-testid': dataTestId
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -133,6 +135,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
           setIsHovered(false);
           onMouseLeave?.();
         }}
+        data-testid={dataTestId}
       >
         {children}
 

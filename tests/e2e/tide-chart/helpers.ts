@@ -359,13 +359,13 @@ export async function setupCleanPage(page: Page) {
     state: 'attached'
   });
 
-  // UIが表示されるまで待機
+  // UIが表示されるまで待機 (ModernApp.tsx: nav-form パターン)
   await page.waitForSelector(
-    `[data-testid="${TestIds.FORM_TAB}"]`,
+    `[data-testid="nav-form"]`,
     { timeout: 5000, state: 'visible' }
   );
 
   // タブUIが操作可能か確認
-  const formTab = page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
+  const formTab = page.locator(`[data-testid="nav-form"]`);
   await expect(formTab).toBeEnabled();
 }

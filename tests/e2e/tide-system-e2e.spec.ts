@@ -23,8 +23,8 @@ class TideSystemE2EHelper {
     size?: number;
     useGPS?: boolean;
   }) {
-    // 🟢 改善1: タブ切り替えをより堅牢に
-    const formTab = this.page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
+    // 🟢 改善1: タブ切り替えをより堅牢に (ModernApp.tsx: nav-form パターン)
+    const formTab = this.page.locator(`[data-testid="nav-form"]`);
     await formTab.waitFor({ state: 'visible', timeout: 10000 });
     await expect(formTab).toBeEnabled();
     await formTab.click();
@@ -50,8 +50,14 @@ class TideSystemE2EHelper {
       await expect(this.page.locator('[data-testid="fish-size"]')).toHaveValue(recordData.size.toString());
     }
 
-    // GPS使用はフォーム送信時にuseGPS=trueとして処理される
-    // use-gps-buttonは存在しないため、この処理は不要
+    // GPS座標を明示的に入力（自動取得に頼らない）
+    if (recordData.useGPS) {
+      // モック位置情報（東京湾: 35.6762, 139.6503）
+      await this.page.fill('[data-testid="latitude"]', '35.6762');
+      await this.page.fill('[data-testid="longitude"]', '139.6503');
+      await expect(this.page.locator('[data-testid="latitude"]')).toHaveValue('35.6762');
+      await expect(this.page.locator('[data-testid="longitude"]')).toHaveValue('139.6503');
+    }
 
     // 🟢 改善4: 保存ボタンが有効か確認してからクリック
     const saveButton = this.page.locator('[data-testid="save-record-button"]');
@@ -60,15 +66,15 @@ class TideSystemE2EHelper {
 
     // 🟢 改善5: 保存後、リストタブに自動切り替わることを確認（waitForTimeoutの代わり）
     let switchedToList = await this.page.waitForSelector(
-      `[data-testid="${TestIds.FISHING_RECORDS_LINK}"][aria-selected="true"]`,
+      `[data-testid="nav-list"][aria-current="page"]`,
       { timeout: 5000, state: 'visible' }
     ).then(() => true).catch(() => false);
 
     if (!switchedToList) {
-      // 手動で切り替え
-      await this.page.locator(`[data-testid="${TestIds.FISHING_RECORDS_LINK}"]`).click();
+      // 手動で切り替え (ModernApp.tsx: nav-list パターン、aria-current使用)
+      await this.page.locator(`[data-testid="nav-list"]`).click();
       await this.page.waitForSelector(
-        `[data-testid="${TestIds.FISHING_RECORDS_LINK}"][aria-selected="true"]`,
+        `[data-testid="nav-list"][aria-current="page"]`,
         { timeout: 5000, state: 'visible' }
       );
     }
@@ -82,8 +88,8 @@ class TideSystemE2EHelper {
 
   // 釣果記録詳細ページに移動
   async goToRecordDetail(recordId?: string) {
-    // リストタブに切り替え
-    const listTab = this.page.locator(`[data-testid="${TestIds.FISHING_RECORDS_LINK}"]`);
+    // リストタブに切り替え (ModernApp.tsx: nav-list パターン)
+    const listTab = this.page.locator(`[data-testid="nav-list"]`);
     await listTab.waitFor({ state: 'visible', timeout: 10000 });
     await expect(listTab).toBeEnabled();
     await listTab.click();
