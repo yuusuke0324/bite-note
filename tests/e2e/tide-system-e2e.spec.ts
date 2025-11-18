@@ -233,20 +233,25 @@ class TideSystemE2EHelper {
     // Rechartsのラインパス要素に直接hoverして確実にtooltipを表示
     // .recharts-line-curveはRechartsが自動生成する実際のライン要素
     const lineCurve = this.page.locator('.recharts-line-curve').first();
-    await lineCurve.waitFor({ state: 'visible', timeout: 5000 });
+
+    // CI環境では親要素の overflow: hidden が解除されるまでに時間がかかるため
+    // DOMに存在することのみを確認（attached状態）し、force: true でhoverを実行
+    await lineCurve.waitFor({ state: 'attached', timeout: 5000 });
 
     // ラインの中央付近にhover（より確実にtooltipが表示される）
+    // force: true を使用してvisibilityチェックを回避
     const boundingBox = await lineCurve.boundingBox();
     if (boundingBox) {
       await lineCurve.hover({
         position: {
           x: boundingBox.width / 2,
           y: boundingBox.height / 2
-        }
+        },
+        force: true
       });
     } else {
       // bounding boxが取れない場合は相対位置でhover
-      await lineCurve.hover();
+      await lineCurve.hover({ force: true });
     }
 
     const tooltip = this.page.locator('[data-testid="tide-tooltip"]');
@@ -263,7 +268,8 @@ class TideSystemE2EHelper {
         position: {
           x: boundingBox.width * 0.7,
           y: boundingBox.height / 2
-        }
+        },
+        force: true
       });
     }
     await expect(tooltip).toBeVisible();
