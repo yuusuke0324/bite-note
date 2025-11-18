@@ -210,8 +210,9 @@ class TideSystemE2EHelper {
     await contentSection.waitFor({ state: 'visible', timeout: 5000 });
 
     // 展開アニメーション完了を待つ（TideIntegrationのアニメーション時間は250ms）
-    // overflow: hidden → visible への変更完了を確実にするため500ms待機
-    await this.page.waitForTimeout(500);
+    // overflow: hidden → visible への変更完了を確実にするため1000ms待機
+    // CI環境ではアニメーション処理が遅延する可能性があるため余裕を持たせる
+    await this.page.waitForTimeout(1000);
 
     // Rechartsは内部的にSVGを生成するため、より柔軟なセレクターを使用
     // 1. data-testid経由で探す
