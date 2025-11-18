@@ -224,6 +224,8 @@ test.describe('TASK-402: 潮汐システムE2Eテスト', () => {
   test.beforeEach(async ({ page }) => {
     // ⚠️ 重要: テスト間の状態分離のため、クリーンな環境を保証
     // LocalStorage/sessionStorage/IndexedDBをクリア
+    // CI環境でのIndexedDB削除完了を考慮し、タイムアウトを60秒に延長
+    test.setTimeout(60000);
     await setupCleanPage(page);
 
     helper = new TideSystemE2EHelper(page);
