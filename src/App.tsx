@@ -176,12 +176,20 @@ function App() {
     initializeApp();
   }, [appActions, formActions, records.length, settings.theme]);
 
+  // 型安全なTestIDsマッピング
+  const TAB_TEST_IDS: Record<'form' | 'list' | 'tide-chart' | 'debug', string> = {
+    form: TestIds.FORM_TAB,
+    list: TestIds.FISHING_RECORDS_LINK,
+    'tide-chart': TestIds.TIDE_GRAPH_TAB,
+    debug: TestIds.DEBUG_TAB,
+  } as const;
+
   const TabButton = ({ tab, label, emoji }: { tab: 'form' | 'list' | 'tide-chart' | 'debug', label: string, emoji: string }) => (
     <Button
       variant={activeTab === tab ? 'primary' : 'text'}
       size="md"
       onClick={() => setActiveTab(tab)}
-      data-testid={tab === 'list' ? TestIds.FISHING_RECORDS_LINK : `${tab}-tab`}
+      data-testid={TAB_TEST_IDS[tab]}
       style={{
         borderRadius: '8px 8px 0 0',
         borderBottom: activeTab === tab ? `3px solid ${colors.primary[500]}` : '3px solid transparent',
