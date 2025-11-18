@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { LocationDisplay } from './LocationDisplay';
 import { useToastStore } from '../stores/toast-store';
-import { TestIds } from '../constants/TestIds';
+import { TestIds } from '../constants/testIds';
 import type { Coordinates } from '../types';
 
 interface GPSLocationInputProps {

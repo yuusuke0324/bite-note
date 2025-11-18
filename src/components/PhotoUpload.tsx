@@ -5,7 +5,7 @@ import { customValidationRules } from '../hooks/useFormValidation';
 import { photoMetadataService } from '../lib/photo-metadata-service';
 import { weatherService } from '../lib/weather-service';
 import { useToastStore } from '../stores/toast-store';
-import { TestIds } from '../constants/TestIds';
+import { TestIds } from '../constants/testIds';
 import { Skeleton } from './ui/Skeleton';
 import type { PhotoMetadata, AutoFillData } from '../types';
 
