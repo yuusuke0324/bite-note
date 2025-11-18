@@ -499,7 +499,7 @@ const CustomTooltip = React.memo(({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div
-        data-testid="tooltip"
+        data-testid="tide-tooltip"
         className="custom-tooltip"
         style={{
           backgroundColor: 'white',
@@ -509,8 +509,8 @@ const CustomTooltip = React.memo(({ active, payload, label }: any) => {
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}
       >
-        <p>{`時刻: ${label}`}</p>
-        <p>{`潮位: ${payload[0].value}cm`}</p>
+        <p data-testid="tooltip-time">{`時刻: ${label}`}</p>
+        <p data-testid="tooltip-level">{`潮位: ${payload[0].value}cm`}</p>
       </div>
     );
   }
