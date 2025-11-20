@@ -112,11 +112,19 @@ export async function clearAllCaches(page: Page): Promise<void> {
  */
 export async function clearStorage(page: Page): Promise<void> {
   await page.evaluate(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.clear();
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.clear();
+      }
+    } catch (err) {
+      // Access denied の場合はスキップ
     }
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.clear();
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.clear();
+      }
+    } catch (err) {
+      // Access denied の場合はスキップ
     }
   });
 }
