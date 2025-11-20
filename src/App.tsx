@@ -15,7 +15,6 @@ import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 import { PWAUpdateNotification } from './components/PWAUpdateNotification'
-import { TideChart } from './components/chart/tide/TideChart'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ErrorDisplay } from './components/errors'
 import { ToastContainer } from './components/ToastContainer'
@@ -33,7 +32,7 @@ function App() {
   const [dbMessage, setDbMessage] = useState<string>('')
   const [storeStatus, setStoreStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [storeMessage, setStoreMessage] = useState<string>('')
-  const [activeTab, setActiveTab] = useState<'form' | 'list' | 'tide-chart' | 'debug'>('form')
+  const [activeTab, setActiveTab] = useState<'form' | 'list' | 'debug'>('form')
   const [selectedRecord, setSelectedRecord] = useState<FishingRecord | null>(null)
   const [editingRecord, setEditingRecord] = useState<FishingRecord | null>(null)
   const [deletingRecord, setDeletingRecord] = useState<FishingRecord | null>(null)
@@ -295,14 +294,13 @@ function App() {
   }, []);
 
   // 型安全なTestIDsマッピング
-  const TAB_TEST_IDS: Record<'form' | 'list' | 'tide-chart' | 'debug', string> = {
+  const TAB_TEST_IDS: Record<'form' | 'list' | 'debug', string> = {
     form: TestIds.FORM_TAB,
     list: TestIds.FISHING_RECORDS_LINK,
-    'tide-chart': TestIds.TIDE_GRAPH_TAB,
     debug: TestIds.DEBUG_TAB,
   } as const;
 
-  const TabButton = ({ tab, label, emoji }: { tab: 'form' | 'list' | 'tide-chart' | 'debug', label: string, emoji: string }) => (
+  const TabButton = ({ tab, label, emoji }: { tab: 'form' | 'list' | 'debug', label: string, emoji: string }) => (
     <Button
       variant={activeTab === tab ? 'primary' : 'text'}
       size="md"
@@ -386,7 +384,6 @@ function App() {
         }}>
           <TabButton tab="form" label="記録登録" emoji="✏️" />
           <TabButton tab="list" label="写真で確認" emoji="📸" />
-          <TabButton tab="tide-chart" label="潮汐グラフ" emoji="🌊" />
           <TabButton tab="debug" label="デバッグ" emoji="🔧" />
         </div>
       </div>
@@ -422,28 +419,6 @@ function App() {
               onRecordEdit={handleRecordEdit}
               onRecordDelete={handleRecordDelete}
               onDataRefresh={handleDataRefresh}
-            />
-          </div>
-        )}
-
-        {activeTab === 'tide-chart' && (
-          <div>
-            <h2 style={{
-              ...textStyles.headline.medium,
-              color: colors.text.primary,
-              marginBottom: '1.5rem',
-            }}>🌊 潮汐グラフ</h2>
-            <TideChart
-              data={[
-                { time: '00:00', tide: 120 },
-                { time: '03:00', tide: 80 },
-                { time: '06:00', tide: 200 },
-                { time: '09:00', tide: 150 },
-                { time: '12:00', tide: 90 },
-                { time: '15:00', tide: 180 },
-                { time: '18:00', tide: 140 },
-                { time: '21:00', tide: 110 }
-              ]}
             />
           </div>
         )}
