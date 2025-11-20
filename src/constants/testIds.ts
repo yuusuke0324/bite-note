@@ -93,7 +93,6 @@ export const TestIds = {
 
   // Generic
   FLOATING_ACTION_BUTTON: 'floating-action-button',
-  TIDE_TOOLTIP: 'tide-tooltip',
   TIDE_GRAPH_SKELETON: 'tide-graph-skeleton',
   TIDE_GRAPH_ERROR: 'tide-graph-error',
   TIDE_GRAPH_CONTAINER: 'tide-graph-container',
