@@ -14,13 +14,23 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OfflineIndicator } from '../OfflineIndicator';
-import { offlineQueueService } from '../../../lib/offline-queue-service';
-import { useToastStore } from '../../../stores/toast-store';
 import { TestIds } from '../../../constants/testIds';
 
-// モック
-vi.mock('../../../lib/offline-queue-service');
-vi.mock('../../../stores/toast-store');
+// モック: offlineQueueService
+vi.mock('../../../lib/offline-queue-service', () => ({
+  offlineQueueService: {
+    getQueueStatus: vi.fn(),
+    syncQueue: vi.fn(),
+  },
+}));
+
+// モック: useToastStore
+vi.mock('../../../stores/toast-store', () => ({
+  useToastStore: vi.fn(),
+}));
+
+import { offlineQueueService } from '../../../lib/offline-queue-service';
+import { useToastStore } from '../../../stores/toast-store';
 
 describe('OfflineIndicator', () => {
   const mockShowInfo = vi.fn();
