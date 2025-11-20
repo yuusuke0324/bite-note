@@ -590,8 +590,8 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                         showTooltip={false}
                         fishingTimes={fishingTimes}
                         responsive={false}
-                        keyboardNavigationEnabled={false}
-                        focusManagementEnabled={false}
+                        keyboardNavigationEnabled={true}
+                        focusManagementEnabled={true}
                         enablePerformanceMonitoring={false}
                       />
                     </div>

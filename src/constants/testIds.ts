@@ -37,6 +37,7 @@ export const TestIds = {
   FISH_SPECIES_NO_RESULTS: 'fish-species-no-results',
 
   // Tide Graph
+  TIDE_CHART: 'tide-chart', // TideChart メインコンテナ（実装済み）
   TIDE_GRAPH_CANVAS: 'tide-graph-canvas',
   TIDE_GRAPH_AREA: 'tide-graph-area',
   TIDE_GRAPH_TIME_LABELS: 'tide-graph-time-labels',
@@ -48,6 +49,13 @@ export const TestIds = {
   LEVEL_LABEL: (index: number) => `level-label-${index}`,
   GRID_LINE: (index: number) => `grid-line-${index}`,
   FISHING_MARKER: (index: number) => `fishing-marker-${index}`,
+
+  // TideChart Accessibility (実装済み)
+  FALLBACK_DATA_TABLE: 'fallback-data-table', // アクセシビリティ用データテーブル
+  TIDE_TOOLTIP: 'tide-tooltip', // ツールチップ
+  TOOLTIP_TIME: 'tooltip-time', // ツールチップ時刻
+  TOOLTIP_LEVEL: 'tooltip-level', // ツールチップ潮位
+  DATA_POINT: (index: number) => `data-point-${index}`, // データポイント
 
   // Tide Integration
   TIDE_GRAPH_TAB: 'tide-graph-tab', // Navigation: Bottom tab for tide graph page
