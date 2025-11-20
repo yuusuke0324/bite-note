@@ -19,8 +19,17 @@ import { TestIds } from '../../../constants/testIds';
 // モック: offlineQueueService
 vi.mock('../../../lib/offline-queue-service', () => ({
   offlineQueueService: {
-    getQueueStatus: vi.fn(),
-    syncQueue: vi.fn(),
+    getQueueStatus: vi.fn().mockResolvedValue({
+      pendingCount: 0,
+      syncingCount: 0,
+      failedCount: 0,
+      isQueueFull: false,
+      isSyncing: false,
+    }),
+    syncQueue: vi.fn().mockResolvedValue({
+      success: true,
+      syncedCount: 0,
+    }),
   },
 }));
 

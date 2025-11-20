@@ -16,6 +16,23 @@ import userEvent from '@testing-library/user-event';
 import { FeedbackToast } from '../FeedbackToast';
 import { TestIds } from '../../constants/testIds';
 
+// offlineQueueService をモック (CI環境での安定性向上のため)
+vi.mock('../../lib/offline-queue-service', () => ({
+  offlineQueueService: {
+    getQueueStatus: vi.fn().mockResolvedValue({
+      pendingCount: 0,
+      syncingCount: 0,
+      failedCount: 0,
+      isQueueFull: false,
+      isSyncing: false,
+    }),
+    syncQueue: vi.fn().mockResolvedValue({
+      success: true,
+      syncedCount: 0,
+    }),
+  },
+}));
+
 describe('FeedbackToast', () => {
   const mockOnClose = vi.fn();
 
