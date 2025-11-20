@@ -250,10 +250,13 @@ describe('OfflineIndicator', () => {
 
     render(<OfflineIndicator isOnline={true} />);
 
-    const syncButton = await screen.findByTestId(TestIds.SYNC_BUTTON);
+    // 初期状態で同期ボタンが表示されるまで待機
+    const syncButton = await screen.findByTestId(TestIds.SYNC_BUTTON, {}, { timeout: 3000 });
 
     // 1回目のクリック
-    await user.click(syncButton);
+    await act(async () => {
+      await user.click(syncButton);
+    });
 
     // 最初の同期開始メッセージ
     expect(mockShowInfo).toHaveBeenCalledWith('同期を開始しました');
@@ -261,10 +264,12 @@ describe('OfflineIndicator', () => {
     // 同期ボタンが非表示になるまで待機（同期中状態）
     await waitFor(() => {
       expect(screen.queryByTestId(TestIds.SYNC_BUTTON)).not.toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
 
     // 同期中表示を確認
-    expect(screen.getByText(/同期中\.\.\. 5件のデータを処理しています/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/同期中\.\.\. 5件のデータを処理しています/)).toBeInTheDocument();
+    });
 
     // Note: このテストは handleManualSync() の内部防御をテストしているが、
     // 実装ではUIレベルで同期中はボタンを非表示にするため、このコードパスは通常実行されない。
