@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore, selectError, selectRecords, selectSettings, selectActions } from './stores/app-store'
 import { useToastStore } from './stores/toast-store'
+import { useSessionStore } from './stores/session-store'
 import { TestIds } from './constants/testIds'
 import { useFormStore, selectFormData, selectValidation, selectFormActions } from './stores/form-store'
+import { exportImportService } from './lib/export-import-service'
 import { FishingRecordForm } from './components/FishingRecordForm'
 import { SimplePhotoList } from './components/SimplePhotoList'
 import { photoService } from './lib/photo-service'
@@ -17,6 +19,7 @@ import { TideChart } from './components/chart/tide/TideChart'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ErrorDisplay } from './components/errors'
 import { ToastContainer } from './components/ToastContainer'
+import { ReAuthPrompt } from './components/features/SessionManagement/ReAuthPrompt'
 import Button from './components/ui/Button'
 import { colors } from './theme/colors'
 import { textStyles, typography } from './theme/typography'
@@ -48,6 +51,14 @@ function App() {
   const formData = useFormStore(selectFormData)
   const validation = useFormStore(selectValidation)
   const formActions = useFormStore(selectFormActions)
+
+  // セッション管理
+  const sessionStatus = useSessionStore((state) => state.sessionStatus)
+  const isSessionExpiredModalOpen = useSessionStore(
+    (state) => state.isSessionExpiredModalOpen
+  )
+  const unsavedDataCount = useSessionStore((state) => state.unsavedDataCount)
+  const sessionActions = useSessionStore((state) => state.actions)
 
   // フォーム送信ハンドラー
   const handleFormSubmit = async (data: CreateFishingRecordFormData) => {
@@ -123,6 +134,42 @@ function App() {
     setEditingRecord(null);
   };
 
+  // セッション管理のハンドラー
+  const handleReconnect = async () => {
+    const success = await sessionActions.reconnectSession();
+    if (success) {
+      // 再接続成功後、データを再読み込み
+      await appActions.refreshRecords();
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      // 全データをエクスポート
+      const result = await exportImportService.exportAllData();
+
+      if (result.success && result.data) {
+        // JSONファイルとしてダウンロード
+        const blob = exportImportService.createDownloadBlob(result.data, 'application/json');
+        const filename = `bite-note-backup-${new Date().toISOString().split('T')[0]}.json`;
+        exportImportService.downloadFile(blob, filename);
+
+        // 成功トースト表示
+        useToastStore.getState().showSuccess(`${filename}をダウンロードしました`);
+
+        // モーダルを閉じる
+        sessionActions.hideSessionExpiredModal();
+      } else {
+        useToastStore.getState().showError(
+          'データのエクスポートに失敗しました'
+        );
+      }
+    } catch (error) {
+      console.error('[App] Export error', error);
+      useToastStore.getState().showError('データのエクスポート中にエラーが発生しました');
+    }
+  };
+
   useEffect(() => {
     // 全体的なエラーハンドリング
     const initializeApp = async () => {
@@ -181,6 +228,20 @@ function App() {
 
     initializeApp();
   }, [appActions, formActions]); // records.length, settings.theme を削除（再レンダリングループ防止）
+
+  // Phase 3-4: セッション管理の初期化
+  useEffect(() => {
+    // ストレージモードの初期化
+    sessionActions.initializeStorageMode();
+
+    // セッション管理を開始
+    sessionActions.startSession();
+
+    // クリーンアップ
+    return () => {
+      sessionActions.stopSession();
+    };
+  }, [sessionActions]);
 
   // Phase 3-2: グローバルストレージエラーハンドラー
   useEffect(() => {
@@ -611,6 +672,17 @@ function App() {
           onConfirm={handleDeleteConfirm}
           onCancel={handleDeleteCancel}
           isLoading={isDeletingInProgress}
+        />
+      )}
+
+      {/* セッション期限切れモーダル (Phase 3-4) */}
+      {isSessionExpiredModalOpen && (
+        <ReAuthPrompt
+          unsavedCount={unsavedDataCount}
+          onReconnect={handleReconnect}
+          onExport={handleExport}
+          onClose={() => sessionActions.hideSessionExpiredModal()}
+          isReconnecting={sessionStatus === 'reconnecting'}
         />
       )}
 

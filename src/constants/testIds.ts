@@ -124,7 +124,20 @@ export const TestIds = {
   LOCAL_SAVE_MESSAGE: 'local-save-message',
   SYNC_SUCCESS_MESSAGE: 'sync-success-message',
   STORAGE_ERROR: 'storage-error',
-  DATA_MANAGEMENT_BUTTON: 'data-management-button'
+  DATA_MANAGEMENT_BUTTON: 'data-management-button',
+
+  // Session Management (Phase 3-4)
+  SESSION_TIMEOUT_MODAL: 'session-timeout-modal',
+  REAUTH_PROMPT: 'reauth-prompt',
+  RECONNECT_AND_SAVE_BUTTON: 'reconnect-and-save-button',
+  EXPORT_NOW_BUTTON: 'export-now-button',
+  SESSION_MODAL_CLOSE_BUTTON: 'session-modal-close-button',
+
+  // Fallback Storage (Phase 3-4)
+  FALLBACK_STORAGE_NOTICE: 'fallback-storage-notice',
+  INDEXEDDB_UNAVAILABLE_WARNING: 'indexeddb-unavailable-warning',
+  STORAGE_QUOTA_WARNING: 'storage-quota-warning',
+  MIGRATION_PROMPT: 'migration-prompt'
 } as const;
 
 export type TestId = typeof TestIds[keyof typeof TestIds];

@@ -91,7 +91,7 @@ class TideSystemE2EHelper {
     await saveButton.click({ force: true });
 
     // 🟢 改善5: 保存後、リストタブに自動切り替わることを確認（waitForTimeoutの代わり）
-    let switchedToList = await this.page.waitForSelector(
+    const switchedToList = await this.page.waitForSelector(
       `[data-testid="nav-list"][aria-current="page"]`,
       { timeout: 5000, state: 'visible' }
     ).then(() => true).catch(() => false);
