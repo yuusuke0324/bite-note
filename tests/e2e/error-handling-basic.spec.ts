@@ -15,7 +15,18 @@ test.describe('エラーハンドリング基礎', () => {
     await page.goto('/');
   });
 
-  test('should display ErrorBoundary on render error', async ({ page }) => {
+  // TODO: ErrorBoundaryテストの実装
+  // 現在のテスト方法（page.evaluate()でエラーを投げる）では、
+  // ReactのレンダリングサイクルP外でエラーが発生するため、ErrorBoundaryにキャッチされない。
+  //
+  // 推奨される実装方法（将来のタスク）:
+  // 1. localStorageフラグ（__test_force_error__）を設定
+  // 2. ModernAppでフラグをチェックし、意図的にレンダリングエラーを発生させる
+  // 3. ErrorBoundaryが表示されることを確認
+  // 4. フラグをクリーンアップ
+  //
+  // 参照: Issue #172 - qa-engineer レビュー結果
+  test.skip('should display ErrorBoundary on render error', async ({ page }) => {
     // ErrorBoundaryをテストするため、意図的にエラーを発生させる
     await page.evaluate(() => {
       // 開発環境でのみテスト可能（本番環境ではErrorBoundaryは通常発生しない）
@@ -42,30 +53,23 @@ test.describe('エラーハンドリング基礎', () => {
     await page.click(`[data-testid="${TestIds.NAV_ITEM('form')}"]`);
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
-    // 必須フィールドを空のまま送信を試行
+    // 必須フィールドを明示的に空にする（clear()ではなくfill('')を使用）
+    const dateInput = page.locator(`[data-testid="${TestIds.FISHING_DATE}"]`);
+    await dateInput.fill(''); // fill('')はReactのonChangeをトリガーする
+
+    const locationInput = page.locator(`[data-testid="${TestIds.LOCATION_NAME}"]`);
+    await locationInput.fill('');
+
+    // 保存ボタンを取得
     const saveButton = page.locator(`[data-testid="${TestIds.SAVE_RECORD_BUTTON}"]`);
 
-    // 釣行日時フィールドをクリア
-    const dateInput = page.locator(`[data-testid="${TestIds.FISHING_DATE}"]`);
-    await dateInput.clear();
+    // ボタンの状態を確認
+    const isDisabled = await saveButton.isDisabled();
 
-    // 釣り場フィールドをクリア
-    const locationInput = page.locator(`[data-testid="${TestIds.LOCATION_NAME}"]`);
-    await locationInput.clear();
-
-    // 送信を試行
-    await saveButton.click();
-
-    // HTML5バリデーションまたはフォームバリデーションが機能することを確認
-    // (実装によっては、送信がブロックされるか、エラーメッセージが表示される)
-    const form = page.locator('form[data-testid="fishing-record-form"]');
-    await expect(form).toBeVisible();
-
-    // 必須フィールドにinvalid状態があることを確認（HTML5バリデーション）
-    const isDateInvalid = await dateInput.evaluate((el: HTMLInputElement) => !el.validity.valid);
-    const isLocationInvalid = await locationInput.evaluate((el: HTMLInputElement) => !el.validity.valid);
-
-    expect(isDateInvalid || isLocationInvalid).toBeTruthy();
+    // ボタンが無効化されることを確認（クライアントサイドバリデーション）
+    // react-hook-formを使用しているため、HTML5のvalidityではなく、
+    // ボタンのdisabled状態でバリデーションを確認
+    expect(isDisabled).toBeTruthy();
   });
 
   test('should detect offline state', async ({ page, context }) => {
@@ -76,11 +80,9 @@ test.describe('エラーハンドリング基礎', () => {
     // オフライン状態をシミュレート
     await context.setOffline(true);
 
-    // OfflineIndicatorが表示されることを確認
+    // OfflineIndicatorが表示されることを確認（タイムアウトを3秒に短縮）
     const offlineIndicator = page.locator(`[data-testid="${TestIds.OFFLINE_INDICATOR}"]`);
-
-    // オフライン検出まで少し待機（最大5秒）
-    await expect(offlineIndicator).toBeVisible({ timeout: 5000 });
+    await expect(offlineIndicator).toBeVisible({ timeout: 3000 });
 
     // オフラインメッセージが含まれることを確認
     await expect(offlineIndicator).toContainText('オフライン');
@@ -89,22 +91,24 @@ test.describe('エラーハンドリング基礎', () => {
     await context.setOffline(false);
 
     // OfflineIndicatorが非表示になることを確認（または同期ステータスに変わる）
-    await expect(offlineIndicator).not.toBeVisible({ timeout: 5000 });
+    await expect(offlineIndicator).not.toBeVisible({ timeout: 3000 });
   });
 
   test('should persist data in IndexedDB', async ({ page }) => {
     // リストタブに移動
     await page.click(`[data-testid="${TestIds.NAV_ITEM('list')}"]`);
-    await page.waitForSelector(`[data-testid="${TestIds.FISHING_RECORDS_LIST}"]`, { state: 'visible' });
+    await page.waitForSelector(`[data-testid="${TestIds.FISHING_RECORDS_LIST}"]`, { state: 'visible', timeout: 10000 });
 
     // IndexedDBにデータが存在するか確認
     const hasData = await page.evaluate(async () => {
-      const dbName = 'BiteNoteDB';
+      // 実際のデータベース名を使用（FishingRecordDB）
+      const dbName = 'FishingRecordDB';
       return new Promise<boolean>((resolve) => {
         const request = indexedDB.open(dbName);
         request.onsuccess = () => {
           const db = request.result;
-          resolve(db.objectStoreNames.contains('fishingRecords'));
+          // 実際のテーブル名を使用（fishing_records）
+          resolve(db.objectStoreNames.contains('fishing_records'));
         };
         request.onerror = () => resolve(false);
       });
@@ -123,7 +127,7 @@ test.describe('エラーハンドリング基礎', () => {
 
     // リストタブ
     await page.click(`[data-testid="${TestIds.NAV_ITEM('list')}"]`);
-    await page.waitForSelector(`[data-testid="${TestIds.FISHING_RECORDS_LIST}"]`, { state: 'visible' });
+    await page.waitForSelector(`[data-testid="${TestIds.FISHING_RECORDS_LIST}"]`, { state: 'visible', timeout: 10000 });
 
     // タイドグラフタブ（存在する場合）
     const tideGraphTab = page.locator(`[data-testid="${TestIds.NAV_ITEM('tide-graph')}"]`);

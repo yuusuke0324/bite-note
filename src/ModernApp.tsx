@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppStore, selectError, selectRecords, selectSettings, selectActions } from './stores/app-store';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
 
 // モダンコンポーネント
 import AppLayout from './components/layout/AppLayout';
@@ -30,6 +31,9 @@ import { Skeleton, SkeletonPhotoCard, SkeletonList } from './components/ui/Skele
 
 // 地図コンポーネント
 import { FishingMap } from './components/map/FishingMap';
+
+// オフラインインジケーター
+import { OfflineIndicator } from './components/common/OfflineIndicator';
 
 // アイコン
 import Icons from './components/icons/Icons';
@@ -168,6 +172,9 @@ function ModernApp() {
   const [isDeletingInProgress, setIsDeletingInProgress] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [mapSelectedRecordId, setMapSelectedRecordId] = useState<string | undefined>(undefined);
+
+  // オンライン/オフライン状態（カスタムフックを使用）
+  const { isOnline } = useOnlineStatus();
 
   // 詳細モーダル用の写真URL
   const [detailPhotoUrl, setDetailPhotoUrl] = useState<string | null>(null);
@@ -1650,7 +1657,7 @@ function ModernApp() {
     };
 
     return (
-      <div style={{ padding: '16px' }}>
+      <div data-testid={TestIds.FISHING_RECORDS_LIST} style={{ padding: '16px' }}>
         {isLoading ? (
           <div>
             <div style={{ marginBottom: '16px' }}>
@@ -1871,31 +1878,35 @@ function ModernApp() {
   };
 
   return (
-    <AppLayout
-      header={
-        <ModernHeader
-          title={getHeaderTitle()}
-          subtitle={getHeaderSubtitle()}
-          actions={
-            <FloatingActionButton
-              icon={<Icons.Add />}
-              size="md"
-              onClick={() => setActiveTab('form')}
-              style={{
-                display: activeTab === 'form' ? 'none' : 'flex',
-              }}
-            />
-          }
-        />
-      }
-      navigation={
-        <BottomNavigation
-          items={navigationItems}
-          onItemClick={(id) => setActiveTab(id as any)}
-        />
-      }
-    >
-      {renderContent()}
+    <>
+      {/* オフラインインジケーター */}
+      <OfflineIndicator isOnline={isOnline} />
+
+      <AppLayout
+        header={
+          <ModernHeader
+            title={getHeaderTitle()}
+            subtitle={getHeaderSubtitle()}
+            actions={
+              <FloatingActionButton
+                icon={<Icons.Add />}
+                size="md"
+                onClick={() => setActiveTab('form')}
+                style={{
+                  display: activeTab === 'form' ? 'none' : 'flex',
+                }}
+              />
+            }
+          />
+        }
+        navigation={
+          <BottomNavigation
+            items={navigationItems}
+            onItemClick={(id) => setActiveTab(id as any)}
+          />
+        }
+      >
+        {renderContent()}
 
       {/* モーダル */}
       {selectedRecord && (
@@ -1931,11 +1942,12 @@ function ModernApp() {
         />
       )}
 
-      {/* PWA コンポーネント */}
-      <PWAInstallPrompt />
-      <PWAInstallBanner />
-      <PWAUpdateNotification />
-    </AppLayout>
+        {/* PWA コンポーネント */}
+        <PWAInstallPrompt />
+        <PWAInstallBanner />
+        <PWAUpdateNotification />
+      </AppLayout>
+    </>
   );
 }
 
