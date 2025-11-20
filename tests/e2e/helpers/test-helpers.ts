@@ -82,8 +82,8 @@ export async function createTestFishingRecord(
 export async function navigateToRecordsList(page: Page): Promise<void> {
   // Use the list tab since the current app uses "写真で確認" tab instead of records link
   await page.click('[data-testid="list-tab"]');
-  // Wait for the photo list or records container to load
-  await page.waitForTimeout(1000); // Allow time for tab switch
+  // Wait for the tab to be selected
+  await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 2000 });
 }
 
 /**
