@@ -58,10 +58,17 @@ export async function waitForServiceWorker(page: Page, timeout = 10000): Promise
 
 /**
  * IndexedDBを完全にクリア
+ * IndexedDB APIはセキュアコンテキスト（HTTPS）でのみ利用可能
  */
 export async function clearIndexedDB(page: Page, dbNames: string[] = ['BiteNoteDB', 'BiteNoteDB-offline-queue']): Promise<void> {
   await page.evaluate((databases) => {
     return new Promise<void>((resolve) => {
+      // IndexedDB APIが利用できない場合はスキップ
+      if (typeof indexedDB === 'undefined') {
+        resolve();
+        return;
+      }
+
       let completed = 0;
 
       if (databases.length === 0) {
@@ -70,11 +77,17 @@ export async function clearIndexedDB(page: Page, dbNames: string[] = ['BiteNoteD
       }
 
       databases.forEach((dbName) => {
-        const req = indexedDB.deleteDatabase(dbName);
-        req.onsuccess = req.onerror = () => {
+        try {
+          const req = indexedDB.deleteDatabase(dbName);
+          req.onsuccess = req.onerror = () => {
+            completed++;
+            if (completed === databases.length) resolve();
+          };
+        } catch (err) {
+          // セキュアコンテキストでない場合のエラーをキャッチ
           completed++;
           if (completed === databases.length) resolve();
-        };
+        }
       });
     });
   }, dbNames);
@@ -95,11 +108,16 @@ export async function clearAllCaches(page: Page): Promise<void> {
 
 /**
  * localStorage と sessionStorage をクリア
+ * Storage APIはセキュアコンテキスト（HTTPS）でのみ利用可能
  */
 export async function clearStorage(page: Page): Promise<void> {
   await page.evaluate(() => {
-    localStorage.clear();
-    sessionStorage.clear();
+    if (typeof localStorage !== 'undefined') {
+      localStorage.clear();
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.clear();
+    }
   });
 }
 
@@ -199,9 +217,15 @@ export async function simulateOnline(page: Page): Promise<void> {
 /**
  * ストレージ満杯エラーをシミュレート
  * IndexedDBのaddメソッドをモックしてQuotaExceededErrorを発生させる
+ * IndexedDB APIはセキュアコンテキスト（HTTPS）でのみ利用可能
  */
 export async function simulateStorageQuotaExceeded(page: Page): Promise<void> {
   await page.evaluate(() => {
+    // IndexedDB APIが利用できない場合はスキップ
+    if (typeof indexedDB === 'undefined' || typeof IDBDatabase === 'undefined') {
+      return;
+    }
+
     // IndexedDB.transaction の元のメソッドを保存
     const originalTransaction = IDBDatabase.prototype.transaction;
 
