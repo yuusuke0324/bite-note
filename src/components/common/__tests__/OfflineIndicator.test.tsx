@@ -11,7 +11,7 @@
  */
 
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, waitFor, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OfflineIndicator } from '../OfflineIndicator';
 import { TestIds } from '../../../constants/testIds';
@@ -46,8 +46,17 @@ describe('OfflineIndicator', () => {
   const mockShowSuccess = vi.fn();
   const mockShowError = vi.fn();
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+
+    // CI環境でのJSDOM初期化待機（Issue #37, #115パターン）
+    if (process.env.CI) {
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    }
 
     // useToastStoreのモック設定
     vi.mocked(useToastStore).mockImplementation((selector: any) => {
@@ -71,6 +80,11 @@ describe('OfflineIndicator', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+
+    // CI環境ではroot containerを保持（Issue #37パターン）
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
   });
 
   // 1. オフライン時バナー表示
@@ -83,13 +97,13 @@ describe('OfflineIndicator', () => {
       isSyncing: false,
     });
 
-    render(<OfflineIndicator isOnline={false} />);
+    const result = render(<OfflineIndicator isOnline={false} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId(TestIds.OFFLINE_INDICATOR)).toBeInTheDocument();
+      expect(within(result.container).getByTestId(TestIds.OFFLINE_INDICATOR)).toBeInTheDocument();
     });
 
-    expect(screen.getByText('オフライン')).toBeInTheDocument();
+    expect(within(result.container).getByText('オフライン')).toBeInTheDocument();
   });
 
   // 2. 未同期カウント表示
@@ -102,10 +116,10 @@ describe('OfflineIndicator', () => {
       isSyncing: false,
     });
 
-    render(<OfflineIndicator isOnline={false} />);
+    const result = render(<OfflineIndicator isOnline={false} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId(TestIds.OFFLINE_BADGE)).toHaveTextContent('未同期: 5件');
+      expect(within(result.container).getByTestId(TestIds.OFFLINE_BADGE)).toHaveTextContent('未同期: 5件');
     });
   });
 
@@ -127,14 +141,14 @@ describe('OfflineIndicator', () => {
       failedCount: 0,
     });
 
-    render(<OfflineIndicator isOnline={true} />);
+    const result = render(<OfflineIndicator isOnline={true} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId(TestIds.SYNC_BUTTON)).toBeInTheDocument();
+      expect(within(result.container).getByTestId(TestIds.SYNC_BUTTON)).toBeInTheDocument();
     });
 
     await act(async () => {
-      await user.click(screen.getByTestId(TestIds.SYNC_BUTTON));
+      await user.click(within(result.container).getByTestId(TestIds.SYNC_BUTTON));
     });
 
     expect(mockShowInfo).toHaveBeenCalledWith('同期を開始しました');
@@ -154,14 +168,14 @@ describe('OfflineIndicator', () => {
       isSyncing: true,
     });
 
-    render(<OfflineIndicator isOnline={true} />);
+    const result = render(<OfflineIndicator isOnline={true} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/同期中\.\.\. 5件のデータを処理しています/)).toBeInTheDocument();
+      expect(within(result.container).getByText(/同期中\.\.\. 5件のデータを処理しています/)).toBeInTheDocument();
     });
 
     // 同期ボタンが非表示
-    expect(screen.queryByTestId(TestIds.SYNC_BUTTON)).not.toBeInTheDocument();
+    expect(within(result.container).queryByTestId(TestIds.SYNC_BUTTON)).not.toBeInTheDocument();
   });
 
   // 5. オンライン+キュー空時は非表示
@@ -198,14 +212,14 @@ describe('OfflineIndicator', () => {
       error: 'NETWORK_ERROR',
     } as any);
 
-    render(<OfflineIndicator isOnline={true} />);
+    const result = render(<OfflineIndicator isOnline={true} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId(TestIds.SYNC_BUTTON)).toBeInTheDocument();
+      expect(within(result.container).getByTestId(TestIds.SYNC_BUTTON)).toBeInTheDocument();
     });
 
     await act(async () => {
-      await user.click(screen.getByTestId(TestIds.SYNC_BUTTON));
+      await user.click(within(result.container).getByTestId(TestIds.SYNC_BUTTON));
     });
 
     await waitFor(() => {
@@ -231,14 +245,14 @@ describe('OfflineIndicator', () => {
       failedCount: 0,
     });
 
-    render(<OfflineIndicator isOnline={true} />);
+    const result = render(<OfflineIndicator isOnline={true} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId(TestIds.SYNC_BUTTON)).toBeInTheDocument();
+      expect(within(result.container).getByTestId(TestIds.SYNC_BUTTON)).toBeInTheDocument();
     });
 
     await act(async () => {
-      await user.click(screen.getByTestId(TestIds.SYNC_BUTTON));
+      await user.click(within(result.container).getByTestId(TestIds.SYNC_BUTTON));
     });
 
     await waitFor(() => {
@@ -267,10 +281,10 @@ describe('OfflineIndicator', () => {
       });
     });
 
-    render(<OfflineIndicator isOnline={true} />);
+    const result = render(<OfflineIndicator isOnline={true} />);
 
     // 初期状態で同期ボタンが表示されるまで待機
-    const syncButton = await screen.findByTestId(TestIds.SYNC_BUTTON, {}, { timeout: 3000 });
+    const syncButton = await within(result.container).findByTestId(TestIds.SYNC_BUTTON, {}, { timeout: 3000 });
 
     // 1回目のクリック
     await act(async () => {
@@ -282,12 +296,12 @@ describe('OfflineIndicator', () => {
 
     // 同期ボタンが非表示になるまで待機（同期中状態）
     await waitFor(() => {
-      expect(screen.queryByTestId(TestIds.SYNC_BUTTON)).not.toBeInTheDocument();
+      expect(within(result.container).queryByTestId(TestIds.SYNC_BUTTON)).not.toBeInTheDocument();
     }, { timeout: 3000 });
 
     // 同期中表示を確認
     await waitFor(() => {
-      expect(screen.getByText(/同期中\.\.\. 5件のデータを処理しています/)).toBeInTheDocument();
+      expect(within(result.container).getByText(/同期中\.\.\. 5件のデータを処理しています/)).toBeInTheDocument();
     });
 
     // Note: このテストは handleManualSync() の内部防御をテストしているが、

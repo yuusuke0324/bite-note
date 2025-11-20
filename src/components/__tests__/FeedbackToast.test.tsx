@@ -10,8 +10,8 @@
  * - アニメーション確認
  */
 
-import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, waitFor, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FeedbackToast } from '../FeedbackToast';
 import { TestIds } from '../../constants/testIds';
@@ -36,14 +36,30 @@ vi.mock('../../lib/offline-queue-service', () => ({
 describe('FeedbackToast', () => {
   const mockOnClose = vi.fn();
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+
+    // CI環境でのJSDOM初期化待機（Issue #37, #115パターン）
+    if (process.env.CI) {
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    }
+  });
+
+  afterEach(() => {
+    // CI環境ではroot containerを保持（Issue #37パターン）
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
   });
 
   describe('ARIA Attributes', () => {
     // 1. ARIA属性設定確認（infoトースト）
     test('should set ARIA attributes correctly for info toast', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="info"
           message="テストメッセージ"
@@ -52,14 +68,14 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const toast = screen.getByRole('alert');
+      const toast = within(result.container).getByRole('alert');
       expect(toast).toHaveAttribute('aria-live', 'polite');
       expect(toast).toHaveAttribute('aria-atomic', 'true');
     });
 
     // 2. errorトーストはassertive
     test('should set assertive aria-live for error toast', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="error"
           message="エラーメッセージ"
@@ -68,7 +84,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const toast = screen.getByRole('alert');
+      const toast = within(result.container).getByRole('alert');
       expect(toast).toHaveAttribute('aria-live', 'assertive');
     });
   });
@@ -76,7 +92,7 @@ describe('FeedbackToast', () => {
   describe('Touch Target Size (44x44px)', () => {
     // 3. クローズボタンの44x44pxタッチターゲット確認
     test('should maintain 44x44px touch target for close button', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="success"
           message="成功"
@@ -85,7 +101,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const closeButton = screen.getByTestId(TestIds.TOAST_CLOSE_BUTTON);
+      const closeButton = within(result.container).getByTestId(TestIds.TOAST_CLOSE_BUTTON);
       const styles = window.getComputedStyle(closeButton);
 
       expect(styles.minWidth).toBe('44px');
@@ -94,7 +110,7 @@ describe('FeedbackToast', () => {
 
     // 4. アクションボタンの44x44pxタッチターゲット確認
     test('should maintain 44x44px touch target for action button', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="error"
           message="ストレージエラー"
@@ -104,7 +120,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const actionButton = screen.getByTestId(TestIds.TOAST_ACTION_BUTTON);
+      const actionButton = within(result.container).getByTestId(TestIds.TOAST_ACTION_BUTTON);
       const styles = window.getComputedStyle(actionButton);
 
       expect(styles.minHeight).toBe('44px');
@@ -117,7 +133,7 @@ describe('FeedbackToast', () => {
       const user = userEvent.setup();
       const mockAction = vi.fn();
 
-      render(
+      const result = render(
         <FeedbackToast
           type="info"
           message="テスト"
@@ -127,7 +143,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const actionButton = screen.getByTestId(TestIds.TOAST_ACTION_BUTTON);
+      const actionButton = within(result.container).getByTestId(TestIds.TOAST_ACTION_BUTTON);
       await user.click(actionButton);
 
       expect(mockAction).toHaveBeenCalledTimes(1);
@@ -135,7 +151,7 @@ describe('FeedbackToast', () => {
 
     // 6. 複数アクションボタンのレンダリング
     test('should render multiple action buttons', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="warning"
           message="警告"
@@ -148,7 +164,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const actionButtons = screen.getAllByTestId(TestIds.TOAST_ACTION_BUTTON);
+      const actionButtons = within(result.container).getAllByTestId(TestIds.TOAST_ACTION_BUTTON);
       expect(actionButtons).toHaveLength(2);
     });
   });
@@ -214,7 +230,7 @@ describe('FeedbackToast', () => {
     test('should display long message correctly', () => {
       const longMessage = 'あ'.repeat(200);
 
-      render(
+      const result = render(
         <FeedbackToast
           type="info"
           message={longMessage}
@@ -223,14 +239,14 @@ describe('FeedbackToast', () => {
         />
       );
 
-      expect(screen.getByText(longMessage)).toBeInTheDocument();
+      expect(within(result.container).getByText(longMessage)).toBeInTheDocument();
     });
 
     // 10. 複数行メッセージ
     test('should display multiline message correctly', () => {
       const multilineMessage = '行1\n行2\n行3';
 
-      render(
+      const result = render(
         <FeedbackToast
           type="warning"
           message={multilineMessage}
@@ -240,9 +256,9 @@ describe('FeedbackToast', () => {
       );
 
       // 複数行は改行コードでそのまま表示されるので、部分一致で検証
-      expect(screen.getByText(/行1/)).toBeInTheDocument();
-      expect(screen.getByText(/行2/)).toBeInTheDocument();
-      expect(screen.getByText(/行3/)).toBeInTheDocument();
+      expect(within(result.container).getByText(/行1/)).toBeInTheDocument();
+      expect(within(result.container).getByText(/行2/)).toBeInTheDocument();
+      expect(within(result.container).getByText(/行3/)).toBeInTheDocument();
     });
   });
 
@@ -251,7 +267,7 @@ describe('FeedbackToast', () => {
     test('should close manually when close button clicked', async () => {
       const user = userEvent.setup();
 
-      render(
+      const result = render(
         <FeedbackToast
           type="success"
           message="成功"
@@ -261,7 +277,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const closeButton = screen.getByTestId(TestIds.TOAST_CLOSE_BUTTON);
+      const closeButton = within(result.container).getByTestId(TestIds.TOAST_CLOSE_BUTTON);
       await user.click(closeButton);
 
       await waitFor(() => {
@@ -273,7 +289,7 @@ describe('FeedbackToast', () => {
   describe('Animation', () => {
     // 12. アニメーション：表示時
     test('should animate in when visible', async () => {
-      const { rerender } = render(
+      const result = render(
         <FeedbackToast
           type="info"
           message="テスト"
@@ -283,10 +299,10 @@ describe('FeedbackToast', () => {
       );
 
       // 初期状態（非表示）
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(within(result.container).queryByRole('alert')).not.toBeInTheDocument();
 
       // 表示状態に変更
-      rerender(
+      result.rerender(
         <FeedbackToast
           type="info"
           message="テスト"
@@ -296,7 +312,7 @@ describe('FeedbackToast', () => {
       );
 
       await waitFor(() => {
-        const toast = screen.getByRole('alert');
+        const toast = within(result.container).getByRole('alert');
         const styles = window.getComputedStyle(toast);
         expect(styles.opacity).toBe('1'); // アニメーション後
       });
@@ -306,7 +322,7 @@ describe('FeedbackToast', () => {
   describe('Icon Display', () => {
     // 13. アイコン表示（success）
     test('should display success icon', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="success"
           message="成功"
@@ -315,12 +331,12 @@ describe('FeedbackToast', () => {
         />
       );
 
-      expect(screen.getByTestId('success-icon')).toBeInTheDocument();
+      expect(within(result.container).getByTestId('success-icon')).toBeInTheDocument();
     });
 
     // 14. アイコン表示（error）
     test('should display error icon', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="error"
           message="エラー"
@@ -329,12 +345,12 @@ describe('FeedbackToast', () => {
         />
       );
 
-      expect(screen.getByTestId('error-icon')).toBeInTheDocument();
+      expect(within(result.container).getByTestId('error-icon')).toBeInTheDocument();
     });
 
     // 15. アイコン表示（warning）
     test('should display warning icon', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="warning"
           message="警告"
@@ -343,12 +359,12 @@ describe('FeedbackToast', () => {
         />
       );
 
-      expect(screen.getByTestId('warning-icon')).toBeInTheDocument();
+      expect(within(result.container).getByTestId('warning-icon')).toBeInTheDocument();
     });
 
     // 16. アイコン表示（info）
     test('should display info icon', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="info"
           message="情報"
@@ -357,14 +373,14 @@ describe('FeedbackToast', () => {
         />
       );
 
-      expect(screen.getByTestId('info-icon')).toBeInTheDocument();
+      expect(within(result.container).getByTestId('info-icon')).toBeInTheDocument();
     });
   });
 
   describe('Position', () => {
     // 17. ポジション：top-right（デフォルト）
     test('should position toast at top-right by default', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="info"
           message="テスト"
@@ -373,7 +389,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const toast = screen.getByRole('alert');
+      const toast = within(result.container).getByRole('alert');
       const styles = window.getComputedStyle(toast);
 
       expect(styles.top).toBe('1rem');
@@ -382,7 +398,7 @@ describe('FeedbackToast', () => {
 
     // 18. ポジション：bottom-center
     test('should position toast at bottom-center', () => {
-      render(
+      const result = render(
         <FeedbackToast
           type="info"
           message="テスト"
@@ -392,7 +408,7 @@ describe('FeedbackToast', () => {
         />
       );
 
-      const toast = screen.getByRole('alert');
+      const toast = within(result.container).getByRole('alert');
       const styles = window.getComputedStyle(toast);
 
       expect(styles.bottom).toBe('1rem');
