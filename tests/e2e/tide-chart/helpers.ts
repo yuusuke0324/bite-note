@@ -2,6 +2,80 @@
 import { Page, expect } from '@playwright/test';
 import { TestIds } from '../../../src/constants/testIds';
 
+/**
+ * テスト用ヘルパー関数: テスト用釣果記録を作成
+ *
+ * CI環境でIndexedDBが空の場合に、テストデータを自動作成します。
+ * IndexedDBに直接データを挿入する方法を使用します。
+ */
+async function createTestRecord(page: Page) {
+  // IndexedDBに直接テストレコードを挿入
+  await page.evaluate(() => {
+    return new Promise<void>((resolve, reject) => {
+      // setupCleanPage() でセットされたテスト用DB名を使用
+      const dbName = (globalThis as any).__TEST_DB_NAME__ || 'FishingRecordDB';
+      // バージョン指定なし - Dexieが作成したDBをそのまま開く
+      const request = indexedDB.open(dbName);
+
+      request.onerror = () => {
+        console.error('[createTestRecord] IndexedDB open error:', request.error);
+        reject(request.error);
+      };
+
+      request.onsuccess = () => {
+        const db = request.result;
+
+        // fishing_records テーブルが存在するか確認
+        if (!db.objectStoreNames.contains('fishing_records')) {
+          console.error('[createTestRecord] fishing_records table not found');
+          reject(new Error('fishing_records table not found'));
+          return;
+        }
+
+        const transaction = db.transaction(['fishing_records'], 'readwrite');
+        const store = transaction.objectStore('fishing_records');
+
+        // テスト用釣果記録データ
+        const testRecord = {
+          id: 'test-record-' + Date.now(),
+          fishSpecies: 'テスト魚種',
+          size: 30,
+          location: 'テスト地点',
+          coordinates: {
+            latitude: 35.6812,
+            longitude: 139.7671
+          },
+          date: new Date(),
+          weather: '晴れ',
+          notes: 'E2Eテスト用データ',
+          photos: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        const addRequest = store.add(testRecord);
+
+        addRequest.onsuccess = () => {
+          console.log('[createTestRecord] テストレコードをIndexedDBに挿入しました (DB: ' + dbName + ')');
+          db.close();
+          resolve();
+        };
+
+        addRequest.onerror = () => {
+          console.error('[createTestRecord] Add record error:', addRequest.error);
+          db.close();
+          reject(addRequest.error);
+        };
+      };
+
+    });
+  });
+
+  // ページをリロードしてデータを反映
+  await page.reload();
+  await page.waitForTimeout(1500); // IndexedDB読み込み + レンダリング完了待機
+}
+
 // Test Data Sets
 export const validTideData = [
   { time: '00:00', tide: 120 },
@@ -28,17 +102,49 @@ export const largeTideDataset = Array.from({ length: 50000 }, (_, i) => ({
 export class TideChartPage {
   constructor(private page: Page) {}
 
+  /**
+   * 潮汐グラフを表示（記録詳細画面経由）
+   *
+   * 処理フロー:
+   * 1. ホーム画面に移動
+   * 2. 記録が存在しない場合は自動作成
+   * 3. 最初の記録カードをクリック（記録詳細画面を開く）
+   * 4. 潮汐グラフトグルボタンをクリック（グラフを展開）
+   * 5. グラフの表示を待つ（潮汐API計算完了を待機）
+   */
   async goto() {
+    // Step 1: ホーム画面に移動
     await this.page.goto('/');
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(1000); // IndexedDB初期化待機
 
-    // ModernAppなので、ボトムナビゲーションから潮汐グラフタブをクリック
-    const tideChartTab = this.page.locator(`[data-testid="${TestIds.TIDE_GRAPH_TAB}"]`);
-    await tideChartTab.waitFor({ state: 'visible', timeout: 10000 });
-    await tideChartTab.click();
+    // Step 2: 記録が存在しない場合は自動作成
+    const recordCount = await this.page.locator('[data-testid^="record-"]').count();
+    if (recordCount === 0) {
+      console.log('[TideChartPage.goto] 釣果記録が存在しないため、テストデータを作成します');
+      await createTestRecord(this.page);
+    }
 
-    // チャートの表示を待機
-    await this.page.waitForTimeout(1000); // アニメーション待機
+    // Step 3: 最初の記録カードをクリック（記録詳細画面を開く）
+    const firstRecord = this.page.locator('[data-testid^="record-"]').first();
+    await expect(firstRecord).toBeVisible({ timeout: 10000 });
+    await firstRecord.click();
+
+    // Step 4: 記録詳細画面が開いたことを確認
+    await this.page.waitForSelector('[data-testid="tide-integration-section"]', { timeout: 10000 });
+
+    // Step 5: 潮汐グラフトグルボタンをクリック（グラフを展開）
+    const toggleButton = this.page.locator('[data-testid="tide-graph-toggle-button"]');
+    await expect(toggleButton).toBeVisible();
+    await toggleButton.click();
+
+    // Step 6: グラフの表示を待つ（潮汐API計算完了を待機）
+    await this.page.waitForSelector('[data-testid="tide-chart"]', {
+      state: 'visible',
+      timeout: 30000  // 潮汐計算 + 記録作成に時間がかかる可能性がある
+    });
+
+    // チャートの表示を待機（アニメーション完了）
+    await this.page.waitForTimeout(1000);
   }
 
   async waitForChart() {
@@ -49,39 +155,34 @@ export class TideChartPage {
     return this.page.locator('[data-testid="tide-chart"]');
   }
 
-  getDataPoints() {
-    // TideChartはカスタムdata-pointを使用
-    return this.page.locator('[data-testid^="data-point-"]');
+  // TideIntegration 実装に合わせたヘルパーメソッド
+
+  getTideError() {
+    return this.page.locator('[data-testid="tide-error"]');
+  }
+
+  getTideLoading() {
+    return this.page.locator('[data-testid="tide-loading"]');
+  }
+
+  getCoordinatesError() {
+    return this.page.locator('[data-testid="coordinates-error"]');
   }
 
   getTooltip() {
     return this.page.locator('.recharts-tooltip-wrapper');
   }
 
-  getErrorMessage() {
-    return this.page.locator('[data-testid="error-message"]');
-  }
-
   getFallbackTable() {
     return this.page.locator('[data-testid="fallback-table"]');
   }
 
-  getThemeSelector() {
-    return this.page.locator('[data-testid="theme-selector"]');
+  async expectTideError() {
+    await expect(this.getTideError()).toBeVisible();
   }
 
-  async selectTheme(theme: string) {
-    await this.page.selectOption('[data-testid="theme-selector"]', theme);
-  }
-
-  async hoverDataPoint(index: number = 0) {
-    const dataPoints = this.getDataPoints();
-    await dataPoints.nth(index).hover();
-  }
-
-  async clickDataPoint(index: number = 0) {
-    const dataPoints = this.getDataPoints();
-    await dataPoints.nth(index).click();
+  async expectCoordinatesError() {
+    await expect(this.getCoordinatesError()).toBeVisible();
   }
 
   async navigateWithKeyboard(key: string) {
