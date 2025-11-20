@@ -161,7 +161,7 @@ const applyFilters = (records: FishingRecord[], filters: FilterState): FishingRe
 
 function ModernApp() {
   // 状態管理
-  const [activeTab, setActiveTab] = useState<'home' | 'form' | 'list' | 'map' | 'tide' | 'debug'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'form' | 'list' | 'map' | 'debug'>('home');
   const [selectedRecord, setSelectedRecord] = useState<FishingRecord | null>(null);
   const [editingRecord, setEditingRecord] = useState<FishingRecord | null>(null);
   const [deletingRecord, setDeletingRecord] = useState<FishingRecord | null>(null);
@@ -333,13 +333,6 @@ function ModernApp() {
       testId: TestIds.MAP_TAB,
     },
     {
-      id: 'tide',
-      label: '潮汐',
-      icon: <span style={{ fontSize: '20px' }}>🌊</span>,
-      active: activeTab === 'tide',
-      testId: TestIds.TIDE_GRAPH_TAB,
-    },
-    {
       id: 'form',
       label: '新規記録',
       icon: <Icons.Add />,
@@ -361,7 +354,6 @@ function ModernApp() {
       case 'home': return '釣果記録';
       case 'list': return '記録一覧';
       case 'map': return '釣り場マップ';
-      case 'tide': return '潮汐グラフ';
       case 'form': return '新規記録';
       case 'debug': return '設定';
       default: return '釣果記録アプリ';
@@ -374,7 +366,6 @@ function ModernApp() {
       case 'home': return `${records.length}件の記録`;
       case 'list': return '写真で振り返る';
       case 'map': return `${recordsWithCoordinates}箇所の釣り場`;
-      case 'tide': return '24時間の潮位変化';
       case 'form': return '新しい釣果を記録';
       case 'debug': return 'アプリの設定';
       default: return '';
@@ -1867,98 +1858,6 @@ function ModernApp() {
     </div>
   );
 
-  // 潮汐コンテンツ
-  const TideContent = () => {
-    if (isLoading) {
-      return (
-        <div style={{ padding: '12px' }}>
-          <Skeleton width="100%" height="400px" borderRadius="12px" />
-        </div>
-      );
-    }
-
-    if (records.length === 0) {
-      return (
-        <ModernCard variant="outlined" size="lg" style={{ margin: '16px' }}>
-          <div style={{
-            textAlign: 'center',
-            padding: '32px',
-            color: colors.text.secondary,
-          }}>
-            <span style={{ fontSize: '4rem', marginBottom: '16px', display: 'block' }}>🌊</span>
-            <div style={{
-              ...textStyles.headline.small,
-              marginBottom: '8px',
-            }}>
-              釣果記録がありません
-            </div>
-            <div style={textStyles.body.medium}>
-              GPS座標付きの釣果記録を追加すると、潮汐グラフを表示できます
-            </div>
-          </div>
-        </ModernCard>
-      );
-    }
-
-    const recordsWithCoordinates = records.filter(r => r.coordinates);
-
-    if (recordsWithCoordinates.length === 0) {
-      return (
-        <ModernCard variant="outlined" size="lg" style={{ margin: '16px' }}>
-          <div style={{
-            textAlign: 'center',
-            padding: '32px',
-            color: colors.text.secondary,
-          }}>
-            <span style={{ fontSize: '4rem', marginBottom: '16px', display: 'block' }}>📍</span>
-            <div style={{
-              ...textStyles.headline.small,
-              marginBottom: '8px',
-            }}>
-              GPS座標が記録されていません
-            </div>
-            <div style={textStyles.body.medium}>
-              位置情報付きの釣果記録を追加すると、その場所の潮汐グラフを表示できます
-            </div>
-          </div>
-        </ModernCard>
-      );
-    }
-
-    return (
-      <div style={{ padding: '16px' }}>
-        <ModernCard variant="outlined" size="lg">
-          <div style={{
-            textAlign: 'center',
-            padding: '48px 32px',
-            color: colors.text.secondary,
-          }}>
-            <span style={{ fontSize: '4rem', marginBottom: '16px', display: 'block' }}>🌊</span>
-            <div style={{
-              ...textStyles.headline.small,
-              marginBottom: '8px',
-              color: colors.text.primary,
-            }}>
-              潮汐グラフ機能
-            </div>
-            <div style={{
-              ...textStyles.body.medium,
-              marginBottom: '16px',
-            }}>
-              {recordsWithCoordinates.length}件の位置情報付き記録があります
-            </div>
-            <div style={{
-              ...textStyles.body.small,
-              color: colors.text.tertiary,
-            }}>
-              潮汐グラフ表示機能は現在開発中です
-            </div>
-          </div>
-        </ModernCard>
-      </div>
-    );
-  };
-
   // メインコンテンツレンダリング
   const renderContent = () => {
     switch (activeTab) {
@@ -1966,7 +1865,6 @@ function ModernApp() {
       case 'list': return <ListContent />;
       case 'form': return <FormContent />;
       case 'map': return <MapContent />;
-      case 'tide': return <TideContent />;
       case 'debug': return <DebugContent />;
       default: return <HomeContent />;
     }

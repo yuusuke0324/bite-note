@@ -58,7 +58,6 @@ export const TestIds = {
   DATA_POINT: (index: number) => `data-point-${index}`, // データポイント
 
   // Tide Integration
-  TIDE_GRAPH_TAB: 'tide-graph-tab', // Navigation: Bottom tab for tide graph page
   TIDE_GRAPH_TOGGLE_BUTTON: 'tide-graph-toggle-button', // Toggle: Button to expand/collapse tide graph section
   TIDE_INTEGRATION_SECTION: 'tide-integration-section',
   TIDE_ERROR: 'tide-error',
