@@ -117,7 +117,14 @@ export const TestIds = {
   TOAST_INFO: 'toast-info',
   TOAST_SUCCESS: 'toast-success',
   TOAST_CLOSE_BUTTON: 'toast-close-button',
-  TOAST_ACTION_BUTTON: 'toast-action-button'
+  TOAST_ACTION_BUTTON: 'toast-action-button',
+
+  // Offline Sync UI (Phase 3-2)
+  SYNC_BUTTON: 'sync-button',
+  LOCAL_SAVE_MESSAGE: 'local-save-message',
+  SYNC_SUCCESS_MESSAGE: 'sync-success-message',
+  STORAGE_ERROR: 'storage-error',
+  DATA_MANAGEMENT_BUTTON: 'data-management-button'
 } as const;
 
 export type TestId = typeof TestIds[keyof typeof TestIds];

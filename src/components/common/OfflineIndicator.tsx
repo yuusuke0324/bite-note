@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { offlineQueueService } from '../../lib/offline-queue-service';
+import { useToastStore } from '../../stores/toast-store';
 import { TestIds } from '../../constants/testIds';
 
 interface OfflineIndicatorProps {
@@ -11,21 +12,67 @@ interface OfflineIndicatorProps {
 
 export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
   const [pendingCount, setPendingCount] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  // トースト通知
+  const showInfo = useToastStore(state => state.showInfo);
+  const showSuccess = useToastStore(state => state.showSuccess);
+  const showError = useToastStore(state => state.showError);
 
   useEffect(() => {
     // 初回表示時とオンライン状態変化時にキューステータスを取得
     const updateQueueStatus = async () => {
       const status = await offlineQueueService.getQueueStatus();
       setPendingCount(status.pendingCount);
+      setIsSyncing(status.isSyncing);
     };
 
     updateQueueStatus();
 
-    // 定期的に更新（5秒ごと）
-    const interval = setInterval(updateQueueStatus, 5000);
+    // tech-lead指摘: オンライン時のみ定期更新（パフォーマンス最適化）
+    let interval: NodeJS.Timeout | null = null;
+    if (isOnline) {
+      interval = setInterval(updateQueueStatus, 5000);
+    }
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isOnline]);
+
+  // 手動同期実行
+  const handleManualSync = async () => {
+    if (isSyncing) {
+      showInfo('同期が既に進行中です');
+      return;
+    }
+
+    try {
+      setIsSyncing(true);
+      showInfo('同期を開始しました');
+
+      const result = await offlineQueueService.syncQueue();
+
+      if (result.success) {
+        if (result.syncedCount === 0) {
+          showInfo('同期するデータがありません');
+        } else {
+          showSuccess(`${result.syncedCount}件のデータを同期しました`);
+        }
+
+        // 同期後にカウンターを更新
+        const status = await offlineQueueService.getQueueStatus();
+        setPendingCount(status.pendingCount);
+      } else {
+        showError('同期に失敗しました');
+      }
+    } catch (error) {
+      console.error('[OfflineIndicator] Manual sync error:', error);
+      showError('同期中にエラーが発生しました');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // オンライン時かつキューが空の場合は表示しない
   if (isOnline && pendingCount === 0) {
@@ -62,12 +109,26 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
           role="status"
           aria-live="polite"
           aria-label={`未同期データ ${pendingCount}件`}
-          className="bg-blue-50 border-b border-blue-200 px-4 py-2 text-center text-sm text-blue-900"
+          className="bg-blue-50 border-b border-blue-200 px-4 py-2 text-center text-sm text-blue-900 flex items-center justify-center gap-2"
         >
-          <span className="inline text-base mr-1" aria-hidden="true">
+          <span className="inline text-base" aria-hidden="true">
             ☁️
           </span>
-          同期中... {pendingCount}件のデータを処理しています
+          <span>
+            {isSyncing
+              ? `同期中... ${pendingCount}件のデータを処理しています`
+              : `未同期データ ${pendingCount}件`}
+          </span>
+          {!isSyncing && (
+            <button
+              data-testid={TestIds.SYNC_BUTTON}
+              onClick={handleManualSync}
+              aria-label="手動で同期する"
+              className="ml-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[32px]"
+            >
+              今すぐ同期
+            </button>
+          )}
         </div>
       )}
     </>
@@ -81,6 +142,7 @@ interface OfflineSyncButtonProps {
 
 /**
  * 未同期カウンターボタン（ヘッダー右側用）
+ * Phase 3-2: 手動同期機能を統合
  */
 export const OfflineSyncButton = ({
   pendingCount,
@@ -92,6 +154,7 @@ export const OfflineSyncButton = ({
 
   return (
     <button
+      data-testid={TestIds.SYNC_BUTTON}
       onClick={onClick}
       className="
         min-h-[44px] min-w-[44px] px-3 py-2

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore, selectError, selectRecords, selectSettings, selectActions } from './stores/app-store'
+import { useToastStore } from './stores/toast-store'
 import { TestIds } from './constants/testIds'
 import { useFormStore, selectFormData, selectValidation, selectFormActions } from './stores/form-store'
 import { FishingRecordForm } from './components/FishingRecordForm'
@@ -180,6 +181,57 @@ function App() {
 
     initializeApp();
   }, [appActions, formActions]); // records.length, settings.theme を削除（再レンダリングループ防止）
+
+  // Phase 3-2: グローバルストレージエラーハンドラー
+  useEffect(() => {
+    const handleStorageError = (error: Error | ErrorEvent) => {
+      const errorObj = error instanceof Error ? error : error.error;
+
+      // tech-lead指摘: より厳密なQuotaExceededError検出
+      const isQuotaExceeded =
+        errorObj?.name === 'QuotaExceededError' ||
+        (errorObj instanceof DOMException && errorObj.code === 22) ||
+        errorObj?.message?.includes('QuotaExceededError');
+
+      if (isQuotaExceeded) {
+        useToastStore.getState().showError(
+          'ストレージが満杯です。アプリを再起動するか、不要なデータを削除してください。',
+          [
+            {
+              label: 'データを管理',
+              handler: () => {
+                // Phase 3-3で実装予定: データ管理画面へ遷移
+                console.log('[StorageError] Navigate to data management');
+              },
+              primary: true
+            }
+          ]
+        );
+      }
+    };
+
+    // グローバルエラーハンドラー
+    const handleError = (event: ErrorEvent) => {
+      if (event.error) {
+        handleStorageError(event.error);
+      }
+    };
+
+    // Promise rejection ハンドラー
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason instanceof Error) {
+        handleStorageError(event.reason);
+      }
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
 
   // 型安全なTestIDsマッピング
   const TAB_TEST_IDS: Record<'form' | 'list' | 'tide-chart' | 'debug', string> = {

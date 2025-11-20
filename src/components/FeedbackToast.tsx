@@ -1,6 +1,7 @@
 // フィードバックトーストコンポーネント
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { TestIds } from '../constants/testIds';
 
 export interface FeedbackToastProps {
   type: 'success' | 'error' | 'warning' | 'info';
@@ -27,6 +28,14 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
+  // tech-lead指摘: handleCloseをuseCallbackでメモ化
+  const handleClose = useCallback(() => {
+    setIsAnimating(false);
+    setTimeout(() => {
+      onClose();
+    }, 300); // アニメーション完了を待つ
+  }, [onClose]);
+
   useEffect(() => {
     if (isVisible) {
       setIsAnimating(true);
@@ -39,14 +48,7 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
         return () => clearTimeout(timer);
       }
     }
-  }, [isVisible, duration]);
-
-  const handleClose = () => {
-    setIsAnimating(false);
-    setTimeout(() => {
-      onClose();
-    }, 300); // アニメーション完了を待つ
-  };
+  }, [isVisible, duration, handleClose]); // tech-lead指摘: handleCloseを依存配列に追加
 
   const getIcon = () => {
     switch (type) {
@@ -141,6 +143,9 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
 
   return (
     <div
+      role="alert"
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+      aria-atomic="true"
       style={{
         ...getPositionStyle(),
         maxWidth: '400px',
@@ -178,12 +183,14 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
                 <button
                   key={index}
                   onClick={action.action}
+                  data-testid={TestIds.TOAST_ACTION_BUTTON}
                   style={{
-                    padding: '0.375rem 0.75rem',
+                    padding: '0.625rem 1rem',
                     fontSize: '0.875rem',
                     borderRadius: '4px',
                     cursor: 'pointer',
                     fontWeight: '500',
+                    minHeight: '44px',
                     backgroundColor: action.style === 'primary' ? getTextColor() : 'transparent',
                     color: action.style === 'primary' ? '#fff' : getTextColor(),
                     border: action.style === 'primary' ? 'none' : `1px solid ${getBorderColor()}`
@@ -199,6 +206,8 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
         {/* 閉じるボタン */}
         <button
           onClick={handleClose}
+          data-testid={TestIds.TOAST_CLOSE_BUTTON}
+          aria-label="通知を閉じる"
           style={{
             background: 'none',
             border: 'none',
@@ -207,8 +216,8 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
             color: getTextColor(),
             opacity: 0.7,
             padding: '0',
-            width: '20px',
-            height: '20px',
+            minWidth: '44px',
+            minHeight: '44px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
