@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, waitFor, act, within } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
@@ -22,13 +22,39 @@ expect.extend(toHaveNoViolations);
 // usePWAフックをモック
 vi.mock('../../hooks/usePWA');
 
+// offlineQueueService をモック (usePWA内部で使用されているため)
+vi.mock('../../lib/offline-queue-service', () => ({
+  offlineQueueService: {
+    getQueueStatus: vi.fn().mockResolvedValue({
+      pendingCount: 0,
+      syncingCount: 0,
+      failedCount: 0,
+      isQueueFull: false,
+      isSyncing: false,
+    }),
+    syncQueue: vi.fn().mockResolvedValue({
+      success: true,
+      syncedCount: 0,
+    }),
+  },
+}));
+
 describe('PWAInstallPrompt - 基本機能', () => {
   let mockInstallApp: ReturnType<typeof vi.fn>;
   let mockGetIOSInstructions: ReturnType<typeof vi.fn>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     localStorage.clear();
+
+    // CI環境でのJSDOM初期化待機（Issue #37, #115パターン）
+    if (process.env.CI) {
+      await waitFor(() => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      }, { timeout: 5000, interval: 100 });
+    }
 
     // デフォルトのモック設定
     mockInstallApp = vi.fn().mockResolvedValue(true);
@@ -51,15 +77,20 @@ describe('PWAInstallPrompt - 基本機能', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers(); // タイマーを確実にリセット
+
+    // CI環境ではroot containerを保持（Issue #37パターン）
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
   });
 
   it('installStateがisInstallable=trueの時、3秒後にプロンプトを表示する', async () => {
     vi.useFakeTimers();
 
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     // 初期状態では非表示
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(within(result.container).queryByRole('dialog')).not.toBeInTheDocument();
 
     // 3秒進める（act()でラップ）
     await act(async () => {
@@ -67,14 +98,14 @@ describe('PWAInstallPrompt - 基本機能', () => {
     });
 
     // プロンプトが表示される
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(within(result.container).getByRole('dialog')).toBeInTheDocument();
   });
 
   it('「インストール」ボタンクリックでinstallApp()を呼び出す', async () => {
     const user = userEvent.setup({ delay: null });
 
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -82,7 +113,7 @@ describe('PWAInstallPrompt - 基本機能', () => {
 
     vi.useRealTimers(); // クリック前にリアルタイマーに戻す
 
-    const installButton = screen.getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
 
     await act(async () => {
       await user.click(installButton);
@@ -97,7 +128,7 @@ describe('PWAInstallPrompt - 基本機能', () => {
     const user = userEvent.setup({ delay: null });
 
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -105,7 +136,7 @@ describe('PWAInstallPrompt - 基本機能', () => {
 
     vi.useRealTimers();
 
-    const laterButton = screen.getByRole('button', { name: '後で' });
+    const laterButton = within(result.container).getByRole('button', { name: '後で' });
 
     await act(async () => {
       await user.click(laterButton);
@@ -113,7 +144,7 @@ describe('PWAInstallPrompt - 基本機能', () => {
 
     await waitFor(() => {
       expect(localStorage.getItem('pwa-install-dismissed')).toBe('true');
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(within(result.container).queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 });
@@ -163,7 +194,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
 
   it('メインプロンプトにrole="dialog"があること', async () => {
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -171,7 +202,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
 
     vi.useRealTimers();
 
-    const dialog = screen.getByRole('dialog');
+    const dialog = within(result.container).getByRole('dialog');
     expect(dialog).toBeInTheDocument();
     expect(dialog).toHaveAttribute('aria-labelledby', 'install-prompt-title');
     expect(dialog).toHaveAttribute('aria-describedby', 'install-prompt-description');
@@ -192,7 +223,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
     });
 
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -200,7 +231,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
 
     vi.useRealTimers();
 
-    const installButton = screen.getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
 
     // クリックとローディング状態確認
     await act(async () => {
@@ -209,7 +240,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
 
     // ローディング表示を確認
     await waitFor(() => {
-      expect(screen.getByText('インストール中...')).toBeInTheDocument();
+      expect(within(result.container).getByText('インストール中...')).toBeInTheDocument();
     });
 
     // aria-live属性を確認
@@ -220,7 +251,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
 
   it('クローズボタンのタッチターゲットサイズが44x44pxであること', async () => {
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -228,7 +259,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
 
     vi.useRealTimers();
 
-    const closeButton = screen.getByLabelText('インストールプロンプトを閉じる');
+    const closeButton = within(result.container).getByLabelText('インストールプロンプトを閉じる');
     expect(closeButton).toBeInTheDocument();
     expect(closeButton).toHaveStyle({ width: '44px', height: '44px' });
   });
@@ -270,7 +301,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
     });
 
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -278,7 +309,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
 
     vi.useRealTimers();
 
-    const installButton = screen.getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
 
     await act(async () => {
       await user.click(installButton);
@@ -302,7 +333,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
     });
 
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -310,7 +341,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
 
     vi.useRealTimers();
 
-    const laterButton = screen.getByRole('button', { name: '後で' });
+    const laterButton = within(result.container).getByRole('button', { name: '後で' });
 
     await act(async () => {
       await user.click(laterButton);
@@ -319,7 +350,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
     await waitFor(() => {
       expect(consoleWarnSpy).toHaveBeenCalledWith('[PWA] Failed to save dismiss state:', expect.any(Error));
       // UIは正常に動作（クラッシュしない）
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(within(result.container).queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     // 元に戻す
@@ -340,7 +371,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
     });
 
     vi.useFakeTimers();
-    render(<PWAInstallPrompt />);
+    const result = render(<PWAInstallPrompt />);
 
     await act(async () => {
       vi.advanceTimersByTime(3000);
@@ -348,7 +379,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
 
     vi.useRealTimers();
 
-    const installButton = screen.getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
 
     // 連打
     await act(async () => {

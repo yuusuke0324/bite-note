@@ -32,6 +32,7 @@ export const defaultTestRecord: TestFishingRecord = {
 
 /**
  * テスト用釣果記録を作成
+ * QAエンジニアレビュー対応: waitForTimeoutを削除し、安定版に改善
  */
 export async function createTestFishingRecord(
   page: Page,
@@ -41,7 +42,7 @@ export async function createTestFishingRecord(
 
   // 記録登録タブに移動
   await page.click('[data-testid="form-tab"]');
-  await page.waitForTimeout(500);
+  await page.waitForSelector(`[data-testid="${TestIds.LOCATION_NAME}"]`, { state: 'visible' });
 
   // フォーム入力
   await page.fill(`[data-testid="${TestIds.LOCATION_NAME}"]`, testRecord.location);
@@ -68,8 +69,11 @@ export async function createTestFishingRecord(
   // 記録を保存
   await page.click(`[data-testid="${TestIds.SAVE_RECORD_BUTTON}"]`);
 
-  // 保存後は写真で確認タブに自動的に切り替わるので待機
-  await page.waitForTimeout(1000);
+  // トースト表示またはタブ切り替えを待機（固定時間待機ではなく）
+  await page.waitForSelector(
+    `[data-testid="${TestIds.TOAST_SUCCESS}"], [data-testid="list-tab"][aria-selected="true"]`,
+    { timeout: 5000 }
+  );
 }
 
 /**

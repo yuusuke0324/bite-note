@@ -200,8 +200,8 @@ function App() {
             {
               label: 'データを管理',
               handler: () => {
-                // Phase 3-3で実装予定: データ管理画面へ遷移
-                console.log('[StorageError] Navigate to data management');
+                // Phase 3-3実装完了: データ管理画面へ遷移
+                window.location.href = '/data-management';
               },
               primary: true
             }

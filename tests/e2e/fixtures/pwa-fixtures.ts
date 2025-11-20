@@ -143,3 +143,86 @@ export async function getManifest(page: Page): Promise<any> {
     return await response.json();
   });
 }
+
+/**
+ * オフライン状態をシミュレート（安定版）
+ * MessageChannelを使用してServiceWorkerからの応答を待つ
+ */
+export async function simulateOffline(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    // Service Workerにメッセージを送信し、応答を待つ
+    const sw = navigator.serviceWorker.controller;
+    if (!sw) throw new Error('Service Worker not active');
+
+    return new Promise<void>((resolve) => {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = () => resolve();
+      sw.postMessage({ type: 'SET_OFFLINE' }, [channel.port2]);
+    });
+  });
+
+  // オフライン状態反映を待機（Zustand storeの更新）
+  await page.waitForFunction(() => {
+    const appStore = (window as any).__APP_STORE__;
+    return appStore?.getState().isOnline === false;
+  }, { timeout: 5000 });
+}
+
+/**
+ * オンライン状態に復帰（安定版）
+ * MessageChannelを使用してServiceWorkerからの応答を待つ
+ */
+export async function simulateOnline(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const sw = navigator.serviceWorker.controller;
+    if (!sw) throw new Error('Service Worker not active');
+
+    return new Promise<void>((resolve) => {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = () => resolve();
+      sw.postMessage({ type: 'SET_ONLINE' }, [channel.port2]);
+    });
+  });
+
+  await page.waitForFunction(() => {
+    const appStore = (window as any).__APP_STORE__;
+    return appStore?.getState().isOnline === true;
+  }, { timeout: 5000 });
+}
+
+/**
+ * ストレージ満杯エラーをシミュレート
+ * IndexedDBのaddメソッドをモックしてQuotaExceededErrorを発生させる
+ */
+export async function simulateStorageQuotaExceeded(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    // IndexedDB.transaction の元のメソッドを保存
+    const originalTransaction = IDBDatabase.prototype.transaction;
+
+    // transactionメソッドをオーバーライド
+    IDBDatabase.prototype.transaction = function(...args: any[]) {
+      const tx = originalTransaction.apply(this, args as any);
+      const originalObjectStore = tx.objectStore.bind(tx);
+
+      tx.objectStore = function(name: string) {
+        const store = originalObjectStore(name);
+
+        // addメソッドをオーバーライドしてQuotaExceededErrorを発生
+        store.add = function() {
+          const error = new DOMException('QuotaExceededError', 'QuotaExceededError');
+          throw error;
+        };
+
+        // putメソッドもオーバーライド
+        store.put = function() {
+          const error = new DOMException('QuotaExceededError', 'QuotaExceededError');
+          throw error;
+        };
+
+        return store;
+      };
+
+      return tx;
+    };
+  });
+}
