@@ -76,7 +76,10 @@ test.describe('Epic #9: PWA Full Integration Tests', () => {
 
       // Then: キャッシュが存在する
       const cacheNames = await page.evaluate(async () => {
-        return await caches.keys();
+        if (typeof caches !== 'undefined') {
+          return await caches.keys();
+        }
+        return [];
       });
 
       expect(cacheNames.length).toBeGreaterThan(0);
@@ -197,16 +200,19 @@ test.describe('Epic #9: PWA Full Integration Tests', () => {
 
       // And: キャッシュが存在する
       const cacheCount = await page.evaluate(async () => {
-        const cacheNames = await caches.keys();
-        let totalEntries = 0;
+        if (typeof caches !== 'undefined') {
+          const cacheNames = await caches.keys();
+          let totalEntries = 0;
 
-        for (const cacheName of cacheNames) {
-          const cache = await caches.open(cacheName);
-          const requests = await cache.keys();
-          totalEntries += requests.length;
+          for (const cacheName of cacheNames) {
+            const cache = await caches.open(cacheName);
+            const requests = await cache.keys();
+            totalEntries += requests.length;
+          }
+
+          return totalEntries;
         }
-
-        return totalEntries;
+        return 0;
       });
 
       expect(cacheCount).toBeGreaterThan(0);

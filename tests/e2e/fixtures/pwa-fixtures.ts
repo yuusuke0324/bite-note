@@ -30,9 +30,12 @@ export const test = base.extend<{
     const page = await context.newPage();
 
     // Service Worker登録前にキャッシュをクリーンアップ
+    // Cache Storage APIはセキュアコンテキスト（HTTPS）でのみ利用可能
     await page.evaluate(async () => {
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      if (typeof caches !== 'undefined') {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      }
     });
 
     await use(page);
@@ -79,11 +82,14 @@ export async function clearIndexedDB(page: Page, dbNames: string[] = ['BiteNoteD
 
 /**
  * すべてのキャッシュを削除
+ * Cache Storage APIはセキュアコンテキスト（HTTPS）でのみ利用可能
  */
 export async function clearAllCaches(page: Page): Promise<void> {
   await page.evaluate(async () => {
-    const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map((name) => caches.delete(name)));
+    if (typeof caches !== 'undefined') {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+    }
   });
 }
 
