@@ -42,7 +42,7 @@ export class FallbackStorageService {
   static async testIndexedDB(): Promise<boolean> {
     try {
       // プライベートモード等で例外が発生する可能性があるため、実際に操作してテスト
-      await db.fishingRecords.limit(1).count();
+      await db.fishing_records.limit(1).count();
       return true;
     } catch (error) {
       console.error('[FallbackStorage] IndexedDB test failed', error);
@@ -258,12 +258,12 @@ export class FallbackStorageService {
       const errors: string[] = [];
 
       try {
-        await db.transaction('rw', db.fishingRecords, async () => {
+        await db.transaction('rw', db.fishing_records, async () => {
           for (const record of records) {
             try {
               // IDを除外して追加（新しいIDが生成される）
               const { id, ...recordData } = record;
-              await db.fishingRecords.add({
+              await db.fishing_records.add({
                 ...recordData,
                 id: crypto.randomUUID(), // 新しいIDを生成
               });

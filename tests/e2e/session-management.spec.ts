@@ -17,7 +17,7 @@ test.describe('Session Management (Phase 3-4)', () => {
     // コンソールログを確認してセッション管理が開始されたことを検証
     const sessionStartLog = await page.evaluate(() => {
       // セッション管理が開始されているか確認
-      // @ts-ignore
+      // @ts-expect-error - window.sessionServiceStarted is not defined in types
       return window.sessionServiceStarted || false;
     });
 

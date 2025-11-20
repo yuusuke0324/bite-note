@@ -187,7 +187,7 @@ export class SessionService {
   async checkIndexedDBConnection(): Promise<boolean> {
     try {
       // 軽量な確認クエリ（1件だけカウント）
-      await db.fishingRecords.limit(1).count();
+      await db.fishing_records.limit(1).count();
       return true;
     } catch (error) {
       console.error('[SessionService] IndexedDB connection check failed', error);
