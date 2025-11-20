@@ -29,6 +29,13 @@ export const TestIds = {
   LONGITUDE: 'longitude',
   SAVE_RECORD_BUTTON: 'save-record-button',
 
+  // Fish Species Autocomplete
+  FISH_SPECIES_AUTOCOMPLETE: 'fish-species-autocomplete',
+  FISH_SPECIES_INPUT: 'fish-species-input',
+  FISH_SPECIES_SUGGESTIONS: 'fish-species-suggestions',
+  FISH_SPECIES_OPTION: (id: string) => `fish-species-option-${id}`,
+  FISH_SPECIES_NO_RESULTS: 'fish-species-no-results',
+
   // Tide Graph
   TIDE_GRAPH_CANVAS: 'tide-graph-canvas',
   TIDE_GRAPH_AREA: 'tide-graph-area',
