@@ -472,20 +472,28 @@ test.describe('PWA Installation Flow', () => {
 
       // キャッシュが存在することを確認
       const cachesBefore = await page.evaluate(async () => {
-        return await caches.keys();
+        if (typeof caches !== 'undefined') {
+          return await caches.keys();
+        }
+        return [];
       });
 
       expect(cachesBefore.length).toBeGreaterThan(0);
 
       // すべてのキャッシュを削除
       await page.evaluate(async () => {
-        const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+        if (typeof caches !== 'undefined') {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map((name) => caches.delete(name)));
+        }
       });
 
       // キャッシュが削除されたことを確認
       const cachesAfter = await page.evaluate(async () => {
-        return await caches.keys();
+        if (typeof caches !== 'undefined') {
+          return await caches.keys();
+        }
+        return [];
       });
 
       expect(cachesAfter.length).toBe(0);
