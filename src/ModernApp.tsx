@@ -190,6 +190,14 @@ function ModernApp() {
   // const validation = useFormStore(selectValidation);
   // const formActions = useFormStore(selectFormActions);
 
+  // E2Eテスト用: 意図的なエラー発生
+  useEffect(() => {
+    if (typeof window !== 'undefined' &&
+        localStorage.getItem('__test_force_error__') === 'true') {
+      throw new Error('Test error for ErrorBoundary');
+    }
+  }, []);
+
   // 初期化
   useEffect(() => {
     const initializeApp = async () => {
