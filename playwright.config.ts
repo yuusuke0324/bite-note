@@ -79,8 +79,9 @@ export default defineConfig({
                   '**/record-creation-flow.spec.ts',
                   '**/record-list-operations.spec.ts',
                   '**/tide-system-e2e.spec.ts',  // #136: CI品質ゲート強化
+                  '**/tide-chart/performance.spec.ts',  // Experiment: Test orientationChange performance
                 ],
-                testIgnore: '**/performance-*.spec.ts',
+                testIgnore: undefined,  // Allow performance tests for this experiment
                 use: { ...devices['Desktop Chrome'] },
               },
             ]
