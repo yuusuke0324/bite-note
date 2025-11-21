@@ -41,7 +41,7 @@ export async function createTestFishingRecord(
   const testRecord = { ...defaultTestRecord, ...record };
 
   // 記録登録タブに移動
-  await page.click('[data-testid="form-tab"]');
+  await page.click('[data-testid="nav-form"]');
   await page.waitForSelector(`[data-testid="${TestIds.LOCATION_NAME}"]`, { state: 'visible' });
 
   // フォーム入力
@@ -87,10 +87,12 @@ export async function navigateToRecordsList(page: Page): Promise<void> {
 }
 
 /**
- * 潮汐グラフタブを開く
+ * 潮汐グラフセクションを開く
  */
 export async function openTideGraphTab(page: Page): Promise<void> {
-  await page.click(`[data-testid="${TestIds.TIDE_GRAPH_TAB}"]`);
+  // 潮汐グラフトグルボタンをクリック
+  await page.click(`[data-testid="${TestIds.TIDE_GRAPH_TOGGLE_BUTTON}"]`);
+  // グラフが表示されるまで待機
   await page.waitForSelector(`[data-testid="${TestIds.TIDE_GRAPH_CANVAS}"]`, { timeout: 10000 });
 }
 
