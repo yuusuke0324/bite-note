@@ -1,8 +1,34 @@
 // セッション管理E2Eテスト
 // Phase 3-4: セッション管理機能実装
 
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { TestIds } from '../../src/constants/testIds';
+
+// ヘルパー関数: セッション期限切れイベントを発火してモーダル表示を待機
+async function triggerSessionExpiredAndWaitForModal(page: Page) {
+  // セッション期限切れイベントを発火
+  await page.evaluate(() => {
+    const event = new CustomEvent('session_expired', {
+      detail: {
+        lastActivityAt: Date.now() - 30 * 60 * 1000,
+        elapsedTime: 30 * 60 * 1000,
+      },
+    });
+    window.dispatchEvent(event);
+  });
+
+  // Zustand storeの状態変更を待つ
+  await page.waitForFunction(() => {
+    // @ts-expect-error - テスト用
+    return window.__sessionStore?.getState().isSessionExpiredModalOpen === true;
+  }, { timeout: 2000 });
+
+  // モーダルが表示されるまで待機
+  await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, {
+    state: 'visible',
+    timeout: 3000
+  });
+}
 
 test.describe('Session Management (Phase 3-4)', () => {
   test.beforeEach(async ({ page }) => {
@@ -31,20 +57,12 @@ test.describe('Session Management (Phase 3-4)', () => {
   test('TC-SM-002: セッション期限切れモーダルの表示（手動トリガー）', async ({
     page,
   }) => {
-    // セッション期限切れイベントを手動で発火
-    await page.evaluate(() => {
-      const event = new CustomEvent('session_expired', {
-        detail: {
-          lastActivityAt: Date.now() - 30 * 60 * 1000, // 30分前
-          elapsedTime: 30 * 60 * 1000,
-        },
-      });
-      window.dispatchEvent(event);
-    });
+    // セッション期限切れイベントを発火してモーダル表示を待機
+    await triggerSessionExpiredAndWaitForModal(page);
 
     // モーダルが表示されることを確認
     const modal = page.locator(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
-    await expect(modal).toBeVisible({ timeout: 5000 });
+    await expect(modal).toBeVisible();
 
     // モーダルのコンテンツを確認
     const reAuthPrompt = page.locator(`[data-testid="${TestIds.REAUTH_PROMPT}"]`);
@@ -65,14 +83,8 @@ test.describe('Session Management (Phase 3-4)', () => {
   });
 
   test('TC-SM-003: 再接続ボタンのクリック', async ({ page }) => {
-    // セッション期限切れイベントを発火
-    await page.evaluate(() => {
-      const event = new CustomEvent('session_expired');
-      window.dispatchEvent(event);
-    });
-
-    // モーダルが表示されるまで待機
-    await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+    // セッション期限切れイベントを発火してモーダル表示を待機
+    await triggerSessionExpiredAndWaitForModal(page);
 
     // 再接続ボタンをクリック
     const reconnectButton = page.locator(
