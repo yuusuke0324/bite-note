@@ -98,8 +98,11 @@ export const useSessionStore = create<SessionStore>()(
           console.log('[SessionStore] Session started - listener registered');
         }
 
-        // E2Eテスト用フラグ設定（本番環境では設定しない）
-        if (typeof window !== 'undefined' && !import.meta.env.PROD) {
+        // E2Eテスト用フラグ設定
+        // - 開発モード（MODE=development）
+        // - テストモード（MODE=test、CI環境のE2Eテスト）
+        // 本番デプロイ（MODE=production）では露出しない
+        if (typeof window !== 'undefined' && import.meta.env.MODE !== 'production') {
           window.sessionServiceStarted = true;
         }
       },
@@ -117,8 +120,8 @@ export const useSessionStore = create<SessionStore>()(
           sessionExpiredHandler = null;
         }
 
-        // E2Eテスト用フラグリセット（本番環境では設定しない）
-        if (typeof window !== 'undefined' && !import.meta.env.PROD) {
+        // E2Eテスト用フラグリセット
+        if (typeof window !== 'undefined' && import.meta.env.MODE !== 'production') {
           window.sessionServiceStarted = false;
         }
       },
@@ -349,8 +352,10 @@ export const selectIsSessionExpiredModalOpen = (state: SessionStore) =>
 export const selectUnsavedDataCount = (state: SessionStore) => state.unsavedDataCount;
 
 // E2Eテスト用のグローバルアクセス
-// 開発環境とテスト環境のみ露出（本番環境では露出しない）
-if (typeof window !== 'undefined' && !import.meta.env.PROD) {
+// - 開発モード（MODE=development）
+// - テストモード（MODE=test、CI環境のE2Eテスト）
+// 本番デプロイ（MODE=production）では露出しない
+if (typeof window !== 'undefined' && import.meta.env.MODE !== 'production') {
   window.__sessionStore = useSessionStore;
 
   // デバッグ用: グローバル露出を確認
