@@ -35,6 +35,8 @@ describe('TASK-105: LRUキャッシュシステム', () => {
 
   afterEach(() => {
     cache.clear();
+    // タイマーが使用されている場合はリセット
+    vi.useRealTimers();
   });
 
   describe('LRU削除ロジック', () => {

@@ -211,6 +211,93 @@ export class TideChartPage {
   async expectFallbackState() {
     await expect(this.getFallbackTable()).toBeVisible();
   }
+
+  // ========================================
+  // 追加実装メソッド（Issue #181対応）
+  // ========================================
+
+  /**
+   * チャートのデータポイント要素を取得
+   *
+   * Note:
+   * - Rechartsライブラリのクラス名に依存（recharts@2.x）
+   * - ライブラリアップデート時に動作確認が必要
+   * - DOM構造: .recharts-line > .recharts-layer.recharts-line-dots > .recharts-dot
+   */
+  getDataPoints() {
+    // .recharts-line-dots クラスは .recharts-layer と共存するため、.recharts-dot のみで取得
+    return this.page.locator('[data-testid="tide-chart"] .recharts-dot');
+  }
+
+  /**
+   * エラーメッセージ要素を取得
+   * getTideError()のエイリアス（テストコードとの互換性のため両方提供）
+   */
+  getErrorMessage() {
+    return this.getTideError();
+  }
+
+  /**
+   * チャートの内部サイズ（clientWidth）を取得
+   *
+   * Note: boundingBox ではなく clientWidth を使用する理由：
+   * - TideChart は最小サイズ 600x300 を強制（TideChart.tsx Line 863-864）
+   * - モバイルでは親コンテナが overflow-x-auto のため、boundingBox と clientSize が異なる
+   *
+   * @returns チャートの clientWidth (px)
+   */
+  async getChartWidth(): Promise<number> {
+    return this.getChartElement().evaluate(el => el.clientWidth);
+  }
+
+  /**
+   * チャートの内部サイズ（clientHeight）を取得
+   * @returns チャートの clientHeight (px)
+   */
+  async getChartHeight(): Promise<number> {
+    return this.getChartElement().evaluate(el => el.clientHeight);
+  }
+
+  /**
+   * データポイントにホバー
+   * @param index データポイントのインデックス（0始まり）
+   */
+  async hoverDataPoint(index: number) {
+    const dataPoints = this.getDataPoints();
+    await dataPoints.nth(index).hover();
+  }
+
+  /**
+   * データポイントをクリック
+   * @param index データポイントのインデックス（0始まり）
+   */
+  async clickDataPoint(index: number) {
+    const dataPoints = this.getDataPoints();
+    await dataPoints.nth(index).click();
+  }
+
+  /**
+   * テーマを選択
+   *
+   * Note: 実際のUI実装に合わせて調整が必要
+   * 現在はdata-testid="theme-selector"を想定
+   *
+   * @param theme テーマ名 ('light' | 'dark' | 'high-contrast')
+   * @throws セレクターが見つからない場合はエラーをthrow
+   */
+  async selectTheme(theme: 'light' | 'dark' | 'high-contrast') {
+    const selector = this.page.locator('[data-testid="theme-selector"]');
+
+    // 実装が存在しない場合はテストをスキップ（明示的）
+    if (await selector.count() === 0) {
+      throw new Error(
+        `テーマセレクター [data-testid="theme-selector"] が実装されていません。` +
+        `このテストはスキップしてください。`
+      );
+    }
+
+    await selector.selectOption(theme);
+  }
 }
 
 // Mock API Helpers
