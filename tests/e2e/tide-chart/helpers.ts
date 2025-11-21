@@ -196,7 +196,7 @@ export class TideChartPage {
   async expectChartRendered() {
     await this.expectVisible();
     await expect(this.page.locator('[role="img"]')).toBeVisible();
-    await expect(this.page.locator('.recharts-line')).toBeVisible();
+    await expect(this.page.locator('.recharts-line').first()).toBeVisible();
   }
 
   async expectAxisLabelsVisible() {
