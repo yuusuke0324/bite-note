@@ -10,7 +10,7 @@ import { useToastStore } from './toast-store';
 export type SessionStatus = 'active' | 'expired' | 'reconnecting';
 
 // イベントリスナーハンドラーの参照を保持（メモリリーク防止）
-let sessionExpiredHandler: (() => void) | null = null;
+let sessionExpiredHandler: EventListener | null = null;
 
 interface SessionStore {
   // セッション状態
@@ -66,20 +66,37 @@ export const useSessionStore = create<SessionStore>()(
     actions: {
       // セッション管理の開始
       startSession: () => {
-        console.log('[SessionStore] Starting session');
+        if (import.meta.env.DEV) {
+          console.log('[SessionStore] Starting session at:', new Date().toISOString());
+        }
+
+        // 既存のリスナーがあれば削除（二重登録防止）
+        if (sessionExpiredHandler) {
+          window.removeEventListener('session_expired', sessionExpiredHandler);
+          sessionExpiredHandler = null;
+        }
 
         // SessionServiceを開始
         sessionService.start();
 
         // セッション期限切れイベントのリスナー登録
         // メモリリーク防止のため、ハンドラー参照を保持
-        sessionExpiredHandler = () => {
+        sessionExpiredHandler = (event: Event) => {
+          const customEvent = event as CustomEvent<SessionExpiredDetail>;
+          if (import.meta.env.DEV) {
+            console.log('[SessionStore] Session expired event received', customEvent.detail);
+            console.log('[SessionStore] Current state before expireSession:', get().sessionStatus);
+          }
           const { actions } = get();
           actions.expireSession();
         };
         window.addEventListener('session_expired', sessionExpiredHandler);
 
         set({ sessionStatus: 'active', lastActivityAt: Date.now() });
+
+        if (import.meta.env.DEV) {
+          console.log('[SessionStore] Session started - listener registered');
+        }
       },
 
       // セッション管理の停止
@@ -157,15 +174,24 @@ export const useSessionStore = create<SessionStore>()(
 
       // セッション期限切れ処理
       expireSession: () => {
-        console.warn('[SessionStore] Session expired');
+        if (import.meta.env.DEV) {
+          console.warn('[SessionStore] Session expired - BEFORE set');
+        }
 
         set({ sessionStatus: 'expired' });
+
+        if (import.meta.env.DEV) {
+          console.warn('[SessionStore] Session expired - AFTER set, status:', get().sessionStatus);
+        }
 
         // 未保存データ数を取得（実装は後で）
         const unsavedCount = 0; // TODO: 実際の未保存データ数を取得
 
         // セッション期限切れモーダルを表示
         const { actions } = get();
+        if (import.meta.env.DEV) {
+          console.warn('[SessionStore] Calling showSessionExpiredModal with unsavedCount:', unsavedCount);
+        }
         actions.showSessionExpiredModal(unsavedCount);
       },
 
@@ -268,10 +294,22 @@ export const useSessionStore = create<SessionStore>()(
 
       // セッション期限切れモーダルの表示
       showSessionExpiredModal: (unsavedCount: number) => {
+        if (import.meta.env.DEV) {
+          console.warn('[SessionStore] showSessionExpiredModal called - BEFORE set');
+        }
+
         set({
           isSessionExpiredModalOpen: true,
           unsavedDataCount: unsavedCount,
         });
+
+        if (import.meta.env.DEV) {
+          const state = get();
+          console.warn('[SessionStore] showSessionExpiredModal - AFTER set', {
+            isSessionExpiredModalOpen: state.isSessionExpiredModalOpen,
+            unsavedDataCount: state.unsavedDataCount,
+          });
+        }
       },
 
       // セッション期限切れモーダルの非表示
@@ -296,3 +334,8 @@ export const selectStorageMode = (state: SessionStore) => state.storageMode;
 export const selectIsSessionExpiredModalOpen = (state: SessionStore) =>
   state.isSessionExpiredModalOpen;
 export const selectUnsavedDataCount = (state: SessionStore) => state.unsavedDataCount;
+
+// E2Eテスト用のグローバルアクセス
+if (import.meta.env.MODE === 'test' || import.meta.env.DEV) {
+  window.__sessionStore = useSessionStore;
+}
