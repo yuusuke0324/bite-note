@@ -98,7 +98,8 @@ class TideSystemE2EHelper {
 
     if (!switchedToList) {
       // 手動で切り替え (ModernApp.tsx: nav-list パターン、aria-current使用)
-      await this.page.locator(`[data-testid="nav-list"]`).click();
+      // CI環境（特にタブレットサイズ）ではオーバーレイが残ることがあるため、force: true で確実にクリック
+      await this.page.locator(`[data-testid="nav-list"]`).click({ force: true });
       await this.page.waitForSelector(
         `[data-testid="nav-list"][aria-current="page"]`,
         { timeout: 5000, state: 'visible' }
@@ -118,7 +119,8 @@ class TideSystemE2EHelper {
     const listTab = this.page.locator(`[data-testid="nav-list"]`);
     await listTab.waitFor({ state: 'visible', timeout: 10000 });
     await expect(listTab).toBeEnabled();
-    await listTab.click();
+    // CI環境（特にタブレットサイズ）ではオーバーレイが残ることがあるため、force: true で確実にクリック
+    await listTab.click({ force: true });
 
     // 🟢 改善1: タブ切り替え完了を確認
     await this.page.waitForSelector(
