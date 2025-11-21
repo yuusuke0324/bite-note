@@ -196,7 +196,7 @@ export class TideChartPage {
   async expectChartRendered() {
     await this.expectVisible();
     await expect(this.page.locator('[role="img"]')).toBeVisible();
-    await expect(this.page.locator('.recharts-line')).toBeVisible();
+    await expect(this.page.locator('.recharts-line').first()).toBeVisible();
   }
 
   async expectAxisLabelsVisible() {
@@ -499,7 +499,8 @@ export class DeviceHelper {
 // Test Utilities
 export async function waitForChartLoad(page: Page) {
   await page.waitForSelector('[data-testid="tide-chart"]');
-  await page.waitForSelector('.recharts-line');
+  // Wait for at least one recharts line to be rendered (multiple may exist in CI)
+  await page.waitForSelector('.recharts-line >> nth=0');
   await page.waitForLoadState('networkidle');
 }
 

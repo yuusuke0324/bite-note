@@ -29,7 +29,7 @@ test.describe('TC-E005: 統合シナリオテスト群', () => {
     await chartPage.expectChartRendered();
 
     // 2. データ確認
-    await expect(page.locator('.recharts-line')).toBeVisible();
+    await expect(page.locator('.recharts-line').first()).toBeVisible();
 
     // 3. データポイントインタラクション
     await chartPage.hoverDataPoint(0);
