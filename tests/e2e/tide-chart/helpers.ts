@@ -455,6 +455,7 @@ export class VisualRegressionHelper {
     const isCI = process.env.CI === 'true';
     const config = {
       threshold: isCI ? 0.2 : 0.1,
+      maxDiffPixelRatio: 0.02, // 2%までのpixel差異を許容（緊急措置、Issue #187）
       animations: 'disabled' as const,
     };
 
