@@ -13,8 +13,8 @@ import { defineConfig, devices } from '@playwright/test';
  * - スクリーンショット・ビデオ: 失敗時のみ（CI）
  * - webServer: 本番ビルド（CI）、開発サーバー（ローカル）
  *
- * テスト数: 約30個（PR時）、約255個（main merge時）、約1,107個（ローカル）
- * 推定実行時間: 3-4分（PR時）、8-10分（main merge時）
+ * テスト数: 約28個（PR時）、約255個（main merge時）、約1,107個（ローカル）
+ * 推定実行時間: 3分（PR時）、8-10分（main merge時）
  *
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -80,7 +80,6 @@ export default defineConfig({
                   '**/record-creation-flow.spec.ts',
                   '**/record-list-operations.spec.ts',
                   '**/tide-system-e2e.spec.ts',  // #136: CI品質ゲート強化
-                  '**/tide-chart/integration-scenarios.spec.ts',  // TideChart統合テスト
                   '**/tide-chart/performance.spec.ts',  // パフォーマンステスト（mainとの差異検出）
                 ],
                 use: { ...devices['Desktop Chrome'] },
