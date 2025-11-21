@@ -13,8 +13,8 @@ import { defineConfig, devices } from '@playwright/test';
  * - スクリーンショット・ビデオ: 失敗時のみ（CI）
  * - webServer: 本番ビルド（CI）、開発サーバー（ローカル）
  *
- * テスト数: 約20個（PR時）、約255個（main merge時）、約1,107個（ローカル）
- * 推定実行時間: 2-3分（PR時）、8-10分（main merge時）
+ * テスト数: 約28個（PR時）、約255個（main merge時）、約1,107個（ローカル）
+ * 推定実行時間: 3分（PR時）、8-10分（main merge時）
  *
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -69,7 +69,8 @@ export default defineConfig({
   /* CI環境: PR時はSmoke tests、main merge時はFull suite (Issue #129) */
   projects: process.env.CI
     ? [
-        // PR時: Smoke tests（重要なテストのみ）
+        // PR時: Smoke tests（重要なテストのみ + パフォーマンステスト）
+        // 注: パフォーマンステストを含めることで、mainマージ前に劣化を検出
         ...(process.env.GITHUB_EVENT_NAME === 'pull_request'
           ? [
               {
@@ -79,8 +80,8 @@ export default defineConfig({
                   '**/record-creation-flow.spec.ts',
                   '**/record-list-operations.spec.ts',
                   '**/tide-system-e2e.spec.ts',  // #136: CI品質ゲート強化
+                  '**/tide-chart/performance.spec.ts',  // パフォーマンステスト（mainとの差異検出）
                 ],
-                testIgnore: '**/performance-*.spec.ts',
                 use: { ...devices['Desktop Chrome'] },
               },
             ]
