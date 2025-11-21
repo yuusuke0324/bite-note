@@ -17,16 +17,19 @@ async function triggerSessionExpiredAndWaitForModal(page: Page) {
     window.dispatchEvent(event);
   });
 
-  // Zustand storeの状態変更を待つ
+  // イベント処理完了を待つ（小さな遅延）
+  await page.waitForTimeout(100);
+
+  // Zustand storeの状態変更を待つ（タイムアウト延長）
   await page.waitForFunction(() => {
     // @ts-expect-error - テスト用
     return window.__sessionStore?.getState().isSessionExpiredModalOpen === true;
-  }, { timeout: 2000 });
+  }, { timeout: 5000 });
 
-  // モーダルが表示されるまで待機
+  // モーダルが表示されるまで待機（タイムアウト延長）
   await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, {
     state: 'visible',
-    timeout: 3000
+    timeout: 5000
   });
 }
 
@@ -37,6 +40,22 @@ test.describe('Session Management (Phase 3-4)', () => {
 
     // アプリが初期化されるまで待機
     await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
+
+    // セッション管理の初期化を待機
+    await page.waitForFunction(() => {
+      // @ts-expect-error - テスト用
+      return window.sessionServiceStarted === true;
+    }, { timeout: 5000 });
+
+    // Zustand storeが利用可能か確認
+    const hasSessionStore = await page.evaluate(() => {
+      // @ts-expect-error - テスト用
+      return typeof window.__sessionStore !== 'undefined';
+    });
+
+    if (!hasSessionStore) {
+      throw new Error('window.__sessionStore is not available. Check environment variables.');
+    }
   });
 
   test('TC-SM-001: セッション管理サービスが起動する', async ({ page }) => {

@@ -97,6 +97,11 @@ export const useSessionStore = create<SessionStore>()(
         if (import.meta.env.DEV) {
           console.log('[SessionStore] Session started - listener registered');
         }
+
+        // E2Eテスト用フラグ設定（本番環境では設定しない）
+        if (typeof window !== 'undefined' && !import.meta.env.PROD) {
+          window.sessionServiceStarted = true;
+        }
       },
 
       // セッション管理の停止
@@ -110,6 +115,11 @@ export const useSessionStore = create<SessionStore>()(
         if (sessionExpiredHandler) {
           window.removeEventListener('session_expired', sessionExpiredHandler);
           sessionExpiredHandler = null;
+        }
+
+        // E2Eテスト用フラグリセット（本番環境では設定しない）
+        if (typeof window !== 'undefined' && !import.meta.env.PROD) {
+          window.sessionServiceStarted = false;
         }
       },
 
@@ -178,21 +188,24 @@ export const useSessionStore = create<SessionStore>()(
           console.warn('[SessionStore] Session expired - BEFORE set');
         }
 
-        set({ sessionStatus: 'expired' });
-
-        if (import.meta.env.DEV) {
-          console.warn('[SessionStore] Session expired - AFTER set, status:', get().sessionStatus);
-        }
-
         // 未保存データ数を取得（実装は後で）
         const unsavedCount = 0; // TODO: 実際の未保存データ数を取得
 
-        // セッション期限切れモーダルを表示
-        const { actions } = get();
+        // 状態を一度にまとめて更新（Zustandの非同期バッチ処理を回避）
+        set({
+          sessionStatus: 'expired',
+          isSessionExpiredModalOpen: true,
+          unsavedDataCount: unsavedCount,
+        });
+
         if (import.meta.env.DEV) {
-          console.warn('[SessionStore] Calling showSessionExpiredModal with unsavedCount:', unsavedCount);
+          const state = get();
+          console.warn('[SessionStore] Session expired - AFTER set', {
+            sessionStatus: state.sessionStatus,
+            isSessionExpiredModalOpen: state.isSessionExpiredModalOpen,
+            unsavedDataCount: state.unsavedDataCount,
+          });
         }
-        actions.showSessionExpiredModal(unsavedCount);
       },
 
       // ストレージモードの初期化
@@ -336,6 +349,17 @@ export const selectIsSessionExpiredModalOpen = (state: SessionStore) =>
 export const selectUnsavedDataCount = (state: SessionStore) => state.unsavedDataCount;
 
 // E2Eテスト用のグローバルアクセス
-if (import.meta.env.MODE === 'test' || import.meta.env.DEV) {
+// 開発環境とテスト環境のみ露出（本番環境では露出しない）
+if (typeof window !== 'undefined' && !import.meta.env.PROD) {
   window.__sessionStore = useSessionStore;
+
+  // デバッグ用: グローバル露出を確認
+  if (import.meta.env.DEV) {
+    console.log('[SessionStore] Exposed to window.__sessionStore');
+  }
+
+  // E2Eテスト用: セッション管理が開始されたフラグ（初期値false）
+  if (window.sessionServiceStarted === undefined) {
+    window.sessionServiceStarted = false;
+  }
 }

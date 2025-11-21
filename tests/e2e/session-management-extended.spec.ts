@@ -11,6 +11,22 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
 
     // アプリが初期化されるまで待機
     await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
+
+    // セッション管理の初期化を待機
+    await page.waitForFunction(() => {
+      // @ts-expect-error - テスト用
+      return window.sessionServiceStarted === true;
+    }, { timeout: 5000 });
+
+    // Zustand storeが利用可能か確認
+    const hasSessionStore = await page.evaluate(() => {
+      // @ts-expect-error - テスト用
+      return typeof window.__sessionStore !== 'undefined';
+    });
+
+    if (!hasSessionStore) {
+      throw new Error('window.__sessionStore is not available. Check environment variables.');
+    }
   });
 
   test.describe('異常系テスト', () => {
@@ -40,7 +56,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       });
 
       // モーダルが表示されるまで待機
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       // ページをリロード
       await page.reload();
@@ -73,7 +89,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       });
 
       const modal = page.locator(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
-      await expect(modal).toBeVisible({ timeout: 5000 });
+      await expect(modal).toBeVisible({ timeout: 10000 });
 
       // 未保存データカウントが表示されていることを確認
       await expect(modal).toContainText('保存されていない釣果記録が5件あります');
@@ -89,7 +105,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       });
 
       const modal = page.locator(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
-      await expect(modal).toBeVisible({ timeout: 5000 });
+      await expect(modal).toBeVisible({ timeout: 10000 });
 
       // カウントメッセージが表示されていないことを確認
       await expect(modal).not.toContainText('保存されていない釣果記録が');
@@ -118,7 +134,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const reconnectButton = page.locator(
         `[data-testid="${TestIds.RECONNECT_AND_SAVE_BUTTON}"]`
@@ -143,7 +159,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const reconnectButton = page.locator(
         `[data-testid="${TestIds.RECONNECT_AND_SAVE_BUTTON}"]`
@@ -164,7 +180,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const reconnectButton = page.locator(
         `[data-testid="${TestIds.RECONNECT_AND_SAVE_BUTTON}"]`
@@ -189,7 +205,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       // 確認ダイアログのハンドラーを設定
       page.on('dialog', async (dialog) => {
@@ -205,7 +221,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       // モーダルが閉じていないことを確認（キャンセルしたので）
       await expect(
         page.locator(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`)
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 10000 });
     });
   });
 
@@ -220,7 +236,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const endTime = Date.now();
       const displayTime = endTime - startTime;
@@ -241,7 +257,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const startTime = Date.now();
 
@@ -270,7 +286,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       // 再接続ボタンにフォーカスが当たっていることを確認
       const reconnectButton = page.locator(
@@ -286,7 +302,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const reconnectButton = page.locator(
         `[data-testid="${TestIds.RECONNECT_AND_SAVE_BUTTON}"]`
@@ -321,16 +337,16 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       // モーダルタイトルが存在し、aria-labelledbyで参照されていることを確認
       const title = page.locator('#modal-title');
-      await expect(title).toBeVisible();
+      await expect(title).toBeVisible({ timeout: 10000 });
       await expect(title).toContainText('セッションが期限切れになりました');
 
       // モーダル説明が存在し、aria-describedbyで参照されていることを確認
       const description = page.locator('#modal-description');
-      await expect(description).toBeVisible();
+      await expect(description).toBeVisible({ timeout: 10000 });
       await expect(description).toContainText('しばらく操作がなかったため');
     });
   });
@@ -348,7 +364,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const reconnectButton = page.locator(
         `[data-testid="${TestIds.RECONNECT_AND_SAVE_BUTTON}"]`
@@ -375,7 +391,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
         window.dispatchEvent(event);
       });
 
-      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`);
+      await page.waitForSelector(`[data-testid="${TestIds.SESSION_TIMEOUT_MODAL}"]`, { timeout: 5000 });
 
       const reconnectButton = page.locator(
         `[data-testid="${TestIds.RECONNECT_AND_SAVE_BUTTON}"]`

@@ -19,6 +19,7 @@ declare global {
         unsavedDataCount: number;
       };
     };
+    sessionServiceStarted?: boolean;
   }
 }
 
