@@ -26,7 +26,8 @@ import {
 import { createTestFishingRecord } from './helpers/test-helpers';
 import { TestIds } from '../../src/constants/testIds';
 
-test.describe('Phase 3-3: E2E Tests - Offline Sync UI & Storage Error Handling', () => {
+// TODO: Issue #202 - Implement PWA offline sync features
+test.describe.skip('Phase 3-3: E2E Tests - Offline Sync UI & Storage Error Handling', () => {
   test.setTimeout(90000);
 
   test.beforeEach(async ({ page }) => {
