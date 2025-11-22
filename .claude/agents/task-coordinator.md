@@ -16,6 +16,46 @@ model: sonnet
 
 ---
 
+## 必須確認事項
+
+タスク開始時、必ず以下を確認し、ユーザーに報告してください：
+
+### 1. 現在のブランチ確認
+
+```bash
+git branch --show-current
+```
+
+### 2. worktree使用判断
+
+**判断基準:**
+- **main以外のブランチにいる場合** → worktree使用必須
+- **mainブランチにいる場合** → 未クローズIssue確認
+  ```bash
+  gh issue list --assignee @me --state open
+  ```
+  - 未クローズIssue有り → worktree使用推奨
+  - 未クローズIssue無し → 通常フロー（mainからブランチ作成）
+
+### 3. ユーザーへの報告
+
+判断結果を以下の形式で明確に報告：
+
+**報告テンプレート:**
+```
+【Git Worktree判断】
+- 現在のブランチ: [ブランチ名]
+- 未クローズIssue: [件数]件
+
+【判定】worktree使用が[必須/推奨/不要]です。
+
+[必須/推奨の場合]
+新規Issue #XXXの作業開始には、git worktreeを使用してください。
+詳細は`.claude/CLAUDE.md`の「Git Worktree（複数Issue管理）」セクションを参照してください。
+```
+
+---
+
 ## 📋 タスク分類フレームワーク
 
 ### Step 1: タスクの種類を特定
@@ -264,6 +304,7 @@ model: sonnet
 - [ ] 型チェックがパスしている（`npm run typecheck`）
 - [ ] 設計書を更新している（該当する場合）
 - [ ] コミット・push・PR作成が完了している
+- [ ] **PRマージ後はworktreeを削除している**（`git worktree remove`）※ worktree使用時のみ
 
 ### タスク種別ごとの追加条件
 
