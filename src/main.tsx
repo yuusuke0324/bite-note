@@ -4,14 +4,13 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import { AppRoutes } from './Routes.tsx'
 
-// E2Eテスト用: セッション管理フラグを事前に設定
+// E2Eテスト用: セッション管理フラグを常に事前に設定
 // これにより、ModernAppのuseEffectが実行される前にフラグが利用可能になる
-if (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true') {
-  window.sessionServiceStarted = false;
-  window.__sessionStore = undefined;
-  if (import.meta.env.VITE_E2E_TEST === 'true') {
-    console.log('[E2E] Global session flags initialized');
-  }
+// Production環境でも初期化（パフォーマンス影響は微小、E2Eテストの信頼性向上）
+window.sessionServiceStarted = false;
+// Note: window.__sessionStore は session-store.ts で設定されるため、ここでは初期化しない
+if (import.meta.env.VITE_E2E_TEST === 'true') {
+  console.log('[E2E] Global session flags initialized');
 }
 
 // 開発モード: 既存のService Workerを全て解除
