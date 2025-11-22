@@ -24,8 +24,10 @@ export default defineConfig({
   /* Global setup for test environment initialization (Issue #129) */
   globalSetup: './tests/e2e/global-setup.ts',
 
-  /* タイムアウト設定を最適化 (Issue #129 - Sharding) */
-  timeout: 20000,  // 各テスト: 20秒（30秒 → 20秒に短縮）
+  /* タイムアウト設定を最適化 */
+  // CI環境: 30秒（複雑なテストに対応）
+  // ローカル: 20秒（高速フィードバック）
+  timeout: process.env.CI ? 30000 : 20000,
 
   expect: {
     timeout: 10000,  // アサーション: 10秒
@@ -66,42 +68,24 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  /* CI環境: PR時はSmoke tests、main merge時はFull suite (Issue #129) */
+  /* CI環境: PR時もmain時もFull suiteを実行（mainマージ前に全ての問題を検出） */
   projects: process.env.CI
     ? [
-        // PR時: Smoke tests（重要なテストのみ + パフォーマンステスト）
-        // 注: パフォーマンステストを含めることで、mainマージ前に劣化を検出
-        ...(process.env.GITHUB_EVENT_NAME === 'pull_request'
-          ? [
-              {
-                name: 'smoke',
-                testMatch: [
-                  '**/app-navigation.spec.ts',
-                  '**/record-creation-flow.spec.ts',
-                  '**/record-list-operations.spec.ts',
-                  '**/tide-system-e2e.spec.ts',  // #136: CI品質ゲート強化
-                  '**/tide-chart/performance.spec.ts',  // パフォーマンステスト（mainとの差異検出）
-                ],
-                use: { ...devices['Desktop Chrome'] },
-              },
-            ]
-          : [
-              // main merge時: Full suite
-              {
-                name: 'chromium',
-                testMatch: '**/*.spec.ts',
-                testIgnore: '**/performance-*.spec.ts',
-                use: { ...devices['Desktop Chrome'] },
-              },
-              {
-                name: 'pwa-chromium',
-                testMatch: /pwa-.*\.spec\.ts/,
-                use: {
-                  ...devices['Desktop Chrome'],
-                  channel: 'chrome',
-                },
-              },
-            ]),
+        // CI環境: Full suite（PR時もmain時も同じテストを実行）
+        {
+          name: 'chromium',
+          testMatch: '**/*.spec.ts',
+          testIgnore: '**/performance-*.spec.ts',
+          use: { ...devices['Desktop Chrome'] },
+        },
+        {
+          name: 'pwa-chromium',
+          testMatch: /pwa-.*\.spec\.ts/,
+          use: {
+            ...devices['Desktop Chrome'],
+            channel: 'chrome',
+          },
+        },
       ]
     : [
         // ローカル環境: Desktop Chromeのみ（Mobile環境はCI環境で初期化が遅延するため除外）
