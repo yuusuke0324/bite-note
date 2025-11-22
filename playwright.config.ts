@@ -137,12 +137,13 @@ export default defineConfig({
       ],
 
   /* Run your local dev server before starting the tests */
-  webServer: process.env.CI
-    ? undefined  // CI: 外部で起動済みの開発サーバーを使用
-    : {
-        command: 'npm run dev',  // ローカル: 開発サーバー
-        url: 'http://localhost:3000',
-        reuseExistingServer: true,
-        timeout: 120000,  // 2分
-      },
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,  // CIでは各shardで新規起動、ローカルでは再利用
+    timeout: 120000,  // 2分
+    env: {
+      VITE_E2E_TEST: 'true',  // E2Eテスト用フラグを設定
+    },
+  },
 });

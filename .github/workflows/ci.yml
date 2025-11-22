@@ -119,13 +119,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Start development server for E2E tests
-      run: |
-        npm run dev &
-        npx wait-on http://localhost:3000 --timeout 30000
-      env:
-        VITE_E2E_TEST: 'true'
-
     - name: Cache Playwright browsers
       uses: actions/cache@v4
       id: playwright-cache
