@@ -100,9 +100,11 @@ export const useSessionStore = create<SessionStore>()(
 
         // E2Eテスト用フラグ設定
         // - 開発モード（MODE=development）
-        // - テストモード（MODE=test、CI環境のE2Eテスト）
-        // 本番デプロイ（MODE=production）では露出しない
-        if (typeof window !== 'undefined' && import.meta.env.MODE !== 'production') {
+        // - テストモード（MODE=test）
+        // - CI E2Eテスト（VITE_E2E_TEST=true、production buildでも露出）
+        // 本番デプロイでは露出しない
+        if (typeof window !== 'undefined' &&
+            (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
           window.sessionServiceStarted = true;
         }
       },
@@ -121,7 +123,8 @@ export const useSessionStore = create<SessionStore>()(
         }
 
         // E2Eテスト用フラグリセット
-        if (typeof window !== 'undefined' && import.meta.env.MODE !== 'production') {
+        if (typeof window !== 'undefined' &&
+            (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
           window.sessionServiceStarted = false;
         }
       },
@@ -353,9 +356,11 @@ export const selectUnsavedDataCount = (state: SessionStore) => state.unsavedData
 
 // E2Eテスト用のグローバルアクセス
 // - 開発モード（MODE=development）
-// - テストモード（MODE=test、CI環境のE2Eテスト）
-// 本番デプロイ（MODE=production）では露出しない
-if (typeof window !== 'undefined' && import.meta.env.MODE !== 'production') {
+// - テストモード（MODE=test）
+// - CI E2Eテスト（VITE_E2E_TEST=true、production buildでも露出）
+// 本番デプロイでは露出しない
+if (typeof window !== 'undefined' &&
+    (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
   window.__sessionStore = useSessionStore;
 
   // デバッグ用: グローバル露出を確認
