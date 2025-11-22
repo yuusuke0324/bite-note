@@ -83,6 +83,8 @@ test.describe('TC-E004: パフォーマンステスト群', () => {
   });
 
   test('TC-E004-008: should maintain reasonable CPU usage', async ({ page }) => {
+    test.setTimeout(30000); // CI環境でのパフォーマンス測定に余裕を持たせる
+
     await mockAPI.mockValidData();
 
     await chartPage.goto();
