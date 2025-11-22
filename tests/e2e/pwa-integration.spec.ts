@@ -12,7 +12,10 @@ test.describe('Epic #9: PWA Full Integration Tests', () => {
   test.setTimeout(90000); // 統合テストは長時間実行される可能性
 
   test.beforeEach(async ({ page }) => {
-    // 各テスト前にストレージをクリア
+    // ページコンテキスト確立後にストレージをクリア（SecurityError回避）
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();

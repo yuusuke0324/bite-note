@@ -77,6 +77,8 @@ jobs:
 
     - name: Build application
       run: npm run build
+      env:
+        VITE_E2E_TEST: 'true'
 
     # ビルド成果物をキャッシュして E2E テストで再利用
     - name: Cache build artifacts
@@ -141,6 +143,7 @@ jobs:
         TOTAL_SHARDS=3
         npx playwright test --shard=${{ matrix.shard }}/${TOTAL_SHARDS}
       env:
+        VITE_E2E_TEST: 'true'
         NODE_OPTIONS: '--max-old-space-size=4096'
         GITHUB_EVENT_NAME: ${{ github.event_name }}
       timeout-minutes: 10

@@ -11,7 +11,10 @@ test.describe('PWA Installation Flow', () => {
   test.setTimeout(60000);
 
   test.beforeEach(async ({ page }) => {
-    // 各テスト前に完全クリーンアップ
+    // ページコンテキスト確立後にクリーンアップ（SecurityError回避）
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
     await clearAllCaches(page);
     await clearIndexedDB(page);
     await clearStorage(page);
