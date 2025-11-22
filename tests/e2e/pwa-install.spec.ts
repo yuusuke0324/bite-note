@@ -3,7 +3,7 @@
  * Phase 3: インストール・アンインストールフロー、マニフェスト検証
  */
 
-import { test, expect, waitForServiceWorker, isStandaloneMode, getManifest, fullPWACleanup } from './fixtures/pwa-fixtures';
+import { test, expect, waitForServiceWorker, isStandaloneMode, getManifest, clearAllCaches, clearIndexedDB, clearStorage } from './fixtures/pwa-fixtures';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -12,7 +12,9 @@ test.describe('PWA Installation Flow', () => {
 
   test.beforeEach(async ({ page }) => {
     // 各テスト前に完全クリーンアップ
-    await fullPWACleanup(page);
+    await clearAllCaches(page);
+    await clearIndexedDB(page);
+    await clearStorage(page);
   });
 
   test.describe('beforeinstallprompt Flow (Android/Desktop)', () => {
