@@ -103,14 +103,14 @@ export const useSessionStore = create<SessionStore>()(
         // - テストモード（MODE=test）
         // - CI E2Eテスト（VITE_E2E_TEST=true、production buildでも露出）
         // 本番デプロイでは露出しない
-        // Object.definePropertyを使用してTree Shakingを回避
+        // console.logで副作用を明示的に作成し、Tree Shakingを回避
         if (typeof window !== 'undefined' &&
             (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
-          Object.defineProperty(window, 'sessionServiceStarted', {
-            value: true,
-            writable: true,
-            configurable: true,
-          });
+          window.sessionServiceStarted = true;
+          // Tree Shaking回避のため副作用を残す
+          if (import.meta.env.VITE_E2E_TEST === 'true') {
+            console.log('[E2E] sessionServiceStarted flag set');
+          }
         }
       },
 
@@ -128,15 +128,14 @@ export const useSessionStore = create<SessionStore>()(
         }
 
         // E2Eテスト用フラグリセット
-        // Object.definePropertyで設定したプロパティを更新
         if (typeof window !== 'undefined' &&
             (import.meta.env.MODE !== 'production' ||
              import.meta.env.VITE_E2E_TEST === 'true')) {
-          Object.defineProperty(window, 'sessionServiceStarted', {
-            value: false,
-            writable: true,
-            configurable: true,
-          });
+          window.sessionServiceStarted = false;
+          // Tree Shaking回避のため副作用を残す
+          if (import.meta.env.VITE_E2E_TEST === 'true') {
+            console.log('[E2E] sessionServiceStarted flag reset');
+          }
         }
       },
 
