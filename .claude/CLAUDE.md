@@ -12,11 +12,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Git作業フロー
 
 - **mainブランチでの直接作業は絶対禁止**: いかなる変更もmainブランチに直接コミットしない
-- **作業開始時**: 必ず専用ブランチを作成（feat-issue-番号-説明）
+- **作業開始時の判断**:
+  - **現在のブランチを確認**（`git branch --show-current`）
+  - **main以外のブランチにいる場合** → git worktree使用必須（下記「Git Worktree」参照）
+  - **mainブランチにいる場合** → 未クローズIssue確認（`gh issue list --assignee @me --state open`）
+    - 未クローズIssue有り → git worktree使用推奨（下記参照）
+    - 未クローズIssue無し → `git checkout -b feat-issue-番号-説明`
 - **作業終了時**: コミット → push → PR作成の3ステップを必ず実施
 - 📄 **詳細**: `ai-rules/COMMIT_AND_PR_GUIDELINES.md`
 
-### Git Worktree（並行作業時）
+### Git Worktree（複数Issue管理）
+
+**使用するケース:**
+既存の作業中Issue（未マージブランチや未クローズIssue）が存在する状態で、新規Issueを開始する場合
 
 複数のIssueを同時作業する場合、git worktreeを使用：
 
@@ -39,7 +47,7 @@ code .
 ### Issue駆動開発フロー
 
 - **Issue作成**: タスク粒度（2-6時間、1-5ファイル）を確認
-- **作業開始時**: Issue番号を含むブランチ作成、WIPラベル付与、セルフアサイン
+- **作業開始時**: 上記「Git作業フロー」の判断に従いブランチ作成、WIPラベル付与、セルフアサイン
 - **作業中**: Session Notes更新、Files to Edit実績更新
 - **PR作成時**: `Closes #番号` でIssueとリンク
 - **マージ後**: Issue自動クローズ
@@ -47,7 +55,7 @@ code .
 
 ### 専門エージェント活用
 
-- **タスク開始時**: `task-coordinator` エージェントに相談し、適切なサイクルを決定
+- **タスク開始時**: `task-coordinator` エージェントに相談し、適切なサイクルとgit worktree使用の要否を決定
 - **UI/UX実装**: `designer` エージェントのレビュー必須
 - **コード改修**: `tech-lead` エージェントのレビュー必須
 - **テストコード**: `qa-engineer` エージェントのレビュー必須
