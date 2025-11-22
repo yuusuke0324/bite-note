@@ -4,8 +4,8 @@
 import { test, expect } from '@playwright/test';
 import { TestIds } from '../../src/constants/testIds';
 
-// TODO: Issue #201 - Fix VITE_E2E_TEST environment variable propagation
-test.describe.skip('Session Management - Extended Tests (Phase 3-4)', () => {
+// Fixed: Issue #201 - Using development server for E2E tests in CI
+test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
   test.beforeEach(async ({ page }) => {
     // アプリを起動
     await page.goto('/');

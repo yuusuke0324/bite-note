@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
-  loadEnv(mode, process.cwd(), '');
+  const env = loadEnv(mode, process.cwd(), '');
 
   const isProduction = mode === 'production';
 
@@ -66,8 +66,8 @@ export default defineConfig(({ mode }) => {
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.env.VITE_APP_VERSION': JSON.stringify(process.env.npm_package_version),
       'import.meta.env.VITE_BUILD_DATE': JSON.stringify(new Date().toISOString()),
-      // E2Eテスト用フラグ（CI環境でのみtrue、本番デプロイではfalse）
-      'import.meta.env.VITE_E2E_TEST': process.env.VITE_E2E_TEST ? '"true"' : '""',
+      // E2Eテスト用フラグ（環境変数またはenvファイルから読み込み）
+      'import.meta.env.VITE_E2E_TEST': JSON.stringify(process.env.VITE_E2E_TEST || env.VITE_E2E_TEST || ''),
     },
     // Dependency optimization
     optimizeDeps: {

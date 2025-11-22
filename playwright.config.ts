@@ -137,12 +137,12 @@ export default defineConfig({
       ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: process.env.CI
-      ? 'npm run preview -- --port 3000'  // CI: ビルド済み成果物を port 3000 で起動
-      : 'npm run dev',  // ローカル: 開発サーバー
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: process.env.CI ? 30000 : 120000,  // CI: 30秒、ローカル: 2分
-  },
+  webServer: process.env.CI
+    ? undefined  // CI: 外部で起動済みの開発サーバーを使用
+    : {
+        command: 'npm run dev',  // ローカル: 開発サーバー
+        url: 'http://localhost:3000',
+        reuseExistingServer: true,
+        timeout: 120000,  // 2分
+      },
 });
