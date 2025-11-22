@@ -16,6 +16,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **作業終了時**: コミット → push → PR作成の3ステップを必ず実施
 - 📄 **詳細**: `ai-rules/COMMIT_AND_PR_GUIDELINES.md`
 
+### Git Worktree（並行作業時）
+
+複数のIssueを同時作業する場合、git worktreeを使用：
+
+```bash
+# worktree作成
+git worktree add ../bite-note-worktrees/issue-XXX -b feat-issue-XXX-description
+
+# worktreeに移動
+cd ../bite-note-worktrees/issue-XXX
+npm install
+code .
+```
+
+**重要ポイント**:
+- **1 worktree = 1 Claude Codeセッション**: 各worktreeで独立したセッション起動
+- **ブランチ確認**: `git branch --show-current` で現在のブランチ確認
+- **最大3 worktree推奨**: ディスク容量・メモリ考慮
+- 📄 **詳細**: `ai-rules/GIT_WORKTREE_GUIDELINES.md`
+
 ### Issue駆動開発フロー
 
 - **Issue作成**: タスク粒度（2-6時間、1-5ファイル）を確認
