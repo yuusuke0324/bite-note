@@ -42,7 +42,17 @@ export async function createTestFishingRecord(
 
   // 記録登録タブに移動
   await page.click('[data-testid="nav-form"]');
-  await page.waitForSelector(`[data-testid="${TestIds.LOCATION_NAME}"]`, { state: 'visible' });
+
+  // タブが選択されたことを確認
+  await page.waitForSelector('[data-testid="nav-form"][aria-selected="true"]', { state: 'visible' });
+
+  // すべての主要フォームフィールドが表示されるまで待機
+  await Promise.all([
+    page.waitForSelector(`[data-testid="${TestIds.LOCATION_NAME}"]`, { state: 'visible' }),
+    page.waitForSelector(`[data-testid="${TestIds.LATITUDE}"]`, { state: 'visible' }),
+    page.waitForSelector(`[data-testid="${TestIds.LONGITUDE}"]`, { state: 'visible' }),
+    page.waitForSelector(`[data-testid="${TestIds.FISHING_DATE}"]`, { state: 'visible' }),
+  ]);
 
   // フォーム入力
   await page.fill(`[data-testid="${TestIds.LOCATION_NAME}"]`, testRecord.location);
