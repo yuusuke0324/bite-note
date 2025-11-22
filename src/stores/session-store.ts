@@ -124,7 +124,8 @@ export const useSessionStore = create<SessionStore>()(
 
         // E2Eテスト用フラグリセット
         if (typeof window !== 'undefined' &&
-            (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
+            (import.meta.env.MODE !== 'production' ||
+             import.meta.env.VITE_E2E_TEST === 'true')) {
           window.sessionServiceStarted = false;
         }
       },
@@ -360,7 +361,8 @@ export const selectUnsavedDataCount = (state: SessionStore) => state.unsavedData
 // - CI E2Eテスト（VITE_E2E_TEST=true、production buildでも露出）
 // 本番デプロイでは露出しない
 if (typeof window !== 'undefined' &&
-    (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
+    (import.meta.env.MODE !== 'production' ||
+     import.meta.env.VITE_E2E_TEST === 'true')) {
   window.__sessionStore = useSessionStore;
 
   // デバッグ用: グローバル露出を確認

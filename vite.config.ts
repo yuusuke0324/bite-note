@@ -66,6 +66,8 @@ export default defineConfig(({ mode }) => {
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.env.VITE_APP_VERSION': JSON.stringify(process.env.npm_package_version),
       'import.meta.env.VITE_BUILD_DATE': JSON.stringify(new Date().toISOString()),
+      // E2Eテスト用フラグ（CI環境でのみtrue、本番デプロイではfalse）
+      'import.meta.env.VITE_E2E_TEST': process.env.VITE_E2E_TEST ? '"true"' : '""',
     },
     // Dependency optimization
     optimizeDeps: {
