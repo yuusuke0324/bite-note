@@ -103,9 +103,14 @@ export const useSessionStore = create<SessionStore>()(
         // - テストモード（MODE=test）
         // - CI E2Eテスト（VITE_E2E_TEST=true、production buildでも露出）
         // 本番デプロイでは露出しない
+        // Object.definePropertyを使用してTree Shakingを回避
         if (typeof window !== 'undefined' &&
             (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
-          window.sessionServiceStarted = true;
+          Object.defineProperty(window, 'sessionServiceStarted', {
+            value: true,
+            writable: true,
+            configurable: true,
+          });
         }
       },
 
@@ -123,10 +128,15 @@ export const useSessionStore = create<SessionStore>()(
         }
 
         // E2Eテスト用フラグリセット
+        // Object.definePropertyで設定したプロパティを更新
         if (typeof window !== 'undefined' &&
             (import.meta.env.MODE !== 'production' ||
              import.meta.env.VITE_E2E_TEST === 'true')) {
-          window.sessionServiceStarted = false;
+          Object.defineProperty(window, 'sessionServiceStarted', {
+            value: false,
+            writable: true,
+            configurable: true,
+          });
         }
       },
 
