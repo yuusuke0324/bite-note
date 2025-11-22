@@ -349,4 +349,99 @@ EOF
 
 ---
 
+## 9. 並行作業時（Git Worktree使用時）
+
+複数のIssueを同時に作業する場合、git worktreeを使用します。
+
+### 並行作業の基本フロー
+
+```
+Issue A（worktree-A）          Issue B（worktree-B）
+    ↓                              ↓
+task-coordinator相談          task-coordinator相談
+    ↓                              ↓
+worktree-A作成                worktree-B作成
+    ↓                              ↓
+実装 + レビュー                実装 + レビュー
+    ↓                              ↓
+PR作成（独立）                 PR作成（独立）
+```
+
+### worktree作成時のIssue管理
+
+```bash
+# Issue A用worktree作成
+git worktree add ../bite-note-worktrees/issue-208 -b feat-issue-208-icon-library-foundation
+
+# WIPラベル付与・セルフアサイン
+gh issue edit 208 --add-label "status:wip"
+gh issue edit 208 --add-assignee @me
+
+# Issue B用worktree作成（並行作業）
+git worktree add ../bite-note-worktrees/issue-209 -b feat-issue-209-another-feature
+
+# WIPラベル付与・セルフアサイン
+gh issue edit 209 --add-label "status:wip"
+gh issue edit 209 --add-assignee @me
+```
+
+### 複数セッション管理
+
+- **VSCode Window 1**: `~/dev/personal/fish/bite-note-worktrees/issue-208`
+  - Claude Codeセッション1（Issue 208専用）
+  - designer → tech-lead → qa-engineer レビュー
+
+- **VSCode Window 2**: `~/dev/personal/fish/bite-note-worktrees/issue-209`
+  - Claude Codeセッション2（Issue 209専用）
+  - tech-lead → qa-engineer レビュー
+
+### 並行作業時のエージェント活用
+
+- **各セッションで独立したエージェント呼び出し**: 混乱を避けるため
+- **エージェントレビュー結果の整理**: Issue番号を明示
+- **複数タスクの進捗管理**: Session Notesを各Issueで管理
+
+### Git作業（並行実行可能）
+
+```bash
+# worktree-A でコミット・push（Window 1）
+cd ~/dev/personal/fish/bite-note-worktrees/issue-208
+git add .
+git commit -m "feat(ui): add icon library foundation"
+git push origin feat-issue-208-icon-library-foundation
+
+# worktree-B でコミット・push（Window 2、同時実行可能）
+cd ~/dev/personal/fish/bite-note-worktrees/issue-209
+git add .
+git commit -m "feat(data): add data validation"
+git push origin feat-issue-209-another-feature
+```
+
+### CI確認（並行作業時）
+
+```bash
+# worktree-A のPR作成後、CI確認（Window 1）
+cd ~/dev/personal/fish/bite-note-worktrees/issue-208
+gh pr checks
+
+# worktree-B のPR作成後、CI確認（Window 2）
+cd ~/dev/personal/fish/bite-note-worktrees/issue-209
+gh pr checks
+
+# 両方のCIが成功したことを確認してから、ユーザーに完了報告
+```
+
+**重要**: 並行作業時も、各PRごとに必ずCI確認を実施してから完了報告すること
+
+### 注意点
+
+- **ブランチ確認**: 各worktreeで `git branch --show-current` を実行し、正しいブランチで作業していることを確認
+- **working directory確認**: Claude Codeセッション開始時に、正しいworktreeであることを確認
+- **1 worktree = 1 Claude Codeセッション**: 混乱を避けるため、各worktreeで独立したセッション起動
+- **最大3 worktree推奨**: ディスク容量・メモリ考慮
+
+**詳細**: `ai-rules/GIT_WORKTREE_GUIDELINES.md` を参照
+
+---
+
 **ヒント**: タスクの種類が不明確な場合は、`task-coordinator` エージェントに相談して、適切なサイクルを提案してもらってください。

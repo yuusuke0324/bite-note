@@ -40,6 +40,53 @@ chore-issue-12-deps-update         # Issue #12: 依存関係更新
 
 ---
 
+## 🌲 Git Worktree使用時の補足
+
+### worktree使用時のブランチ作成
+
+複数タスクを並行作業する場合、git worktreeを使用します。
+
+```bash
+# mainブランチで最新コード取得
+git checkout main
+git pull origin main
+
+# worktree作成（新規ブランチと同時作成）
+git worktree add ../bite-note-worktrees/issue-XXX -b feat-issue-XXX-description
+
+# worktreeに移動
+cd ../bite-note-worktrees/issue-XXX
+
+# 依存関係インストール
+npm install
+
+# VSCode起動
+code .
+```
+
+### worktree削除（タスク完了後）
+
+```bash
+# メインリポジトリに移動
+cd ~/dev/personal/fish/bite-note
+
+# worktree削除
+git worktree remove ../bite-note-worktrees/issue-XXX
+
+# ブランチ削除（オプション）
+git branch -d feat-issue-XXX-description
+```
+
+### 並行作業時の注意点
+
+- **各worktreeは独立**: コミット・pushは並行実行可能
+- **ブランチ確認**: `git branch --show-current` で現在のブランチ確認
+- **Claude Codeセッション**: 1 worktree = 1 Claude Codeセッション推奨
+
+**詳細**: `ai-rules/GIT_WORKTREE_GUIDELINES.md` を参照
+
+---
+
 ## 💬 コミットメッセージ規約
 
 ### Conventional Commits形式を採用
