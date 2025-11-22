@@ -304,6 +304,7 @@ git branch --show-current
 - [ ] 型チェックがパスしている（`npm run typecheck`）
 - [ ] 設計書を更新している（該当する場合）
 - [ ] コミット・push・PR作成が完了している
+- [ ] **PRマージ後はworktreeを削除している**（`git worktree remove`）※ worktree使用時のみ
 
 ### タスク種別ごとの追加条件
 

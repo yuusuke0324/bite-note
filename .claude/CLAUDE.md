@@ -42,6 +42,7 @@ code .
 - **1 worktree = 1 Claude Codeセッション**: 各worktreeで独立したセッション起動
 - **ブランチ確認**: `git branch --show-current` で現在のブランチ確認
 - **最大3 worktree推奨**: ディスク容量・メモリ考慮
+- **削除必須**: PRマージ後は必ず`git worktree remove`でworktreeを削除（ディスク容量節約）
 - 📄 **詳細**: `ai-rules/GIT_WORKTREE_GUIDELINES.md`
 
 ### Issue駆動開発フロー
@@ -50,7 +51,7 @@ code .
 - **作業開始時**: 上記「Git作業フロー」の判断に従いブランチ作成、WIPラベル付与、セルフアサイン
 - **作業中**: Session Notes更新、Files to Edit実績更新
 - **PR作成時**: `Closes #番号` でIssueとリンク
-- **マージ後**: Issue自動クローズ
+- **マージ後**: Issue自動クローズ、**worktree削除**（使用時は必須）
 - 📄 **詳細**: `ai-rules/TASK_CYCLES.md` セクション8
 
 ### 専門エージェント活用
