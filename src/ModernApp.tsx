@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppStore, selectError, selectRecords, selectSettings, selectActions } from './stores/app-store';
+import { useSessionStore } from './stores/session-store';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 
 // モダンコンポーネント
@@ -186,6 +187,7 @@ function ModernApp() {
   const records = useAppStore(selectRecords);
   const settings = useAppStore(selectSettings);
   const appActions = useAppStore(selectActions);
+  const sessionActions = useSessionStore((state) => state.actions);
   // const formData = useFormStore(selectFormData);
   // const validation = useFormStore(selectValidation);
   // const formActions = useFormStore(selectFormActions);
@@ -216,6 +218,20 @@ function ModernApp() {
     };
     initializeApp();
   }, [appActions]);
+
+  // セッション管理の初期化
+  useEffect(() => {
+    // ストレージモードの初期化
+    sessionActions.initializeStorageMode();
+
+    // セッション管理を開始
+    sessionActions.startSession();
+
+    // クリーンアップ
+    return () => {
+      sessionActions.stopSession();
+    };
+  }, [sessionActions]);
 
   // 詳細モーダルの写真読み込み
   useEffect(() => {
