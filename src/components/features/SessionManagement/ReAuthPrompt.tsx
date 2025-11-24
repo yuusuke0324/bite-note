@@ -113,37 +113,6 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
         onClick={(e) => e.stopPropagation()}
         data-testid={TestIds.REAUTH_PROMPT}
       >
-        {/* 閉じるボタン */}
-        {onClose && (
-          <button
-            type="button"
-            aria-label="閉じる"
-            onClick={handleCloseClick}
-            disabled={isReconnecting}
-            data-testid={TestIds.SESSION_MODAL_CLOSE_BUTTON}
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              right: '1rem',
-              width: '44px',
-              height: '44px',
-              backgroundColor: 'transparent',
-              border: 'none',
-              borderRadius: '50%',
-              cursor: isReconnecting ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.5rem',
-              color: '#6c757d',
-              opacity: isReconnecting ? 0.5 : 1,
-              transition: 'all 0.15s ease',
-            }}
-          >
-            ×
-          </button>
-        )}
-
         {/* ヘッダー */}
         <div
           style={{
@@ -282,6 +251,39 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
             今すぐエクスポート
           </button>
         </div>
+
+        {/* 閉じるボタン */}
+        {onClose && (
+          <button
+            type="button"
+            aria-label="閉じる"
+            onClick={handleCloseClick}
+            disabled={isReconnecting}
+            data-testid={TestIds.SESSION_MODAL_CLOSE_BUTTON}
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              width: '44px',
+              height: '44px',
+              minWidth: '44px',
+              minHeight: '44px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '50%',
+              cursor: isReconnecting ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              color: '#6c757d',
+              opacity: isReconnecting ? 0.5 : 1,
+              transition: 'all 0.15s ease',
+            }}
+          >
+            ×
+          </button>
+        )}
       </div>
 
       {/* CSS アニメーション */}
