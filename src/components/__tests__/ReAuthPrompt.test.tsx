@@ -14,7 +14,7 @@
 
 import React from 'react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ReAuthPrompt } from '../features/SessionManagement/ReAuthPrompt';
@@ -72,7 +72,7 @@ describe('ReAuthPrompt', () => {
         isReconnecting = true;
       });
 
-      const { rerender } = render(
+      const result = render(
         <ReAuthPrompt
           unsavedCount={0}
           onReconnect={onReconnect}
@@ -81,7 +81,7 @@ describe('ReAuthPrompt', () => {
         />
       );
 
-      const reconnectButton = await screen.findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
+      const reconnectButton = await within(result.container).findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
       expect(reconnectButton).not.toBeDisabled();
 
       // 1回目のクリック
@@ -89,7 +89,7 @@ describe('ReAuthPrompt', () => {
       expect(onReconnect).toHaveBeenCalledTimes(1);
 
       // 親コンポーネントが状態を更新する想定でrerender
-      rerender(
+      result.rerender(
         <ReAuthPrompt
           unsavedCount={0}
           onReconnect={onReconnect}
@@ -110,25 +110,25 @@ describe('ReAuthPrompt', () => {
     });
 
     it('[TC-SM-011] エクスポートボタンが無効化されること', async () => {
-      renderReAuthPrompt(true);
+      const result = renderReAuthPrompt(true);
 
-      const exportButton = await screen.findByTestId(TestIds.EXPORT_NOW_BUTTON);
+      const exportButton = await within(result.container).findByTestId(TestIds.EXPORT_NOW_BUTTON);
       expect(exportButton).toBeDisabled();
     });
 
     it('[TC-SM-012] 閉じるボタンが無効化されること', async () => {
-      renderReAuthPrompt(true);
+      const result = renderReAuthPrompt(true);
 
-      const closeButton = await screen.findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
+      const closeButton = await within(result.container).findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
       expect(closeButton).toBeDisabled();
     });
 
     it('[TC-SM-014] 再接続中は3つのボタンすべてが同時に無効化されること', async () => {
-      renderReAuthPrompt(true);
+      const result = renderReAuthPrompt(true);
 
-      const reconnectButton = await screen.findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
-      const exportButton = await screen.findByTestId(TestIds.EXPORT_NOW_BUTTON);
-      const closeButton = await screen.findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
+      const reconnectButton = await within(result.container).findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
+      const exportButton = await within(result.container).findByTestId(TestIds.EXPORT_NOW_BUTTON);
+      const closeButton = await within(result.container).findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
 
       expect(reconnectButton).toBeDisabled();
       expect(exportButton).toBeDisabled();
@@ -139,7 +139,7 @@ describe('ReAuthPrompt', () => {
       const user = userEvent.setup();
       const onReconnect = vi.fn();
 
-      render(
+      const result = render(
         <ReAuthPrompt
           unsavedCount={0}
           onReconnect={onReconnect}
@@ -148,7 +148,7 @@ describe('ReAuthPrompt', () => {
         />
       );
 
-      const reconnectButton = await screen.findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
+      const reconnectButton = await within(result.container).findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
       expect(reconnectButton).toBeDisabled();
 
       // 無効化されたボタンをクリック
@@ -162,7 +162,7 @@ describe('ReAuthPrompt', () => {
       const user = userEvent.setup();
       const onExport = vi.fn();
 
-      render(
+      const result = render(
         <ReAuthPrompt
           unsavedCount={0}
           onReconnect={vi.fn()}
@@ -171,7 +171,7 @@ describe('ReAuthPrompt', () => {
         />
       );
 
-      const exportButton = await screen.findByTestId(TestIds.EXPORT_NOW_BUTTON);
+      const exportButton = await within(result.container).findByTestId(TestIds.EXPORT_NOW_BUTTON);
       await user.click(exportButton);
 
       expect(onExport).not.toHaveBeenCalled();
@@ -181,7 +181,7 @@ describe('ReAuthPrompt', () => {
       const user = userEvent.setup();
       const onClose = vi.fn();
 
-      render(
+      const result = render(
         <ReAuthPrompt
           unsavedCount={0}
           onReconnect={vi.fn()}
@@ -191,7 +191,7 @@ describe('ReAuthPrompt', () => {
         />
       );
 
-      const closeButton = await screen.findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
+      const closeButton = await within(result.container).findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
       await user.click(closeButton);
 
       expect(onClose).not.toHaveBeenCalled();
@@ -200,7 +200,7 @@ describe('ReAuthPrompt', () => {
 
   describe('再接続完了後（isReconnecting=false）', () => {
     it('[TC-SM-013] 再接続完了後、すべてのボタンが再度有効化されること', async () => {
-      const { rerender } = render(
+      const result = render(
         <ReAuthPrompt
           unsavedCount={0}
           onReconnect={vi.fn()}
@@ -210,16 +210,16 @@ describe('ReAuthPrompt', () => {
         />
       );
 
-      const reconnectButton = await screen.findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
-      const exportButton = await screen.findByTestId(TestIds.EXPORT_NOW_BUTTON);
-      const closeButton = await screen.findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
+      const reconnectButton = await within(result.container).findByTestId(TestIds.RECONNECT_AND_SAVE_BUTTON);
+      const exportButton = await within(result.container).findByTestId(TestIds.EXPORT_NOW_BUTTON);
+      const closeButton = await within(result.container).findByTestId(TestIds.SESSION_MODAL_CLOSE_BUTTON);
 
       expect(reconnectButton).toBeDisabled();
       expect(exportButton).toBeDisabled();
       expect(closeButton).toBeDisabled();
 
       // 再接続完了
-      rerender(
+      result.rerender(
         <ReAuthPrompt
           unsavedCount={0}
           onReconnect={vi.fn()}
