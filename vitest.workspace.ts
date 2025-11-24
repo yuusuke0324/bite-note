@@ -30,6 +30,7 @@ export default defineWorkspace([
         'src/components/__tests__/ErrorBoundary.test.tsx',
         'src/components/__tests__/FeedbackToast.test.tsx', // Phase 3-3追加
         'src/components/common/__tests__/OfflineIndicator.test.tsx', // Phase 3-3追加
+        'src/components/__tests__/ReAuthPrompt.test.tsx', // Issue #216追加
         // TODO: 将来のIssueでTASK-203実装後に有効化（TideTooltipテストが15分タイムアウトする問題あり）
         // 'src/components/__tests__/TideTooltip.test.tsx',
       ],
