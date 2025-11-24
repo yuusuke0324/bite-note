@@ -99,13 +99,11 @@ export const useSessionStore = create<SessionStore>()(
         }
 
         // E2Eテスト用フラグ設定
-        // - 開発モード（MODE=development）
-        // - テストモード（MODE=test）
-        // - CI E2Eテスト（VITE_E2E_TEST=true、production buildでも露出）
-        // 本番デプロイでは露出しない
+        // main.tsxで事前に初期化されたフラグをtrueに更新
+        // Production環境でもE2Eテストのために実行（パフォーマンス影響は微小）
         // Object.definePropertyを使用してTree Shakingを回避
-        if (typeof window !== 'undefined' &&
-            (import.meta.env.MODE !== 'production' || import.meta.env.VITE_E2E_TEST === 'true')) {
+        // Note: main.tsxで window.sessionServiceStarted = false が設定済み
+        if (typeof window !== 'undefined') {
           Object.defineProperty(window, 'sessionServiceStarted', {
             value: true,
             writable: true,
@@ -129,9 +127,8 @@ export const useSessionStore = create<SessionStore>()(
 
         // E2Eテスト用フラグリセット
         // Object.definePropertyで設定したプロパティを更新
-        if (typeof window !== 'undefined' &&
-            (import.meta.env.MODE !== 'production' ||
-             import.meta.env.VITE_E2E_TEST === 'true')) {
+        // Production環境でもE2Eテストのために実行（パフォーマンス影響は微小）
+        if (typeof window !== 'undefined') {
           Object.defineProperty(window, 'sessionServiceStarted', {
             value: false,
             writable: true,
@@ -366,22 +363,13 @@ export const selectIsSessionExpiredModalOpen = (state: SessionStore) =>
 export const selectUnsavedDataCount = (state: SessionStore) => state.unsavedDataCount;
 
 // E2Eテスト用のグローバルアクセス
-// - 開発モード（MODE=development）
-// - テストモード（MODE=test）
-// - CI E2Eテスト（VITE_E2E_TEST=true、production buildでも露出）
-// 本番デプロイでは露出しない
-if (typeof window !== 'undefined' &&
-    (import.meta.env.MODE !== 'production' ||
-     import.meta.env.VITE_E2E_TEST === 'true')) {
+// Production環境でもE2Eテストのために露出（パフォーマンス影響は微小）
+// Note: main.tsxで window.sessionServiceStarted = false が既に設定済み
+if (typeof window !== 'undefined') {
   window.__sessionStore = useSessionStore;
 
   // デバッグ用: グローバル露出を確認
   if (import.meta.env.DEV) {
     console.log('[SessionStore] Exposed to window.__sessionStore');
-  }
-
-  // E2Eテスト用: セッション管理が開始されたフラグ（初期値false）
-  if (window.sessionServiceStarted === undefined) {
-    window.sessionServiceStarted = false;
   }
 }
