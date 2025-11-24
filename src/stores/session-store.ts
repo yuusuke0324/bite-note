@@ -202,14 +202,14 @@ export const useSessionStore = create<SessionStore>()(
           console.warn('[SessionStore] Session expired - BEFORE set');
         }
 
-        // 未保存データ数を取得（実装は後で）
-        const unsavedCount = 0; // TODO: 実際の未保存データ数を取得
+        // 現在の未保存データ数を保持（テストやアプリケーションで事前に設定されている可能性がある）
+        const currentUnsavedCount = get().unsavedDataCount;
 
         // 状態を一度にまとめて更新（Zustandの非同期バッチ処理を回避）
         set({
           sessionStatus: 'expired',
           isSessionExpiredModalOpen: true,
-          unsavedDataCount: unsavedCount,
+          unsavedDataCount: currentUnsavedCount,
         });
 
         if (import.meta.env.DEV) {

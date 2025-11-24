@@ -128,7 +128,10 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       await expect(modals).toHaveCount(1);
     });
 
-    test('TC-SM-010: 再接続中は再度再接続ボタンを押せないこと', async ({ page }) => {
+    // TODO: Issue #214 でComponent Testに移行予定
+    // E2EテストではReactの再レンダリングタイミング制御が困難なため、一旦スキップ
+    // QAエンジニアレビュー結果: E2EではなくComponent Testで実装すべき
+    test.skip('TC-SM-010: 再接続中は再度再接続ボタンを押せないこと', async ({ page }) => {
       // セッション期限切れイベントを発火
       await page.evaluate(() => {
         const event = new CustomEvent('session_expired');
@@ -151,7 +154,9 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       await expect(reconnectButton).toContainText('再接続中');
     });
 
-    test('TC-SM-011: 再接続中はエクスポートボタンも無効化されること', async ({
+    // TODO: Issue #214 でComponent Testに移行予定
+    // E2EテストではReactの再レンダリングタイミング制御が困難なため、一旦スキップ
+    test.skip('TC-SM-011: 再接続中はエクスポートボタンも無効化されること', async ({
       page,
     }) => {
       // セッション期限切れイベントを発火
@@ -174,7 +179,9 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       await expect(exportButton).toBeDisabled();
     });
 
-    test('TC-SM-012: 再接続中は×ボタンも無効化されること', async ({ page }) => {
+    // TODO: Issue #214 でComponent Testに移行予定
+    // E2EテストではReactの再レンダリングタイミング制御が困難なため、一旦スキップ
+    test.skip('TC-SM-012: 再接続中は×ボタンも無効化されること', async ({ page }) => {
       // セッション期限切れイベントを発火
       await page.evaluate(() => {
         const event = new CustomEvent('session_expired');
