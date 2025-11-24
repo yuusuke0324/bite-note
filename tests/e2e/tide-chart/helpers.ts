@@ -137,18 +137,40 @@ export class TideChartPage {
     await expect(toggleButton).toBeVisible();
     await toggleButton.click();
 
-    // Step 6: グラフの表示を待つ（潮汐API計算完了を待機）
-    await this.page.waitForSelector('[data-testid="tide-chart"]', {
-      state: 'visible',
-      timeout: 30000  // 潮汐計算 + 記録作成に時間がかかる可能性がある
-    });
-
-    // チャートの表示を待機（アニメーション完了）
-    await this.page.waitForTimeout(1000);
+    // Step 6: グラフの完全なロードを待つ（waitForChart()を使用）
+    await this.waitForChart();
   }
 
+  /**
+   * 潮汐グラフの完全なロードを待機
+   *
+   * 段階的待機戦略:
+   * 1. tide-chartの表示を待つ
+   * 2. Rechartsのレンダリング完了を待つ（recharts-lineの存在確認）
+   * 3. 最低1つのデータポイントが表示されることを確認
+   */
   async waitForChart() {
-    await this.page.waitForSelector('[data-testid="tide-chart"]', { timeout: 10000 });
+    // 1. tide-chartの表示を待つ
+    await this.page.waitForSelector('[data-testid="tide-chart"]', {
+      state: 'visible',
+      timeout: 15000
+    });
+
+    // 2. Rechartsのレンダリング完了を待つ（recharts-lineの存在確認）
+    await this.page.waitForSelector(
+      '[data-testid="tide-graph-canvas"] .recharts-line',
+      {
+        state: 'attached',
+        timeout: 15000
+      }
+    );
+
+    // 3. 最低1つのデータポイントが表示されることを確認（スコープ限定版）
+    // データポイントの数を確認して、実際にレンダリングされていることを検証
+    await this.page.waitForFunction(() => {
+      const dataPoints = document.querySelectorAll('[data-testid="tide-chart"] [data-testid^="data-point-"]');
+      return dataPoints.length > 0;
+    }, { timeout: 10000 });
   }
 
   getChartElement() {
@@ -196,7 +218,8 @@ export class TideChartPage {
   async expectChartRendered() {
     await this.expectVisible();
     await expect(this.page.locator('[role="img"]')).toBeVisible();
-    await expect(this.page.locator('.recharts-line').first()).toBeVisible();
+    // .recharts-lineはvisibility:hiddenの場合があるので、attachedで確認
+    await expect(this.page.locator('.recharts-line').first()).toBeAttached();
   }
 
   async expectAxisLabelsVisible() {
@@ -220,13 +243,13 @@ export class TideChartPage {
    * チャートのデータポイント要素を取得
    *
    * Note:
-   * - Rechartsライブラリのクラス名に依存（recharts@2.x）
-   * - ライブラリアップデート時に動作確認が必要
-   * - DOM構造: .recharts-line > .recharts-layer.recharts-line-dots > .recharts-dot
+   * - カスタムDataPointコンポーネントのdata-testidに依存
+   * - TideChartスコープ内に限定して誤検知を防止
+   * - セレクタ: [data-testid="tide-chart"] [data-testid^="data-point-"]
    */
   getDataPoints() {
-    // .recharts-line-dots クラスは .recharts-layer と共存するため、.recharts-dot のみで取得
-    return this.page.locator('[data-testid="tide-chart"] .recharts-dot');
+    // TideChartスコープ内に限定（他のチャートコンポーネントとの衝突を防止）
+    return this.page.locator('[data-testid="tide-chart"] [data-testid^="data-point-"]');
   }
 
   /**
@@ -537,7 +560,7 @@ export async function setupCleanPage(page: Page) {
 
   // ブラウザコンテキストにDB名を注入（ページロード前）
   await page.addInitScript((dbName) => {
-    globalThis.__TEST_DB_NAME__ = dbName;
+    (globalThis as any).__TEST_DB_NAME__ = dbName;
   }, testDbName);
 
   // ページアクセス（IndexedDB削除不要 → 高速化）
