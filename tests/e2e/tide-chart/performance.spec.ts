@@ -20,7 +20,7 @@ test.describe('TC-E004: パフォーマンステスト群', () => {
   const thresholds = {
     resize: isCI ? 1000 : 100, // 500 → 1000ms (actual: 943ms in main, Run #19560050171)
     orientationChange: isCI ? 1000 : 200, // 600 → 1000ms (actual: 942ms in main, Run #19560050171)
-    scrollTime: isCI ? 250 : 50, // 100 → 250ms (actual: 199.7ms avg in CI)
+    scrollTime: isCI ? 250 : 100, // Issue #217: 50ms → 100ms (実測値: 93.7ms)
     longTaskDuration: isCI ? 100 : 50,
     // 緊急措置: mainブランチ安定化のため閾値を一時調整
     // Issue #187で根本原因調査を実施（目標: 600ms以下に戻す）
