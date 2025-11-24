@@ -12,9 +12,12 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     build: {
       target: 'esnext',
-      minify: isProduction ? 'terser' : false,
+      // E2Eテスト時はminifyを無効化（副作用を保持）
+      minify: (isProduction && process.env.VITE_E2E_TEST !== 'true') ? 'terser' : false,
       sourcemap: !isProduction,
       rollupOptions: {
+        // Tree Shaking設定: E2Eテスト時は無効化（副作用を保持）
+        treeshake: process.env.VITE_E2E_TEST === 'true' ? false : true,
         output: {
           manualChunks: {
             vendor: ['react', 'react-dom'],
@@ -43,7 +46,8 @@ export default defineConfig(({ mode }) => {
       // Terser options for production
       terserOptions: isProduction ? {
         compress: {
-          drop_console: true,
+          // E2Eテスト時はconsoleを残す（Tree Shaking回避のため）
+          drop_console: process.env.VITE_E2E_TEST === 'true' ? false : true,
           drop_debugger: true,
         },
       } : undefined,
