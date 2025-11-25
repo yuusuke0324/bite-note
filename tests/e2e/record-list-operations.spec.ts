@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { waitForAppInit } from './helpers/test-helpers';
 
 test.describe('釣果記録一覧操作', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForAppInit(page);
+    await page.goto('/');
+
+    // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
+    // waitForAppInitはHOME_TAB待機のため、正常系フローのみで使用
+    await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 
     // テストデータを事前に作成（モックまたは実際のデータ作成）
     await page.evaluate(() => {
