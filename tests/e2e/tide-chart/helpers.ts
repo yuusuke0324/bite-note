@@ -71,9 +71,20 @@ async function createTestRecord(page: Page) {
     });
   });
 
-  // ページをリロードしてデータを反映
-  await page.reload();
-  await page.waitForTimeout(1500); // IndexedDB読み込み + レンダリング完了待機
+  // ページをリロードしてデータを反映 + 初期化待機
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  // App.tsx初期化完了を待機
+  await page.waitForSelector('body[data-app-initialized="true"]', {
+    timeout: 25000,
+    state: 'attached'
+  });
+
+  // UIが表示されるまで待機
+  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+    timeout: 5000,
+    state: 'visible'
+  });
 }
 
 // Test Data Sets
@@ -113,9 +124,20 @@ export class TideChartPage {
    * 5. グラフの表示を待つ（潮汐API計算完了を待機）
    */
   async goto() {
-    // Step 1: ホーム画面に移動
-    await this.page.goto('/');
-    await this.page.waitForTimeout(1000); // IndexedDB初期化待機
+    // Step 1: ホーム画面に移動 + アプリ初期化待機
+    await this.page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // App.tsx初期化完了を待機
+    await this.page.waitForSelector('body[data-app-initialized="true"]', {
+      timeout: 25000,
+      state: 'attached'
+    });
+
+    // UIが表示されるまで待機
+    await this.page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+      timeout: 5000,
+      state: 'visible'
+    });
 
     // Step 2: 記録が存在しない場合は自動作成
     const recordCount = await this.page.locator('[data-testid^="record-"]').count();

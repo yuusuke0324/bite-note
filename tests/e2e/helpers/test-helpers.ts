@@ -40,11 +40,21 @@ export async function createTestFishingRecord(
 ): Promise<void> {
   const testRecord = { ...defaultTestRecord, ...record };
 
+  // フォームタブが存在し、操作可能であることを事前確認
+  const formTabSelector = `[data-testid="${TestIds.FORM_TAB}"]`;
+  await page.waitForSelector(formTabSelector, {
+    state: 'visible',
+    timeout: 10000
+  });
+
   // 記録登録タブに移動
-  await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
+  await page.click(formTabSelector);
 
   // タブが選択されたことを確認
-  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"][aria-selected="true"]`, { state: 'visible' });
+  await page.waitForSelector(`${formTabSelector}[aria-selected="true"]`, {
+    state: 'visible',
+    timeout: 5000
+  });
 
   // すべての主要フォームフィールドが表示されるまで待機
   await Promise.all([
