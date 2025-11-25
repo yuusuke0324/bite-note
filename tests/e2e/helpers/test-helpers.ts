@@ -8,6 +8,8 @@ import { TestIds } from '../../../src/constants/testIds';
 /**
  * アプリケーション初期化待機
  * App.tsxの初期化と基本UIの表示を確実に待機する
+ *
+ * 注意: ModernAppの初期タブは'home'なので、HOME_TABを待機する
  */
 export async function waitForAppInit(page: Page): Promise<void> {
   // App.tsx初期化完了を待機
@@ -16,8 +18,9 @@ export async function waitForAppInit(page: Page): Promise<void> {
     state: 'attached'
   });
 
-  // UIが表示されるまで待機（CI環境では遅い場合があるため20秒）
-  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+  // 初期表示される要素（home-tab）を待機
+  // ModernAppの初期タブは'home'なので、form-tabではなくhome-tabを待つ
+  await page.waitForSelector(`[data-testid="${TestIds.HOME_TAB}"]`, {
     timeout: 20000,
     state: 'visible'
   });

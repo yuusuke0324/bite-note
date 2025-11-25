@@ -570,7 +570,7 @@ export async function setupCleanPage(page: Page) {
   // 共通の初期化待機関数を使用
   await waitForAppInit(page);
 
-  // タブUIが操作可能か確認
-  const formTab = page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
-  await expect(formTab).toBeEnabled();
+  // タブUIが操作可能か確認（初期表示はhome-tab）
+  const homeTab = page.locator(`[data-testid="${TestIds.HOME_TAB}"]`);
+  await expect(homeTab).toBeEnabled();
 }
