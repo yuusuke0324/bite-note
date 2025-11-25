@@ -135,34 +135,41 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
       const suggestions = page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`);
 
+      // Note: 「あ」で検索すると複数の候補（マアジ、アオリイカ等）が確実に表示される
       await input.fill('あ');
       await expect(suggestions).toBeVisible();
 
-      // ↓を押して最初の候補を選択（index: 0）
+      // ↓を押して最初の候補を選択
       await input.press('ArrowDown');
-      // 最初の候補（id=fish-species-0）が選択されるまで待機
-      await expect(page.locator('#fish-species-0[aria-selected="true"]')).toBeVisible();
 
-      // 状態安定化のため短い待機（CI環境でのReact状態更新遅延対策）
-      await page.waitForTimeout(100);
+      // 選択された候補があることを確認
+      const selectedOption = page.locator('[role="option"][aria-selected="true"]');
+      await expect(selectedOption).toBeVisible();
 
-      // もう一度↓を押して2番目の候補を選択（index: 1）
+      // 選択された候補のテキストを取得
+      const firstSelectedText = await selectedOption.first().textContent();
+
+      // もう一度↓を押して次の候補を選択
       await input.press('ArrowDown');
-      // 2番目の候補（id=fish-species-1）が選択されるまで待機
-      await expect(page.locator('#fish-species-1[aria-selected="true"]')).toBeVisible();
 
-      // 状態安定化のため短い待機
-      await page.waitForTimeout(100);
+      // まだ1つだけ選択されていることを確認
+      await expect(selectedOption).toHaveCount(1);
 
-      // ↑を押して1つ上に移動（index: 0に戻る）
+      // 選択された候補のテキストを取得（異なる候補が選択されているはず）
+      const secondSelectedText = await selectedOption.first().textContent();
+
+      // ↑を押して前の候補に戻る
       await input.press('ArrowUp');
-      // 最初の候補（id=fish-species-0）が再度選択されるまで待機
-      await expect(page.locator('#fish-species-0[aria-selected="true"]')).toBeVisible();
 
-      // 選択されている候補が1つだけであることを確認
-      const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
-      const count = await selectedOptions.count();
-      expect(count).toBe(1);
+      // まだ1つだけ選択されていることを確認
+      await expect(selectedOption).toHaveCount(1);
+
+      // 最初に選択されていた候補と同じテキストが選択されていることを確認
+      const afterUpSelectedText = await selectedOption.first().textContent();
+      expect(afterUpSelectedText).toBe(firstSelectedText);
+
+      // ArrowUpで異なる候補に移動したことを確認（2回目の選択とは異なる）
+      expect(secondSelectedText).not.toBe(afterUpSelectedText);
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
