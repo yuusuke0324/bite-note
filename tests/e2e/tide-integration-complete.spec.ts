@@ -23,8 +23,8 @@ class TideSystemIntegrationHelper {
       state: 'attached'
     });
 
-    // UIが表示されるまで待機（BottomNavigationは nav-${id} パターンを使用）
-    await this.page.waitForSelector('[data-testid="nav-form"]', {
+    // UIが表示されるまで待機
+    await this.page.waitForSelector('[data-testid="form-tab"]', {
       timeout: 10000,
       state: 'visible'
     });

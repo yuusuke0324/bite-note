@@ -115,8 +115,8 @@ test.describe('TASK-301-008: レンダリング性能測定', () => {
       };
     });
 
-    // 記録一覧タブに移動（BottomNavigationは nav-${id} パターンを使用）
-    await page.click('[data-testid="nav-list"]');
+    // 記録一覧タブに移動
+    await page.click('[data-testid="list-tab"]');
     await createTestRecord(page);
     await page.click('[data-testid^="record-"]');
 
@@ -165,8 +165,8 @@ test.describe('TASK-301-009: メモリ使用量監視', () => {
     await page.evaluate(() => window.takeMemorySnapshot('after-page-load'));
 
     // When: 複数の釣果記録を連続表示
-    // 記録一覧タブに移動（BottomNavigationは nav-${id} パターンを使用）
-    await page.click('[data-testid="nav-list"]');
+    // 記録一覧タブに移動
+    await page.click('[data-testid="list-tab"]');
 
     for (let i = 0; i < 5; i++) {
       await createTestRecord(page, `test-record-${i}`);
@@ -238,8 +238,8 @@ test.describe('TASK-301-010: CI/CD統合パフォーマンステスト', () => {
     }
 
     // パフォーマンステストの実行
-    // 記録一覧タブに移動（BottomNavigationは nav-${id} パターンを使用）
-    await page.click('[data-testid="nav-list"]');
+    // 記録一覧タブに移動
+    await page.click('[data-testid="list-tab"]');
     await createTestRecord(page);
 
     const startTime = performance.now();
@@ -279,8 +279,8 @@ test.describe('TASK-301-010: CI/CD統合パフォーマンステスト', () => {
     });
 
     // パフォーマンステストの実行
-    // 記録一覧タブに移動（BottomNavigationは nav-${id} パターンを使用）
-    await page.click('[data-testid="nav-list"]');
+    // 記録一覧タブに移動
+    await page.click('[data-testid="list-tab"]');
     await createTestRecord(page);
     await page.click('[data-testid^="record-"]');
     await page.click('[data-testid="tide-graph-tab"]');

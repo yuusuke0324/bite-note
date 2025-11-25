@@ -8,8 +8,8 @@ test.describe('釣果記録作成フロー', () => {
     // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
     // waitForAppInitはHOME_TAB待機のため、正常系フローのみで使用
     await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
-    // 記録登録タブに移動（BottomNavigationは nav-${id} パターンを使用）
-    await page.click('[data-testid="nav-form"]');
+    // 記録登録タブに移動
+    await page.click('[data-testid="form-tab"]');
     // フォームが表示されるまで待機
     await page.waitForSelector('form', { state: 'visible' });
   });

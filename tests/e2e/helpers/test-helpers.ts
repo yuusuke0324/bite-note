@@ -29,8 +29,7 @@ export async function waitForAppInit(page: Page): Promise<void> {
   });
 
   // 初期表示されるナビゲーション要素を待機
-  // BottomNavigationは data-testid="nav-${id}" パターンを使用
-  await page.waitForSelector('[data-testid="nav-home"]', {
+  await page.waitForSelector('[data-testid="home-tab"]', {
     timeout: 20000,
     state: 'visible'
   });
@@ -72,8 +71,7 @@ export async function createTestFishingRecord(
   const testRecord = { ...defaultTestRecord, ...record };
 
   // フォームタブが存在し、操作可能であることを事前確認
-  // BottomNavigationは nav-${id} パターンを使用
-  const formTabSelector = '[data-testid="nav-form"]';
+  const formTabSelector = '[data-testid="form-tab"]';
   await page.waitForSelector(formTabSelector, {
     state: 'visible',
     timeout: 10000
@@ -125,9 +123,8 @@ export async function createTestFishingRecord(
   await page.click(`[data-testid="${TestIds.SAVE_RECORD_BUTTON}"]`);
 
   // トースト表示またはタブ切り替えを待機（固定時間待機ではなく）
-  // BottomNavigationは nav-${id} パターンと aria-current="page" を使用
   await page.waitForSelector(
-    `[data-testid="${TestIds.TOAST_SUCCESS}"], [data-testid="nav-list"][aria-current="page"]`,
+    `[data-testid="${TestIds.TOAST_SUCCESS}"], [data-testid="list-tab"][aria-selected="true"]`,
     { timeout: 5000 }
   );
 }
@@ -136,10 +133,10 @@ export async function createTestFishingRecord(
  * 釣果記録一覧に移動
  */
 export async function navigateToRecordsList(page: Page): Promise<void> {
-  // 記録一覧タブに移動（BottomNavigationは nav-${id} パターンを使用）
-  await page.click('[data-testid="nav-list"]');
-  // タブがアクティブになるまで待機（aria-current="page" を使用）
-  await page.waitForSelector('[data-testid="nav-list"][aria-current="page"]', { timeout: 2000 });
+  // 記録一覧タブに移動
+  await page.click('[data-testid="list-tab"]');
+  // タブがアクティブになるまで待機
+  await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 2000 });
 }
 
 /**

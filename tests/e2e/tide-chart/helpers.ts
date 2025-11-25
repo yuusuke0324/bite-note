@@ -574,7 +574,7 @@ export async function setupCleanPage(page: Page) {
   // Fixed: Issue #226 & #228 - 共通の初期化待機関数を使用（より堅牢）
   await waitForAppInit(page);
 
-  // タブUIが操作可能か確認（BottomNavigationは nav-${id} パターンを使用）
-  const homeTab = page.locator('[data-testid="nav-home"]');
+  // タブUIが操作可能か確認
+  const homeTab = page.locator('[data-testid="home-tab"]');
   await expect(homeTab).toBeEnabled();
 }
