@@ -137,14 +137,22 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       await input.fill('あ');
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
-      // ↓を2回押して2番目の候補を選択
+      // ↓を押して最初の候補を選択
       await input.press('ArrowDown');
-      await input.press('ArrowDown');
+      // 選択状態が反映されるまで待機
+      await expect(page.locator('[role="option"][aria-selected="true"]')).toBeVisible();
 
-      // ↑を押す
+      // もう一度↓を押して2番目の候補を選択
+      await input.press('ArrowDown');
+      // 選択状態が反映されるまで待機
+      await expect(page.locator('[role="option"][aria-selected="true"]')).toBeVisible();
+
+      // ↑を押して1つ上に移動
       await input.press('ArrowUp');
+      // 選択状態が反映されるまで待機
+      await expect(page.locator('[role="option"][aria-selected="true"]')).toBeVisible();
 
-      // 最初の候補が選択される
+      // 選択されている候補が1つだけであることを確認
       const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
       const count = await selectedOptions.count();
       expect(count).toBe(1);
