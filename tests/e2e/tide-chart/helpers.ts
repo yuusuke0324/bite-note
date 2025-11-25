@@ -1,7 +1,6 @@
 // E2E Test Helpers for TideChart Component
 import { Page, expect } from '@playwright/test';
 import { TestIds } from '../../../src/constants/testIds';
-import { waitForAppInit } from '../helpers/test-helpers';
 
 /**
  * テスト用ヘルパー関数: テスト用釣果記録を作成
@@ -72,9 +71,11 @@ async function createTestRecord(page: Page) {
     });
   });
 
-  // ページをリロードしてデータを反映 + 初期化待機
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await waitForAppInit(page);
+  // ページをリロードしてデータを反映
+  await page.reload();
+
+  // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
+  await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 }
 
 // Test Data Sets
@@ -114,9 +115,11 @@ export class TideChartPage {
    * 5. グラフの表示を待つ（潮汐API計算完了を待機）
    */
   async goto() {
-    // Step 1: ホーム画面に移動 + アプリ初期化待機
-    await this.page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForAppInit(this.page);
+    // Step 1: ホーム画面に移動
+    await this.page.goto('/');
+
+    // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
+    await this.page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 
     // Step 2: 記録が存在しない場合は自動作成
     const recordCount = await this.page.locator('[data-testid^="record-"]').count();
@@ -565,12 +568,8 @@ export async function setupCleanPage(page: Page) {
   }, testDbName);
 
   // ページアクセス（IndexedDB削除不要 → 高速化）
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/');
 
-  // 共通の初期化待機関数を使用
-  await waitForAppInit(page);
-
-  // タブUIが操作可能か確認（初期表示はhome-tab）
-  const homeTab = page.locator(`[data-testid="${TestIds.HOME_TAB}"]`);
-  await expect(homeTab).toBeEnabled();
+  // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
+  await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 }
