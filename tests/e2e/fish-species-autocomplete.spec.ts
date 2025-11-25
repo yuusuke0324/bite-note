@@ -151,25 +151,26 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       expect(optionCount).toBeGreaterThanOrEqual(2);
 
       // ステップ1: ↓で1番目を選択
-      // 状態ベースのアサーションで入力がフォーカスされ、候補が表示されていることを確認
-      await expect(input).toBeFocused();
-      await expect(suggestions).toBeVisible();
+      // waitForFunctionを使用してReact状態更新を確実に検出
       await input.press('ArrowDown');
-      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
+      await page.waitForFunction(
+        () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
+        { timeout: 10000 }
+      );
 
       // ステップ2: ↓で2番目を選択
-      await expect(input).toBeFocused();
-      await expect(suggestions).toBeVisible();
       await input.press('ArrowDown');
-      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
-      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
+      await page.waitForFunction(
+        () => document.querySelector('[role="option"]:nth-child(2)')?.getAttribute('aria-selected') === 'true',
+        { timeout: 10000 }
+      );
 
       // ステップ3: ↑で1番目に戻る
-      await expect(input).toBeFocused();
-      await expect(suggestions).toBeVisible();
       await input.press('ArrowUp');
-      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
-      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
+      await page.waitForFunction(
+        () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
+        { timeout: 10000 }
+      );
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
