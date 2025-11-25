@@ -28,9 +28,8 @@ export async function waitForAppInit(page: Page): Promise<void> {
     state: 'attached'
   });
 
-  // 初期表示される要素（home-tab）を待機
-  // ModernAppの初期タブは'home'なので、form-tabではなくhome-tabを待つ
-  await page.waitForSelector(`[data-testid="${TestIds.HOME_TAB}"]`, {
+  // 初期表示されるナビゲーション要素を待機
+  await page.waitForSelector('[data-testid="home-tab"]', {
     timeout: 20000,
     state: 'visible'
   });
@@ -39,8 +38,8 @@ export async function waitForAppInit(page: Page): Promise<void> {
 export interface TestFishingRecord {
   id: string;
   location: string;
-  latitude: number;
-  longitude: number;
+  latitude?: number;  // GPSLocationInputの手動入力モードでのみ使用可能
+  longitude?: number; // GPSLocationInputの手動入力モードでのみ使用可能
   date: string;
   fishSpecies?: string;
   weather?: string;
@@ -49,11 +48,12 @@ export interface TestFishingRecord {
 }
 
 // デフォルトテストデータ
+// 注意: 緯度・経度はGPSLocationInputの手動入力モードでのみ設定可能
+// 現在のフォームUIでは写真からのGPS抽出またはGPSボタンで位置情報を取得するため、
+// E2Eテストでは緯度・経度を直接入力しない
 export const defaultTestRecord: TestFishingRecord = {
   id: 'test-record',
   location: '東京湾',
-  latitude: 35.6762,
-  longitude: 139.6503,
   date: '2024-07-15T10:00',
   fishSpecies: 'アジ',
   weather: '晴れ',
@@ -72,7 +72,7 @@ export async function createTestFishingRecord(
   const testRecord = { ...defaultTestRecord, ...record };
 
   // フォームタブが存在し、操作可能であることを事前確認
-  const formTabSelector = `[data-testid="${TestIds.FORM_TAB}"]`;
+  const formTabSelector = '[data-testid="form-tab"]';
   await page.waitForSelector(formTabSelector, {
     state: 'visible',
     timeout: 10000
@@ -81,28 +81,30 @@ export async function createTestFishingRecord(
   // 記録登録タブに移動
   await page.click(formTabSelector);
 
-  // タブが選択されたことを確認
-  await page.waitForSelector(`${formTabSelector}[aria-selected="true"]`, {
+  // タブが選択されたことを確認（BottomNavigationはaria-current="page"を使用）
+  await page.waitForSelector(`${formTabSelector}[aria-current="page"]`, {
     state: 'visible',
     timeout: 5000
   });
 
-  // すべての主要フォームフィールドが表示されるまで待機
+  // CI環境でのレンダリング遅延を吸収（Service Worker初期化等の影響）
+  await page.waitForTimeout(500);
+
+  // 主要フォームフィールドが表示されるまで待機
+  // 注意: 緯度・経度フィールドはGPSLocationInputの手動入力モードでのみ表示されるため、
+  // ここでは待機しない（現在のUIではGPS取得または写真からの自動抽出を使用）
   await Promise.all([
     page.waitForSelector(`[data-testid="${TestIds.LOCATION_NAME}"]`, { state: 'visible' }),
-    page.waitForSelector(`[data-testid="${TestIds.LATITUDE}"]`, { state: 'visible' }),
-    page.waitForSelector(`[data-testid="${TestIds.LONGITUDE}"]`, { state: 'visible' }),
     page.waitForSelector(`[data-testid="${TestIds.FISHING_DATE}"]`, { state: 'visible' }),
   ]);
 
-  // フォーム入力
+  // フォーム入力（緯度・経度は省略 - UIでは直接入力フィールドがない）
   await page.fill(`[data-testid="${TestIds.LOCATION_NAME}"]`, testRecord.location);
-  await page.fill(`[data-testid="${TestIds.LATITUDE}"]`, testRecord.latitude.toString());
-  await page.fill(`[data-testid="${TestIds.LONGITUDE}"]`, testRecord.longitude.toString());
   await page.fill(`[data-testid="${TestIds.FISHING_DATE}"]`, testRecord.date);
 
   if (testRecord.fishSpecies) {
-    await page.fill(`[data-testid="${TestIds.FISH_SPECIES}"]`, testRecord.fishSpecies);
+    // FishSpeciesAutocompleteコンポーネントはFISH_SPECIES_INPUTを使用
+    await page.fill(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`, testRecord.fishSpecies);
   }
 
   if (testRecord.weather) {
@@ -125,15 +127,117 @@ export async function createTestFishingRecord(
     `[data-testid="${TestIds.TOAST_SUCCESS}"], [data-testid="list-tab"][aria-selected="true"]`,
     { timeout: 5000 }
   );
+
+  // 保存完了後、記録一覧タブに移動（潮汐統合テスト等でrecord詳細ページへ遷移するため）
+  await page.click('[data-testid="list-tab"]');
+  await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 2000 });
+}
+
+/**
+ * 座標付き釣果記録をIndexedDBに直接作成（潮汐統合テスト用）
+ *
+ * 通常のcreateTestFishingRecordはフォーム経由で記録を作成するため、
+ * 座標情報を保存できません（フォームにGPS座標の直接入力フィールドがないため）。
+ *
+ * この関数は、TideIntegrationコンポーネントのテストなど、
+ * 座標情報が必須のテストケースで使用してください。
+ *
+ * @param page Playwrightのページオブジェクト
+ * @param record 作成する記録データ（coordinatesは必須）
+ */
+export async function createTestFishingRecordWithCoordinates(
+  page: Page,
+  record: {
+    location: string;
+    latitude: number;
+    longitude: number;
+    date: string;
+    fishSpecies?: string;
+    size?: number;
+    weather?: string;
+    notes?: string;
+  }
+): Promise<void> {
+  // IndexedDBに直接テストレコードを挿入
+  // Note: setupCleanPage() でセットされたテスト用DB名を使用（tide-system-e2e.spec.ts等で必要）
+  await page.evaluate((data) => {
+    return new Promise<void>((resolve, reject) => {
+      // @ts-expect-error - テスト用グローバル変数
+      const dbName = (globalThis as any).__TEST_DB_NAME__ || 'FishingRecordDB';
+      const request = indexedDB.open(dbName);
+
+      request.onerror = () => {
+        console.error('[createTestFishingRecordWithCoordinates] IndexedDB open error:', request.error);
+        reject(request.error);
+      };
+
+      request.onsuccess = () => {
+        const db = request.result;
+
+        // fishing_records テーブルが存在するか確認
+        if (!db.objectStoreNames.contains('fishing_records')) {
+          console.error('[createTestFishingRecordWithCoordinates] fishing_records table not found');
+          db.close();
+          reject(new Error('fishing_records table not found'));
+          return;
+        }
+
+        const transaction = db.transaction(['fishing_records'], 'readwrite');
+        const store = transaction.objectStore('fishing_records');
+
+        // テスト用釣果記録データ
+        const testRecord = {
+          id: 'test-record-' + Date.now(),
+          fishSpecies: data.fishSpecies || 'テスト魚種',
+          size: data.size || 30,
+          location: data.location,
+          coordinates: {
+            latitude: data.latitude,
+            longitude: data.longitude
+          },
+          date: new Date(data.date),
+          weather: data.weather || '晴れ',
+          notes: data.notes || 'E2Eテスト用データ',
+          photos: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        const addRequest = store.add(testRecord);
+
+        addRequest.onsuccess = () => {
+          console.log('[createTestFishingRecordWithCoordinates] テストレコードをIndexedDBに挿入しました');
+          db.close();
+          resolve();
+        };
+
+        addRequest.onerror = () => {
+          console.error('[createTestFishingRecordWithCoordinates] Add record error:', addRequest.error);
+          db.close();
+          reject(addRequest.error);
+        };
+      };
+    });
+  }, record);
+
+  // ページをリロードしてデータを反映
+  await page.reload();
+
+  // アプリ初期化を待機
+  await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
+
+  // 記録一覧タブに移動して記録を表示
+  await page.click('[data-testid="list-tab"]');
+  await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 5000 });
 }
 
 /**
  * 釣果記録一覧に移動
  */
 export async function navigateToRecordsList(page: Page): Promise<void> {
-  // Use the list tab since the current app uses "写真で確認" tab instead of records link
+  // 記録一覧タブに移動
   await page.click('[data-testid="list-tab"]');
-  // Wait for the tab to be selected
+  // タブがアクティブになるまで待機
   await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 2000 });
 }
 
@@ -149,15 +253,22 @@ export async function openTideGraphTab(page: Page): Promise<void> {
 
 /**
  * 潮汐グラフが表示されることを確認
+ *
+ * Note: TideIntegrationはTideChart（Rechartsベース）を使用しているため、
+ * tide-graph-area, tide-graph-time-labels, tide-graph-y-axis などの
+ * TideGraph（独自SVG実装）固有のtestIdは検証しない。
+ *
+ * TideChartはRechartsライブラリが内部でSVG要素を生成するため、
+ * tide-chart（メインコンテナ）とtide-graph-canvas（チャートラッパー）で検証。
  */
 export async function assertTideGraphVisible(page: Page): Promise<void> {
-  const tideGraph = page.locator(`[data-testid="${TestIds.TIDE_GRAPH_CANVAS}"]`);
-  await expect(tideGraph).toBeVisible();
+  // TideChartのメインコンテナを確認
+  const tideChart = page.locator(`[data-testid="${TestIds.TIDE_CHART}"]`);
+  await expect(tideChart).toBeVisible();
 
-  // グラフの基本要素が存在することを確認
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_AREA}"]`)).toBeVisible();
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_TIME_LABELS}"]`)).toBeVisible();
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_Y_AXIS}"]`)).toBeVisible();
+  // TideChartの内部チャートキャンバスを確認
+  const tideGraphCanvas = page.locator(`[data-testid="${TestIds.TIDE_GRAPH_CANVAS}"]`);
+  await expect(tideGraphCanvas).toBeVisible();
 }
 
 /**

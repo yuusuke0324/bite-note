@@ -347,7 +347,7 @@ test.describe('TASK-301-013: 色覚障害者対応確認', () => {
 // ヘルパー関数: テスト環境のセットアップ
 async function setupTideGraphTest(page: Page) {
   // ナビゲーションを通じて釣果記録一覧に移動
-  await page.click('[data-testid="fishing-records-link"]');
+  await page.click('[data-testid="list-tab"]');
 
   // サンプル釣果記録を作成
   await page.click('[data-testid="add-record-button"]');

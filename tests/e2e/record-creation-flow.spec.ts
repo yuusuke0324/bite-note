@@ -8,7 +8,7 @@ test.describe('釣果記録作成フロー', () => {
     // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
     // waitForAppInitはHOME_TAB待機のため、正常系フローのみで使用
     await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
-    // 記録登録タブに移動（BottomNavigationのdata-testid属性を使用）
+    // 記録登録タブに移動
     await page.click('[data-testid="form-tab"]');
     // フォームが表示されるまで待機
     await page.waitForSelector('form', { state: 'visible' });
@@ -123,7 +123,7 @@ test.describe('釣果記録作成フロー', () => {
     // フォームがクリアされることを確認
     await expect(page.locator('[data-testid="fishing-date"]')).toHaveValue('');
     await expect(page.locator('[data-testid="location-name"]')).toHaveValue('');
-    await expect(page.locator('[data-testid="fish-species"]')).toHaveValue('');
+    await expect(page.locator('[data-testid="fish-species-input"]')).toHaveValue('');
   });
 
   test.skip('エラーハンドリングが適切に動作する', async ({ page }) => {

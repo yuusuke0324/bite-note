@@ -133,18 +133,33 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
     test('↑キーで候補を上に移動できる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
+      const suggestions = page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`);
 
       await input.fill('あ');
-      await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
+      await expect(suggestions).toBeVisible();
 
-      // ↓を2回押して2番目の候補を選択
+      // ↓を押して最初の候補を選択（index: 0）
       await input.press('ArrowDown');
-      await input.press('ArrowDown');
+      // 最初の候補（id=fish-species-0）が選択されるまで待機
+      await expect(page.locator('#fish-species-0[aria-selected="true"]')).toBeVisible();
 
-      // ↑を押す
+      // 状態安定化のため短い待機（CI環境でのReact状態更新遅延対策）
+      await page.waitForTimeout(100);
+
+      // もう一度↓を押して2番目の候補を選択（index: 1）
+      await input.press('ArrowDown');
+      // 2番目の候補（id=fish-species-1）が選択されるまで待機
+      await expect(page.locator('#fish-species-1[aria-selected="true"]')).toBeVisible();
+
+      // 状態安定化のため短い待機
+      await page.waitForTimeout(100);
+
+      // ↑を押して1つ上に移動（index: 0に戻る）
       await input.press('ArrowUp');
+      // 最初の候補（id=fish-species-0）が再度選択されるまで待機
+      await expect(page.locator('#fish-species-0[aria-selected="true"]')).toBeVisible();
 
-      // 最初の候補が選択される
+      // 選択されている候補が1つだけであることを確認
       const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
       const count = await selectedOptions.count();
       expect(count).toBe(1);
