@@ -37,8 +37,8 @@ class TideSystemE2EHelper {
     size?: number;
     useGPS?: boolean;
   }) {
-    // 🟢 改善1: タブ切り替えをより堅牢に (ModernApp.tsx: nav-form パターン)
-    const formTab = this.page.locator(`[data-testid="form-tab"]`);
+    // 🟢 改善1: タブ切り替えをより堅牢に (BottomNavigationは nav-${id} パターンを使用)
+    const formTab = this.page.locator('[data-testid="nav-form"]');
     await formTab.waitFor({ state: 'visible', timeout: 10000 });
     await expect(formTab).toBeEnabled();
     await formTab.click();
@@ -87,21 +87,23 @@ class TideSystemE2EHelper {
     const saveButton = this.page.locator('[data-testid="save-record-button"]');
     await expect(saveButton).toBeEnabled();
 
-    // CI環境ではオーバーレイが残ることがあるため、force: true で確実にクリック
-    await saveButton.click({ force: true });
+    // 保存ボタンが完全に表示されるまで待機してからクリック
+    await saveButton.waitFor({ state: 'visible', timeout: 5000 });
+    await saveButton.click();
 
     // 🟢 改善5: 保存後、リストタブに自動切り替わることを確認（waitForTimeoutの代わり）
     const switchedToList = await this.page.waitForSelector(
-      `[data-testid="fishing-records-link"][aria-current="page"]`,
+      `[data-testid="nav-list"][aria-current="page"]`,
       { timeout: 5000, state: 'visible' }
     ).then(() => true).catch(() => false);
 
     if (!switchedToList) {
       // 手動で切り替え (ModernApp.tsx: nav-list パターン、aria-current使用)
-      // CI環境（特にタブレットサイズ）ではオーバーレイが残ることがあるため、force: true で確実にクリック
-      await this.page.locator(`[data-testid="fishing-records-link"]`).click({ force: true });
+      const recordsLink = this.page.locator('[data-testid="nav-list"]');
+      await recordsLink.waitFor({ state: 'visible', timeout: 10000 });
+      await recordsLink.click();
       await this.page.waitForSelector(
-        `[data-testid="fishing-records-link"][aria-current="page"]`,
+        `[data-testid="nav-list"][aria-current="page"]`,
         { timeout: 5000, state: 'visible' }
       );
     }
@@ -116,11 +118,10 @@ class TideSystemE2EHelper {
   // 釣果記録詳細ページに移動
   async goToRecordDetail(recordId?: string) {
     // リストタブに切り替え (ModernApp.tsx: nav-list パターン)
-    const listTab = this.page.locator(`[data-testid="fishing-records-link"]`);
+    const listTab = this.page.locator('[data-testid="nav-list"]');
     await listTab.waitFor({ state: 'visible', timeout: 10000 });
     await expect(listTab).toBeEnabled();
-    // CI環境（特にタブレットサイズ）ではオーバーレイが残ることがあるため、force: true で確実にクリック
-    await listTab.click({ force: true });
+    await listTab.click();
 
     // 🟢 改善1: タブ切り替え完了を確認
     await this.page.waitForSelector(

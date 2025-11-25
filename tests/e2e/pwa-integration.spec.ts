@@ -109,21 +109,23 @@ test.describe('Epic #9: PWA Full Integration Tests', () => {
       // Service Workerがアクティブになるまで待機
       await waitForServiceWorker(page);
 
+      // アプリUI初期化完了を待機（オフライン切り替え前に必須）
+      await page.waitForSelector('body[data-app-initialized="true"]', {
+        timeout: 25000,
+        state: 'attached'
+      });
+
       // PHASE 2: オフライン使用
       await context.setOffline(true);
 
-      // 釣果記録作成（オフライン状態）
-      await page.click('[data-testid="form-tab"]');
-      await page.fill('[data-testid="location-name"]', '統合テスト釣り場');
-      await page.fill('[data-testid="latitude"]', '35.6762');
-      await page.fill('[data-testid="longitude"]', '139.6503');
-      await page.fill('[data-testid="fishing-date"]', '2024-11-17T15:00');
-      await page.fill('[data-testid="fish-species"]', 'テストフィッシュ');
-      await page.click('[data-testid="save-record-button"]');
-      await page.waitForTimeout(2000);
-
-      // オフライン時のデータ保存確認（基本的な確認のみ）
-      // TODO: オフラインキューの実装後に詳細なテストを追加
+      // 釣果記録作成（オフライン状態）- createTestFishingRecordパターンを適用
+      await createTestFishingRecord(page, {
+        location: '統合テスト釣り場',
+        latitude: 35.6762,
+        longitude: 139.6503,
+        date: '2024-11-17T15:00',
+        fishSpecies: 'テストフィッシュ'
+      });
 
       // PHASE 3: オンライン復帰
       await context.setOffline(false);

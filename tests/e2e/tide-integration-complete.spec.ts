@@ -23,11 +23,14 @@ class TideSystemIntegrationHelper {
       state: 'attached'
     });
 
-    // UIが表示されるまで待機
-    await this.page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
-      timeout: 5000,
+    // UIが表示されるまで待機（BottomNavigationは nav-${id} パターンを使用）
+    await this.page.waitForSelector('[data-testid="nav-form"]', {
+      timeout: 10000,
       state: 'visible'
     });
+
+    // CI環境でのService Worker初期化等の遅延を吸収
+    await this.page.waitForTimeout(500);
 
     // 2. 新規記録作成
     await createTestFishingRecord(this.page, {

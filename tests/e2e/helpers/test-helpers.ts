@@ -18,9 +18,9 @@ export async function waitForAppInit(page: Page): Promise<void> {
     state: 'attached'
   });
 
-  // 初期表示される要素（home-tab）を待機
-  // ModernAppの初期タブは'home'なので、form-tabではなくhome-tabを待つ
-  await page.waitForSelector(`[data-testid="${TestIds.HOME_TAB}"]`, {
+  // 初期表示されるナビゲーション要素を待機
+  // BottomNavigationは data-testid="nav-${id}" パターンを使用
+  await page.waitForSelector('[data-testid="nav-home"]', {
     timeout: 20000,
     state: 'visible'
   });
@@ -62,7 +62,8 @@ export async function createTestFishingRecord(
   const testRecord = { ...defaultTestRecord, ...record };
 
   // フォームタブが存在し、操作可能であることを事前確認
-  const formTabSelector = `[data-testid="${TestIds.FORM_TAB}"]`;
+  // BottomNavigationは nav-${id} パターンを使用
+  const formTabSelector = '[data-testid="nav-form"]';
   await page.waitForSelector(formTabSelector, {
     state: 'visible',
     timeout: 10000
@@ -71,11 +72,14 @@ export async function createTestFishingRecord(
   // 記録登録タブに移動
   await page.click(formTabSelector);
 
-  // タブが選択されたことを確認
-  await page.waitForSelector(`${formTabSelector}[aria-selected="true"]`, {
+  // タブが選択されたことを確認（BottomNavigationはaria-current="page"を使用）
+  await page.waitForSelector(`${formTabSelector}[aria-current="page"]`, {
     state: 'visible',
     timeout: 5000
   });
+
+  // CI環境でのレンダリング遅延を吸収（Service Worker初期化等の影響）
+  await page.waitForTimeout(500);
 
   // すべての主要フォームフィールドが表示されるまで待機
   await Promise.all([
