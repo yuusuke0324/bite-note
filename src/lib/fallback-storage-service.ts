@@ -81,18 +81,13 @@ export class FallbackStorageService {
       }
     }
 
-    // localStorageをフォールバック
+    // localStorageをフォールバック（IndexedDBが使えない場合のみ）
     if (this.isLocalStorageAvailable()) {
       return 'localstorage';
     }
 
-    // sessionStorageをフォールバック（Phase 2）
-    // 現在は未実装
-
-    // 最終手段としてメモリ（Phase 3）
-    // 現在は未実装
-
-    return 'localstorage'; // デフォルトはlocalStorage
+    // localStorageも使えない場合のフォールバック（エラー状態）
+    return 'localstorage';
   }
 
   /**
@@ -149,11 +144,6 @@ export class FallbackStorageService {
       const jsonData = JSON.stringify(records);
       localStorage.setItem(this.LOCALSTORAGE_KEY, jsonData);
 
-      console.log('[FallbackStorage] Saved to localStorage', {
-        recordCount: records.length,
-        dataSize: jsonData.length * 2, // UTF-16
-      });
-
       return { success: true };
     } catch (error) {
       // QuotaExceededError等
@@ -198,10 +188,6 @@ export class FallbackStorageService {
         }
       });
 
-      console.log('[FallbackStorage] Loaded from localStorage', {
-        recordCount: records.length,
-      });
-
       return {
         success: true,
         data: records,
@@ -225,8 +211,6 @@ export class FallbackStorageService {
    */
   static async migrateToIndexedDB(): Promise<DatabaseResult<MigrationResult>> {
     try {
-      console.log('[FallbackStorage] Starting migration from localStorage to IndexedDB');
-
       // localStorageからデータ読み込み
       const loadResult = await this.loadFromLocalStorage();
       if (!loadResult.success || !loadResult.data) {
@@ -242,7 +226,6 @@ export class FallbackStorageService {
 
       const records = loadResult.data;
       if (records.length === 0) {
-        console.log('[FallbackStorage] No records to migrate');
         return {
           success: true,
           data: {
@@ -290,9 +273,6 @@ export class FallbackStorageService {
       // 移行成功後、localStorageをクリア
       if (errors.length === 0) {
         localStorage.removeItem(this.LOCALSTORAGE_KEY);
-        console.log('[FallbackStorage] localStorage cleared after successful migration');
-      } else {
-        console.warn('[FallbackStorage] Some records failed to migrate, keeping localStorage data');
       }
 
       const result: MigrationResult = {
@@ -300,8 +280,6 @@ export class FallbackStorageService {
         migratedRecords,
         errors,
       };
-
-      console.log('[FallbackStorage] Migration completed', result);
 
       return {
         success: true,
@@ -338,7 +316,6 @@ export class FallbackStorageService {
   static clearLocalStorage(): void {
     try {
       localStorage.removeItem(this.LOCALSTORAGE_KEY);
-      console.log('[FallbackStorage] localStorage cleared');
     } catch (error) {
       console.error('[FallbackStorage] Failed to clear localStorage', error);
     }

@@ -211,23 +211,17 @@ export const usePWA = () => {
 
   useEffect(() => {
     const handleOnline = async () => {
-      console.log('[PWA] Online - starting offline queue sync');
       setIsOnline(true);
 
       // オンライン復帰時にオフラインキューを自動同期
       try {
         setIsSyncing(true);
-        const result = await offlineQueueService.syncQueue((synced, total) => {
-          console.log(`[PWA] Syncing: ${synced}/${total}`);
-        });
+        const result = await offlineQueueService.syncQueue();
 
-        if (result.success) {
-          console.log(`[PWA] Sync completed: ${result.syncedCount} items synced`);
-          if (result.failedCount && result.failedCount > 0) {
-            console.warn(`[PWA] Sync failed: ${result.failedCount} items failed`);
-          }
-        } else {
+        if (!result.success) {
           console.error('[PWA] Sync failed:', result.error);
+        } else if (result.failedCount && result.failedCount > 0) {
+          console.warn(`[PWA] Sync partial failure: ${result.failedCount} items failed`);
         }
       } catch (error) {
         console.error('[PWA] Sync error:', error);
@@ -237,7 +231,6 @@ export const usePWA = () => {
     };
 
     const handleOffline = () => {
-      console.log('[PWA] Offline');
       setIsOnline(false);
     };
 

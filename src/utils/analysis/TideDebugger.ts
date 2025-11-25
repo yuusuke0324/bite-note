@@ -275,11 +275,9 @@ export class TideDebugger {
   }
 
   /**
-   * キャッシュヒット率計算
-   * NOTE: 現在は固定値を返す簡易実装。将来的に実際のキャッシュ統計収集機能を追加予定
+   * キャッシュヒット率計算（固定値を返す簡易実装）
    */
   private static calculateCacheHitRate(): number {
-    // 実際のキャッシュ統計が未実装のため固定値
     return 75;
   }
 

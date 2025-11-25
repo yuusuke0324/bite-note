@@ -33,36 +33,10 @@ export class DataMigrationService {
 
   /**
    * マイグレーション登録
+   * 新しいマイグレーションはここにthis.migrations.push()で追加
    */
   private registerMigrations(): void {
-    // 将来のマイグレーションをここに登録
-    // 例: v1 -> v2のマイグレーション
-    /*
-    this.migrations.push({
-      id: 'v1_to_v2_add_temperature_field',
-      version: '1.1.0',
-      description: '釣果記録に気温フィールドを追加',
-      up: async () => {
-        const records = await db.records.toArray();
-        for (const record of records) {
-          if (!('airTemperature' in record)) {
-            await db.records.update(record.id, {
-              airTemperature: undefined
-            });
-          }
-        }
-      },
-      down: async () => {
-        const records = await db.records.toArray();
-        for (const record of records) {
-          if ('airTemperature' in record) {
-            const { airTemperature, ...rest } = record as any;
-            await db.records.put(rest);
-          }
-        }
-      }
-    });
-    */
+    // 現在登録されているマイグレーションはなし
   }
 
   /**
@@ -154,25 +128,18 @@ export class DataMigrationService {
         };
       }
 
-      console.log(`🔄 マイグレーション実行開始 (${dryRun ? 'DRY RUN' : '本番実行'})`);
-      console.log(`未適用のマイグレーション: ${pendingMigrations.length}件`);
-
       // トランザクション開始
       if (!dryRun) {
         await db.transaction('rw', [db.fishing_records, db.photos, db.app_settings], async () => {
           for (const migration of pendingMigrations) {
             try {
-              console.log(`  ⏳ ${migration.id}: ${migration.description}`);
-
               // マイグレーション実行
               await migration.up();
 
               appliedMigrations.push(migration.id);
-              console.log(`  ✅ ${migration.id}: 完了`);
             } catch (error) {
               const errorMessage = `${migration.id}: ${error instanceof Error ? error.message : String(error)}`;
               errors.push(errorMessage);
-              console.error(`  ❌ ${errorMessage}`);
               throw error; // トランザクションをロールバック
             }
           }
@@ -193,13 +160,9 @@ export class DataMigrationService {
 
           await dataValidationService.updateDataVersion(updatedVersion);
         }
-
-        console.log(`✅ マイグレーション完了: ${appliedMigrations.length}件適用`);
       } else {
         // Dry Run
-        console.log('📋 Dry Run - 実際の変更は行いません');
         for (const migration of pendingMigrations) {
-          console.log(`  📝 ${migration.id}: ${migration.description}`);
           skippedMigrations.push(migration.id);
         }
       }
@@ -265,8 +228,6 @@ export class DataMigrationService {
         };
       }
 
-      console.log(`🔙 ロールバック実行: ${migration.id}`);
-
       // トランザクション内でロールバック実行
       await db.transaction('rw', [db.fishing_records, db.photos, db.app_settings], async () => {
         await migration.down!();
@@ -282,8 +243,6 @@ export class DataMigrationService {
 
         await dataValidationService.updateDataVersion(updatedVersion);
       }
-
-      console.log(`✅ ロールバック完了: ${migration.id}`);
 
       return { success: true };
     } catch (error) {
@@ -391,11 +350,7 @@ export class DataMigrationService {
       const deletedIds = orphanedPhotos.map((p: PhotoData) => p.id);
 
       if (!dryRun) {
-        console.log(`🗑️ 孤立した写真を削除: ${orphanedPhotos.length}件`);
         await db.photos.bulkDelete(deletedIds);
-        console.log(`✅ 削除完了: ${orphanedPhotos.length}件`);
-      } else {
-        console.log(`📋 Dry Run - 削除予定の写真: ${orphanedPhotos.length}件`);
       }
 
       return {

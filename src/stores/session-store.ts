@@ -114,7 +114,6 @@ export const useSessionStore = create<SessionStore>()(
 
       // セッション管理の停止
       stopSession: () => {
-        console.log('[SessionStore] Stopping session');
 
         // SessionServiceを停止
         sessionService.stop();
@@ -224,7 +223,6 @@ export const useSessionStore = create<SessionStore>()(
 
       // ストレージモードの初期化
       initializeStorageMode: async () => {
-        console.log('[SessionStore] Initializing storage mode');
 
         // IndexedDB対応状況を確認
         const isIndexedDBAvailable = fallbackStorageService.isIndexedDBAvailable();
@@ -252,9 +250,6 @@ export const useSessionStore = create<SessionStore>()(
 
           // localStorageにデータがある場合は移行を提案
           if (fallbackStorageService.hasLocalStorageData()) {
-            console.log('[SessionStore] Found localStorage data, suggesting migration');
-
-            // TODO: 移行プロンプトモーダルを表示（Phase 2）
             useToastStore.getState().showInfo(
               'IndexedDBが利用可能です。データを移行できます'
             );
@@ -264,21 +259,16 @@ export const useSessionStore = create<SessionStore>()(
 
       // localStorageへの切り替え
       switchToLocalStorage: () => {
-        console.log('[SessionStore] Switching to localStorage mode');
-
         set({
           storageMode: 'localstorage',
           sessionStatus: 'active', // localStorageモードでは常にアクティブ
         });
-
-        // TODO: 現在のデータをlocalStorageに保存
+        // NOTE: 既存データはIndexedDBに保持、新規データのみLocalStorageに保存
       },
 
       // IndexedDBへのデータ移行
       migrateToIndexedDB: async (): Promise<boolean> => {
         try {
-          console.log('[SessionStore] Starting data migration to IndexedDB');
-
           const result = await fallbackStorageService.migrateToIndexedDB();
 
           if (result.success && result.data) {

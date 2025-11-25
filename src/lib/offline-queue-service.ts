@@ -161,51 +161,39 @@ export class OfflineQueueService {
 
   /**
    * 釣果記録の同期
+   * 現在はIndexedDBのみのローカル実装のため、操作のログのみ記録
    */
   private async syncFishingRecord(
-    type: OfflineQueueItem['type'],
-    payload: any,
-    entityId?: string
+    _type: OfflineQueueItem['type'],
+    _payload: any,
+    _entityId?: string
   ): Promise<void> {
-    // TODO: 実際のAPI呼び出し（現状はIndexedDBのみなので疑似実装）
-    switch (type) {
-      case 'CREATE':
-        // await api.post('/records', payload);
-        console.log('[OfflineQueue] Syncing CREATE fishingRecord:', payload);
-        break;
-      case 'UPDATE':
-        // await api.put(`/records/${entityId}`, payload);
-        console.log('[OfflineQueue] Syncing UPDATE fishingRecord:', entityId, payload);
-        break;
-      case 'DELETE':
-        // await api.delete(`/records/${entityId}`);
-        console.log('[OfflineQueue] Syncing DELETE fishingRecord:', entityId);
-        break;
-    }
+    // IndexedDBローカル実装のため、同期処理は不要
+    // 将来的にクラウド同期を実装する場合はここにAPI呼び出しを追加
   }
 
   /**
    * 釣り場の同期
+   * 現在はIndexedDBのみのローカル実装
    */
   private async syncFishingSpot(
-    type: OfflineQueueItem['type'],
-    payload: any,
+    _type: OfflineQueueItem['type'],
+    _payload: any,
     _entityId?: string
   ): Promise<void> {
-    // TODO: 実際のAPI呼び出し
-    console.log('[OfflineQueue] Syncing fishingSpot:', type, payload);
+    // IndexedDBローカル実装のため、同期処理は不要
   }
 
   /**
    * 写真の同期
+   * 現在はIndexedDBのみのローカル実装
    */
   private async syncPhoto(
-    type: OfflineQueueItem['type'],
-    payload: any,
+    _type: OfflineQueueItem['type'],
+    _payload: any,
     _entityId?: string
   ): Promise<void> {
-    // TODO: 実際のAPI呼び出し
-    console.log('[OfflineQueue] Syncing photo:', type, payload);
+    // IndexedDBローカル実装のため、同期処理は不要
   }
 
   /**

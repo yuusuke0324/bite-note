@@ -50,8 +50,6 @@ export class SessionService {
    * セッション管理の開始
    */
   start(): void {
-    console.log('[SessionService] Starting session management');
-
     // 初期化
     this.lastActivityAt = Date.now();
 
@@ -66,8 +64,6 @@ export class SessionService {
    * セッション管理の停止
    */
   stop(): void {
-    console.log('[SessionService] Stopping session management');
-
     // アクティビティ監視の停止
     this.stopActivityMonitoring();
 
@@ -134,8 +130,6 @@ export class SessionService {
    */
   private startHeartbeat(): void {
     this.heartbeatIntervalId = window.setInterval(async () => {
-      console.log('[SessionService] Heartbeat: Checking session validity');
-
       const isValid = await this.checkSession();
       if (!isValid) {
         console.warn('[SessionService] Session expired detected by heartbeat');
@@ -201,8 +195,6 @@ export class SessionService {
    */
   async reconnect(): Promise<DatabaseResult<void>> {
     try {
-      console.log('[SessionService] Attempting to reconnect to IndexedDB');
-
       // 接続確認
       const isConnected = await this.checkIndexedDBConnection();
       if (!isConnected) {
@@ -225,7 +217,6 @@ export class SessionService {
       // 最終アクティビティ時刻を更新
       this.updateLastActivity();
 
-      console.log('[SessionService] Reconnection successful');
       return { success: true };
     } catch (error) {
       console.error('[SessionService] Reconnection failed', error);
