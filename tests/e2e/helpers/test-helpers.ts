@@ -38,8 +38,8 @@ export async function waitForAppInit(page: Page): Promise<void> {
 export interface TestFishingRecord {
   id: string;
   location: string;
-  latitude: number;
-  longitude: number;
+  latitude?: number;  // GPSLocationInputの手動入力モードでのみ使用可能
+  longitude?: number; // GPSLocationInputの手動入力モードでのみ使用可能
   date: string;
   fishSpecies?: string;
   weather?: string;
@@ -48,11 +48,12 @@ export interface TestFishingRecord {
 }
 
 // デフォルトテストデータ
+// 注意: 緯度・経度はGPSLocationInputの手動入力モードでのみ設定可能
+// 現在のフォームUIでは写真からのGPS抽出またはGPSボタンで位置情報を取得するため、
+// E2Eテストでは緯度・経度を直接入力しない
 export const defaultTestRecord: TestFishingRecord = {
   id: 'test-record',
   location: '東京湾',
-  latitude: 35.6762,
-  longitude: 139.6503,
   date: '2024-07-15T10:00',
   fishSpecies: 'アジ',
   weather: '晴れ',
@@ -89,18 +90,16 @@ export async function createTestFishingRecord(
   // CI環境でのレンダリング遅延を吸収（Service Worker初期化等の影響）
   await page.waitForTimeout(500);
 
-  // すべての主要フォームフィールドが表示されるまで待機
+  // 主要フォームフィールドが表示されるまで待機
+  // 注意: 緯度・経度フィールドはGPSLocationInputの手動入力モードでのみ表示されるため、
+  // ここでは待機しない（現在のUIではGPS取得または写真からの自動抽出を使用）
   await Promise.all([
     page.waitForSelector(`[data-testid="${TestIds.LOCATION_NAME}"]`, { state: 'visible' }),
-    page.waitForSelector(`[data-testid="${TestIds.LATITUDE}"]`, { state: 'visible' }),
-    page.waitForSelector(`[data-testid="${TestIds.LONGITUDE}"]`, { state: 'visible' }),
     page.waitForSelector(`[data-testid="${TestIds.FISHING_DATE}"]`, { state: 'visible' }),
   ]);
 
-  // フォーム入力
+  // フォーム入力（緯度・経度は省略 - UIでは直接入力フィールドがない）
   await page.fill(`[data-testid="${TestIds.LOCATION_NAME}"]`, testRecord.location);
-  await page.fill(`[data-testid="${TestIds.LATITUDE}"]`, testRecord.latitude.toString());
-  await page.fill(`[data-testid="${TestIds.LONGITUDE}"]`, testRecord.longitude.toString());
   await page.fill(`[data-testid="${TestIds.FISHING_DATE}"]`, testRecord.date);
 
   if (testRecord.fishSpecies) {
