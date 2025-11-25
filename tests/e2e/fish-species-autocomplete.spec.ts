@@ -139,19 +139,22 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       await expect(suggestions).toBeVisible();
 
       // ↓を押して最初の候補を選択（index: 0）
-      await input.focus(); // CI環境でのフォーカス維持
       await input.press('ArrowDown');
       // 最初の候補（id=fish-species-0）が選択されるまで待機
       await expect(page.locator('#fish-species-0[aria-selected="true"]')).toBeVisible();
 
+      // 状態安定化のため短い待機（CI環境でのReact状態更新遅延対策）
+      await page.waitForTimeout(100);
+
       // もう一度↓を押して2番目の候補を選択（index: 1）
-      await input.focus(); // CI環境でのフォーカス維持
       await input.press('ArrowDown');
       // 2番目の候補（id=fish-species-1）が選択されるまで待機
       await expect(page.locator('#fish-species-1[aria-selected="true"]')).toBeVisible();
 
+      // 状態安定化のため短い待機
+      await page.waitForTimeout(100);
+
       // ↑を押して1つ上に移動（index: 0に戻る）
-      await input.focus(); // CI環境でのフォーカス維持
       await input.press('ArrowUp');
       // 最初の候補（id=fish-species-0）が再度選択されるまで待機
       await expect(page.locator('#fish-species-0[aria-selected="true"]')).toBeVisible();
