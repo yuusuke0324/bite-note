@@ -567,19 +567,10 @@ export async function setupCleanPage(page: Page) {
   // ページアクセス（IndexedDB削除不要 → 高速化）
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  // App.tsx初期化完了を待機（Desktop Chromeでも余裕を持たせて25秒）
-  await page.waitForSelector('body[data-app-initialized="true"]', {
-    timeout: 25000,
-    state: 'attached'
-  });
-
-  // UIが表示されるまで待機 (ModernApp.tsx: nav-form パターン)
-  await page.waitForSelector(
-    `[data-testid="form-tab"]`,
-    { timeout: 5000, state: 'visible' }
-  );
+  // 共通の初期化待機関数を使用
+  await waitForAppInit(page);
 
   // タブUIが操作可能か確認
-  const formTab = page.locator(`[data-testid="form-tab"]`);
+  const formTab = page.locator(`[data-testid="${TestIds.FORM_TAB}"]`);
   await expect(formTab).toBeEnabled();
 }

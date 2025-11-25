@@ -16,9 +16,9 @@ export async function waitForAppInit(page: Page): Promise<void> {
     state: 'attached'
   });
 
-  // UIが表示されるまで待機
+  // UIが表示されるまで待機（CI環境では遅い場合があるため10秒）
   await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
-    timeout: 5000,
+    timeout: 10000,
     state: 'visible'
   });
 }
