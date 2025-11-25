@@ -157,29 +157,23 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // ↓を押して最初の候補を選択
       await input.press('ArrowDown');
-      // waitForFunctionでDOM状態が完全に更新されるのを待機
-      await page.waitForFunction(() => {
-        const options = document.querySelectorAll('[role="option"]');
-        return options[0]?.getAttribute('aria-selected') === 'true';
-      }, { timeout: 5000 });
+      // CI環境のタイミング問題対策：React状態更新を待機
+      await page.waitForTimeout(100);
+      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 5000 });
 
       // もう一度↓を押して2番目の候補を選択
       await input.press('ArrowDown');
-      // waitForFunctionで2番目が選択され、1番目が選択解除されるのを待機
-      await page.waitForFunction(() => {
-        const options = document.querySelectorAll('[role="option"]');
-        return options[1]?.getAttribute('aria-selected') === 'true' &&
-               options[0]?.getAttribute('aria-selected') === 'false';
-      }, { timeout: 5000 });
+      // CI環境のタイミング問題対策：React状態更新を待機
+      await page.waitForTimeout(100);
+      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 5000 });
+      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'false', { timeout: 5000 });
 
       // ↑を押して1番目の候補に戻る
       await input.press('ArrowUp');
-      // waitForFunctionで1番目が再び選択されるのを待機
-      await page.waitForFunction(() => {
-        const options = document.querySelectorAll('[role="option"]');
-        return options[0]?.getAttribute('aria-selected') === 'true' &&
-               options[1]?.getAttribute('aria-selected') === 'false';
-      }, { timeout: 5000 });
+      // CI環境のタイミング問題対策：React状態更新を待機
+      await page.waitForTimeout(100);
+      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 5000 });
+      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'false', { timeout: 5000 });
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
