@@ -3,14 +3,18 @@
 
 import { test, expect } from '@playwright/test';
 import { TestIds } from '../../src/constants/testIds';
-import { waitForAppInit } from './helpers/test-helpers';
 
 // Fixed: Issue #201 - Using development server for E2E tests in CI
+// Fixed: Issue #226 - Use same initialization pattern as session-management.spec.ts
 test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
   test.beforeEach(async ({ page }) => {
-    // アプリを起動 + 初期化待機
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForAppInit(page);
+    // アプリを起動
+    await page.goto('/');
+
+    // Fixed: Issue #226 - セッション管理テストではwaitForAppInitを使用しない
+    // 理由: waitForAppInitはHOME_TABを待機するため、モーダルテストでは不適切
+    // session-management.spec.ts と同じ初期化パターンに統一
+    await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 
     // セッション管理の初期化を待機
     await page.waitForFunction(() => {
