@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import { waitForAppInit } from './helpers/test-helpers';
 
 test.describe('釣果記録作成フロー', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await waitForAppInit(page);
     // 記録登録タブに移動（BottomNavigationのdata-testid属性を使用）
     await page.click('[data-testid="form-tab"]');
     // フォームが表示されるまで待機

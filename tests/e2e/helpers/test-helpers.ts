@@ -5,6 +5,24 @@
 import { Page, expect } from '@playwright/test';
 import { TestIds } from '../../../src/constants/testIds';
 
+/**
+ * アプリケーション初期化待機
+ * App.tsxの初期化と基本UIの表示を確実に待機する
+ */
+export async function waitForAppInit(page: Page): Promise<void> {
+  // App.tsx初期化完了を待機
+  await page.waitForSelector('body[data-app-initialized="true"]', {
+    timeout: 25000,
+    state: 'attached'
+  });
+
+  // UIが表示されるまで待機
+  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+    timeout: 5000,
+    state: 'visible'
+  });
+}
+
 export interface TestFishingRecord {
   id: string;
   location: string;

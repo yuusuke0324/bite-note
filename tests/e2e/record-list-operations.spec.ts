@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { waitForAppInit } from './helpers/test-helpers';
 
 test.describe('釣果記録一覧操作', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await waitForAppInit(page);
 
     // テストデータを事前に作成（モックまたは実際のデータ作成）
     await page.evaluate(() => {

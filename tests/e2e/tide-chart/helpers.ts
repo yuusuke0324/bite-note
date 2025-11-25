@@ -1,6 +1,7 @@
 // E2E Test Helpers for TideChart Component
 import { Page, expect } from '@playwright/test';
 import { TestIds } from '../../../src/constants/testIds';
+import { waitForAppInit } from '../helpers/test-helpers';
 
 /**
  * テスト用ヘルパー関数: テスト用釣果記録を作成
@@ -73,18 +74,7 @@ async function createTestRecord(page: Page) {
 
   // ページをリロードしてデータを反映 + 初期化待機
   await page.reload({ waitUntil: 'domcontentloaded' });
-
-  // App.tsx初期化完了を待機
-  await page.waitForSelector('body[data-app-initialized="true"]', {
-    timeout: 25000,
-    state: 'attached'
-  });
-
-  // UIが表示されるまで待機
-  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
-    timeout: 5000,
-    state: 'visible'
-  });
+  await waitForAppInit(page);
 }
 
 // Test Data Sets
@@ -126,18 +116,7 @@ export class TideChartPage {
   async goto() {
     // Step 1: ホーム画面に移動 + アプリ初期化待機
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });
-
-    // App.tsx初期化完了を待機
-    await this.page.waitForSelector('body[data-app-initialized="true"]', {
-      timeout: 25000,
-      state: 'attached'
-    });
-
-    // UIが表示されるまで待機
-    await this.page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
-      timeout: 5000,
-      state: 'visible'
-    });
+    await waitForAppInit(this.page);
 
     // Step 2: 記録が存在しない場合は自動作成
     const recordCount = await this.page.locator('[data-testid^="record-"]').count();
