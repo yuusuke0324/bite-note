@@ -21,8 +21,6 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
     // waitForAppInitはHOME_TAB待機のため、正常系フローのみで使用
     await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 
-    // 記録登録タブが表示されるまで待機（CI環境の初期化時間を考慮し20秒に延長）
-    await page.waitForSelector('[data-testid="form-tab"]', { state: 'visible', timeout: 20000 });
     // 記録登録タブに移動
     await page.click('[data-testid="form-tab"]');
     // オートコンプリート入力フィールドが表示されるまで待機
