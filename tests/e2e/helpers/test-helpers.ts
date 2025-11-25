@@ -251,16 +251,22 @@ export async function openTideGraphTab(page: Page): Promise<void> {
 
 /**
  * 潮汐グラフが表示されることを確認
+ *
+ * Note: TideIntegrationはTideChart（Rechartsベース）を使用しているため、
+ * tide-graph-area, tide-graph-time-labels, tide-graph-y-axis などの
+ * TideGraph（独自SVG実装）固有のtestIdは検証しない。
+ *
+ * TideChartはRechartsライブラリが内部でSVG要素を生成するため、
+ * tide-chart（メインコンテナ）とtide-graph-canvas（チャートラッパー）で検証。
  */
 export async function assertTideGraphVisible(page: Page): Promise<void> {
-  const tideGraph = page.locator(`[data-testid="${TestIds.TIDE_GRAPH_CANVAS}"]`);
-  await expect(tideGraph).toBeVisible();
+  // TideChartのメインコンテナを確認
+  const tideChart = page.locator(`[data-testid="${TestIds.TIDE_CHART}"]`);
+  await expect(tideChart).toBeVisible();
 
-  // グラフの基本要素が存在することを確認
-  // Note: Recharts内部のSVG要素はvisibility制御されるため、toBeAttached()を使用
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_AREA}"]`)).toBeAttached();
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_TIME_LABELS}"]`)).toBeAttached();
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_Y_AXIS}"]`)).toBeAttached();
+  // TideChartの内部チャートキャンバスを確認
+  const tideGraphCanvas = page.locator(`[data-testid="${TestIds.TIDE_GRAPH_CANVAS}"]`);
+  await expect(tideGraphCanvas).toBeVisible();
 }
 
 /**
