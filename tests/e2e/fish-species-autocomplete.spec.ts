@@ -115,20 +115,24 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       // 候補が表示されるまで待機
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
-      // 候補リストを取得
-      const options = page.locator('[role="option"]');
-
       // ↓キーを押す
       await input.press('ArrowDown');
 
-      // 最初の候補が選択される（React状態更新を待機）
-      await expect(options.first()).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+      // waitForFunctionでDOM状態が完全に更新されるのを待機
+      await page.waitForFunction(() => {
+        const options = document.querySelectorAll('[role="option"]');
+        return options[0]?.getAttribute('aria-selected') === 'true';
+      }, { timeout: 5000 });
 
       // もう一度↓キーを押す
       await input.press('ArrowDown');
 
-      // 2番目の候補が選択される（React状態更新を待機）
-      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+      // waitForFunctionで2番目が選択され、1番目が選択解除されるのを待機
+      await page.waitForFunction(() => {
+        const options = document.querySelectorAll('[role="option"]');
+        return options[1]?.getAttribute('aria-selected') === 'true' &&
+               options[0]?.getAttribute('aria-selected') === 'false';
+      }, { timeout: 5000 });
 
       // 選択されている候補が1つだけであることを確認
       const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
@@ -153,18 +157,29 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // ↓を押して最初の候補を選択
       await input.press('ArrowDown');
-      // 最初の候補が選択されていることを確認（React状態更新を待機）
-      await expect(options.first()).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+      // waitForFunctionでDOM状態が完全に更新されるのを待機
+      await page.waitForFunction(() => {
+        const options = document.querySelectorAll('[role="option"]');
+        return options[0]?.getAttribute('aria-selected') === 'true';
+      }, { timeout: 5000 });
 
       // もう一度↓を押して2番目の候補を選択
       await input.press('ArrowDown');
-      // 2番目の候補が選択されていることを確認（React状態更新を待機）
-      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+      // waitForFunctionで2番目が選択され、1番目が選択解除されるのを待機
+      await page.waitForFunction(() => {
+        const options = document.querySelectorAll('[role="option"]');
+        return options[1]?.getAttribute('aria-selected') === 'true' &&
+               options[0]?.getAttribute('aria-selected') === 'false';
+      }, { timeout: 5000 });
 
       // ↑を押して1番目の候補に戻る
       await input.press('ArrowUp');
-      // 1番目の候補が再び選択されていることを確認（React状態更新を待機）
-      await expect(options.first()).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+      // waitForFunctionで1番目が再び選択されるのを待機
+      await page.waitForFunction(() => {
+        const options = document.querySelectorAll('[role="option"]');
+        return options[0]?.getAttribute('aria-selected') === 'true' &&
+               options[1]?.getAttribute('aria-selected') === 'false';
+      }, { timeout: 5000 });
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
