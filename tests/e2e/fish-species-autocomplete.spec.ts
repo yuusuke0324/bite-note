@@ -135,41 +135,31 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
       const suggestions = page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`);
 
-      // Note: 「あ」で検索すると複数の候補（マアジ、アオリイカ等）が確実に表示される
-      await input.fill('あ');
+      // 「マ」で検索すると複数の候補（マアジ、マダイ等）が表示される
+      await input.fill('マ');
       await expect(suggestions).toBeVisible();
+
+      // 候補リストを取得
+      const options = page.locator('[role="option"]');
+      const optionCount = await options.count();
+
+      // 候補が2つ以上あることを確認（上下移動をテストするため）
+      expect(optionCount).toBeGreaterThanOrEqual(2);
 
       // ↓を押して最初の候補を選択
       await input.press('ArrowDown');
+      // 最初の候補が選択されていることを確認
+      await expect(options.first()).toHaveAttribute('aria-selected', 'true');
 
-      // 選択された候補があることを確認
-      const selectedOption = page.locator('[role="option"][aria-selected="true"]');
-      await expect(selectedOption).toBeVisible();
-
-      // 選択された候補のテキストを取得
-      const firstSelectedText = await selectedOption.first().textContent();
-
-      // もう一度↓を押して次の候補を選択
+      // もう一度↓を押して2番目の候補を選択
       await input.press('ArrowDown');
+      // 2番目の候補が選択されていることを確認
+      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true');
 
-      // まだ1つだけ選択されていることを確認
-      await expect(selectedOption).toHaveCount(1);
-
-      // 選択された候補のテキストを取得（異なる候補が選択されているはず）
-      const secondSelectedText = await selectedOption.first().textContent();
-
-      // ↑を押して前の候補に戻る
+      // ↑を押して1番目の候補に戻る
       await input.press('ArrowUp');
-
-      // まだ1つだけ選択されていることを確認
-      await expect(selectedOption).toHaveCount(1);
-
-      // 最初に選択されていた候補と同じテキストが選択されていることを確認
-      const afterUpSelectedText = await selectedOption.first().textContent();
-      expect(afterUpSelectedText).toBe(firstSelectedText);
-
-      // ArrowUpで異なる候補に移動したことを確認（2回目の選択とは異なる）
-      expect(secondSelectedText).not.toBe(afterUpSelectedText);
+      // 1番目の候補が再び選択されていることを確認
+      await expect(options.first()).toHaveAttribute('aria-selected', 'true');
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
