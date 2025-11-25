@@ -306,6 +306,8 @@ function App() {
       size="md"
       onClick={() => setActiveTab(tab)}
       data-testid={TAB_TEST_IDS[tab]}
+      aria-selected={activeTab === tab}
+      role="tab"
       style={{
         borderRadius: '8px 8px 0 0',
         borderBottom: activeTab === tab ? `3px solid ${colors.primary[500]}` : '3px solid transparent',
