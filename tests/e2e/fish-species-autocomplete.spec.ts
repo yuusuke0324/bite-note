@@ -5,7 +5,7 @@
  * FishSpeciesAutocompleteコンポーネントのエンドツーエンドテスト
  * ユーザーフロー、キーボード操作、アクセシビリティを検証
  *
- * @version 2.7.1
+ * @version 2.8.0
  * @since 2025-10-25
  */
 
@@ -151,18 +151,22 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       expect(optionCount).toBeGreaterThanOrEqual(2);
 
       // ステップ1: ↓で1番目を選択
-      await input.focus(); // CI環境でのフォーカス喪失対策
+      // 状態ベースのアサーションで入力がフォーカスされ、候補が表示されていることを確認
+      await expect(input).toBeFocused();
+      await expect(suggestions).toBeVisible();
       await input.press('ArrowDown');
       await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
 
       // ステップ2: ↓で2番目を選択
-      await input.focus(); // CI環境でのフォーカス喪失対策
+      await expect(input).toBeFocused();
+      await expect(suggestions).toBeVisible();
       await input.press('ArrowDown');
       await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
       await expect(options.nth(0)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
 
       // ステップ3: ↑で1番目に戻る
-      await input.focus(); // CI環境でのフォーカス喪失対策
+      await expect(input).toBeFocused();
+      await expect(suggestions).toBeVisible();
       await input.press('ArrowUp');
       await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
       await expect(options.nth(1)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
