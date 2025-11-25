@@ -11,6 +11,8 @@
 import { describe, it, expect } from 'vitest';
 import { CelestialCalculator } from '../CelestialCalculator';
 
+// NOTE: 高精度要件（±0.1日）は現在の実装で達成していないためskip
+// Issue #106 (on-hold) で精度向上を予定
 describe.skip('TASK-101: 天体計算エンジン要件テスト', () => {
   const calculator = new CelestialCalculator();
 
