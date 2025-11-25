@@ -115,17 +115,22 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       // 候補が表示されるまで待機
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
+      // 候補リストを取得
+      const options = page.locator('[role="option"]');
+
       // ↓キーを押す
       await input.press('ArrowDown');
 
-      // 最初の候補が選択される
-      const firstOption = page.locator('[role="option"][aria-selected="true"]').first();
-      await expect(firstOption).toBeVisible();
+      // 最初の候補が選択される（React状態更新を待機）
+      await expect(options.first()).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
 
       // もう一度↓キーを押す
       await input.press('ArrowDown');
 
-      // 2番目の候補が選択される
+      // 2番目の候補が選択される（React状態更新を待機）
+      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+
+      // 選択されている候補が1つだけであることを確認
       const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
       const count = await selectedOptions.count();
       expect(count).toBe(1);
@@ -148,18 +153,18 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // ↓を押して最初の候補を選択
       await input.press('ArrowDown');
-      // 最初の候補が選択されていることを確認
-      await expect(options.first()).toHaveAttribute('aria-selected', 'true');
+      // 最初の候補が選択されていることを確認（React状態更新を待機）
+      await expect(options.first()).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
 
       // もう一度↓を押して2番目の候補を選択
       await input.press('ArrowDown');
-      // 2番目の候補が選択されていることを確認
-      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true');
+      // 2番目の候補が選択されていることを確認（React状態更新を待機）
+      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
 
       // ↑を押して1番目の候補に戻る
       await input.press('ArrowUp');
-      // 1番目の候補が再び選択されていることを確認
-      await expect(options.first()).toHaveAttribute('aria-selected', 'true');
+      // 1番目の候補が再び選択されていることを確認（React状態更新を待機）
+      await expect(options.first()).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
@@ -170,6 +175,10 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // ↓キーで最初の候補を選択
       await input.press('ArrowDown');
+
+      // 候補が選択されていることを確認（React状態更新を待機）
+      const options = page.locator('[role="option"]');
+      await expect(options.first()).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
 
       // Enterキーで確定
       await input.press('Enter');
