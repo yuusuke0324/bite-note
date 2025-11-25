@@ -103,7 +103,8 @@ export async function createTestFishingRecord(
   await page.fill(`[data-testid="${TestIds.FISHING_DATE}"]`, testRecord.date);
 
   if (testRecord.fishSpecies) {
-    await page.fill(`[data-testid="${TestIds.FISH_SPECIES}"]`, testRecord.fishSpecies);
+    // FishSpeciesAutocompleteコンポーネントはFISH_SPECIES_INPUTを使用
+    await page.fill(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`, testRecord.fishSpecies);
   }
 
   if (testRecord.weather) {

@@ -123,7 +123,7 @@ test.describe('釣果記録作成フロー', () => {
     // フォームがクリアされることを確認
     await expect(page.locator('[data-testid="fishing-date"]')).toHaveValue('');
     await expect(page.locator('[data-testid="location-name"]')).toHaveValue('');
-    await expect(page.locator('[data-testid="fish-species"]')).toHaveValue('');
+    await expect(page.locator('[data-testid="fish-species-input"]')).toHaveValue('');
   });
 
   test.skip('エラーハンドリングが適切に動作する', async ({ page }) => {
