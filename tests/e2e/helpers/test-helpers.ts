@@ -125,8 +125,9 @@ export async function createTestFishingRecord(
   await page.click(`[data-testid="${TestIds.SAVE_RECORD_BUTTON}"]`);
 
   // トースト表示またはタブ切り替えを待機（固定時間待機ではなく）
+  // BottomNavigationは nav-${id} パターンと aria-current="page" を使用
   await page.waitForSelector(
-    `[data-testid="${TestIds.TOAST_SUCCESS}"], [data-testid="list-tab"][aria-selected="true"]`,
+    `[data-testid="${TestIds.TOAST_SUCCESS}"], [data-testid="nav-list"][aria-current="page"]`,
     { timeout: 5000 }
   );
 }
@@ -135,10 +136,10 @@ export async function createTestFishingRecord(
  * 釣果記録一覧に移動
  */
 export async function navigateToRecordsList(page: Page): Promise<void> {
-  // Use the list tab since the current app uses "写真で確認" tab instead of records link
-  await page.click('[data-testid="list-tab"]');
-  // Wait for the tab to be selected
-  await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 2000 });
+  // 記録一覧タブに移動（BottomNavigationは nav-${id} パターンを使用）
+  await page.click('[data-testid="nav-list"]');
+  // タブがアクティブになるまで待機（aria-current="page" を使用）
+  await page.waitForSelector('[data-testid="nav-list"][aria-current="page"]', { timeout: 2000 });
 }
 
 /**

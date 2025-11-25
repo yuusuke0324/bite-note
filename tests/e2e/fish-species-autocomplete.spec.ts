@@ -21,8 +21,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
     // waitForAppInitはHOME_TAB待機のため、正常系フローのみで使用
     await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 
-    // 記録登録タブに移動
-    await page.click('[data-testid="form-tab"]');
+    // 記録登録タブに移動（BottomNavigationは nav-${id} パターンを使用）
+    await page.click('[data-testid="nav-form"]');
     // オートコンプリート入力フィールドが表示されるまで待機
     await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`)).toBeVisible({ timeout: 3000 });
   });
