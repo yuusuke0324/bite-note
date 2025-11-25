@@ -147,8 +147,8 @@ test.describe('Epic #9: PWA Full Integration Tests', () => {
       // PHASE 4: データ検証（基本的な動作確認のみ）
       // TODO: Issue #203 - オフライン同期機能実装後に詳細な検証を追加
 
-      // 最終確認: ページが正常に動作している
-      expect(page.url()).toContain('localhost:3000');
+      // 最終確認: ページが正常に動作している（dev:3000またはpreview:4173）
+      expect(page.url()).toMatch(/localhost:(3000|4173)/);
     });
 
     test('should work consistently on Desktop Chrome', async ({ page, context }) => {

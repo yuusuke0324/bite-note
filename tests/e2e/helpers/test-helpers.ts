@@ -127,6 +127,10 @@ export async function createTestFishingRecord(
     `[data-testid="${TestIds.TOAST_SUCCESS}"], [data-testid="list-tab"][aria-selected="true"]`,
     { timeout: 5000 }
   );
+
+  // 保存完了後、記録一覧タブに移動（潮汐統合テスト等でrecord詳細ページへ遷移するため）
+  await page.click('[data-testid="list-tab"]');
+  await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 2000 });
 }
 
 /**
