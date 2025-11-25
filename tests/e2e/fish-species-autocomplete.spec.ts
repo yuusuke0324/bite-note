@@ -135,8 +135,13 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
       const suggestions = page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`);
 
-      await input.fill('あ');
+      // Note: 「あじ」で検索すると複数の候補（マアジ、シマアジ等）が確実に表示される
+      await input.fill('あじ');
       await expect(suggestions).toBeVisible();
+
+      // 複数の候補があることを確認（最低2つ必要）
+      const options = page.locator('[role="option"]');
+      await expect(options.nth(1)).toBeVisible({ timeout: 5000 });
 
       // ↓を押して最初の候補を選択（index: 0）
       await input.press('ArrowDown');
