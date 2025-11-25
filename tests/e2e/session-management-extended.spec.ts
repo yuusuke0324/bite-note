@@ -3,15 +3,14 @@
 
 import { test, expect } from '@playwright/test';
 import { TestIds } from '../../src/constants/testIds';
+import { waitForAppInit } from './helpers/test-helpers';
 
 // Fixed: Issue #201 - Using development server for E2E tests in CI
 test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
   test.beforeEach(async ({ page }) => {
-    // アプリを起動
-    await page.goto('/');
-
-    // アプリが初期化されるまで待機
-    await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
+    // アプリを起動 + 初期化待機
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await waitForAppInit(page);
 
     // セッション管理の初期化を待機
     await page.waitForFunction(() => {

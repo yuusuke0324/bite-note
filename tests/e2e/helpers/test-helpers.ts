@@ -5,6 +5,27 @@
 import { Page, expect } from '@playwright/test';
 import { TestIds } from '../../../src/constants/testIds';
 
+/**
+ * アプリケーション初期化待機
+ * App.tsxの初期化と基本UIの表示を確実に待機する
+ *
+ * 注意: ModernAppの初期タブは'home'なので、HOME_TABを待機する
+ */
+export async function waitForAppInit(page: Page): Promise<void> {
+  // App.tsx初期化完了を待機
+  await page.waitForSelector('body[data-app-initialized="true"]', {
+    timeout: 25000,
+    state: 'attached'
+  });
+
+  // 初期表示される要素（home-tab）を待機
+  // ModernAppの初期タブは'home'なので、form-tabではなくhome-tabを待つ
+  await page.waitForSelector(`[data-testid="${TestIds.HOME_TAB}"]`, {
+    timeout: 20000,
+    state: 'visible'
+  });
+}
+
 export interface TestFishingRecord {
   id: string;
   location: string;
@@ -40,11 +61,21 @@ export async function createTestFishingRecord(
 ): Promise<void> {
   const testRecord = { ...defaultTestRecord, ...record };
 
+  // フォームタブが存在し、操作可能であることを事前確認
+  const formTabSelector = `[data-testid="${TestIds.FORM_TAB}"]`;
+  await page.waitForSelector(formTabSelector, {
+    state: 'visible',
+    timeout: 10000
+  });
+
   // 記録登録タブに移動
-  await page.click('[data-testid="nav-form"]');
+  await page.click(formTabSelector);
 
   // タブが選択されたことを確認
-  await page.waitForSelector('[data-testid="nav-form"][aria-selected="true"]', { state: 'visible' });
+  await page.waitForSelector(`${formTabSelector}[aria-selected="true"]`, {
+    state: 'visible',
+    timeout: 5000
+  });
 
   // すべての主要フォームフィールドが表示されるまで待機
   await Promise.all([

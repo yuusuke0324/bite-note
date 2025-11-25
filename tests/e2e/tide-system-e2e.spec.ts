@@ -38,7 +38,7 @@ class TideSystemE2EHelper {
     useGPS?: boolean;
   }) {
     // 🟢 改善1: タブ切り替えをより堅牢に (ModernApp.tsx: nav-form パターン)
-    const formTab = this.page.locator(`[data-testid="nav-form"]`);
+    const formTab = this.page.locator(`[data-testid="form-tab"]`);
     await formTab.waitFor({ state: 'visible', timeout: 10000 });
     await expect(formTab).toBeEnabled();
     await formTab.click();
@@ -92,16 +92,16 @@ class TideSystemE2EHelper {
 
     // 🟢 改善5: 保存後、リストタブに自動切り替わることを確認（waitForTimeoutの代わり）
     const switchedToList = await this.page.waitForSelector(
-      `[data-testid="nav-list"][aria-current="page"]`,
+      `[data-testid="fishing-records-link"][aria-current="page"]`,
       { timeout: 5000, state: 'visible' }
     ).then(() => true).catch(() => false);
 
     if (!switchedToList) {
       // 手動で切り替え (ModernApp.tsx: nav-list パターン、aria-current使用)
       // CI環境（特にタブレットサイズ）ではオーバーレイが残ることがあるため、force: true で確実にクリック
-      await this.page.locator(`[data-testid="nav-list"]`).click({ force: true });
+      await this.page.locator(`[data-testid="fishing-records-link"]`).click({ force: true });
       await this.page.waitForSelector(
-        `[data-testid="nav-list"][aria-current="page"]`,
+        `[data-testid="fishing-records-link"][aria-current="page"]`,
         { timeout: 5000, state: 'visible' }
       );
     }
@@ -116,7 +116,7 @@ class TideSystemE2EHelper {
   // 釣果記録詳細ページに移動
   async goToRecordDetail(recordId?: string) {
     // リストタブに切り替え (ModernApp.tsx: nav-list パターン)
-    const listTab = this.page.locator(`[data-testid="nav-list"]`);
+    const listTab = this.page.locator(`[data-testid="fishing-records-link"]`);
     await listTab.waitFor({ state: 'visible', timeout: 10000 });
     await expect(listTab).toBeEnabled();
     // CI環境（特にタブレットサイズ）ではオーバーレイが残ることがあるため、force: true で確実にクリック

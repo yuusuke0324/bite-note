@@ -11,12 +11,16 @@
 
 import { test, expect } from '@playwright/test';
 import { TestIds } from '../../src/constants/testIds';
+import { waitForAppInit } from './helpers/test-helpers';
 
 test.describe('魚種オートコンプリート E2Eテスト', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    // ホーム画面から開始 + アプリ初期化待機
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await waitForAppInit(page);
+
     // 記録登録タブに移動
-    await page.click('[data-testid="nav-form"]');
+    await page.click('[data-testid="form-tab"]');
     // オートコンプリート入力フィールドが表示されるまで待機
     await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`)).toBeVisible({ timeout: 3000 });
   });
