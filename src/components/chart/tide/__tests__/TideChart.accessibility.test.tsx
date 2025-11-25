@@ -181,28 +181,6 @@ describe('TideChart Accessibility - TC-A001: ARIA属性実装テスト', () => {
     });
   });
 
-  describe.skip('TC-A001-03: 動的ARIA属性更新（Future Enhancement）', () => {
-    // This test checks for dynamic aria-value* updates which are not implemented
-    // since role="img" doesn't support aria-value* attributes
-    test('should update numeric ARIA attributes when data changes', async () => {
-      const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);
-
-      const newData = [
-        { time: '00:00', tide: 200, type: 'high' },
-        { time: '12:00', tide: 10, type: 'low' },
-      ];
-
-      rerender(<TideChart data={newData} chartComponents={mockChartComponents} />);
-
-      await waitFor(() => {
-        const chartContainer = screen.getByRole('img');
-        expect(chartContainer.getAttribute('aria-valuemin')).toBe('10');
-        expect(chartContainer.getAttribute('aria-valuemax')).toBe('200');
-        expect(chartContainer.getAttribute('aria-valuenow')).toBe('10');
-      });
-    });
-  });
-
   describe('TC-A001-03: ARIA属性動的更新', () => {
     test('should update aria-label when data changes', async () => {
       const { rerender } = render(<TideChart data={mockTideData} chartComponents={mockChartComponents} />);

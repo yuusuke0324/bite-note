@@ -10,7 +10,7 @@ import type { MoonPhase, CelestialPosition } from '../../../types/tide';
 import { CelestialCalculator } from '../CelestialCalculator';
 import { SYNODIC_MONTH } from '../constants/astronomical-constants';
 
-describe.skip('CelestialCalculator', () => {
+describe('CelestialCalculator', () => {
   let calculator: CelestialCalculator;
 
   beforeEach(() => {

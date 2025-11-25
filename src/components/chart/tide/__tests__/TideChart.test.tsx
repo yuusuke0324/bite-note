@@ -330,9 +330,10 @@ describe.skipIf(isCI)('TideChart', () => {
       const chartElement = screen.getByTestId('tide-chart');
       expect(chartElement).toHaveAttribute('role', 'img');
       // aria-labelは動的生成のため正規表現でマッチ（保守性向上）
+      // 新フォーマット: 「潮汐グラフ、現在{current}cm、最低{min}cm、最高{max}cm」
       expect(chartElement).toHaveAttribute(
         'aria-label',
-        expect.stringMatching(/潮汐グラフ:.*06:00.*18:00.*最高200cm.*最低-50cm/)
+        expect.stringMatching(/潮汐グラフ、現在120cm、最低-50cm、最高200cm/)
       );
       expect(chartElement).toHaveAttribute('aria-describedby');
     });
