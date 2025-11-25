@@ -15,7 +15,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
   isVisible,
   onClose
 }) => {
-  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'excel'>('json');
+  const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json');
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
   const [includePhotos, setIncludePhotos] = useState(true);
@@ -62,25 +62,6 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
           setExportStatus({
             type: 'success',
             message: 'CSVファイルのダウンロードが開始されました。'
-          });
-        } else {
-          setExportStatus({
-            type: 'error',
-            message: `エクスポートに失敗しました: ${result.error?.message}`
-          });
-        }
-      } else if (exportFormat === 'excel') {
-        // Excelエクスポート（記録のみ）
-        const result = await exportImportService.exportRecordsAsExcel();
-
-        if (result.success && result.data) {
-          const blob = exportImportService.createDownloadBlob(result.data, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-          const filename = `fishing-records-${new Date().toISOString().split('T')[0]}.xlsx`;
-          exportImportService.downloadFile(blob, filename);
-
-          setExportStatus({
-            type: 'success',
-            message: 'Excelファイルのダウンロードが開始されました。'
           });
         } else {
           setExportStatus({
@@ -191,7 +172,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 type="radio"
                 value="json"
                 checked={exportFormat === 'json'}
-                onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv' | 'excel')}
+                onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
               <span>📄 JSON (全データ)</span>
             </label>
@@ -205,23 +186,9 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 type="radio"
                 value="csv"
                 checked={exportFormat === 'csv'}
-                onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv' | 'excel')}
+                onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
               <span>📊 CSV (記録のみ)</span>
-            </label>
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              cursor: 'pointer'
-            }}>
-              <input
-                type="radio"
-                value="excel"
-                checked={exportFormat === 'excel'}
-                onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv' | 'excel')}
-              />
-              <span>📗 Excel (記録のみ)</span>
             </label>
           </div>
         </div>
