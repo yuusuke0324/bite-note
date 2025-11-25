@@ -8,6 +8,7 @@ interface NavigationItem {
   icon: React.ReactNode;
   badge?: number;
   active?: boolean;
+  testId?: string;
 }
 
 interface BottomNavigationProps {
@@ -84,7 +85,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
       {items.map((item) => (
         <button
           key={item.id}
-          data-testid={`nav-${item.id}`}
+          data-testid={item.testId || `nav-${item.id}`}
           style={itemStyles(item.active || false)}
           onClick={() => onItemClick(item.id)}
           onMouseEnter={(e) => {
@@ -98,6 +99,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             }
           }}
           aria-label={item.label}
+          aria-selected={item.active}
           aria-current={item.active ? 'page' : undefined}
           role="tab"
           tabIndex={0}

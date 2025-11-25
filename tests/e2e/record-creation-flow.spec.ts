@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
-import { waitForAppInit } from './helpers/test-helpers';
 
 test.describe('釣果記録作成フロー', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForAppInit(page);
+    await page.goto('/');
+
+    // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
+    // waitForAppInitはHOME_TAB待機のため、正常系フローのみで使用
+    await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
     // 記録登録タブに移動（BottomNavigationのdata-testid属性を使用）
     await page.click('[data-testid="form-tab"]');
     // フォームが表示されるまで待機

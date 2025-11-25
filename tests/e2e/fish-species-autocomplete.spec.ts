@@ -11,13 +11,15 @@
 
 import { test, expect } from '@playwright/test';
 import { TestIds } from '../../src/constants/testIds';
-import { waitForAppInit } from './helpers/test-helpers';
 
 test.describe('魚種オートコンプリート E2Eテスト', () => {
   test.beforeEach(async ({ page }) => {
-    // ホーム画面から開始 + アプリ初期化待機
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForAppInit(page);
+    // ホーム画面から開始
+    await page.goto('/');
+
+    // Fixed: Issue #226 - E2Eテストの初期化パターンを統一
+    // waitForAppInitはHOME_TAB待機のため、正常系フローのみで使用
+    await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
 
     // 記録登録タブに移動
     await page.click('[data-testid="form-tab"]');
