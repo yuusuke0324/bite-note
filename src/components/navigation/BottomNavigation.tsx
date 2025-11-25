@@ -81,7 +81,12 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   };
 
   return (
-    <nav style={navigationStyles} className={className}>
+    <nav
+      style={navigationStyles}
+      className={className}
+      role="tablist"
+      aria-label="メインナビゲーション"
+    >
       {items.map((item) => (
         <button
           key={item.id}
