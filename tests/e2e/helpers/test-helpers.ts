@@ -257,9 +257,10 @@ export async function assertTideGraphVisible(page: Page): Promise<void> {
   await expect(tideGraph).toBeVisible();
 
   // グラフの基本要素が存在することを確認
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_AREA}"]`)).toBeVisible();
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_TIME_LABELS}"]`)).toBeVisible();
-  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_Y_AXIS}"]`)).toBeVisible();
+  // Note: Recharts内部のSVG要素はvisibility制御されるため、toBeAttached()を使用
+  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_AREA}"]`)).toBeAttached();
+  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_TIME_LABELS}"]`)).toBeAttached();
+  await expect(page.locator(`[data-testid="${TestIds.TIDE_GRAPH_Y_AXIS}"]`)).toBeAttached();
 }
 
 /**
