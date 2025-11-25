@@ -159,9 +159,11 @@ export async function createTestFishingRecordWithCoordinates(
   }
 ): Promise<void> {
   // IndexedDBに直接テストレコードを挿入
+  // Note: setupCleanPage() でセットされたテスト用DB名を使用（tide-system-e2e.spec.ts等で必要）
   await page.evaluate((data) => {
     return new Promise<void>((resolve, reject) => {
-      const dbName = 'FishingRecordDB';
+      // @ts-expect-error - テスト用グローバル変数
+      const dbName = (globalThis as any).__TEST_DB_NAME__ || 'FishingRecordDB';
       const request = indexedDB.open(dbName);
 
       request.onerror = () => {
