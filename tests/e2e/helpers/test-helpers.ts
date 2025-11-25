@@ -10,6 +10,16 @@ import { TestIds } from '../../../src/constants/testIds';
  * App.tsxの初期化と基本UIの表示を確実に待機する
  *
  * 注意: ModernAppの初期タブは'home'なので、HOME_TABを待機する
+ *
+ * 使用範囲:
+ * - 正常系フロー（HOME_TAB表示が前提）: 使用OK
+ * - モーダル/セッション管理テスト: 使用しない（代わりに page.waitForSelector('[data-app-initialized]') を使用）
+ *
+ * 理由: この関数はHOME_TABの表示を待機するため、初期画面がHOME_TABでないテストでは
+ * タイムアウトが発生します。セッション管理テストなど、モーダルの動作をテストする場合は
+ * HOME_TABが表示されない可能性があるため、より汎用的な [data-app-initialized] の待機を使用してください。
+ *
+ * @see Issue #226 - session-management-extended.spec.ts での互換性問題
  */
 export async function waitForAppInit(page: Page): Promise<void> {
   // App.tsx初期化完了を待機

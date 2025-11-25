@@ -45,7 +45,7 @@ test.describe('エラーハンドリング基礎', () => {
 
   test('should validate required fields on form submission', async ({ page }) => {
     // フォームタブに移動
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('form')}"]`);
+    await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // 必須フィールドを明示的に空にする（clear()ではなくfill('')を使用）
@@ -69,7 +69,7 @@ test.describe('エラーハンドリング基礎', () => {
 
   test('should validate date field with future date', async ({ page }) => {
     // フォームタブに移動
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('form')}"]`);
+    await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // 未来の日付を生成（1年後）
@@ -99,7 +99,7 @@ test.describe('エラーハンドリング基礎', () => {
 
   test('should validate size field with negative value', async ({ page }) => {
     // フォームタブに移動
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('form')}"]`);
+    await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // 必須フィールドを入力
@@ -127,7 +127,7 @@ test.describe('エラーハンドリング基礎', () => {
 
   test('should handle location field with special characters', async ({ page }) => {
     // フォームタブに移動
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('form')}"]`);
+    await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // 必須フィールドを入力
@@ -151,7 +151,7 @@ test.describe('エラーハンドリング基礎', () => {
     await page.waitForTimeout(2000);
 
     // リストタブに移動して保存されたデータを確認
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('list')}"]`);
+    await page.click(`[data-testid="${TestIds.LIST_TAB}"]`);
     await page.waitForSelector(`[data-testid="${TestIds.FISHING_RECORDS_LIST}"]`, { state: 'visible', timeout: 10000 });
 
     // スクリプトタグがそのまま実行されず、テキストとして表示されることを確認
@@ -163,7 +163,7 @@ test.describe('エラーハンドリング基礎', () => {
 
   test('should detect offline state', async ({ page, context }) => {
     // フォームタブに移動
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('form')}"]`);
+    await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // オフライン状態をシミュレート
@@ -185,7 +185,7 @@ test.describe('エラーハンドリング基礎', () => {
 
   test('should persist data in IndexedDB', async ({ page }) => {
     // リストタブに移動
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('list')}"]`);
+    await page.click(`[data-testid="${TestIds.LIST_TAB}"]`);
     await page.waitForSelector(`[data-testid="${TestIds.FISHING_RECORDS_LIST}"]`, { state: 'visible', timeout: 10000 });
 
     // IndexedDBにデータが存在するか確認
@@ -211,11 +211,11 @@ test.describe('エラーハンドリング基礎', () => {
     // 各タブに移動してエラーが発生しないことを確認
 
     // フォームタブ
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('form')}"]`);
+    await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // リストタブ
-    await page.click(`[data-testid="${TestIds.NAV_ITEM('list')}"]`);
+    await page.click(`[data-testid="${TestIds.LIST_TAB}"]`);
     await page.waitForSelector(`[data-testid="${TestIds.FISHING_RECORDS_LIST}"]`, { state: 'visible', timeout: 10000 });
 
     // タイドグラフタブ（存在する場合）
