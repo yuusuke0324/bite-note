@@ -14,9 +14,20 @@ class TideSystemIntegrationHelper {
 
   // アプリケーション全体のフロー実行
   async executeCompleteUserFlow() {
-    // 1. ホーム画面から開始
-    await this.page.goto('/');
-    await this.page.waitForLoadState('networkidle');
+    // 1. ホーム画面から開始 + アプリ初期化待機
+    await this.page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // App.tsx初期化完了を待機
+    await this.page.waitForSelector('body[data-app-initialized="true"]', {
+      timeout: 25000,
+      state: 'attached'
+    });
+
+    // UIが表示されるまで待機
+    await this.page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+      timeout: 5000,
+      state: 'visible'
+    });
 
     // 2. 新規記録作成
     await createTestFishingRecord(this.page, {

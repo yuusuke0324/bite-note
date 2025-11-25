@@ -83,9 +83,20 @@ test.describe('TASK-301-001: 東京湾夏期記録での表示確認', () => {
     // Given: 東京湾での夏期釣果記録が存在する
     const record = testFishingRecords.tokyoBaySummer;
 
-    // ホーム画面から開始
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    // ホーム画面から開始 + アプリ初期化待機
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // App.tsx初期化完了を待機
+    await page.waitForSelector('body[data-app-initialized="true"]', {
+      timeout: 25000,
+      state: 'attached'
+    });
+
+    // UIが表示されるまで待機
+    await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+      timeout: 5000,
+      state: 'visible'
+    });
 
     // テスト用の釣果記録を作成
     await createTestFishingRecord(page, {
@@ -124,8 +135,20 @@ test.describe('TASK-301-002: 相模湾冬期記録での動的スケール確認
   test('should adapt scale dynamically for winter conditions', async ({ page }) => {
     const record = testFishingRecords.sagamiBayWinter;
 
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    // ホーム画面から開始 + アプリ初期化待機
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // App.tsx初期化完了を待機
+    await page.waitForSelector('body[data-app-initialized="true"]', {
+      timeout: 25000,
+      state: 'attached'
+    });
+
+    // UIが表示されるまで待機
+    await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+      timeout: 5000,
+      state: 'visible'
+    });
 
     await createTestFishingRecord(page, {
       id: record.id,
@@ -154,8 +177,20 @@ test.describe('TASK-301-002: 相模湾冬期記録での動的スケール確認
 
 test.describe('TASK-301-003: キャッシュ効果による高速化確認', () => {
   test('should improve load times with cache strategy', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    // ホーム画面から開始 + アプリ初期化待機
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // App.tsx初期化完了を待機
+    await page.waitForSelector('body[data-app-initialized="true"]', {
+      timeout: 25000,
+      state: 'attached'
+    });
+
+    // UIが表示されるまで待機
+    await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"]`, {
+      timeout: 5000,
+      state: 'visible'
+    });
 
     // 初回ロードの時間を測定
     const startTime1 = Date.now();
