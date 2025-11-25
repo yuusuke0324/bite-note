@@ -99,6 +99,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             }
           }}
           aria-label={item.label}
+          aria-selected={item.active}
           aria-current={item.active ? 'page' : undefined}
           role="tab"
           tabIndex={0}
