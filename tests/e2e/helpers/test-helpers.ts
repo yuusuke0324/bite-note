@@ -134,6 +134,102 @@ export async function createTestFishingRecord(
 }
 
 /**
+ * 座標付き釣果記録をIndexedDBに直接作成（潮汐統合テスト用）
+ *
+ * 通常のcreateTestFishingRecordはフォーム経由で記録を作成するため、
+ * 座標情報を保存できません（フォームにGPS座標の直接入力フィールドがないため）。
+ *
+ * この関数は、TideIntegrationコンポーネントのテストなど、
+ * 座標情報が必須のテストケースで使用してください。
+ *
+ * @param page Playwrightのページオブジェクト
+ * @param record 作成する記録データ（coordinatesは必須）
+ */
+export async function createTestFishingRecordWithCoordinates(
+  page: Page,
+  record: {
+    location: string;
+    latitude: number;
+    longitude: number;
+    date: string;
+    fishSpecies?: string;
+    size?: number;
+    weather?: string;
+    notes?: string;
+  }
+): Promise<void> {
+  // IndexedDBに直接テストレコードを挿入
+  await page.evaluate((data) => {
+    return new Promise<void>((resolve, reject) => {
+      const dbName = 'FishingRecordDB';
+      const request = indexedDB.open(dbName);
+
+      request.onerror = () => {
+        console.error('[createTestFishingRecordWithCoordinates] IndexedDB open error:', request.error);
+        reject(request.error);
+      };
+
+      request.onsuccess = () => {
+        const db = request.result;
+
+        // fishing_records テーブルが存在するか確認
+        if (!db.objectStoreNames.contains('fishing_records')) {
+          console.error('[createTestFishingRecordWithCoordinates] fishing_records table not found');
+          db.close();
+          reject(new Error('fishing_records table not found'));
+          return;
+        }
+
+        const transaction = db.transaction(['fishing_records'], 'readwrite');
+        const store = transaction.objectStore('fishing_records');
+
+        // テスト用釣果記録データ
+        const testRecord = {
+          id: 'test-record-' + Date.now(),
+          fishSpecies: data.fishSpecies || 'テスト魚種',
+          size: data.size || 30,
+          location: data.location,
+          coordinates: {
+            latitude: data.latitude,
+            longitude: data.longitude
+          },
+          date: new Date(data.date),
+          weather: data.weather || '晴れ',
+          notes: data.notes || 'E2Eテスト用データ',
+          photos: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        const addRequest = store.add(testRecord);
+
+        addRequest.onsuccess = () => {
+          console.log('[createTestFishingRecordWithCoordinates] テストレコードをIndexedDBに挿入しました');
+          db.close();
+          resolve();
+        };
+
+        addRequest.onerror = () => {
+          console.error('[createTestFishingRecordWithCoordinates] Add record error:', addRequest.error);
+          db.close();
+          reject(addRequest.error);
+        };
+      };
+    });
+  }, record);
+
+  // ページをリロードしてデータを反映
+  await page.reload();
+
+  // アプリ初期化を待機
+  await page.waitForSelector('[data-app-initialized]', { timeout: 10000 });
+
+  // 記録一覧タブに移動して記録を表示
+  await page.click('[data-testid="list-tab"]');
+  await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 5000 });
+}
+
+/**
  * 釣果記録一覧に移動
  */
 export async function navigateToRecordsList(page: Page): Promise<void> {

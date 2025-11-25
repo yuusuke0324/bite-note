@@ -6,7 +6,7 @@
  */
 
 import { test, expect, Page } from '@playwright/test';
-import { createTestFishingRecord } from './helpers/test-helpers';
+import { createTestFishingRecordWithCoordinates } from './helpers/test-helpers';
 import { TestIds } from '../../src/constants/testIds';
 
 class TideSystemIntegrationHelper {
@@ -32,9 +32,8 @@ class TideSystemIntegrationHelper {
     // CI環境でのService Worker初期化等の遅延を吸収
     await this.page.waitForTimeout(500);
 
-    // 2. 新規記録作成
-    await createTestFishingRecord(this.page, {
-      id: 'test-record-' + Date.now(),
+    // 2. 新規記録作成（座標付き - 潮汐表示に必須）
+    await createTestFishingRecordWithCoordinates(this.page, {
       location: '東京湾 豊洲埠頭',
       latitude: 35.6762,
       longitude: 139.6503,
@@ -95,9 +94,8 @@ class TideSystemIntegrationHelper {
     await this.page.goto('/');
     await this.page.waitForLoadState('networkidle');
 
-    // 2つ目の記録作成
-    await createTestFishingRecord(this.page, {
-      id: 'test-record-osaka-' + Date.now(),
+    // 2つ目の記録作成（座標付き - 潮汐表示に必須）
+    await createTestFishingRecordWithCoordinates(this.page, {
       location: '大阪湾',
       latitude: 34.6937,
       longitude: 135.5023,
