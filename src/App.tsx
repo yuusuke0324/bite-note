@@ -69,11 +69,9 @@ function App() {
         // 成功時にアプリストアを更新
         await appActions.refreshRecords();
       } else {
-        console.error('❌ Direct creation failed:', result.error);
         throw new Error(result.error?.message || '記録の保存に失敗しました');
       }
     } catch (error) {
-      console.error('💥 Direct creation error:', error);
       appActions.setError(error instanceof Error ? error.message : '記録の保存に失敗しました');
     }
 

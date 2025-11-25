@@ -143,8 +143,7 @@ describe('Performance Integration', () => {
     expect(result1.summary).toBeDefined();
     expect(result2.summary).toBeDefined();
 
-    // NOTE: パフォーマンス比較はCI環境で不安定なため除外（Issue #109）
-    // TODO: Issue #112 - performanceMode実装の改善後、パフォーマンステストを追加
+    // NOTE: パフォーマンス比較はCI環境で不安定なため除外
   });
 
   test('should handle concurrent validation requests', async () => {

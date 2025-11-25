@@ -307,8 +307,7 @@ describe('TASK-202 Step 4: TideSummaryCard統合テスト', () => {
   });
 });
 
-// TODO: Issue #26 で TASK-202要件（4項目グリッド + イベント一覧）を実装予定
-// 現在の実装は「次イベントのみ表示」のシンプル版
+// TASK-202: 4項目グリッド + イベント一覧（Issue #26で実装済み）
 describe('TASK-202: TideSummaryCardコンポーネント（残りのテスト）', () => {
   beforeEach(async () => {
     // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #45）
