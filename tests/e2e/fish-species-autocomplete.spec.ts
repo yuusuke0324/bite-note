@@ -16,7 +16,7 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // 記録登録タブに移動
-    await page.click('[data-testid="nav-form"]');
+    await page.click('[data-testid="form-tab"]');
     // オートコンプリート入力フィールドが表示されるまで待機
     await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`)).toBeVisible({ timeout: 3000 });
   });

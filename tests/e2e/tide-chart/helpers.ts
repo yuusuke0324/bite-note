@@ -574,11 +574,11 @@ export async function setupCleanPage(page: Page) {
 
   // UIが表示されるまで待機 (ModernApp.tsx: nav-form パターン)
   await page.waitForSelector(
-    `[data-testid="nav-form"]`,
+    `[data-testid="form-tab"]`,
     { timeout: 5000, state: 'visible' }
   );
 
   // タブUIが操作可能か確認
-  const formTab = page.locator(`[data-testid="nav-form"]`);
+  const formTab = page.locator(`[data-testid="form-tab"]`);
   await expect(formTab).toBeEnabled();
 }

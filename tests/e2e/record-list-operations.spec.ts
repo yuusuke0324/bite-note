@@ -43,7 +43,7 @@ test.describe('釣果記録一覧操作', () => {
     });
 
     // 記録一覧タブに移動
-    await page.click('[data-testid="nav-list"]');
+    await page.click('[data-testid="fishing-records-link"]');
     await expect(page.locator('[data-testid="record-list"]')).toBeVisible();
   });
 
@@ -175,7 +175,7 @@ test.describe('釣果記録一覧操作', () => {
 
     // ページをリロードして新しいデータを読み込み
     await page.reload();
-    await page.click('[data-testid="nav-list"]');
+    await page.click('[data-testid="fishing-records-link"]');
 
     // ページネーションが表示されることを確認
     await expect(page.locator('[data-testid="pagination"]')).toBeVisible();
@@ -194,7 +194,7 @@ test.describe('釣果記録一覧操作', () => {
     });
 
     await page.reload();
-    await page.click('[data-testid="nav-list"]');
+    await page.click('[data-testid="fishing-records-link"]');
 
     // 空の状態メッセージが表示されることを確認
     await expect(page.locator('[data-testid="empty-state"]')).toBeVisible();

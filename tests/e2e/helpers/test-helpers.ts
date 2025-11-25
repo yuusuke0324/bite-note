@@ -41,10 +41,10 @@ export async function createTestFishingRecord(
   const testRecord = { ...defaultTestRecord, ...record };
 
   // 記録登録タブに移動
-  await page.click('[data-testid="nav-form"]');
+  await page.click(`[data-testid="${TestIds.FORM_TAB}"]`);
 
   // タブが選択されたことを確認
-  await page.waitForSelector('[data-testid="nav-form"][aria-selected="true"]', { state: 'visible' });
+  await page.waitForSelector(`[data-testid="${TestIds.FORM_TAB}"][aria-selected="true"]`, { state: 'visible' });
 
   // すべての主要フォームフィールドが表示されるまで待機
   await Promise.all([

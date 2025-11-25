@@ -5,7 +5,7 @@ test.describe('釣果記録作成フロー', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // 記録登録タブに移動（BottomNavigationのdata-testid属性を使用）
-    await page.click('[data-testid="nav-form"]');
+    await page.click('[data-testid="form-tab"]');
     // フォームが表示されるまで待機
     await page.waitForSelector('form', { state: 'visible' });
   });
