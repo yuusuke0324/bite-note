@@ -26,7 +26,7 @@ const mockDb = vi.hoisted(() => ({
 
 // パフォーマンスモニターのモック
 const mockPerformanceMonitor = vi.hoisted(() => ({
-  measureAsync: vi.fn(async (name: string, context: any, fn: () => Promise<any>) => {
+  measureAsync: vi.fn(async (name: string, fn: () => Promise<any>) => {
     return fn();
   })
 }));
