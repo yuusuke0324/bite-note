@@ -140,7 +140,7 @@ export class ChartConfigManager {
     if (options?.overrides) {
       for (const [key, value] of Object.entries(options.overrides)) {
         if (value && this.isValidColor(value)) {
-          (result as any)[key] = this.normalizeColor(value);
+          result[key as keyof ColorConfig] = this.normalizeColor(value);
         }
       }
     }
@@ -221,32 +221,34 @@ export class ChartConfigManager {
   /**
    * 設定マージ
    */
-  mergeConfigs(base: any, override: any): any {
-    if (!base) return override || {};
+  mergeConfigs<T extends Record<string, unknown>>(base: T | null | undefined, override: Partial<T> | null | undefined): T {
+    if (!base) return (override || {}) as T;
     if (!override) return base;
 
-    return this.deepMerge(base, override);
+    return this.deepMerge(base, override) as T;
   }
 
   /**
    * 深いマージ処理（private）
    */
-  private deepMerge(target: any, source: any): any {
-    const result = { ...target };
+  private deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
+    const result = { ...target } as Record<string, unknown>;
 
     for (const key in source) {
-      if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        if (target[key] && typeof target[key] === 'object' && !Array.isArray(target[key])) {
-          result[key] = this.deepMerge(target[key], source[key]);
+      const sourceValue = source[key];
+      const targetValue = target[key];
+      if (sourceValue !== null && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
+        if (targetValue && typeof targetValue === 'object' && !Array.isArray(targetValue)) {
+          result[key] = this.deepMerge(targetValue as Record<string, unknown>, sourceValue as Record<string, unknown>);
         } else {
-          result[key] = { ...source[key] };
+          result[key] = { ...sourceValue };
         }
       } else {
-        result[key] = source[key];
+        result[key] = sourceValue;
       }
     }
 
-    return result;
+    return result as T;
   }
 
   /**
@@ -373,7 +375,7 @@ export class ChartConfigManager {
       const validColors: Partial<ColorConfig> = {};
       for (const [key, value] of Object.entries(config.colors)) {
         if (typeof value === 'string' && this.isValidColor(value)) {
-          (validColors as any)[key] = this.normalizeColor(value);
+          validColors[key as keyof ColorConfig] = this.normalizeColor(value);
         }
       }
       if (Object.keys(validColors).length > 0) {
@@ -384,7 +386,7 @@ export class ChartConfigManager {
     // フォント設定のフィルタリング
     if (config.fonts?.size) {
       const sizes = config.fonts.size;
-      const validSizes: any = {};
+      const validSizes: Partial<FontConfig['size']> = {};
 
       if (sizes.small && typeof sizes.small === 'number' && sizes.small >= 8 && sizes.small <= 24) {
         validSizes.small = sizes.small;
@@ -437,7 +439,7 @@ export class ChartConfigManager {
   /**
    * 設定検証
    */
-  validateConfig(config: any): ConfigValidationResult {
+  validateConfig(config: Partial<ChartConfig>): ConfigValidationResult {
     const errors: string[] = [];
 
     // 色設定の検証

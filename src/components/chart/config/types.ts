@@ -158,7 +158,7 @@ export interface ConfigValidationResult {
  */
 export interface ConfigChangeEvent {
   type: string;
-  changes: any;
+  changes: Partial<ColorConfig | FontConfig | MarginConfig | A11yConfig>;
 }
 
 /**
