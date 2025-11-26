@@ -13,7 +13,7 @@ import { photoService } from '../../lib/photo-service';
 import type { FishingRecord } from '../../types';
 import { logger } from '../../lib/errors/logger';
 import { Icon } from '../ui/Icon';
-import { Map, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2 } from 'lucide-react';
+import { Map as MapIcon, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2 } from 'lucide-react';
 
 // Leafletのデフォルトアイコン修正
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -355,7 +355,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           display: 'flex',
           justifyContent: 'center',
         }}>
-          <Icon icon={Map} size={80} color="secondary" decorative />
+          <Icon icon={MapIcon} size={80} color="secondary" decorative />
         </div>
         <h3 style={{
           ...textStyles.headline.medium,
