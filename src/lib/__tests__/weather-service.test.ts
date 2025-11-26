@@ -11,6 +11,21 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { WeatherService } from '../weather-service';
 import type { Coordinates } from '../../types';
+import { logger } from '../errors';
+
+// loggerをモック
+vi.mock('../errors', async () => {
+  const actual = await vi.importActual('../errors');
+  return {
+    ...actual,
+    logger: {
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+      debug: vi.fn(),
+    },
+  };
+});
 
 // 固定タイムスタンプ（2024-01-15 12:00:00 JST）
 const FIXED_NOW = new Date('2024-01-15T12:00:00+09:00').getTime();
@@ -70,9 +85,6 @@ describe('WeatherService', () => {
     // Math.random() モック（決定的テスト用）
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
 
-    // console.error モック
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-
     // キャッシュクリア
     service.clearCache();
     service.resetApiUsage();
@@ -80,6 +92,7 @@ describe('WeatherService', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers(); // vi.setSystemTime()によるfake timersをリセット
   });
 
   // ============================================================================
@@ -661,9 +674,9 @@ describe('WeatherService', () => {
       expect(result.success).toBe(true);
       expect(result.data?.condition).toBe('雨'); // Math.random() = 0.5 → icons[2] = '03d'
       expect(result.data?.icon).toBe('03d');
-      expect(console.error).toHaveBeenCalledWith(
-        '天気情報取得エラー:',
-        expect.any(Error)
+      expect(logger.error).toHaveBeenCalledWith(
+        '天気情報取得エラー',
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
 
@@ -685,9 +698,9 @@ describe('WeatherService', () => {
 
       expect(result.success).toBe(true);
       expect(result.data?.temperature).toBe(20); // 現在天気データ
-      expect(console.error).toHaveBeenCalledWith(
-        'Open-Meteo履歴天気取得エラー:',
-        expect.any(Error)
+      expect(logger.error).toHaveBeenCalledWith(
+        'Open-Meteo履歴天気取得エラー',
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
 
@@ -699,9 +712,9 @@ describe('WeatherService', () => {
       expect(result.success).toBe(false);
       expect(result.error?.code).toBe('MARINE_API_ERROR');
       expect(result.error?.message).toContain('Marine API unavailable');
-      expect(console.error).toHaveBeenCalledWith(
-        '海洋データ取得エラー:',
-        expect.any(Error)
+      expect(logger.error).toHaveBeenCalledWith(
+        '海洋データ取得エラー',
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
 

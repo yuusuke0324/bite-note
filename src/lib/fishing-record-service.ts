@@ -3,6 +3,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import Dexie from 'dexie';
 import { db } from './database';
+import { logger } from './errors';
 import type {
   FishingRecord,
   CreateFishingRecordForm,
@@ -471,7 +472,7 @@ export class FishingRecordService {
       const count = await db.fishing_records.count();
       await db.updateMetadata('total_records', count.toString());
     } catch (error) {
-      console.warn('Failed to update total records count:', error);
+      logger.warn('Failed to update total records count', { error });
     }
   }
 }

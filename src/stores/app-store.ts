@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { fishingRecordService } from '../lib/fishing-record-service';
 import { settingsService } from '../lib/settings-service';
+import { logger } from '../lib/errors';
 import type {
   AppState,
   AppSettings,
@@ -82,7 +83,7 @@ export const useAppStore = create<AppStore>()(
           ]);
 
         } catch (error) {
-          console.error('App initialization failed:', error);
+          logger.error('App initialization failed', { error });
           actions.setError('アプリの初期化に失敗しました');
         } finally {
           actions.setLoading(false);
@@ -102,7 +103,7 @@ export const useAppStore = create<AppStore>()(
             actions.setError(result.error?.message || '記録の読み込みに失敗しました');
           }
         } catch (error) {
-          console.error('Failed to load records:', error);
+          logger.error('Failed to load records', { error });
           actions.setError('記録の読み込み中にエラーが発生しました');
         }
       },
@@ -144,7 +145,7 @@ export const useAppStore = create<AppStore>()(
             actions.setError(result.error?.message || '記録の更新に失敗しました');
           }
         } catch (error) {
-          console.error('Failed to update record:', error);
+          logger.error('Failed to update record', { error });
           actions.setError('記録の更新中にエラーが発生しました');
         }
       },
@@ -169,7 +170,7 @@ export const useAppStore = create<AppStore>()(
             actions.setError(result.error?.message || '記録の削除に失敗しました');
           }
         } catch (error) {
-          console.error('Failed to delete record:', error);
+          logger.error('Failed to delete record', { error });
           actions.setError('記録の削除中にエラーが発生しました');
         }
       },
@@ -183,10 +184,10 @@ export const useAppStore = create<AppStore>()(
           if (result.success && result.data) {
             set({ settings: result.data });
           } else {
-            console.warn('Failed to load settings, using defaults:', result.error?.message);
+            logger.warn('Failed to load settings, using defaults', { error: result.error?.message });
           }
         } catch (error) {
-          console.error('Failed to load settings:', error);
+          logger.error('Failed to load settings', { error });
           // 設定読み込み失敗はアプリ全体を止めない
         }
       },
@@ -204,7 +205,7 @@ export const useAppStore = create<AppStore>()(
             actions.setError(result.error?.message || '設定の更新に失敗しました');
           }
         } catch (error) {
-          console.error('Failed to update settings:', error);
+          logger.error('Failed to update settings', { error });
           actions.setError('設定の更新中にエラーが発生しました');
         }
       },
