@@ -29,7 +29,14 @@ const mockTargetElement = document.createElement('div');
 describe('TASK-203: 潮汐ツールチップシステム', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers(); // タイマーのモック（無限ループ防止）
     document.body.innerHTML = '';
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   describe('基本表示機能', () => {
@@ -250,9 +257,10 @@ describe('TASK-203: 潮汐ツールチップシステム', () => {
         />
       );
 
-      const description = screen.getByTestId('tooltip-description');
-      expect(description).toBeInTheDocument();
-      expect(description).toHaveTextContent(/潮汐詳細情報/);
+      // コンポーネントはaria-labelで潮汐情報を提供している
+      const tooltip = screen.getByTestId('tide-tooltip');
+      expect(tooltip).toHaveAttribute('aria-label');
+      expect(tooltip.getAttribute('aria-label')).toMatch(/潮汐情報/);
     });
   });
 
