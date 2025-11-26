@@ -151,22 +151,25 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       expect(optionCount).toBeGreaterThanOrEqual(2);
 
       // ステップ1: ↓で1番目を選択
-      // waitForFunctionを使用してReact状態更新を確実に検出
-      await input.press('ArrowDown');
+      // input.click() でフォーカスを確実に維持してからキー押下
+      await input.click();
+      await page.keyboard.press('ArrowDown');
       await page.waitForFunction(
         () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
         { timeout: 10000 }
       );
 
       // ステップ2: ↓で2番目を選択
-      await input.press('ArrowDown');
+      await input.click();
+      await page.keyboard.press('ArrowDown');
       await page.waitForFunction(
         () => document.querySelector('[role="option"]:nth-child(2)')?.getAttribute('aria-selected') === 'true',
         { timeout: 10000 }
       );
 
       // ステップ3: ↑で1番目に戻る
-      await input.press('ArrowUp');
+      await input.click();
+      await page.keyboard.press('ArrowUp');
       await page.waitForFunction(
         () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
         { timeout: 10000 }
