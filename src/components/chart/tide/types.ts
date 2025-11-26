@@ -3,13 +3,14 @@
  * TASK-202: TideChart メインコンポーネント実装
  */
 
+import type React from 'react';
 import type {
-  LineChartProps,
-  XAxisProps,
-  YAxisProps,
-  LineProps,
-  TooltipProps,
-  ReferenceLineProps,
+  LineChart,
+  XAxis,
+  YAxis,
+  Line,
+  Tooltip,
+  ReferenceLine,
 } from 'recharts';
 
 /**
@@ -23,14 +24,15 @@ export interface TideChartData {
 
 /**
  * Recharts コンポーネント型定義（依存性注入用）
+ * Note: Rechartsの型はPropsを直接エクスポートしていないため、コンポーネント型を使用
  */
 export interface ChartComponents {
-  LineChart: React.ComponentType<LineChartProps>;
-  XAxis: React.ComponentType<XAxisProps>;
-  YAxis: React.ComponentType<YAxisProps>;
-  Line: React.ComponentType<LineProps>;
-  Tooltip: React.ComponentType<TooltipProps<number, string>>;
-  ReferenceLine: React.ComponentType<ReferenceLineProps>;
+  LineChart: typeof LineChart;
+  XAxis: typeof XAxis;
+  YAxis: typeof YAxis;
+  Line: typeof Line;
+  Tooltip: typeof Tooltip;
+  ReferenceLine: typeof ReferenceLine;
 }
 
 /**

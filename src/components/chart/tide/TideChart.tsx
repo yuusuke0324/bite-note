@@ -557,7 +557,9 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, DataPointProps>(
   const isSelected = selected;
 
   const handleClick = React.useCallback(() => {
-    onClick?.(payload, index);
+    if (payload && index !== undefined) {
+      onClick?.(payload, index);
+    }
   }, [onClick, payload, index]);
 
   // Color-blind friendly patterns (WCAG 2.1 1.4.1 Use of Color)

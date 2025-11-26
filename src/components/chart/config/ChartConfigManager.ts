@@ -221,34 +221,46 @@ export class ChartConfigManager {
   /**
    * 設定マージ
    */
-  mergeConfigs<T extends Record<string, unknown>>(base: T | null | undefined, override: Partial<T> | null | undefined): T {
-    if (!base) return (override || {}) as T;
+  mergeConfigs(base: ChartConfig | null | undefined, override: Partial<ChartConfig> | null | undefined): ChartConfig {
+    if (!base) return (override || this.getDefaultConfig()) as ChartConfig;
     if (!override) return base;
 
-    return this.deepMerge(base, override) as T;
+    return this.deepMerge(base, override);
   }
 
   /**
    * 深いマージ処理（private）
    */
-  private deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
-    const result = { ...target } as Record<string, unknown>;
+  private deepMerge(target: ChartConfig, source: Partial<ChartConfig>): ChartConfig {
+    const result = { ...target };
 
-    for (const key in source) {
-      const sourceValue = source[key];
-      const targetValue = target[key];
-      if (sourceValue !== null && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
-        if (targetValue && typeof targetValue === 'object' && !Array.isArray(targetValue)) {
-          result[key] = this.deepMerge(targetValue as Record<string, unknown>, sourceValue as Record<string, unknown>);
-        } else {
-          result[key] = { ...sourceValue };
-        }
-      } else {
-        result[key] = sourceValue;
-      }
+    if (source.colors) {
+      result.colors = { ...target.colors, ...source.colors };
+    }
+    if (source.fonts) {
+      result.fonts = {
+        ...target.fonts,
+        ...source.fonts,
+        size: { ...target.fonts.size, ...source.fonts.size },
+        weight: { ...target.fonts.weight, ...source.fonts.weight },
+      };
+    }
+    if (source.margin) {
+      result.margin = { ...target.margin, ...source.margin };
+    }
+    if (source.accessibility) {
+      result.accessibility = {
+        ...target.accessibility,
+        ...source.accessibility,
+        highContrast: { ...target.accessibility.highContrast, ...source.accessibility.highContrast },
+        colorBlindness: { ...target.accessibility.colorBlindness, ...source.accessibility.colorBlindness },
+        reducedMotion: { ...target.accessibility.reducedMotion, ...source.accessibility.reducedMotion },
+        fontSize: { ...target.accessibility.fontSize, ...source.accessibility.fontSize },
+        focus: { ...target.accessibility.focus, ...source.accessibility.focus },
+      };
     }
 
-    return result as T;
+    return result;
   }
 
   /**
@@ -386,7 +398,7 @@ export class ChartConfigManager {
     // フォント設定のフィルタリング
     if (config.fonts?.size) {
       const sizes = config.fonts.size;
-      const validSizes: Partial<FontConfig['size']> = {};
+      const validSizes: { small?: number; medium?: number; large?: number } = {};
 
       if (sizes.small && typeof sizes.small === 'number' && sizes.small >= 8 && sizes.small <= 24) {
         validSizes.small = sizes.small;
@@ -399,7 +411,7 @@ export class ChartConfigManager {
       }
 
       if (Object.keys(validSizes).length > 0) {
-        filtered.fonts = { ...config.fonts, size: validSizes };
+        filtered.fonts = { ...config.fonts, size: validSizes as FontConfig['size'] };
       }
     }
 
