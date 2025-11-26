@@ -44,7 +44,6 @@ function App() {
   // Zustand Store の状態を取得
   const error = useAppStore(selectError)
   const records = useAppStore(selectRecords)
-  const settings = useAppStore(selectSettings)
   const appActions = useAppStore(selectActions)
 
   const formData = useFormStore(selectFormData)
