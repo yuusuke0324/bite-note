@@ -1,16 +1,32 @@
 // フィードバックサービス
 
+/**
+ * フィードバックアイコン名（Lucideアイコン名）
+ * - success: Check
+ * - error: X
+ * - warning: AlertTriangle
+ * - info: Info
+ */
+export type FeedbackIconName = 'Check' | 'X' | 'AlertTriangle' | 'Info';
+
 export interface Feedback {
   type: 'success' | 'error' | 'warning' | 'info';
   message: string;
   duration: number;
-  icon: string;
+  icon: FeedbackIconName;
   dismissible?: boolean;
   actions?: Array<{
     label: string;
     action: () => void;
   }>;
 }
+
+const feedbackIcons: Record<Feedback['type'], FeedbackIconName> = {
+  success: 'Check',
+  error: 'X',
+  warning: 'AlertTriangle',
+  info: 'Info'
+};
 
 export class FeedbackService {
   /**
@@ -21,7 +37,7 @@ export class FeedbackService {
       type: 'success',
       message,
       duration,
-      icon: '✓',
+      icon: feedbackIcons.success,
       dismissible: true
     };
   }
@@ -34,7 +50,7 @@ export class FeedbackService {
       type: 'error',
       message,
       duration,
-      icon: '✗',
+      icon: feedbackIcons.error,
       dismissible: true
     };
   }
@@ -47,7 +63,7 @@ export class FeedbackService {
       type: 'warning',
       message,
       duration,
-      icon: '⚠',
+      icon: feedbackIcons.warning,
       dismissible: true
     };
   }
@@ -60,7 +76,7 @@ export class FeedbackService {
       type: 'info',
       message,
       duration,
-      icon: 'ℹ',
+      icon: feedbackIcons.info,
       dismissible: true
     };
   }
@@ -74,18 +90,11 @@ export class FeedbackService {
     actions: Feedback['actions'],
     duration: number = 6000
   ): Feedback {
-    const baseIcons = {
-      success: '✓',
-      error: '✗',
-      warning: '⚠',
-      info: 'ℹ'
-    };
-
     return {
       type,
       message,
       duration,
-      icon: baseIcons[type],
+      icon: feedbackIcons[type],
       dismissible: true,
       actions
     };

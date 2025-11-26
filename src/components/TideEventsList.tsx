@@ -16,6 +16,8 @@
 import React from 'react';
 import type { TideEvent } from '../types/tide';
 import { filterTodayEvents } from '../lib/tide-helpers';
+import { Icon } from './ui/Icon';
+import { Calendar, Waves, ArrowDown } from 'lucide-react';
 
 interface TideEventsListProps {
   events: TideEvent[];
@@ -37,7 +39,9 @@ export const TideEventsList: React.FC<TideEventsListProps> = ({
         data-testid="empty-events-state"
         className="text-center py-8 text-gray-500"
       >
-        <div className="text-4xl mb-2">📅</div>
+        <div className="mb-2">
+          <Icon icon={Calendar} size={48} color="secondary" decorative />
+        </div>
         <div className="text-sm">今日の潮汐イベントがありません</div>
       </div>
     );
@@ -67,9 +71,9 @@ export const TideEventsList: React.FC<TideEventsListProps> = ({
             {/* アイコン */}
             <div
               data-testid={isHighTide ? 'high-tide-icon' : 'low-tide-icon'}
-              className="flex-shrink-0 text-2xl"
+              className="flex-shrink-0"
             >
-              {isHighTide ? '🌊' : '🏖️'}
+              <Icon icon={isHighTide ? Waves : ArrowDown} size={24} color="primary" decorative />
             </div>
 
             {/* イベント詳細 */}

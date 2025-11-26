@@ -22,7 +22,7 @@ describe('getTideTypeColor', () => {
     const result = getTideTypeColor('spring');
     expect(result.bg).toBe('bg-emerald-50');
     expect(result.text).toBe('text-emerald-700');
-    expect(result.icon).toBe('🌊');
+    expect(result.icon).toBe('Waves');
     expect(result.label).toBe('大潮');
   });
 
@@ -30,7 +30,7 @@ describe('getTideTypeColor', () => {
     const result = getTideTypeColor('medium');
     expect(result.bg).toBe('bg-sky-50');
     expect(result.text).toBe('text-sky-700');
-    expect(result.icon).toBe('〰️');
+    expect(result.icon).toBe('Activity');
     expect(result.label).toBe('中潮');
   });
 
@@ -38,7 +38,7 @@ describe('getTideTypeColor', () => {
     const result = getTideTypeColor('neap');
     expect(result.bg).toBe('bg-slate-50');
     expect(result.text).toBe('text-slate-600');
-    expect(result.icon).toBe('💧');
+    expect(result.icon).toBe('Droplet');
     expect(result.label).toBe('小潮');
   });
 
@@ -46,7 +46,7 @@ describe('getTideTypeColor', () => {
     const result = getTideTypeColor('long');
     expect(result.bg).toBe('bg-gray-50');
     expect(result.text).toBe('text-gray-600');
-    expect(result.icon).toBe('➖');
+    expect(result.icon).toBe('Minus');
     expect(result.label).toBe('長潮');
   });
 
@@ -54,7 +54,7 @@ describe('getTideTypeColor', () => {
     const result = getTideTypeColor('young');
     expect(result.bg).toBe('bg-gray-50');
     expect(result.text).toBe('text-gray-600');
-    expect(result.icon).toBe('🔵');
+    expect(result.icon).toBe('Circle');
     expect(result.label).toBe('若潮');
   });
 });

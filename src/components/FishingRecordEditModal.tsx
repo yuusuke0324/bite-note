@@ -5,6 +5,8 @@ import { FishingRecordForm } from './FishingRecordForm';
 import type { FishingRecord } from '../types';
 import type { CreateFishingRecordFormData } from '../lib/validation';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { Edit, X } from 'lucide-react';
 
 interface FishingRecordEditModalProps {
   record: FishingRecord;
@@ -113,7 +115,7 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
             fontWeight: 'bold',
             color: '#333'
           }}>
-            ✏️ 釣果記録を編集
+            <Icon icon={Edit} size={20} decorative /> 釣果記録を編集
           </h2>
 
           <button
@@ -135,7 +137,7 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
             title="閉じる"
             aria-label="モーダルを閉じる"
           >
-            ✕
+            <Icon icon={X} size={20} decorative />
           </button>
         </div>
 

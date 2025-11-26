@@ -3,7 +3,7 @@
  * 月別の釣果数推移を表示するシンプルなチャート
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, type ReactNode } from 'react';
 import {
   LineChart,
   Line,
@@ -15,6 +15,8 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { colors } from '../../theme/colors';
+import { Icon } from '../ui/Icon';
+import { Fish } from 'lucide-react';
 
 export interface TrendChartData {
   month: string;      // '10月' または '2024/10'
@@ -29,6 +31,7 @@ export interface TrendChartProps {
   height?: number;
   showGrid?: boolean;
   title?: string;
+  titleIcon?: ReactNode;
   color?: string;
 }
 
@@ -60,8 +63,12 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
           fontSize: '0.875rem',
           color: colors.primary[600],
           fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
         }}>
-          🐟 {payload[0].value ?? payload[0].payload.count}件の記録
+          <Icon icon={Fish} size={14} decorative />
+          {payload[0].value ?? payload[0].payload.count}件の記録
         </p>
       </div>
     );
@@ -79,6 +86,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({
   height = 250,
   showGrid = true,
   title,
+  titleIcon,
   color = colors.primary[500],
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -125,7 +133,11 @@ export const TrendChart: React.FC<TrendChartProps> = ({
           fontSize: '1rem',
           fontWeight: '600',
           color: colors.text.primary,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
         }}>
+          {titleIcon}
           {title}
         </h3>
       )}

@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import type { SearchFilters } from './AdvancedSearchFilter';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { Save, X } from 'lucide-react';
 
 interface SavedSearch {
   id: string;
@@ -128,7 +130,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           gap: '0.5rem'
         }}
       >
-        💾 保存された検索
+        <Icon icon={Save} size={16} decorative /> 保存された検索
         {savedSearches.length > 0 && (
           <span style={{
             backgroundColor: '#007bff',
@@ -168,9 +170,13 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           margin: 0,
           fontSize: '1.1rem',
           fontWeight: 'bold',
-          color: '#333'
+          color: '#333',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
         }}>
-          💾 保存された検索クエリ
+          <Icon icon={Save} size={20} color="primary" decorative />
+          保存された検索クエリ
         </h3>
         <button
           onClick={() => setIsVisible(false)}
@@ -178,12 +184,14 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
             backgroundColor: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            fontSize: '1.25rem',
             color: '#6c757d',
-            padding: '0.25rem'
+            padding: '0.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          ✕
+          <Icon icon={X} size={20} decorative />
         </button>
       </div>
 
@@ -309,7 +317,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
             padding: '2rem',
             color: '#6c757d'
           }}>
-            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💾</div>
+            <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+              <Icon icon={Save} size={32} color="secondary" decorative />
+            </div>
             <p style={{ margin: 0, fontSize: '0.875rem' }}>
               保存された検索クエリはありません
             </p>

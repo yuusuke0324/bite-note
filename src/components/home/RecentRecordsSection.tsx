@@ -8,6 +8,8 @@ import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 import { CompactRecordCard } from './CompactRecordCard';
 import type { FishingRecord } from '../../types';
+import { Icon } from '../ui/Icon';
+import { Fish, FileText, ArrowRight } from 'lucide-react';
 
 interface RecentRecordsSectionProps {
   records: FishingRecord[];
@@ -41,10 +43,11 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
         }}
       >
         <div style={{
-          fontSize: '3rem',
           marginBottom: '12px',
+          display: 'flex',
+          justifyContent: 'center',
         }}>
-          🎣
+          <Icon icon={Fish} size={48} color="secondary" decorative />
         </div>
         <p style={{
           ...textStyles.body.medium,
@@ -74,7 +77,7 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
           alignItems: 'center',
           gap: '8px',
         }}>
-          <span>📝</span>
+          <Icon icon={FileText} size={24} color="primary" decorative />
           <span>最近の記録</span>
         </h2>
 
@@ -103,7 +106,7 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
             }}
           >
             <span>もっと見る</span>
-            <span>→</span>
+            <Icon icon={ArrowRight} size={16} decorative />
           </button>
         )}
       </div>

@@ -6,6 +6,8 @@ import { useToastStore } from '../stores/toast-store';
 import { TestIds } from '../constants/testIds';
 import type { Coordinates } from '../types';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { MapPin, Edit, Trash2, Map as MapIcon, AlertTriangle } from 'lucide-react';
 
 interface GPSLocationInputProps {
   value?: Coordinates;
@@ -194,7 +196,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                 </>
               ) : (
                 <>
-                  📍 現在位置を取得
+                  <Icon icon={MapPin} size={16} decorative /> 現在位置を取得
                 </>
               )}
             </button>
@@ -213,7 +215,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                 marginRight: '0.5rem'
               }}
             >
-              ✏️ 手動入力
+              <Icon icon={Edit} size={16} decorative /> 手動入力
             </button>
 
             {value && (
@@ -230,7 +232,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                   cursor: disabled ? 'not-allowed' : 'pointer'
                 }}
               >
-                🗑️ クリア
+                <Icon icon={Trash2} size={16} decorative /> クリア
               </button>
             )}
           </div>
@@ -354,7 +356,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                     gap: '0.25rem'
                   }}
                 >
-                  🗺️ Googleマップで表示
+                  <Icon icon={MapIcon} size={14} decorative /> Googleマップで表示
                 </a>
               </div>
             )}
@@ -371,7 +373,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
               borderRadius: '4px',
               fontSize: '0.9rem'
             }}>
-              ⚠️ {error}
+              <Icon icon={AlertTriangle} size={16} color="warning" decorative /> {error}
             </div>
           )}
         </div>

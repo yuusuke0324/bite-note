@@ -124,7 +124,7 @@ describe('FeedbackService', () => {
     expect(feedback.type).toBe('success');
     expect(feedback.message).toBe('操作が完了しました');
     expect(feedback.duration).toBe(3000);
-    expect(feedback.icon).toBe('✓');
+    expect(feedback.icon).toBe('Check');
   });
 
   it('should create error feedback', () => {
@@ -135,7 +135,7 @@ describe('FeedbackService', () => {
     expect(feedback.type).toBe('error');
     expect(feedback.message).toBe('エラーが発生しました');
     expect(feedback.duration).toBe(5000);
-    expect(feedback.icon).toBe('✗');
+    expect(feedback.icon).toBe('X');
   });
 
   it('should create info feedback', () => {
@@ -146,7 +146,7 @@ describe('FeedbackService', () => {
     expect(feedback.type).toBe('info');
     expect(feedback.message).toBe('情報をお知らせします');
     expect(feedback.duration).toBe(4000);
-    expect(feedback.icon).toBe('ℹ');
+    expect(feedback.icon).toBe('Info');
   });
 
   it('should create warning feedback', () => {
@@ -157,7 +157,7 @@ describe('FeedbackService', () => {
     expect(feedback.type).toBe('warning');
     expect(feedback.message).toBe('注意が必要です');
     expect(feedback.duration).toBe(4000);
-    expect(feedback.icon).toBe('⚠');
+    expect(feedback.icon).toBe('AlertTriangle');
   });
 });
 

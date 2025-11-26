@@ -3,6 +3,8 @@
 import React, { useState, useCallback } from 'react';
 import { exportImportService } from '../lib/export-import-service';
 import type { FishingRecord } from '../types';
+import { Icon } from './ui/Icon';
+import { Upload, X, FileText, BarChart3, Calendar, Camera, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 
 interface DataExportModalProps {
   records: FishingRecord[];
@@ -129,7 +131,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             fontWeight: 'bold',
             color: '#333'
           }}>
-            📤 データエクスポート
+            <Icon icon={Upload} size={24} decorative /> データエクスポート
           </h2>
           <button
             onClick={onClose}
@@ -142,7 +144,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               padding: '0.25rem'
             }}
           >
-            ✕
+            <Icon icon={X} size={24} decorative />
           </button>
         </div>
 
@@ -174,7 +176,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 checked={exportFormat === 'json'}
                 onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
-              <span>📄 JSON (全データ)</span>
+              <span><Icon icon={FileText} size={16} decorative /> JSON (全データ)</span>
             </label>
             <label style={{
               display: 'flex',
@@ -188,7 +190,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 checked={exportFormat === 'csv'}
                 onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
-              <span>📊 CSV (記録のみ)</span>
+              <span><Icon icon={BarChart3} size={16} decorative /> CSV (記録のみ)</span>
             </label>
           </div>
         </div>
@@ -202,7 +204,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             fontSize: '0.9rem',
             color: '#333'
           }}>
-            📅 日付範囲（オプション）
+            <Icon icon={Calendar} size={16} decorative /> 日付範囲（オプション）
           </label>
           <div style={{
             display: 'grid',
@@ -263,7 +265,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                   height: '18px'
                 }}
               />
-              <span style={{ fontSize: '0.9rem' }}>📷 写真データを含める</span>
+              <span style={{ fontSize: '0.9rem' }}><Icon icon={Camera} size={16} decorative /> 写真データを含める</span>
             </label>
           </div>
         )}
@@ -307,7 +309,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             color: exportStatus.type === 'success' ? '#155724' : '#721c24',
             border: `1px solid ${exportStatus.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
           }}>
-            {exportStatus.type === 'success' ? '✅' : '❌'} {exportStatus.message}
+            <Icon icon={exportStatus.type === 'success' ? CheckCircle2 : XCircle} size={16} color={exportStatus.type === 'success' ? 'success' : 'error'} decorative /> {exportStatus.message}
           </div>
         )}
 
@@ -349,7 +351,15 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               gap: '0.5rem'
             }}
           >
-            {isExporting ? '⏳ エクスポート中...' : '📤 エクスポート'}
+            {isExporting ? (
+              <>
+                <Icon icon={Loader2} size={16} className="animate-spin" decorative /> エクスポート中...
+              </>
+            ) : (
+              <>
+                <Icon icon={Upload} size={16} decorative /> エクスポート
+              </>
+            )}
           </button>
         </div>
       </div>

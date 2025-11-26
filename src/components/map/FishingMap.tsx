@@ -12,6 +12,8 @@ import { textStyles } from '../../theme/typography';
 import { photoService } from '../../lib/photo-service';
 import type { FishingRecord } from '../../types';
 import { logger } from '../../lib/errors/logger';
+import { Icon } from '../ui/Icon';
+import { Map as MapIcon, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2 } from 'lucide-react';
 
 // Leafletのデフォルトアイコン修正
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -349,10 +351,12 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
         background: `linear-gradient(135deg, ${colors.surface.secondary} 0%, ${colors.surface.tertiary} 100%)`,
       }}>
         <div style={{
-          fontSize: '5rem',
           marginBottom: '1.5rem',
-          filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.1))',
-        }}>🗺️</div>
+          display: 'flex',
+          justifyContent: 'center',
+        }}>
+          <Icon icon={MapIcon} size={80} color="secondary" decorative />
+        </div>
         <h3 style={{
           ...textStyles.headline.medium,
           marginBottom: '0.75rem',
@@ -468,7 +472,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1rem',
                 transition: 'all 0.2s',
               }}
               onMouseEnter={(e) => {
@@ -478,7 +481,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 e.currentTarget.style.backgroundColor = colors.surface.tertiary;
               }}
             >
-              ✕
+              <Icon icon={X} size={16} decorative />
             </button>
 
             {/* 写真（あれば表示） */}
@@ -548,7 +551,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               gap: '8px 12px',
               marginBottom: '16px',
             }}>
-              <span style={{ fontSize: '1rem' }}>📅</span>
+              <Icon icon={Calendar} size={18} color="secondary" decorative />
               <span style={{
                 fontSize: '0.9rem',
                 color: colors.text.secondary,
@@ -557,7 +560,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 {formatDate(selectedRecord.date)}
               </span>
 
-              <span style={{ fontSize: '1rem' }}>📍</span>
+              <Icon icon={MapPin} size={18} color="secondary" decorative />
               <span style={{
                 fontSize: '0.9rem',
                 color: colors.text.secondary,
@@ -568,7 +571,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
               {selectedRecord.size && selectedRecord.weight && (
                 <>
-                  <span style={{ fontSize: '1rem' }}>📏</span>
+                  <Icon icon={Ruler} size={18} color="secondary" decorative />
                   <span style={{
                     fontSize: '0.9rem',
                     color: colors.text.secondary,
@@ -639,7 +642,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               color: colors.text.secondary,
               border: `1px solid ${colors.border.light}`,
               borderRadius: '12px',
-              fontSize: '1.25rem',
               cursor: 'pointer',
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               display: 'flex',
@@ -657,7 +659,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               e.currentTarget.style.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.12)';
             }}
           >
-            ⤢
+            <Icon icon={Maximize2} size={20} decorative />
           </button>
 
           {/* 統計情報カード */}
@@ -682,19 +684,25 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8rem', color: colors.text.secondary }}>📊 記録数</span>
+                <span style={{ fontSize: '0.8rem', color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Icon icon={BarChart3} size={14} color="secondary" decorative /> 記録数
+                </span>
                 <span style={{ fontSize: '0.9rem', fontWeight: '700', color: colors.primary[600] }}>
                   {statistics.totalRecords}
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8rem', color: colors.text.secondary }}>📍 釣り場</span>
+                <span style={{ fontSize: '0.8rem', color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Icon icon={MapPin} size={14} color="secondary" decorative /> 釣り場
+                </span>
                 <span style={{ fontSize: '0.9rem', fontWeight: '700', color: colors.primary[600] }}>
                   {statistics.uniqueLocations}
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8rem', color: colors.text.secondary }}>🐟 魚種</span>
+                <span style={{ fontSize: '0.8rem', color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Icon icon={Fish} size={14} color="secondary" decorative /> 魚種
+                </span>
                 <span style={{ fontSize: '0.9rem', fontWeight: '700', color: colors.primary[600] }}>
                   {statistics.uniqueSpecies}
                 </span>
@@ -733,8 +741,11 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               color: colors.text.primary,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}>
-              📍 釣果一覧 ({recordsWithAdjustedCoordinates.length})
+              <Icon icon={MapPin} size={16} color="primary" decorative /> 釣果一覧 ({recordsWithAdjustedCoordinates.length})
             </h4>
           </div>
           <div style={{ padding: '8px' }}>

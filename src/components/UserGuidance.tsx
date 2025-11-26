@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import type { Guidance } from '../lib/user-guidance-service';
+import { Icon } from './ui/Icon';
+import { Hand, Lightbulb, Wrench, FileText, X } from 'lucide-react';
 
 export interface UserGuidanceProps {
   guidance: Guidance | null;
@@ -100,19 +102,19 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
   };
 
   const getTypeIcon = () => {
-    if (!guidance) return '💡';
+    if (!guidance) return <Icon icon={Lightbulb} size={32} color="primary" decorative />;
 
     switch (guidance.type) {
       case 'first-time':
-        return '👋';
+        return <Icon icon={Hand} size={32} color="success" decorative />;
       case 'feature':
-        return '💡';
+        return <Icon icon={Lightbulb} size={32} color="primary" decorative />;
       case 'error-recovery':
-        return '🔧';
+        return <Icon icon={Wrench} size={32} color="error" decorative />;
       case 'empty-state':
-        return '📄';
+        return <Icon icon={FileText} size={32} color="secondary" decorative />;
       default:
-        return '💡';
+        return <Icon icon={Lightbulb} size={32} color="primary" decorative />;
     }
   };
 
@@ -137,7 +139,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
             gap: '1rem'
           }}
         >
-          <div style={{ fontSize: '2rem' }}>{getTypeIcon()}</div>
+          <div>{getTypeIcon()}</div>
           <div style={{ flex: 1 }}>
             <h2
               style={{
@@ -165,7 +167,6 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              fontSize: '1.5rem',
               cursor: 'pointer',
               color: '#999',
               padding: '0',
@@ -176,7 +177,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
               justifyContent: 'center'
             }}
           >
-            ×
+            <Icon icon={X} size={20} decorative />
           </button>
         </div>
 

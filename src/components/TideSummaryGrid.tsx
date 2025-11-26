@@ -16,6 +16,8 @@
 import React from 'react';
 import type { TideInfo } from '../types/tide';
 import { getTideTypeColor, getTideStrengthColor } from '../lib/tide-helpers';
+import { Icon } from './ui/Icon';
+import { Waves, ArrowDown, ArrowUp } from 'lucide-react';
 
 interface TideSummaryGridProps {
   tideInfo: TideInfo;
@@ -47,8 +49,8 @@ export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) =>
         className={`${tideTypeColor.bg} ${tideTypeColor.text} p-4 rounded-lg`}
       >
         <div className="flex items-center space-x-2">
-          <span data-testid="tide-type-icon" className="text-2xl">
-            {tideTypeColor.icon}
+          <span data-testid="tide-type-icon">
+            <Icon icon={Waves} size={24} decorative />
           </span>
           <div>
             <div className="text-xs opacity-80">潮汐タイプ</div>
@@ -63,8 +65,8 @@ export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) =>
         className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg"
       >
         <div className="flex items-center space-x-2">
-          <span data-testid="current-state-icon" className="text-2xl">
-            {tideInfo.currentState === 'rising' || tideInfo.currentState === 'high' ? '⬆️' : '⬇️'}
+          <span data-testid="current-state-icon">
+            <Icon icon={tideInfo.currentState === 'rising' || tideInfo.currentState === 'high' ? ArrowUp : ArrowDown} size={24} color="primary" decorative />
           </span>
           <div>
             <div className="text-xs text-gray-600">現在の状態</div>
@@ -89,8 +91,8 @@ export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) =>
       >
         {tideInfo.nextEvent ? (
           <div className="flex items-center space-x-2">
-            <span className="text-2xl">
-              {tideInfo.nextEvent.type === 'high' ? '🌊' : '🏖️'}
+            <span>
+              <Icon icon={tideInfo.nextEvent.type === 'high' ? Waves : ArrowDown} size={24} color="primary" decorative />
             </span>
             <div>
               <div className="text-xs text-gray-600">次のイベント</div>

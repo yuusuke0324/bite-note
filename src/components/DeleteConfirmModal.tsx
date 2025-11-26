@@ -2,6 +2,8 @@
 
 import React, { useEffect } from 'react';
 import type { FishingRecord } from '../types';
+import { Icon } from './ui/Icon';
+import { AlertTriangle, Fish, Calendar, MapPin, Ruler, Trash2 } from 'lucide-react';
 
 interface DeleteConfirmModalProps {
   record: FishingRecord;
@@ -81,11 +83,11 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           marginBottom: '1.5rem'
         }}>
           <div style={{
-            fontSize: '3rem',
             marginBottom: '1rem',
-            color: '#dc3545'
+            display: 'flex',
+            justifyContent: 'center'
           }}>
-            ⚠️
+            <Icon icon={AlertTriangle} size={48} color="error" decorative />
           </div>
           <h2 style={{
             margin: 0,
@@ -117,30 +119,42 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             fontSize: '1.1rem',
             fontWeight: 'bold',
             color: '#333',
-            marginBottom: '0.5rem'
+            marginBottom: '0.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            🐟 {record.fishSpecies}
+            <Icon icon={Fish} size={18} color="primary" decorative /> {record.fishSpecies}
           </div>
           <div style={{
             fontSize: '0.875rem',
             color: '#6c757d',
-            marginBottom: '0.25rem'
+            marginBottom: '0.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            📅 {formatDate(record.date)}
+            <Icon icon={Calendar} size={14} color="secondary" decorative /> {formatDate(record.date)}
           </div>
           <div style={{
             fontSize: '0.875rem',
             color: '#6c757d',
-            marginBottom: '0.25rem'
+            marginBottom: '0.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            📍 {record.location}
+            <Icon icon={MapPin} size={14} color="secondary" decorative /> {record.location}
           </div>
           {record.size && (
             <div style={{
               fontSize: '0.875rem',
-              color: '#6c757d'
+              color: '#6c757d',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}>
-              📏 {record.size}cm
+              <Icon icon={Ruler} size={14} color="secondary" decorative /> {record.size}cm
             </div>
           )}
         </div>
@@ -200,7 +214,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
               </>
             ) : (
               <>
-                🗑️ 削除する
+                <Icon icon={Trash2} size={16} decorative /> 削除する
               </>
             )}
           </button>

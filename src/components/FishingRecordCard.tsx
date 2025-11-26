@@ -5,6 +5,8 @@ import { LocationDisplay } from './LocationDisplay';
 import { photoService } from '../lib/photo-service';
 import type { FishingRecord } from '../types';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { Fish, Calendar, Ruler, Map, MessageCircle, Camera, Edit, Trash2 } from 'lucide-react';
 
 interface FishingRecordCardProps {
   record: FishingRecord;
@@ -145,7 +147,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
                 }}
               />
             ) : (
-              <span style={{ fontSize: '2rem' }}>📷</span>
+              <Icon icon={Camera} size={32} color="secondary" decorative />
             )}
           </div>
         )}
@@ -160,14 +162,14 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            🐟 {record.fishSpecies}
+            <Icon icon={Fish} size={20} decorative /> {record.fishSpecies}
           </h3>
           <p style={{
             margin: '0',
             fontSize: '0.875rem',
             color: '#6c757d'
           }}>
-            📅 {formatDate(record.date)}
+            <Icon icon={Calendar} size={14} decorative /> {formatDate(record.date)}
           </p>
         </div>
 
@@ -182,7 +184,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
           minWidth: 'fit-content',
           alignSelf: 'flex-start'
         }}>
-          📏 {formatSize(record.size)}
+          <Icon icon={Ruler} size={14} decorative /> {formatSize(record.size)}
         </div>
       </div>
 
@@ -195,7 +197,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
           color: '#333',
           marginBottom: '0.25rem'
         }}>
-          🗺️ {formatLocation(record.location)}
+          <Icon icon={Map} size={14} decorative /> {formatLocation(record.location)}
         </div>
         {record.coordinates && (
           <LocationDisplay
@@ -222,7 +224,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             }}
             title="Googleマップで表示"
           >
-            🗺️ 地図
+            <Icon icon={Map} size={12} decorative /> 地図
           </a>
         )}
       </div>
@@ -249,7 +251,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical'
           }}>
-            💭 {record.notes}
+            <Icon icon={MessageCircle} size={14} decorative /> {record.notes}
           </p>
         </div>
       )}
@@ -296,7 +298,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
               title="編集"
               aria-label={`${record.fishSpecies}の記録を編集`}
             >
-              ✏️ 編集
+              <Icon icon={Edit} size={12} decorative /> 編集
             </button>
 
             <button
@@ -317,7 +319,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
               title="削除"
               aria-label={`${record.fishSpecies}の記録を削除`}
             >
-              🗑️ 削除
+              <Icon icon={Trash2} size={12} decorative /> 削除
             </button>
           </div>
         )}

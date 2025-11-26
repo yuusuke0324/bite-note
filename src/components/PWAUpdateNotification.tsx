@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { usePWA } from '../hooks/usePWA';
+import { Icon } from './ui/Icon';
+import { RefreshCw, X } from 'lucide-react';
 
 export const PWAUpdateNotification: React.FC = () => {
   const { updateState, updateApp, isOnline } = usePWA();
@@ -36,7 +38,7 @@ export const PWAUpdateNotification: React.FC = () => {
       animation: 'slideDown 0.3s ease-out'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <span style={{ fontSize: '1.5rem' }}>🔄</span>
+        <Icon icon={RefreshCw} size={24} decorative />
         <div>
           <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>
             アプリが更新されました
@@ -80,7 +82,7 @@ export const PWAUpdateNotification: React.FC = () => {
           }}
           title="閉じる"
         >
-          ✕
+          <Icon icon={X} size={16} decorative />
         </button>
       </div>
 
