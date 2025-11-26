@@ -190,17 +190,19 @@ export class TideDataValidator {
     for (const [index, item] of rawData.entries()) {
       // 基本的な検証のみ実行
       if (!this.tideDataValidator.validateTimeFormat(item.time)) {
-        const error = new Error(`Invalid time format: "${item.time}". Expected ISO 8601 format.`) as any;
-        error.code = 'INVALID_TIME_FORMAT';
-        error.context = { timeValue: item.time, index };
-        basicErrors.push(error);
+        basicErrors.push(new TideValidationError(
+          `Invalid time format: "${item.time}". Expected ISO 8601 format.`,
+          'INVALID_TIME_FORMAT',
+          { timeValue: item.time, index }
+        ));
       }
 
       if (!this.tideDataValidator.validateTideRange(item.tide)) {
-        const error = new Error(`Tide value ${item.tide}m is out of valid range.`) as any;
-        error.code = 'TIDE_OUT_OF_RANGE';
-        error.context = { tideValue: item.tide, index };
-        basicErrors.push(error);
+        basicErrors.push(new TideValidationError(
+          `Tide value ${item.tide}m is out of valid range.`,
+          'TIDE_OUT_OF_RANGE',
+          { tideValue: item.tide, index }
+        ));
       }
     }
 
@@ -236,10 +238,11 @@ export class TideDataValidator {
     for (let i = 0; i < data.length; i++) {
       const time = data[i].time;
       if (timeSet.has(time)) {
-        const error = new Error(`Duplicate timestamp: ${time}`) as any;
-        error.code = 'DUPLICATE_TIMESTAMP';
-        error.context = { timeValue: time, index: i };
-        return error;
+        return new TideValidationError(
+          `Duplicate timestamp: ${time}`,
+          'DUPLICATE_TIMESTAMP',
+          { timeValue: time, index: i }
+        );
       }
       timeSet.add(time);
     }
@@ -250,7 +253,7 @@ export class TideDataValidator {
   /**
    * 有効データのフィルタリング
    */
-  private filterValidData(__data: RawTideData[], errors: any[]): RawTideData[] {
+  private filterValidData(__data: RawTideData[], errors: Array<{ index?: number }>): RawTideData[] {
     // 早期リターン最適化: エラーが0件の場合、フィルタリング不要
     if (errors.length === 0) {
       return __data;
@@ -270,10 +273,11 @@ export class TideDataValidator {
    * 構造エラーを作成
    */
   private createStructureError(): TideValidationError {
-    const error = new Error('Data structure is corrupted') as any;
-    error.code = 'STRUCTURE_ERROR';
-    error.context = {};
-    return error;
+    return new TideValidationError(
+      'Data structure is corrupted',
+      'STRUCTURE_ERROR',
+      {}
+    );
   }
 
   /**
@@ -282,8 +286,8 @@ export class TideDataValidator {
   private createSummary(
     totalData: RawTideData[],
     validData: RawTideData[],
-    errors: any[],
-    warnings: any[],
+    errors: unknown[],
+    warnings: unknown[],
     processingTime: number
   ): ValidationSummary {
     return {
@@ -321,7 +325,7 @@ export class TideDataValidator {
    */
   private createErrorResult(
     errors: TideValidationError[],
-    warnings: any[],
+    warnings: unknown[],
     processingTime: number,
     totalData: RawTideData[]
   ): ValidationResult {
@@ -346,9 +350,11 @@ export class TideDataValidator {
    * タイムアウト結果を作成
    */
   private createTimeoutResult(__data: RawTideData[], processingTime: number): ValidationResult {
-    const timeoutError = new Error('Processing timeout exceeded') as any;
-    timeoutError.code = 'PROCESSING_TIMEOUT';
-    timeoutError.context = { timeoutMs: processingTime };
+    const timeoutError = new TideValidationError(
+      'Processing timeout exceeded',
+      'PROCESSING_TIMEOUT',
+      { timeoutMs: processingTime }
+    );
 
     return this.createCriticalErrorResult([timeoutError], processingTime);
   }
@@ -365,19 +371,21 @@ export class TideDataValidator {
 
       // 時刻フォーマット検証（正規表現のみ、Date解析スキップ）
       if (!this.isValidTimeFormatFast(item.time)) {
-        const error = new Error(`Invalid time format: "${item.time}". Expected ISO 8601 format.`) as any;
-        error.code = 'INVALID_TIME_FORMAT';
-        error.context = { timeValue: item.time, index: i };
-        errors.push(error);
+        errors.push(new TideValidationError(
+          `Invalid time format: "${item.time}". Expected ISO 8601 format.`,
+          'INVALID_TIME_FORMAT',
+          { timeValue: item.time, index: i }
+        ));
         continue; // 次の要素へスキップ（潮位検証をスキップ）
       }
 
       // 潮位範囲チェック（軽量なのでそのまま）
       if (!this.tideDataValidator.validateTideRange(item.tide)) {
-        const error = new Error(`Tide value ${item.tide}m is out of valid range.`) as any;
-        error.code = 'TIDE_OUT_OF_RANGE';
-        error.context = { tideValue: item.tide, index: i };
-        errors.push(error);
+        errors.push(new TideValidationError(
+          `Tide value ${item.tide}m is out of valid range.`,
+          'TIDE_OUT_OF_RANGE',
+          { tideValue: item.tide, index: i }
+        ));
       }
     }
 
@@ -395,17 +403,19 @@ export class TideDataValidator {
       try {
         // 個別検証でエラーを収集
         if (!this.tideDataValidator.validateTimeFormat(item.time)) {
-          const error = new Error(`Invalid time format: "${item.time}". Expected ISO 8601 format.`) as any;
-          error.code = 'INVALID_TIME_FORMAT';
-          error.context = { timeValue: item.time, index };
-          errors.push(error);
+          errors.push(new TideValidationError(
+            `Invalid time format: "${item.time}". Expected ISO 8601 format.`,
+            'INVALID_TIME_FORMAT',
+            { timeValue: item.time, index }
+          ));
         }
 
         if (!this.tideDataValidator.validateTideRange(item.tide)) {
-          const error = new Error(`Tide value ${item.tide}m is out of valid range.`) as any;
-          error.code = 'TIDE_OUT_OF_RANGE';
-          error.context = { tideValue: item.tide, index };
-          errors.push(error);
+          errors.push(new TideValidationError(
+            `Tide value ${item.tide}m is out of valid range.`,
+            'TIDE_OUT_OF_RANGE',
+            { tideValue: item.tide, index }
+          ));
         }
       } catch (error) {
         if (error instanceof TideValidationError) {
@@ -431,18 +441,20 @@ export class TideDataValidator {
 
       // 小数点以下の精度チェック
       if (!this.validateTidePrecision(item.tide)) {
-        const error = new Error(`Tide precision ${item.tide}m exceeds allowed decimal places (max 3)`) as any;
-        error.code = 'TIDE_PRECISION_ERROR';
-        error.context = { tideValue: item.tide, index: i };
-        errors.push(error);
+        errors.push(new TideValidationError(
+          `Tide precision ${item.tide}m exceeds allowed decimal places (max 3)`,
+          'TIDE_PRECISION_ERROR',
+          { tideValue: item.tide, index: i }
+        ));
       }
 
       // タイムゾーン情報の検証
       if (!this.validateTimezone(item.time)) {
-        const error = new Error(`Timezone information missing or invalid: "${item.time}"`) as any;
-        error.code = 'TIMEZONE_ERROR';
-        error.context = { timeValue: item.time, index: i };
-        errors.push(error);
+        errors.push(new TideValidationError(
+          `Timezone information missing or invalid: "${item.time}"`,
+          'TIMEZONE_ERROR',
+          { timeValue: item.time, index: i }
+        ));
       }
     }
 

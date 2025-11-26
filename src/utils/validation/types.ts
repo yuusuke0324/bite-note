@@ -47,7 +47,9 @@ export type ValidationErrorCode =
   | 'DUPLICATE_TIMESTAMP'
   | 'STRUCTURE_ERROR'
   | 'DATA_QUALITY_WARNING'
-  | 'PROCESSING_TIMEOUT';
+  | 'PROCESSING_TIMEOUT'
+  | 'TIDE_PRECISION_ERROR'
+  | 'TIMEZONE_ERROR';
 
 // ==========================================
 // エラーコンテキスト型定義

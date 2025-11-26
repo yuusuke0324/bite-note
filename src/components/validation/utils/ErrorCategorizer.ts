@@ -125,7 +125,7 @@ export class ErrorCategorizer {
   /**
    * エラーコンテキストを抽出
    */
-  private static extractContext(error: TideValidationError): any {
+  private static extractContext(error: TideValidationError): Record<string, unknown> {
     return error.context;
   }
 }
