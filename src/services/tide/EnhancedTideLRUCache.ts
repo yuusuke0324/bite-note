@@ -17,6 +17,7 @@ import type {
   MatchingStrategy
 } from '../../types/tide';
 import { SmartKeyGenerator } from './SmartKeyGenerator';
+import { logger } from '../../lib/errors';
 
 // 内部型定義
 interface CacheEntry {
@@ -145,7 +146,7 @@ export class EnhancedTideLRUCache {
 
       return entry.data;
     } catch (error) {
-      console.error('Enhanced cache get error:', error);
+      logger.error('Enhanced cache get error', { error, component: 'EnhancedTideLRUCache', operation: 'get' });
       this.stats.missCount++;
       return null;
     }
@@ -188,7 +189,7 @@ export class EnhancedTideLRUCache {
         }
       }
     } catch (error) {
-      console.error('Enhanced cache set error:', error);
+      logger.error('Enhanced cache set error', { error, component: 'EnhancedTideLRUCache', operation: 'set' });
     }
   }
 
@@ -397,7 +398,7 @@ export class EnhancedTideLRUCache {
         return Math.max(0.3, baseFactor);
       }
     } catch (error) {
-      console.error('Error in calculateProximityConfidence:', error);
+      logger.error('Error in calculateProximityConfidence', { error, component: 'EnhancedTideLRUCache', operation: 'calculateProximityConfidence' });
       return 0;
     }
   }
@@ -440,7 +441,7 @@ export class EnhancedTideLRUCache {
       // 計算結果の妥当性チェック
       return Number.isFinite(distance) ? distance : Number.MAX_SAFE_INTEGER;
     } catch (error) {
-      console.error('Error in calculateGeoDistance:', error);
+      logger.error('Error in calculateGeoDistance', { error, component: 'EnhancedTideLRUCache', operation: 'calculateGeoDistance' });
       return Number.MAX_SAFE_INTEGER;
     }
   }
@@ -516,7 +517,7 @@ export class EnhancedTideLRUCache {
       const confidence = (timeFactor * 0.6 + seasonalMatch * 0.2 + timeRangeOverlap * 0.2);
       return Number.isFinite(confidence) ? confidence : 0;
     } catch (error) {
-      console.error('Error in calculateTemporalConfidence:', error);
+      logger.error('Error in calculateTemporalConfidence', { error, component: 'EnhancedTideLRUCache', operation: 'calculateTemporalConfidence' });
       return 0;
     }
   }
@@ -569,7 +570,7 @@ export class EnhancedTideLRUCache {
       const confidence = (coordSimilarity * 0.3 + seasonalSimilarity * 0.3 + combinedSimilarity * 0.4);
       return Number.isFinite(confidence) ? Math.max(0, Math.min(1, confidence)) : 0;
     } catch (error) {
-      console.error('Error in calculateVariationConfidence:', error);
+      logger.error('Error in calculateVariationConfidence', { error, component: 'EnhancedTideLRUCache', operation: 'calculateVariationConfidence' });
       return 0;
     }
   }

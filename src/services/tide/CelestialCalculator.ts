@@ -7,6 +7,7 @@
 
 import type { MoonPhase, CelestialPosition } from '../../types/tide';
 import { normalizeAngle, julianDay, degreesToRadians } from './utils/celestial-utils';
+import { logger } from '../../lib/errors';
 import {
   SYNODIC_MONTH,
   J2000_EPOCH,
@@ -156,7 +157,7 @@ export class CelestialCalculator {
 
     const year = date.getUTCFullYear();
     if (year < CALCULATION_LIMITS.MIN_YEAR || year > CALCULATION_LIMITS.MAX_YEAR) {
-      console.warn(`Date ${year} is outside recommended range (${CALCULATION_LIMITS.MIN_YEAR}-${CALCULATION_LIMITS.MAX_YEAR}). Accuracy may be reduced.`);
+      logger.warn(`Date is outside recommended range. Accuracy may be reduced.`, { component: 'CelestialCalculator', year, minYear: CALCULATION_LIMITS.MIN_YEAR, maxYear: CALCULATION_LIMITS.MAX_YEAR });
     }
   }
 

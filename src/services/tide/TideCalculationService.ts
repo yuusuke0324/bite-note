@@ -11,6 +11,8 @@ import { RegionalCorrectionEngine } from './RegionalCorrectionEngine';
 import { RegionalDataService } from './RegionalDataService';
 import { TideClassificationEngine } from './TideClassificationEngine';
 import { CelestialCalculator } from './CelestialCalculator';
+import { logger } from '../../lib/errors';
+import { performanceMonitor } from '../../lib/performance-monitor';
 
 export class TideCalculationService {
   private harmonicEngine: HarmonicAnalysisEngine;
@@ -38,16 +40,17 @@ export class TideCalculationService {
     coordinates: { latitude: number; longitude: number },
     date: Date
   ): Promise<TideInfo> {
-    try {
-      // 1. 地域データの取得（最適な観測点選択）
-      // パフォーマンス最適化：初期化チェックとキャッシュ使用
-      if (!this.isInitialized) {
-        throw new Error('TideCalculationServiceが初期化されていません。initialize()を先に呼び出してください。');
-      }
+    return performanceMonitor.measureAsync('tide-calculation-service', async () => {
+      try {
+        // 1. 地域データの取得（最適な観測点選択）
+        // パフォーマンス最適化：初期化チェックとキャッシュ使用
+        if (!this.isInitialized) {
+          throw new Error('TideCalculationServiceが初期化されていません。initialize()を先に呼び出してください。');
+        }
 
-      const regionalData = await this.regionalService.getBestRegionForCoordinates(
-        coordinates
-      );
+        const regionalData = await this.regionalService.getBestRegionForCoordinates(
+          coordinates
+        );
 
       if (!regionalData) {
         throw new Error(`該当地域の潮汐データが見つかりません。座標: ${coordinates.latitude}, ${coordinates.longitude}`);
@@ -111,23 +114,24 @@ export class TideCalculationService {
       // 7. 現在の潮汐状態判定
       const currentState = this.determineCurrentState(date, events);
 
-      return {
-        location: coordinates,
-        date,
-        currentState,
-        currentLevel,
-        tideType: tideClassification,
-        tideStrength: tideStrength.value,
-        events,
-        nextEvent: nextEvent || null,
-        calculatedAt: new Date(),
-        accuracy: 'high'
-      };
+        return {
+          location: coordinates,
+          date,
+          currentState,
+          currentLevel,
+          tideType: tideClassification,
+          tideStrength: tideStrength.value,
+          events,
+          nextEvent: nextEvent || null,
+          calculatedAt: new Date(),
+          accuracy: 'high'
+        };
 
-    } catch (error) {
-      console.error('潮汐計算エラー:', error);
-      throw new Error(`潮汐情報の計算に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`);
-    }
+      } catch (error) {
+        logger.error('潮汐計算エラー', { error, coordinates, date, component: 'TideCalculationService', operation: 'calculateTideInfo' });
+        throw new Error(`潮汐情報の計算に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`);
+      }
+    });
   }
 
   /**
@@ -211,7 +215,7 @@ export class TideCalculationService {
 
       this.isInitialized = true;
     } catch (error) {
-      console.error('潮汐サービス初期化エラー:', error);
+      logger.error('潮汐サービス初期化エラー', { error, component: 'TideCalculationService', operation: 'initialize' });
       this.isInitialized = false;
       throw error;
     }

@@ -14,6 +14,7 @@ import type {
   RegionalDataRecord
 } from '../../types/tide';
 import { regionalDataService, type DistanceResult } from './RegionalDataService';
+import { logger } from '../../lib/errors';
 
 /** 補正オプション */
 export interface CorrectionOptions {
@@ -202,7 +203,7 @@ export class RegionalCorrectionEngine {
       return finalConstants;
 
     } catch (error) {
-      console.error('地域補正エラー:', error);
+      logger.error('地域補正エラー', { error, component: 'RegionalCorrectionEngine', operation: 'applyCorrectionFactors' });
       // エラー時はフォールバック
       return [...harmonicConstants];
     }

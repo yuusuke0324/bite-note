@@ -22,6 +22,8 @@ import type {
   FishDatabaseStats,
   FishCategory
 } from '../../types';
+import { logger } from '../../lib/errors';
+import { performanceMonitor } from '../../lib/performance-monitor';
 
 /**
  * 魚種検索エンジンクラス
@@ -69,57 +71,54 @@ export class FishSpeciesSearchEngine {
    * @param data - 魚種データ配列
    */
   buildIndex(data: FishSpecies[]): void {
-    const startTime = performance.now();
+    performanceMonitor.measure('fish-species-index-build', () => {
+      // データマップを構築
+      this.species = new Map(data.map(s => [s.id, s]));
+      this.prefixIndex = new Map();
 
-    // データマップを構築
-    this.species = new Map(data.map(s => [s.id, s]));
-    this.prefixIndex = new Map();
+      // 各魚種についてインデックスを構築
+      data.forEach(species => {
+        // 検索対象となるすべてのキーワードを収集
+        const searchTerms = [
+          species.standardName,
+          ...species.aliases,
+          ...species.regionalNames
+        ];
 
-    // 各魚種についてインデックスを構築
-    data.forEach(species => {
-      // 検索対象となるすべてのキーワードを収集
-      const searchTerms = [
-        species.standardName,
-        ...species.aliases,
-        ...species.regionalNames
-      ];
-
-      // 学名も検索対象に含める（オプション）
-      if (species.scientificName) {
-        searchTerms.push(species.scientificName);
-      }
-
-      // 各検索キーワードについてプレフィックスインデックスを作成
-      searchTerms.forEach(term => {
-        const normalized = this.normalize(term);
-
-        // 1文字から最大プレフィックス長までのインデックスを作成
-        for (let i = 1; i <= Math.min(normalized.length, this.options.maxPrefixLength || 10); i++) {
-          const prefix = normalized.substring(0, i);
-
-          if (!this.prefixIndex.has(prefix)) {
-            this.prefixIndex.set(prefix, []);
-          }
-
-          const ids = this.prefixIndex.get(prefix)!;
-          // 重複を避けて追加
-          if (!ids.includes(species.id)) {
-            ids.push(species.id);
-          }
+        // 学名も検索対象に含める（オプション）
+        if (species.scientificName) {
+          searchTerms.push(species.scientificName);
         }
+
+        // 各検索キーワードについてプレフィックスインデックスを作成
+        searchTerms.forEach(term => {
+          const normalized = this.normalize(term);
+
+          // 1文字から最大プレフィックス長までのインデックスを作成
+          for (let i = 1; i <= Math.min(normalized.length, this.options.maxPrefixLength || 10); i++) {
+            const prefix = normalized.substring(0, i);
+
+            if (!this.prefixIndex.has(prefix)) {
+              this.prefixIndex.set(prefix, []);
+            }
+
+            const ids = this.prefixIndex.get(prefix)!;
+            // 重複を避けて追加
+            if (!ids.includes(species.id)) {
+              ids.push(species.id);
+            }
+          }
+        });
       });
+
+      this.isIndexed = true;
     });
 
-    this.isIndexed = true;
-
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-
     if (this.options.debug) {
-      console.log('🔍 FishSpeciesSearchEngine インデックス構築完了');
-      console.log(`   魚種数: ${data.length}`);
-      console.log(`   インデックスエントリ数: ${this.prefixIndex.size}`);
-      console.log(`   構築時間: ${duration.toFixed(2)}ms`);
+      logger.debug('FishSpeciesSearchEngine インデックス構築完了', {
+        speciesCount: data.length,
+        indexEntries: this.prefixIndex.size
+      });
     }
   }
 
@@ -155,42 +154,41 @@ export class FishSpeciesSearchEngine {
    * @returns 検索結果の配列
    */
   search(query: string, options: FishSearchOptions = {}): FishSpecies[] {
-    const startTime = performance.now();
+    return performanceMonitor.measure('fish-species-search', () => {
+      let results: FishSpecies[] = [];
 
-    let results: FishSpecies[] = [];
+      // 空クエリの場合は全データからフィルタリング
+      if (!query || query.trim().length === 0) {
+        results = Array.from(this.species.values());
+      } else {
+        // クエリを正規化
+        const normalized = this.normalize(query);
 
-    // 空クエリの場合は全データからフィルタリング
-    if (!query || query.trim().length === 0) {
-      results = Array.from(this.species.values());
-    } else {
-      // クエリを正規化
-      const normalized = this.normalize(query);
+        // 前方一致検索を実行
+        results = this.performPrefixSearch(normalized);
+      }
 
-      // 前方一致検索を実行
-      results = this.performPrefixSearch(normalized);
-    }
+      // フィルタリング処理（空クエリ・通常検索共通）
+      results = this.applyFilters(results, options);
 
-    // フィルタリング処理（空クエリ・通常検索共通）
-    results = this.applyFilters(results, options);
+      // ソート（人気度順）
+      if (options.sortByPopularity !== false) {
+        results.sort((a, b) => b.popularity - a.popularity);
+      }
 
-    // ソート（人気度順）
-    if (options.sortByPopularity !== false) {
-      results.sort((a, b) => b.popularity - a.popularity);
-    }
+      // 件数制限
+      const limit = options.limit ?? 10;
+      results = results.slice(0, limit);
 
-    // 件数制限
-    const limit = options.limit ?? 10;
-    results = results.slice(0, limit);
+      if (this.options.debug) {
+        logger.debug(`魚種検索実行`, {
+          query,
+          resultCount: results.length
+        });
+      }
 
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-
-    if (this.options.debug) {
-      console.log(`🔍 検索実行: "${query}" → ${results.length}件`);
-      console.log(`   検索時間: ${duration.toFixed(2)}ms`);
-    }
-
-    return results;
+      return results;
+    });
   }
 
   /**

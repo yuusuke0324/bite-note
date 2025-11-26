@@ -7,6 +7,8 @@
 import type { RegionalDataRecord, Coordinates } from '../../types/tide';
 import { db } from '../../lib/database';
 import { JAPANESE_COASTAL_REGIONS, REGIONAL_DATA_STATS } from '../../data/regional-tide-data';
+import { logger } from '../../lib/errors';
+import { performanceMonitor } from '../../lib/performance-monitor';
 
 /** ハバーサイン距離計算結果 */
 export interface DistanceResult {
@@ -129,8 +131,8 @@ export class RegionalDataService {
     const R = 6371; // 地球の半径 (km)
 
     // デバッグログ（開発時かつ詳細デバッグ時のみ表示）
-    if (process.env.NODE_ENV === 'development' && process.env.VITE_DEBUG_HAVERSINE === 'true') {
-      console.log('🧮 ハバーサイン計算詳細:', {
+    if (import.meta.env.DEV && import.meta.env.VITE_DEBUG_HAVERSINE === 'true') {
+      logger.debug('ハバーサイン計算詳細', {
         point1,
         point2,
         point1Types: {
@@ -158,8 +160,8 @@ export class RegionalDataService {
     const distance = R * c;
 
     // デバッグログ（開発時かつ詳細デバッグ時のみ表示）
-    if (process.env.NODE_ENV === 'development' && process.env.VITE_DEBUG_HAVERSINE === 'true') {
-      console.log('🧮 計算ステップ:', {
+    if (import.meta.env.DEV && import.meta.env.VITE_DEBUG_HAVERSINE === 'true') {
+      logger.debug('計算ステップ', {
         lat1Rad: lat1Rad.toFixed(6),
         lat2Rad: lat2Rad.toFixed(6),
         deltaLatRad: deltaLatRad.toFixed(6),
@@ -225,7 +227,7 @@ export class RegionalDataService {
       return filteredResults;
 
     } catch (error) {
-      console.error('最寄りステーション検索エラー:', error);
+      logger.error('最寄りステーション検索エラー', { error, component: 'RegionalDataService', operation: 'findNearestStations' });
       return [];
     }
   }
@@ -240,7 +242,7 @@ export class RegionalDataService {
         .equals(regionId)
         .first() || null;
     } catch (error) {
-      console.error('地域データ取得エラー:', error);
+      logger.error('地域データ取得エラー', { error, component: 'RegionalDataService', operation: 'getRegionById' });
       return null;
     }
   }
@@ -251,26 +253,32 @@ export class RegionalDataService {
   async getBestRegionForCoordinates(
     coordinates: Coordinates
   ): Promise<RegionalDataRecord | null> {
-    const nearestStations = await this.findNearestStations(coordinates, {
-      limit: 3,
-      dataQuality: 'any',
-      activeOnly: true,
-      maxDistance: 500
-    });
+    return performanceMonitor.measureAsync(
+      'getBestRegionForCoordinates',
+      { coordinates },
+      async () => {
+        const nearestStations = await this.findNearestStations(coordinates, {
+          limit: 3,
+          dataQuality: 'any',
+          activeOnly: true,
+          maxDistance: 500
+        });
 
-    if (nearestStations.length === 0) {
-      // フォールバック：距離制限なしで最も近い地域を検索
-      const allStations = await this.findNearestStations(coordinates, {
-        limit: 1,
-        dataQuality: 'any',
-        activeOnly: true,
-        maxDistance: 10000
-      });
+        if (nearestStations.length === 0) {
+          // フォールバック：距離制限なしで最も近い地域を検索
+          const allStations = await this.findNearestStations(coordinates, {
+            limit: 1,
+            dataQuality: 'any',
+            activeOnly: true,
+            maxDistance: 10000
+          });
 
-      return allStations.length > 0 ? allStations[0].region : null;
-    }
+          return allStations.length > 0 ? allStations[0].region : null;
+        }
 
-    return nearestStations[0].region;
+        return nearestStations[0].region;
+      }
+    );
   }
 
   /**
@@ -293,7 +301,7 @@ export class RegionalDataService {
         lastUpdated: lastRecord?.updatedAt || null
       };
     } catch (error) {
-      console.error('統計情報取得エラー:', error);
+      logger.error('統計情報取得エラー', { error, component: 'RegionalDataService', operation: 'getDatabaseStats' });
       return {
         ...REGIONAL_DATA_STATS,
         databaseCount: 0,
@@ -399,7 +407,7 @@ export class RegionalDataService {
         isInitialized: totalRecords > 0
       };
     } catch (error) {
-      console.error('データベース状態取得エラー:', error);
+      logger.error('データベース状態取得エラー', { error, component: 'RegionalDataService', operation: 'getDatabaseStatus' });
       return {
         totalRecords: 0,
         activeRecords: 0,
@@ -416,7 +424,7 @@ export class RegionalDataService {
     try {
       return await db.tide_regional_data.toArray();
     } catch (error) {
-      console.error('全地域データ取得エラー:', error);
+      logger.error('全地域データ取得エラー', { error, component: 'RegionalDataService', operation: 'getAllRegions' });
       return [];
     }
   }
@@ -439,7 +447,7 @@ export class RegionalDataService {
         )
         .toArray();
     } catch (error) {
-      console.error('範囲検索エラー:', error);
+      logger.error('範囲検索エラー', { error, component: 'RegionalDataService', operation: 'getRegionsInBounds' });
       return [];
     }
   }
@@ -458,7 +466,7 @@ export class RegionalDataService {
         total: allData.filter(r => r.isActive).length
       };
     } catch (error) {
-      console.error('品質別統計取得エラー:', error);
+      logger.error('品質別統計取得エラー', { error, component: 'RegionalDataService', operation: 'getRegionCountByQuality' });
       return { high: 0, medium: 0, low: 0, total: 0 };
     }
   }

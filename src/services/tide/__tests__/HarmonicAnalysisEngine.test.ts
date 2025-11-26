@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
+import { logger } from '../../../lib/errors';
 import type {
   HarmonicConstant,
   TidalExtreme,
@@ -205,7 +206,7 @@ describe('HarmonicAnalysisEngine', () => {
         expect(timeDiff).toBeLessThan(12 * 60 * 60 * 1000); // ±12時間精度（Refactor版）
       } else {
         // 満潮が検出されない場合も初期実装では許容
-        console.warn('No high tide detected in the test period - initial implementation');
+        logger.warn('No high tide detected in the test period - initial implementation');
       }
     });
 
@@ -413,18 +414,20 @@ describe('HarmonicAnalysisEngine', () => {
       const avg = measurements.reduce((a, b) => a + b, 0) / iterations;
 
       // デバッグ情報（CI環境での診断用）
-      console.log(
-        `TC-H025 Performance: avg=${avg.toFixed(3)}ms, ` +
-        `p50=${p50.toFixed(3)}ms, p95=${p95.toFixed(3)}ms ` +
-        `(threshold: ${expectedMaxTime}ms, env: ${isCI ? 'CI' : 'local'})`
-      );
+      if (import.meta.env.DEV) {
+        logger.info(
+          `TC-H025 Performance: avg=${avg.toFixed(3)}ms, ` +
+          `p50=${p50.toFixed(3)}ms, p95=${p95.toFixed(3)}ms ` +
+          `(threshold: ${expectedMaxTime}ms, env: ${isCI ? 'CI' : 'local'})`
+        );
+      }
 
       // 95パーセンタイルで評価（偶発的なスパイクを除外）
       expect(p95).toBeLessThan(expectedMaxTime);
 
       // 追加: 中央値監視（パフォーマンス劣化の早期検出）
       if (p50 > expectedMaxTime * 0.6) {
-        console.warn(
+        logger.warn(
           `Performance warning: median ${p50.toFixed(3)}ms exceeds 60% of threshold`
         );
       }

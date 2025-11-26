@@ -10,6 +10,7 @@
 
 import type { TideType, MoonPhase } from '../../types/tide';
 import { CelestialCalculator } from './CelestialCalculator';
+import { logger } from '../../lib/errors';
 
 /**
  * 潮汐分類エンジン
@@ -201,7 +202,7 @@ export class TideClassificationEngine {
       throw new Error('Invalid moon distance: must be positive number');
     }
     if (distance < 0.8 || distance > 1.2) {
-      console.warn(`Unusual moon distance: ${distance}. Expected range: 0.8-1.2`);
+      logger.warn('Unusual moon distance', { distance, expectedRange: '0.8-1.2', component: 'TideClassificationEngine' });
     }
   }
 }

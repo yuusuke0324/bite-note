@@ -282,3 +282,8 @@ export class PerformanceMonitor {
     }
   }
 }
+
+/**
+ * グローバルパフォーマンスモニター シングルトンインスタンス
+ */
+export const performanceMonitor = new PerformanceMonitor();

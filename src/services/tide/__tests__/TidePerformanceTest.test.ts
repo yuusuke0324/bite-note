@@ -9,6 +9,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { logger } from '../../../lib/errors';
 import { HarmonicAnalysisEngine } from '../HarmonicAnalysisEngine';
 import { CelestialCalculator } from '../CelestialCalculator';
 import { RegionalCorrectionEngine } from '../RegionalCorrectionEngine';
@@ -210,7 +211,9 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       const duration = endMeasurement();
       expect(duration).toBeLessThan(200);
 
-      console.log(`初回計算時間: ${duration.toFixed(2)}ms`);
+      if (import.meta.env.DEV) {
+        logger.info(`初回計算時間: ${duration.toFixed(2)}ms`);
+      }
     });
 
     it('TC-P002: キャッシュヒットが10ms以内で完了', async () => {
@@ -224,7 +227,9 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       const duration = endMeasurement();
       expect(duration).toBeLessThan(10);
 
-      console.log(`キャッシュヒット時間: ${duration.toFixed(2)}ms`);
+      if (import.meta.env.DEV) {
+        logger.info(`キャッシュヒット時間: ${duration.toFixed(2)}ms`);
+      }
     });
 
     it('TC-P003: 複数地点での計算パフォーマンス', async () => {
@@ -241,12 +246,14 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       expect(stats!.max).toBeLessThan(250);
       expect(stats!.average).toBeLessThan(150);
 
-      console.log('複数地点計算統計:', {
-        count: stats!.count,
-        average: `${stats!.average.toFixed(2)}ms`,
-        max: `${stats!.max.toFixed(2)}ms`,
-        min: `${stats!.min.toFixed(2)}ms`
-      });
+      if (import.meta.env.DEV) {
+        logger.info('複数地点計算統計:', {
+          count: stats!.count,
+          average: `${stats!.average.toFixed(2)}ms`,
+          max: `${stats!.max.toFixed(2)}ms`,
+          min: `${stats!.min.toFixed(2)}ms`
+        });
+      }
     });
   });
 
@@ -274,13 +281,15 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       expect(stats!.p95).toBeLessThan(300); // 95%の計算が300ms以内
       expect(stats!.average).toBeLessThan(100); // 平均100ms以内
 
-      console.log('ストレステスト統計:', {
-        count: stats!.count,
-        average: `${stats!.average.toFixed(2)}ms`,
-        median: `${stats!.median.toFixed(2)}ms`,
-        p95: `${stats!.p95.toFixed(2)}ms`,
-        p99: `${stats!.p99.toFixed(2)}ms`
-      });
+      if (import.meta.env.DEV) {
+        logger.info('ストレステスト統計:', {
+          count: stats!.count,
+          average: `${stats!.average.toFixed(2)}ms`,
+          median: `${stats!.median.toFixed(2)}ms`,
+          p95: `${stats!.p95.toFixed(2)}ms`,
+          p99: `${stats!.p99.toFixed(2)}ms`
+        });
+      }
     });
 
     it('TC-P005: 大量データでの安定性テスト', async () => {
@@ -309,7 +318,7 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
 
         } catch (error) {
           errorCount++;
-          console.error(`計算エラー at ${testData.coordinates.latitude}, ${testData.coordinates.longitude}:`, error);
+          logger.error(`計算エラー at ${testData.coordinates.latitude}, ${testData.coordinates.longitude}:`, { error });
         }
       }
 
@@ -317,12 +326,14 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       expect(errorCount).toBeLessThan(largeDataSet.length * 0.05); // 5%未満エラー
 
       const stats = performanceMeasurer.getStatistics('large-data-test');
-      console.log('大量データテスト結果:', {
-        success: successCount,
-        errors: errorCount,
-        successRate: `${((successCount / largeDataSet.length) * 100).toFixed(2)}%`,
-        averageTime: stats ? `${stats.average.toFixed(2)}ms` : 'N/A'
-      });
+      if (import.meta.env.DEV) {
+        logger.info('大量データテスト結果:', {
+          success: successCount,
+          errors: errorCount,
+          successRate: `${((successCount / largeDataSet.length) * 100).toFixed(2)}%`,
+          averageTime: stats ? `${stats.average.toFixed(2)}ms` : 'N/A'
+        });
+      }
     });
   });
 
@@ -358,12 +369,14 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       // メモリ増加が20%以内であることを確認（メモリリークなし）
       expect(memoryIncreasePercent).toBeLessThan(20);
 
-      console.log('メモリ使用量分析:', {
-        baseline: memoryProfiler.formatBytes(memoryProfiler.getCurrentMemoryUsage()),
-        increase: memoryProfiler.formatBytes(memoryIncrease),
-        increasePercent: `${memoryIncreasePercent.toFixed(2)}%`,
-        maxUsage: memoryProfiler.formatBytes(Math.max(...memoryMeasurements))
-      });
+      if (import.meta.env.DEV) {
+        logger.info('メモリ使用量分析:', {
+          baseline: memoryProfiler.formatBytes(memoryProfiler.getCurrentMemoryUsage()),
+          increase: memoryProfiler.formatBytes(memoryIncrease),
+          increasePercent: `${memoryIncreasePercent.toFixed(2)}%`,
+          maxUsage: memoryProfiler.formatBytes(Math.max(...memoryMeasurements))
+        });
+      }
     });
 
     it('TC-P007: キャッシュメモリ使用量の適正性', async () => {
@@ -386,12 +399,14 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       // キャッシュエントリあたりのメモリ使用量を計算
       const memoryPerEntry = memoryUsage / cacheStats.totalEntries;
 
-      console.log('キャッシュメモリ統計:', {
-        totalEntries: cacheStats.totalEntries,
-        totalMemory: memoryProfiler.formatBytes(memoryUsage),
-        memoryPerEntry: memoryProfiler.formatBytes(memoryPerEntry),
-        hitRate: `${(cacheStats.hitRate * 100).toFixed(2)}%`
-      });
+      if (import.meta.env.DEV) {
+        logger.info('キャッシュメモリ統計:', {
+          totalEntries: cacheStats.totalEntries,
+          totalMemory: memoryProfiler.formatBytes(memoryUsage),
+          memoryPerEntry: memoryProfiler.formatBytes(memoryPerEntry),
+          hitRate: `${(cacheStats.hitRate * 100).toFixed(2)}%`
+        });
+      }
 
       // 各エントリが12KB以下であることを確認（妥当なサイズ）
       // 実測値約11.8KBなので、余裕を持って12KBを閾値とする
@@ -426,12 +441,14 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       const averageSequentialTime = 100; // 予想される順次処理時間
       expect(totalDuration).toBeLessThan(averageSequentialTime * concurrentRequests * 0.8);
 
-      console.log('並行処理統計:', {
-        requests: concurrentRequests,
-        totalTime: `${totalDuration.toFixed(2)}ms`,
-        averagePerRequest: `${(totalDuration / concurrentRequests).toFixed(2)}ms`,
-        efficiency: `${((averageSequentialTime * concurrentRequests / totalDuration) * 100).toFixed(2)}%`
-      });
+      if (import.meta.env.DEV) {
+        logger.info('並行処理統計:', {
+          requests: concurrentRequests,
+          totalTime: `${totalDuration.toFixed(2)}ms`,
+          averagePerRequest: `${(totalDuration / concurrentRequests).toFixed(2)}ms`,
+          efficiency: `${((averageSequentialTime * concurrentRequests / totalDuration) * 100).toFixed(2)}%`
+        });
+      }
     });
   });
 
@@ -460,10 +477,12 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       }
 
       const stats = performanceMeasurer.getStatistics('error-handling');
-      console.log('エラーハンドリング統計:', {
-        averageTime: `${stats!.average.toFixed(2)}ms`,
-        maxTime: `${stats!.max.toFixed(2)}ms`
-      });
+      if (import.meta.env.DEV) {
+        logger.info('エラーハンドリング統計:', {
+          averageTime: `${stats!.average.toFixed(2)}ms`,
+          maxTime: `${stats!.max.toFixed(2)}ms`
+        });
+      }
     });
   });
 
@@ -489,12 +508,14 @@ describe('TASK-401: 潮汐システムパフォーマンステスト', () => {
       // 2回目実行でキャッシュヒット率が40%以上であることを確認（期待値調整）
       expect(cacheStats.hitRate).toBeGreaterThan(0.4);
 
-      console.log('キャッシュヒット統計:', {
-        hitCount: cacheStats.hitCount,
-        missCount: cacheStats.missCount,
-        hitRate: `${(cacheStats.hitRate * 100).toFixed(2)}%`,
-        totalEntries: cacheStats.totalEntries
-      });
+      if (import.meta.env.DEV) {
+        logger.info('キャッシュヒット統計:', {
+          hitCount: cacheStats.hitCount,
+          missCount: cacheStats.missCount,
+          hitRate: `${(cacheStats.hitRate * 100).toFixed(2)}%`,
+          totalEntries: cacheStats.totalEntries
+        });
+      }
     });
   });
 });

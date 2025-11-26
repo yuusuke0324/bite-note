@@ -20,6 +20,7 @@ import {
   isValidConstituent,
   getConstituentNames
 } from './constants/tidal-constituents';
+import { logger } from '../../lib/errors';
 
 export class HarmonicAnalysisEngine {
   private celestialCalculator: CelestialCalculator;
@@ -114,7 +115,7 @@ export class HarmonicAnalysisEngine {
       const factor = factorMap.get(constituent);
 
       if (!factor) {
-        console.warn(`Unknown constituent factor: ${constituent}`);
+        logger.warn(`Unknown constituent factor: ${constituent}`, { component: 'HarmonicAnalysisEngine', constituent });
         continue;
       }
 
