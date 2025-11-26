@@ -1,7 +1,7 @@
 // オフラインインジケーター
 // オフライン状態と未同期カウンターを表示
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { offlineQueueService } from '../../lib/offline-queue-service';
 import { useToastStore } from '../../stores/toast-store';
 import { TestIds } from '../../constants/testIds';
@@ -14,15 +14,22 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
   const [pendingCount, setPendingCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
+  // unmount時の状態更新を防ぐためのref（メモリリーク・unhandled rejection防止）
+  const isMountedRef = useRef(true);
+
   // トースト通知
   const showInfo = useToastStore(state => state.showInfo);
   const showSuccess = useToastStore(state => state.showSuccess);
   const showError = useToastStore(state => state.showError);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     // 初回表示時とオンライン状態変化時にキューステータスを取得
     const updateQueueStatus = async () => {
       const status = await offlineQueueService.getQueueStatus();
+      // unmount後の状態更新を防ぐ
+      if (!isMountedRef.current) return;
       setPendingCount(status.pendingCount);
       setIsSyncing(status.isSyncing);
     };
@@ -36,6 +43,7 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
     }
 
     return () => {
+      isMountedRef.current = false;
       if (interval) clearInterval(interval);
     };
   }, [isOnline]);
@@ -48,10 +56,15 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
     }
 
     try {
+      // unmount後の状態更新を防ぐ
+      if (!isMountedRef.current) return;
       setIsSyncing(true);
       showInfo('同期を開始しました');
 
       const result = await offlineQueueService.syncQueue();
+
+      // unmount後の処理を中断
+      if (!isMountedRef.current) return;
 
       if (result.success) {
         if (result.syncedCount === 0) {
@@ -62,15 +75,22 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
 
         // 同期後にカウンターを更新
         const status = await offlineQueueService.getQueueStatus();
+        // unmount後の状態更新を防ぐ
+        if (!isMountedRef.current) return;
         setPendingCount(status.pendingCount);
       } else {
         showError('同期に失敗しました');
       }
     } catch (error) {
       console.error('[OfflineIndicator] Manual sync error:', error);
+      // unmount後はトースト表示をスキップ
+      if (!isMountedRef.current) return;
       showError('同期中にエラーが発生しました');
     } finally {
-      setIsSyncing(false);
+      // unmount後の状態更新を防ぐ
+      if (isMountedRef.current) {
+        setIsSyncing(false);
+      }
     }
   };
 
