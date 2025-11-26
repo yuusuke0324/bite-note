@@ -15,6 +15,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { PWAInstallPrompt } from '../PWAInstallPrompt';
 import { usePWA } from '../../hooks/usePWA';
+import { logger } from '../../lib/errors/logger';
 
 // jest-axeのカスタムマッチャーを追加
 expect.extend(toHaveNoViolations);
@@ -36,6 +37,16 @@ vi.mock('../../lib/offline-queue-service', () => ({
       success: true,
       syncedCount: 0,
     }),
+  },
+}));
+
+// logger をモック (console.error/warn の代わりに logger を使用)
+vi.mock('../../lib/errors/logger', () => ({
+  logger: {
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
@@ -291,7 +302,6 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
 
   it('installApp()が失敗した場合、エラーログを出力すること', async () => {
     const user = userEvent.setup({ delay: null });
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const mockInstallApp = vi.fn().mockRejectedValue(new Error('Install failed'));
 
     vi.mocked(usePWA).mockReturnValue({
@@ -316,15 +326,12 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
     });
 
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('Install failed:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith('Install failed', { error: expect.any(Error) });
     });
-
-    consoleSpy.mockRestore();
   });
 
   it('localStorageが利用不可の場合でもクラッシュしないこと', async () => {
     const user = userEvent.setup({ delay: null });
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     // localStorage.setItemをモック（失敗させる）
     const originalSetItem = Storage.prototype.setItem;
@@ -348,14 +355,13 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
     });
 
     await waitFor(() => {
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[PWA] Failed to save dismiss state:', expect.any(Error));
+      expect(logger.warn).toHaveBeenCalledWith('Failed to save dismiss state', { error: expect.any(Error) });
       // UIは正常に動作（クラッシュしない）
       expect(within(result.container).queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     // 元に戻す
     Storage.prototype.setItem = originalSetItem;
-    consoleWarnSpy.mockRestore();
   });
 
   it('重複クリック時に複数のインストール処理が走らないこと', async () => {
