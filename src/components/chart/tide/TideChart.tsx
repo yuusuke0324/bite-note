@@ -6,6 +6,34 @@
  * Green Phase: 完全実装 + パフォーマンス最適化
  */
 
+// グローバル型拡張（Performance API & テスト用グローバル変数）
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface TideChartMetrics {
+  renderTime: number;
+  dataPoints: number;
+  memoryUsage: number;
+  optimization: {
+    datasampling: boolean;
+    memoization: boolean;
+    callbacks: boolean;
+  };
+}
+
+declare global {
+  interface Performance {
+    memory?: PerformanceMemory;
+  }
+  interface Window {
+    tideChartMetrics?: TideChartMetrics;
+    getTideChartPerformanceReport?: () => TideChartMetrics;
+  }
+}
+
 import React, {
   useState,
   useCallback,
@@ -14,7 +42,15 @@ import React, {
   useRef,
 } from 'react';
 // CRITICAL: Rechartsを条件付きimportに変更（テスト時の依存性注入を可能にする）
-import type { TideChartProps, TideChartData, ChartComponents } from './types';
+import type {
+  TideChartProps,
+  TideChartData,
+  ChartComponents,
+  TideTooltipProps,
+  DataPointProps,
+  HighContrastTheme,
+  LineDotProps,
+} from './types';
 import styles from './TideChart.module.css';
 
 // ARIA accessibility constants
@@ -308,20 +344,7 @@ function getContrastRatio(foreground: string, background: string): number {
 //   error: string;
 // }
 
-interface HighContrastTheme {
-  background: string;
-  foreground: string;
-  accent: string;
-  focus: string;
-  error: string;
-  // Calculated contrast ratios (WCAG 2.1 compliance)
-  contrastRatios?: {
-    foregroundBg: number;
-    accentBg: number;
-    focusBg: number;
-    errorBg: number;
-  };
-}
+// HighContrastTheme は types.ts からインポート済み
 
 // Calculate and store contrast ratios for each theme
 const calculateThemeContrastRatios = (theme: Omit<HighContrastTheme, 'contrastRatios'>): HighContrastTheme => {
@@ -404,8 +427,8 @@ const performanceTracker = {
     }
 
     // グローバルアクセス（テスト用）
-    (window as any).tideChartMetrics = this.metrics;
-    (window as any).getTideChartPerformanceReport = () => this.metrics;
+    window.tideChartMetrics = this.metrics as TideChartMetrics;
+    window.getTideChartPerformanceReport = () => this.metrics as TideChartMetrics;
   },
 
   getMemoryUsage(): number {
@@ -495,7 +518,7 @@ const dataSampler = {
 /**
  * カスタムツールチップコンポーネント（最適化版）
  */
-const CustomTooltip = React.memo(({ active, payload, label }: any) => {
+const CustomTooltip = React.memo(({ active, payload, label }: TideTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div
@@ -520,7 +543,7 @@ const CustomTooltip = React.memo(({ active, payload, label }: any) => {
 /**
  * Enhanced Data Point Component with Accessibility（最適化版）
  */
-const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
+const DataPoint = React.memo(React.forwardRef<SVGCircleElement, DataPointProps>(({
   cx,
   cy,
   payload,
@@ -534,7 +557,9 @@ const DataPoint = React.memo(React.forwardRef<SVGCircleElement, any>(({
   const isSelected = selected;
 
   const handleClick = React.useCallback(() => {
-    onClick?.(payload, index);
+    if (payload && index !== undefined) {
+      onClick?.(payload, index);
+    }
   }, [onClick, payload, index]);
 
   // Color-blind friendly patterns (WCAG 2.1 1.4.1 Use of Color)
@@ -951,66 +976,25 @@ const TideChartBase: React.FC<TideChartProps> = ({
       }
 
       // メトリクスをグローバルに保存（テスト用）
-      const metrics = {
+      const metrics: TideChartMetrics = {
         renderTime,
         dataPoints: processedData.originalSize || data.length,
-        memoryUsage: (performance as any).memory?.usedJSHeapSize / 1024 / 1024 || 0,
+        memoryUsage: performance.memory?.usedJSHeapSize ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0,
         optimization: {
           datasampling: (processedData.originalSize || data.length) > 1000,
           memoization: true,
           callbacks: true,
         },
       };
-      (window as any).tideChartMetrics = metrics;
-      (window as any).getTideChartPerformanceReport = () => metrics;
+      window.tideChartMetrics = metrics;
+      window.getTideChartPerformanceReport = () => metrics;
     }
   }, [processedData, data.length]);
 
   // データ検証（元の処理を置き換え）
   const validatedData = processedData;
 
-  // エラーハンドリング
-  if (validatedData.error) {
-    return (
-      <div
-        className={`tide-chart ${className || ''}`}
-        style={{ width, height, ...style }}
-        data-testid="tide-chart"
-      >
-        <FallbackDataTable data={data} message={validatedData.error} />
-      </div>
-    );
-  }
-
-  // 空データの処理
-  if (data.length === 0) {
-    return (
-      <div
-        className={`tide-chart ${className || ''}`}
-        style={{ width, height, ...style }}
-        data-testid="tide-chart"
-      >
-        <div style={{ textAlign: 'center', paddingTop: '100px' }}>
-          データがありません
-        </div>
-      </div>
-    );
-  }
-
-  // 不正データの処理
-  if (validatedData.valid.length === 0) {
-    return (
-      <div
-        className={`tide-chart ${className || ''}`}
-        style={{ width, height, ...style }}
-        data-testid="tide-chart"
-      >
-        <FallbackDataTable data={data} message="データ形式が正しくありません" />
-      </div>
-    );
-  }
-
-  // データサンプリング警告（メモ化）
+  // データサンプリング警告（メモ化）- 早期リターン前にHooks呼び出しを配置
   const samplingWarning = useMemo(
     () => processedData.sampled,
     [processedData.sampled]
@@ -1280,6 +1264,49 @@ const TideChartBase: React.FC<TideChartProps> = ({
     [currentTheme, colorMode]
   );
 
+  // === 早期リターン（すべてのHooksの後に配置） ===
+
+  // エラーハンドリング
+  if (validatedData.error) {
+    return (
+      <div
+        className={`tide-chart ${className || ''}`}
+        style={{ width, height, ...style }}
+        data-testid="tide-chart"
+      >
+        <FallbackDataTable data={data} message={validatedData.error} />
+      </div>
+    );
+  }
+
+  // 空データの処理
+  if (data.length === 0) {
+    return (
+      <div
+        className={`tide-chart ${className || ''}`}
+        style={{ width, height, ...style }}
+        data-testid="tide-chart"
+      >
+        <div style={{ textAlign: 'center', paddingTop: '100px' }}>
+          データがありません
+        </div>
+      </div>
+    );
+  }
+
+  // 不正データの処理
+  if (validatedData.valid.length === 0) {
+    return (
+      <div
+        className={`tide-chart ${className || ''}`}
+        style={{ width, height, ...style }}
+        data-testid="tide-chart"
+      >
+        <FallbackDataTable data={data} message="データ形式が正しくありません" />
+      </div>
+    );
+  }
+
   // コンポーネントがロード中の場合はローディング表示（すべてのHooksの後にチェック）
   if (!activeComponents) {
     return (
@@ -1329,8 +1356,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
           data-touch-enabled="true"
           data-voice-enabled="true"
           data-performance={
-            enablePerformanceMonitoring && (window as any).tideChartMetrics
-              ? JSON.stringify((window as any).tideChartMetrics)
+            enablePerformanceMonitoring && window.tideChartMetrics
+              ? JSON.stringify(window.tideChartMetrics)
               : undefined
           }
           data-contrast-ratio={currentTheme.contrastRatios?.foregroundBg.toFixed(2) || '4.5'}
@@ -1653,7 +1680,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
                 dataKey="tide"
                 stroke={currentTheme.accent}
                 strokeWidth={2}
-                dot={(props: any) => (
+                dot={(props: LineDotProps) => (
                   <DataPoint
                     ref={(el: SVGCircleElement | null) => {
                       if (el && props.index !== undefined) {

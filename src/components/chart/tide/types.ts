@@ -3,6 +3,16 @@
  * TASK-202: TideChart メインコンポーネント実装
  */
 
+import type React from 'react';
+import type {
+  LineChart,
+  XAxis,
+  YAxis,
+  Line,
+  Tooltip,
+  ReferenceLine,
+} from 'recharts';
+
 /**
  * 潮汐データポイント
  */
@@ -14,14 +24,72 @@ export interface TideChartData {
 
 /**
  * Recharts コンポーネント型定義（依存性注入用）
+ * Note: Rechartsの型はPropsを直接エクスポートしていないため、コンポーネント型を使用
  */
 export interface ChartComponents {
-  LineChart: React.ComponentType<any>;
-  XAxis: React.ComponentType<any>;
-  YAxis: React.ComponentType<any>;
-  Line: React.ComponentType<any>;
-  Tooltip: React.ComponentType<any>;
-  ReferenceLine: React.ComponentType<any>;
+  LineChart: typeof LineChart;
+  XAxis: typeof XAxis;
+  YAxis: typeof YAxis;
+  Line: typeof Line;
+  Tooltip: typeof Tooltip;
+  ReferenceLine: typeof ReferenceLine;
+}
+
+/**
+ * Recharts Tooltip のカスタムprops型
+ */
+export interface TideTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    dataKey: string;
+    payload: TideChartData;
+  }>;
+  label?: string;
+}
+
+/**
+ * DataPoint コンポーネントのprops型
+ */
+export interface DataPointProps {
+  cx?: number;
+  cy?: number;
+  payload?: TideChartData;
+  index?: number;
+  onClick?: (data: TideChartData, index: number) => void;
+  focused?: boolean;
+  selected?: boolean;
+  theme?: HighContrastTheme;
+}
+
+/**
+ * ハイコントラストテーマ型
+ */
+export interface HighContrastTheme {
+  background: string;
+  foreground: string;
+  accent: string;
+  focus: string;
+  error: string;
+  contrastRatios?: {
+    foregroundBg: number;
+    accentBg: number;
+    focusBg: number;
+    errorBg: number;
+  };
+}
+
+/**
+ * Recharts Line dot props型（dot renderに渡されるprops）
+ */
+export interface LineDotProps {
+  cx?: number;
+  cy?: number;
+  index?: number;
+  payload?: TideChartData;
+  stroke?: string;
+  strokeWidth?: number;
+  fill?: string;
 }
 
 /**
