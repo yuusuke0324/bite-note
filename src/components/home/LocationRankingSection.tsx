@@ -7,6 +7,8 @@ import React, { useMemo } from 'react';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 import type { FishingRecord } from '../../types';
+import { Icon } from '../ui/Icon';
+import { Trophy, MapPin, Medal } from 'lucide-react';
 
 interface LocationRanking {
   location: string;
@@ -49,13 +51,13 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
     }));
   }, [records]);
 
-  // ランキングアイコン
-  const getRankIcon = (rank: number): string => {
+  // ランキングアイコン（メダルアイコンと色で表現）
+  const getRankColor = (rank: number): string => {
     switch (rank) {
-      case 1: return '🥇';
-      case 2: return '🥈';
-      case 3: return '🥉';
-      default: return '';
+      case 1: return '#FFD700'; // Gold
+      case 2: return '#C0C0C0'; // Silver
+      case 3: return '#CD7F32'; // Bronze
+      default: return colors.text.tertiary;
     }
   };
 
@@ -71,10 +73,11 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
         }}
       >
         <div style={{
-          fontSize: '3rem',
           marginBottom: '12px',
+          display: 'flex',
+          justifyContent: 'center',
         }}>
-          📍
+          <Icon icon={MapPin} size={48} color="secondary" decorative />
         </div>
         <p style={{
           ...textStyles.body.medium,
@@ -98,7 +101,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
         alignItems: 'center',
         gap: '8px',
       }}>
-        <span>🏆</span>
+        <Icon icon={Trophy} size={24} color="warning" decorative />
         <span>人気の釣り場</span>
       </h2>
 
@@ -150,7 +153,6 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
           >
             {/* ランクアイコン */}
             <div style={{
-              fontSize: '1.75rem',
               width: '36px',
               height: '36px',
               display: 'flex',
@@ -158,7 +160,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
               justifyContent: 'center',
               flexShrink: 0,
             }}>
-              {getRankIcon(item.rank)}
+              <Icon icon={Medal} size={28} decorative style={{ color: getRankColor(item.rank) }} />
             </div>
 
             {/* 釣り場名 */}

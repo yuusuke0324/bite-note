@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { TestIds } from '../constants/testIds';
+import { Icon } from './ui/Icon';
+import { Check, X, AlertTriangle, Info } from 'lucide-react';
 
 export interface FeedbackToastProps {
   type: 'success' | 'error' | 'warning' | 'info';
@@ -53,13 +55,13 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return <span data-testid="success-icon">✓</span>;
+        return <span data-testid="success-icon"><Icon icon={Check} size={20} color="success" decorative /></span>;
       case 'error':
-        return <span data-testid="error-icon">✗</span>;
+        return <span data-testid="error-icon"><Icon icon={X} size={20} color="error" decorative /></span>;
       case 'warning':
-        return <span data-testid="warning-icon">⚠</span>;
+        return <span data-testid="warning-icon"><Icon icon={AlertTriangle} size={20} color="warning" decorative /></span>;
       case 'info':
-        return <span data-testid="info-icon">ℹ</span>;
+        return <span data-testid="info-icon"><Icon icon={Info} size={20} color="info" decorative /></span>;
       default:
         return null;
     }
@@ -211,7 +213,6 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
           style={{
             background: 'none',
             border: 'none',
-            fontSize: '1.25rem',
             cursor: 'pointer',
             color: getTextColor(),
             opacity: 0.7,
@@ -223,7 +224,7 @@ export const FeedbackToast: React.FC<FeedbackToastProps> = ({
             justifyContent: 'center'
           }}
         >
-          ×
+          <Icon icon={X} size={20} decorative />
         </button>
       </div>
     </div>

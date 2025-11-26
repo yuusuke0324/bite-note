@@ -6,6 +6,8 @@ import { colors } from '../theme/colors';
 import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { Fish, MapPin, CloudSun, Waves, FileText, Ruler, Pencil, Trash2 } from 'lucide-react';
 
 interface PhotoBasedRecordCardProps {
   record: FishingRecord;
@@ -213,8 +215,8 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
             backgroundColor: colors.surface.tertiary,
             color: '#6c757d'
           }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🐟</div>
-            <div style={{ fontSize: '0.875rem' }}>写真なし</div>
+            <Icon icon={Fish} size={48} color="secondary" decorative />
+            <div style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>写真なし</div>
           </div>
         )}
 
@@ -242,9 +244,12 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
             padding: '4px 8px',
             borderRadius: '12px',
             fontSize: '0.75rem',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
           }}>
-            📏 {formatSize(record.size)}
+            <Icon icon={Ruler} size={14} decorative /> {formatSize(record.size)}
           </div>
         )}
 
@@ -267,7 +272,6 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
                 border: 'none',
                 backgroundColor: colors.primary[500],
                 color: 'white',
-                fontSize: '0.875rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -275,7 +279,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
               }}
               title="編集"
             >
-              ✏️
+              <Icon icon={Pencil} size={16} decorative />
             </button>
             <button
               className="photo-card-action-btn"
@@ -287,7 +291,6 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
                 border: 'none',
                 backgroundColor: colors.status.error,
                 color: 'white',
-                fontSize: '0.875rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -295,7 +298,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
               }}
               title="削除"
             >
-              🗑️
+              <Icon icon={Trash2} size={16} decorative />
             </button>
           </div>
         )}
@@ -312,7 +315,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
           alignItems: 'center',
           gap: '8px'
         }}>
-          🐟 {record.fishSpecies}
+          <Icon icon={Fish} size={24} color="primary" decorative /> {record.fishSpecies}
         </h3>
 
         {/* 場所 */}
@@ -324,7 +327,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
           ...textStyles.body.medium,
           color: colors.text.secondary
         }}>
-          <span>📍</span>
+          <Icon icon={MapPin} size={16} color="secondary" decorative />
           <span>{formatLocation(record.location)}</span>
         </div>
 
@@ -342,9 +345,12 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
               padding: '2px 6px',
               borderRadius: '8px',
               fontSize: '0.75rem',
-              fontWeight: '500'
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
             }}>
-              🌤️ {record.weather}
+              <Icon icon={CloudSun} size={14} decorative /> {record.weather}
             </span>
           )}
 
@@ -355,9 +361,12 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
               padding: '2px 6px',
               borderRadius: '8px',
               fontSize: '0.75rem',
-              fontWeight: '500'
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
             }}>
-              🌊 {formatSeaTemperature(record.temperature)}
+              <Icon icon={Waves} size={14} decorative /> {formatSeaTemperature(record.temperature)}
             </span>
           )}
         </div>
@@ -368,9 +377,13 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
             fontSize: '0.8rem',
             color: '#6c757d',
             lineHeight: 1.4,
-            marginTop: '8px'
+            marginTop: '8px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '6px'
           }}>
-            📝 {record.notes.length > 50 ? `${record.notes.substring(0, 50)}...` : record.notes}
+            <Icon icon={FileText} size={14} color="secondary" decorative style={{ flexShrink: 0, marginTop: '2px' }} />
+            <span>{record.notes.length > 50 ? `${record.notes.substring(0, 50)}...` : record.notes}</span>
           </div>
         )}
       </div>

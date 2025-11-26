@@ -30,6 +30,7 @@ import {
   Loader2,
   Trash2,
   AlertTriangle,
+  X,
 } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -222,12 +223,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '1.5rem',
                 color: '#6c757d',
-                padding: '0.25rem'
+                padding: '0.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              ✕
+              <Icon icon={X} size={24} decorative />
             </button>
           </div>
         </div>
