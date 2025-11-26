@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { usePWA } from '../hooks/usePWA';
 import { colors } from '../theme/colors';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { Fish, X, Smartphone } from 'lucide-react';
 
 interface PWAInstallPromptProps {
   onDismiss?: () => void;
@@ -261,10 +263,9 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
         }}>
           {/* アイコン */}
           <div style={{
-            fontSize: '2rem',
             flexShrink: 0
           }}>
-            🎣
+            <Icon icon={Fish} size={32} color="primary" decorative />
           </div>
 
           {/* コンテンツ */}
@@ -340,7 +341,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                   </>
                 ) : (
                   <>
-                    📱 {installState.platform === 'ios' ? '追加方法を見る' : 'インストール'}
+                    <Icon icon={Smartphone} size={16} decorative /> {installState.platform === 'ios' ? '追加方法を見る' : 'インストール'}
                   </>
                 )}
               </button>
@@ -383,7 +384,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
             }}
             aria-label="インストールプロンプトを閉じる"
           >
-            ✕
+            <Icon icon={X} size={20} decorative />
           </button>
         </div>
       </div>
@@ -422,7 +423,9 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
+              <div style={{ marginBottom: '1rem' }}>
+                <Icon icon={Smartphone} size={48} color="primary" decorative />
+              </div>
               <h2
                 id="ios-modal-title"
                 style={{

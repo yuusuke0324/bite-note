@@ -579,7 +579,7 @@ function App() {
                           ctx.font = '20px Arial';
                           ctx.textAlign = 'center';
                           ctx.fillText('テスト釣果写真', 200, 100);
-                          ctx.fillText('🐟', 200, 150);
+                          ctx.fillText('Fish', 200, 150);
                         }
 
                         canvas.toBlob(async (blob) => {
@@ -610,22 +610,22 @@ function App() {
                                 };
 
                                 await handleFormSubmit(testRecord as any);
-                                alert('📸 テスト用写真付き記録を作成しました！「写真で確認」タブで確認してください。');
+                                alert('テスト用写真付き記録を作成しました！「写真で確認」タブで確認してください。');
                               } else {
-                                console.error('❌ 写真保存失敗:', photoResult.error);
+                                console.error('[ERROR] 写真保存失敗:', photoResult.error);
                                 alert('写真の保存に失敗しました: ' + photoResult.error?.message);
                               }
                             } else {
-                              console.error('❌ Canvas Blob生成失敗');
+                              console.error('[ERROR] Canvas Blob生成失敗');
                               alert('画像の生成に失敗しました');
                             }
                           } catch (error) {
-                            console.error('💥 テスト記録作成エラー:', error);
+                            console.error('[ERROR] テスト記録作成エラー:', error);
                             alert('エラーが発生しました: ' + error);
                           }
                         }, 'image/jpeg', 0.8);
                       } catch (error) {
-                        console.error('💥 テストボタンエラー:', error);
+                        console.error('[ERROR] テストボタンエラー:', error);
                         alert('テストボタンでエラーが発生しました: ' + error);
                       }
                     }}
@@ -639,7 +639,7 @@ function App() {
                       fontSize: '0.875rem'
                     }}
                   >
-                    📸 テスト用写真付き記録を作成
+                    <Icon icon={Camera} size={16} decorative /> テスト用写真付き記録を作成
                   </button>
                 </div>
               </div>

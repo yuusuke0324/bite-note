@@ -3,6 +3,8 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { exportImportService } from '../lib/export-import-service';
 import type { ImportResult } from '../types';
+import { Icon } from './ui/Icon';
+import { Download, X, Lightbulb, Folder, Paperclip, CheckCircle2, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface DataImportModalProps {
   isVisible: boolean;
@@ -181,7 +183,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             fontWeight: 'bold',
             color: '#333'
           }}>
-            📥 データインポート
+            <Icon icon={Download} size={24} decorative /> データインポート
           </h2>
           <button
             onClick={handleClose}
@@ -194,7 +196,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               padding: '0.25rem'
             }}
           >
-            ✕
+            <Icon icon={X} size={24} decorative />
           </button>
         </div>
 
@@ -212,7 +214,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             fontSize: '0.9rem',
             fontWeight: 'bold'
           }}>
-            💡 インポート可能なファイル形式
+            <Icon icon={Lightbulb} size={16} decorative /> インポート可能なファイル形式
           </h4>
           <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
             <li>JSON形式: 全データ（記録、写真、設定）</li>
@@ -247,7 +249,9 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
 
           {selectedFile ? (
             <div>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📁</div>
+              <div style={{ marginBottom: '0.5rem' }}>
+                <Icon icon={Folder} size={32} color="primary" decorative />
+              </div>
               <div style={{
                 fontWeight: 'bold',
                 fontSize: '1rem',
@@ -265,7 +269,9 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             </div>
           ) : (
             <div>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📎</div>
+              <div style={{ marginBottom: '0.5rem' }}>
+                <Icon icon={Paperclip} size={32} color="secondary" decorative />
+              </div>
               <div style={{
                 fontSize: '1rem',
                 color: '#333',
@@ -298,7 +304,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               fontWeight: 'bold',
               color: importResult.success ? '#155724' : '#721c24'
             }}>
-              {importResult.success ? '✅ インポート完了' : '❌ インポート失敗'}
+              <Icon icon={importResult.success ? CheckCircle2 : XCircle} size={20} color={importResult.success ? 'success' : 'error'} decorative /> {importResult.success ? 'インポート完了' : 'インポート失敗'}
             </h4>
 
             {importResult.success && (
@@ -347,7 +353,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           color: '#856404',
           border: '1px solid #ffeaa7'
         }}>
-          <strong>⚠️ 注意:</strong> インポートにより既存のデータが上書きされる場合があります。
+          <strong><Icon icon={AlertTriangle} size={16} color="warning" decorative /> 注意:</strong> インポートにより既存のデータが上書きされる場合があります。
           重要なデータは事前にエクスポートしてバックアップを取ることをお勧めします。
         </div>
 
@@ -390,7 +396,15 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
                 gap: '0.5rem'
               }}
             >
-              {isImporting ? '⏳ インポート中...' : '📥 インポート'}
+              {isImporting ? (
+                <>
+                  <Icon icon={Loader2} size={16} className="animate-spin" decorative /> インポート中...
+                </>
+              ) : (
+                <>
+                  <Icon icon={Download} size={16} decorative /> インポート
+                </>
+              )}
             </button>
           )}
         </div>

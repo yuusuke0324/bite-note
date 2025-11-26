@@ -3,6 +3,8 @@
 import React from 'react';
 import { PhotoBasedRecordCard } from './PhotoBasedRecordCard';
 import type { FishingRecord } from '../types';
+import { Icon } from './ui/Icon';
+import { AlertTriangle, Camera, FileText, Fish } from 'lucide-react';
 
 interface SimplePhotoListProps {
   records: FishingRecord[];
@@ -35,7 +37,7 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
         borderRadius: '8px',
         margin: '1rem 0'
       }}>
-        <h3>⚠️ データの読み込みに失敗しました</h3>
+        <h3><Icon icon={AlertTriangle} size={24} color="warning" decorative /> データの読み込みに失敗しました</h3>
         <p>{error}</p>
         <button
           onClick={onDataRefresh}
@@ -69,8 +71,8 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
         marginBottom: '1.5rem',
         border: '1px solid #dee2e6'
       }}>
-        <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
-          📸 写真で確認 ({records.length}件)
+        <h2 style={{ margin: 0, color: '#333', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Icon icon={Camera} size={24} decorative /> 写真で確認 ({records.length}件)
         </h2>
         <div style={{
           display: 'flex',
@@ -79,8 +81,12 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
           fontSize: '0.875rem',
           color: '#6c757d'
         }}>
-          <span>📸 写真付き: {recordsWithPhotos.length}件</span>
-          <span>📝 写真なし: {recordsWithoutPhotos.length}件</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <Icon icon={Camera} size={14} decorative /> 写真付き: {recordsWithPhotos.length}件
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <Icon icon={FileText} size={14} decorative /> 写真なし: {recordsWithoutPhotos.length}件
+          </span>
         </div>
       </div>
 
@@ -111,7 +117,9 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
           borderRadius: '8px',
           border: '1px solid #dee2e6'
         }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🐟</div>
+          <div style={{ marginBottom: '1rem' }}>
+            <Icon icon={Fish} size={48} color="secondary" decorative />
+          </div>
           <h3>釣果記録がありません</h3>
           <p>デバッグタブでテスト記録を作成してみましょう！</p>
         </div>
@@ -128,7 +136,7 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                📸 写真付き記録 ({recordsWithPhotos.length}件)
+                <Icon icon={Camera} size={18} decorative /> 写真付き記録 ({recordsWithPhotos.length}件)
               </h3>
               <div style={{
                 display: 'grid',
@@ -160,7 +168,7 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                📝 写真なし記録 ({recordsWithoutPhotos.length}件)
+                <Icon icon={FileText} size={18} decorative /> 写真なし記録 ({recordsWithoutPhotos.length}件)
               </h3>
               <div style={{
                 display: 'grid',

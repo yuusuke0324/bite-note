@@ -5,6 +5,8 @@
 
 import React from 'react';
 import { AppError, ErrorSeverity } from '../../lib/errors/ErrorTypes';
+import { Icon } from '../ui/Icon';
+import { Info, AlertTriangle, XCircle, AlertOctagon, X } from 'lucide-react';
 
 export interface ErrorModalProps {
   error: AppError | Error;
@@ -26,15 +28,31 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   const getIcon = () => {
     switch (severity) {
       case ErrorSeverity.INFO:
-        return 'ℹ️';
+        return Info;
       case ErrorSeverity.WARNING:
-        return '⚠️';
+        return AlertTriangle;
       case ErrorSeverity.ERROR:
-        return '❌';
+        return XCircle;
       case ErrorSeverity.CRITICAL:
-        return '🚨';
+        return AlertOctagon;
       default:
-        return '❌';
+        return XCircle;
+    }
+  };
+
+  // アイコンカラーの選択
+  const getIconColor = () => {
+    switch (severity) {
+      case ErrorSeverity.INFO:
+        return 'info';
+      case ErrorSeverity.WARNING:
+        return 'warning';
+      case ErrorSeverity.ERROR:
+        return 'error';
+      case ErrorSeverity.CRITICAL:
+        return 'error';
+      default:
+        return 'error';
     }
   };
 
@@ -96,7 +114,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
               gap: '1rem'
             }}
           >
-            <div style={{ fontSize: '2rem' }}>{getIcon()}</div>
+            <Icon icon={getIcon()} size={32} color={getIconColor() as 'info' | 'warning' | 'error'} decorative />
             <div style={{ flex: 1 }}>
               <h2
                 style={{
@@ -140,7 +158,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
               }}
               aria-label="閉じる"
             >
-              ✕
+              <Icon icon={X} size={24} decorative />
             </button>
           </div>
 

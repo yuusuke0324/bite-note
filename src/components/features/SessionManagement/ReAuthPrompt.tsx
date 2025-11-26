@@ -3,6 +3,8 @@
 
 import React, { useEffect, useRef } from 'react';
 import { TestIds } from '../../../constants/testIds';
+import { Icon } from '../../ui/Icon';
+import { AlertTriangle, X } from 'lucide-react';
 
 interface ReAuthPromptProps {
   unsavedCount: number;
@@ -122,13 +124,11 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
         >
           <div
             style={{
-              fontSize: '3rem',
               marginBottom: '1rem',
-              color: '#FBBC04',
             }}
             aria-hidden="true"
           >
-            ⚠️
+            <Icon icon={AlertTriangle} size={48} color="warning" decorative />
           </div>
           <h2
             id="modal-title"
@@ -281,7 +281,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               transition: 'all 0.15s ease',
             }}
           >
-            ×
+            <Icon icon={X} size={24} decorative />
           </button>
         )}
       </div>

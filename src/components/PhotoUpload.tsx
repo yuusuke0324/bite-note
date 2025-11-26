@@ -9,6 +9,8 @@ import { TestIds } from '../constants/testIds';
 import { Skeleton } from './ui/Skeleton';
 import type { PhotoMetadata, AutoFillData } from '../types';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { Camera, MapPin, CheckCircle2, Smartphone, AlertTriangle } from 'lucide-react';
 
 interface PhotoUploadProps {
   value?: File;
@@ -303,11 +305,9 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           ) : (
             <div>
               <div style={{
-                fontSize: '2rem',
                 marginBottom: '1rem',
-                color: disabled ? '#6c757d' : '#007bff'
               }}>
-                📷
+                <Icon icon={Camera} size={32} color={disabled ? 'secondary' : 'primary'} decorative />
               </div>
               <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold' }}>
                 {dragOver ? 'ここにドロップ' : '写真をアップロード'}
@@ -315,15 +315,19 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
               <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#666' }}>
                 ドラッグ&amp;ドロップまたはクリックして選択
               </p>
-              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#007bff', fontWeight: 'bold' }}>
-                📍 GPS情報付きの写真なら位置・日時・天気・海面水温を自動入力！
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#007bff', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                <Icon icon={MapPin} size={14} color="primary" decorative /> GPS情報付きの写真なら位置・日時・天気・海面水温を自動入力！
               </p>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>
                 対応形式: JPEG, PNG, WebP (最大{maxSizeMB}MB)
               </p>
               <div style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#888' }}>
-                <p style={{ margin: 0 }}>✅ GPS付き写真: 位置・日時・天気・海面水温を自動抽出</p>
-                <p style={{ margin: 0 }}>📱 位置情報ONで撮影した写真がおすすめ</p>
+                <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <Icon icon={CheckCircle2} size={12} color="success" decorative /> GPS付き写真: 位置・日時・天気・海面水温を自動抽出
+                </p>
+                <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <Icon icon={Smartphone} size={12} decorative /> 位置情報ONで撮影した写真がおすすめ
+                </p>
               </div>
             </div>
           )}
@@ -384,7 +388,9 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
             gap: '1rem'
           }}
         >
-          <span>⚠️ {error || uploadError}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Icon icon={AlertTriangle} size={16} color="error" decorative /> {error || uploadError}
+          </span>
           {uploadError && (
             <button
               type="button"

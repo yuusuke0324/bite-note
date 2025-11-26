@@ -4,6 +4,8 @@ import React, { Component, type ReactNode } from 'react';
 import { errorManager } from '../lib/errors/ErrorManager';
 import { AppError, ErrorSeverity, ErrorCategory } from '../lib/errors/ErrorTypes';
 import { TestIds } from '../constants/testIds';
+import { Icon } from './ui/Icon';
+import { AlertTriangle } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
@@ -84,7 +86,9 @@ export class ErrorBoundary extends Component<Props, State> {
             margin: '1rem'
           }}
         >
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+          <div style={{ marginBottom: '1rem' }}>
+            <Icon icon={AlertTriangle} size={48} color="warning" decorative />
+          </div>
           <h2 style={{ color: '#dc3545', marginBottom: '1rem' }}>
             エラーが発生しました
           </h2>

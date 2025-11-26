@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { RetryService } from '../lib/retry-service';
+import { Icon } from './ui/Icon';
+import { RefreshCw, AlertTriangle } from 'lucide-react';
 
 export interface RetryableActionProps<T = unknown> {
   action: () => Promise<T>;
@@ -119,7 +121,7 @@ export const RetryableAction = <T = unknown,>({
     if (hasError) {
       return (
         <>
-          🔄 再試行 {retryCount > 0 && `(${retryCount}回目)`}
+          <Icon icon={RefreshCw} size={16} decorative /> 再試行 {retryCount > 0 && `(${retryCount}回目)`}
         </>
       );
     }
@@ -158,7 +160,7 @@ export const RetryableAction = <T = unknown,>({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <span>⚠️</span>
+            <Icon icon={AlertTriangle} size={16} color="warning" decorative />
             <strong>エラーが発生しました</strong>
           </div>
           <p style={{ margin: 0, fontSize: '0.9rem' }}>
