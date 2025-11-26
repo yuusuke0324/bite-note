@@ -40,6 +40,8 @@ import { OfflineIndicator } from './components/common/OfflineIndicator';
 
 // アイコン
 import Icons from './components/icons/Icons';
+import { Icon } from './components/ui/Icon';
+import { Search, Sliders, ChevronDown, Fish, MapPin, Ruler, Trophy, TrendingUp, Calendar } from 'lucide-react';
 
 // テスト用定数
 import { TestIds } from './constants/testIds';
@@ -581,11 +583,12 @@ function ModernApp() {
           left: '14px',
           top: '50%',
           transform: 'translateY(-50%)',
-          fontSize: '1.25rem',
           pointerEvents: 'none',
           color: colors.text.secondary,
+          display: 'flex',
+          alignItems: 'center',
         }}>
-          🔍
+          <Icon icon={Search} size="md" decorative />
         </span>
         {localValue && (
           <button
@@ -673,7 +676,7 @@ function ModernApp() {
         onClick={() => setIsExpanded(!isExpanded)}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '1.25rem' }}>🎛️</span>
+            <Icon icon={Sliders} size="md" color="primary" decorative />
             <span style={{
               fontSize: '0.875rem',
               fontWeight: '600',
@@ -724,11 +727,12 @@ function ModernApp() {
               </button>
             )}
             <span style={{
-              fontSize: '1rem',
+              display: 'flex',
+              alignItems: 'center',
               transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)',
               transition: 'transform 0.2s ease',
             }}>
-              ▼
+              <Icon icon={ChevronDown} size="sm" decorative />
             </span>
           </div>
         </div>
@@ -749,8 +753,12 @@ function ModernApp() {
                   fontWeight: '600',
                   color: colors.text.primary,
                   marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}>
-                  🐟 魚種
+                  <Icon icon={Fish} size="sm" decorative />
+                  魚種
                 </div>
                 <div style={{
                   display: 'flex',
@@ -792,8 +800,12 @@ function ModernApp() {
                   fontWeight: '600',
                   color: colors.text.primary,
                   marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}>
-                  📍 場所
+                  <Icon icon={MapPin} size="sm" decorative />
+                  場所
                 </div>
                 <div style={{
                   display: 'flex',
@@ -834,8 +846,12 @@ function ModernApp() {
                 fontWeight: '600',
                 color: colors.text.primary,
                 marginBottom: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
               }}>
-                📏 サイズ範囲 (cm)
+                <Icon icon={Ruler} size="sm" decorative />
+                サイズ範囲 (cm)
               </div>
               <div style={{
                 display: 'flex',
@@ -906,7 +922,9 @@ function ModernApp() {
           padding: '48px 32px',
           color: colors.text.secondary,
         }}>
-          <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🔍</div>
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+            <Icon icon={Search} size={64} color="secondary" decorative />
+          </div>
           <div style={{
             ...textStyles.headline.small,
             marginBottom: '8px',
@@ -1146,7 +1164,8 @@ function ModernApp() {
               alignItems: 'center',
               gap: '6px',
             }}>
-              🏆 {(() => {
+              <Icon icon={Trophy} size={16} decorative />
+              {(() => {
                 const bestSize = typeof record.size === 'number' ? record.size : 0;
                 const bestWeight = typeof record.weight === 'number' ? record.weight : 0;
                 const bestMax = Math.max(bestSize, bestWeight);
@@ -1176,8 +1195,12 @@ function ModernApp() {
               transform: isHovered ? 'translateY(-2px) scale(1.05)' : 'translateY(0) scale(1)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               boxShadow: isHovered ? '0 4px 12px rgba(0, 0, 0, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
             }}>
-              📏 {record.size}cm
+              <Icon icon={Ruler} size={14} decorative />
+              {record.size}cm
             </div>
           ) : null}
 
@@ -1226,8 +1249,12 @@ function ModernApp() {
               color: 'white',
               textShadow: '0 2px 4px rgba(0,0,0,0.3)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}>
-              🐟 {record.fishSpecies}
+              <Icon icon={Fish} size={20} decorative />
+              {record.fishSpecies}
             </h3>
 
             {/* 場所 */}
@@ -1483,7 +1510,8 @@ function ModernApp() {
               data={trendData}
               type="bar"
               height={200}
-              title="📈 釣果トレンド（最近6ヶ月）"
+              title="釣果トレンド（最近6ヶ月）"
+              titleIcon={<Icon icon={TrendingUp} size="sm" decorative />}
               color={colors.primary[500]}
             />
           </ModernCard>
@@ -1500,7 +1528,8 @@ function ModernApp() {
               alignItems: 'center',
               gap: '8px',
             }}>
-              🏆 今月のベストキャッチ
+              <Icon icon={Trophy} size="md" decorative />
+              今月のベストキャッチ
             </h2>
             <div style={{ maxWidth: '600px', margin: '0 auto' }}>
               <ModernRecordCard record={bestCatch} isBestCatch={true} />
@@ -1777,8 +1806,12 @@ function ModernApp() {
                   fontSize: '0.875rem',
                   color: colors.primary[700],
                   fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}>
-                  🔍 {filteredRecords.length}件の記録が見つかりました
+                  <Icon icon={Search} size="sm" decorative />
+                  {filteredRecords.length}件の記録が見つかりました
                 </span>
                 {(activeFilterCount > 0 || filters.searchQuery) && (
                   <button
@@ -1830,7 +1863,8 @@ function ModernApp() {
                         alignItems: 'center',
                         gap: '8px',
                       }}>
-                        📅 {group.label}
+                        <Icon icon={Calendar} size="sm" decorative />
+                        {group.label}
                         <span style={{
                           ...textStyles.body.small,
                           color: colors.text.secondary,

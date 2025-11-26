@@ -1,9 +1,36 @@
 // 設定・カスタマイズモーダルコンポーネント
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, type ReactNode } from 'react';
 import { useAppStore, selectSettings, selectActions } from '../stores/app-store';
 import type { AppSettings } from '../types';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import {
+  Settings,
+  Palette,
+  Save,
+  Lock,
+  Wrench,
+  Globe,
+  Calendar,
+  Ruler,
+  Target,
+  Moon,
+  Sun,
+  RefreshCw,
+  Eye,
+  CalendarDays,
+  Camera,
+  MapPin,
+  Bell,
+  FileText,
+  FolderOpen,
+  FlaskConical,
+  Info,
+  Loader2,
+  Trash2,
+  AlertTriangle,
+} from 'lucide-react';
 
 interface SettingsModalProps {
   isVisible: boolean;
@@ -125,12 +152,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isVisible) return null;
 
   type TabId = 'general' | 'display' | 'data' | 'privacy' | 'advanced';
-  const tabs: Array<{ id: TabId; label: string; icon: string }> = [
-    { id: 'general', label: '一般', icon: '⚙️' },
-    { id: 'display', label: '表示', icon: '🎨' },
-    { id: 'data', label: 'データ', icon: '💾' },
-    { id: 'privacy', label: 'プライバシー', icon: '🔒' },
-    { id: 'advanced', label: '詳細', icon: '🔧' }
+  const tabs: Array<{ id: TabId; label: string; icon: ReactNode }> = [
+    { id: 'general', label: '一般', icon: <Icon icon={Settings} size="sm" decorative /> },
+    { id: 'display', label: '表示', icon: <Icon icon={Palette} size="sm" decorative /> },
+    { id: 'data', label: 'データ', icon: <Icon icon={Save} size="sm" decorative /> },
+    { id: 'privacy', label: 'プライバシー', icon: <Icon icon={Lock} size="sm" decorative /> },
+    { id: 'advanced', label: '詳細', icon: <Icon icon={Wrench} size="sm" decorative /> }
   ];
 
   return (
@@ -169,9 +196,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333'
+            color: '#333',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}>
-            ⚙️ 設定
+            <Icon icon={Settings} size="md" decorative />
+            設定
           </h2>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             {hasChanges && (
@@ -310,7 +341,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               gap: '0.5rem'
             }}
           >
-            {isSaving ? '⏳ 保存中...' : '💾 保存'}
+            {isSaving ? <><Icon icon={Loader2} size="sm" className="animate-spin" decorative /> 保存中...</> : <><Icon icon={Save} size="sm" decorative /> 保存</>}
           </button>
         </div>
       </div>
@@ -324,11 +355,14 @@ const GeneralTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333' }}>⚙️ 一般設定</h3>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <Icon icon={Settings} size="sm" decorative />
+      一般設定
+    </h3>
 
     <div style={{ display: 'grid', gap: '1.5rem' }}>
       {/* 言語設定 */}
-      <SettingGroup title="🌐 言語" description="アプリの表示言語を選択">
+      <SettingGroup title="言語" titleIcon={<Icon icon={Globe} size="sm" decorative />} description="アプリの表示言語を選択">
         <select
           value={settings.language}
           onChange={(e) => onSettingChange('language', e.target.value as 'ja' | 'en')}
@@ -345,7 +379,7 @@ const GeneralTab: React.FC<{
       </SettingGroup>
 
       {/* 日付形式 */}
-      <SettingGroup title="📅 日付形式" description="日付の表示形式を選択">
+      <SettingGroup title="日付形式" titleIcon={<Icon icon={Calendar} size="sm" decorative />} description="日付の表示形式を選択">
         <select
           value={settings.dateFormat}
           onChange={(e) => onSettingChange('dateFormat', e.target.value as 'YYYY/MM/DD' | 'DD/MM/YYYY' | 'MM/DD/YYYY')}
@@ -364,7 +398,7 @@ const GeneralTab: React.FC<{
       </SettingGroup>
 
       {/* 単位設定 */}
-      <SettingGroup title="📏 単位設定" description="測定単位を選択">
+      <SettingGroup title="単位設定" titleIcon={<Icon icon={Ruler} size="sm" decorative />} description="測定単位を選択">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <label style={{ minWidth: '80px', fontSize: '0.9rem' }}>気温:</label>
@@ -402,7 +436,7 @@ const GeneralTab: React.FC<{
       </SettingGroup>
 
       {/* デフォルト値 */}
-      <SettingGroup title="🎯 デフォルト値" description="新規記録作成時のデフォルト値">
+      <SettingGroup title="デフォルト値" titleIcon={<Icon icon={Target} size="sm" decorative />} description="新規記録作成時のデフォルト値">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
@@ -452,16 +486,19 @@ const DisplayTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333' }}>🎨 表示設定</h3>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <Icon icon={Palette} size="sm" decorative />
+      表示設定
+    </h3>
 
     <div style={{ display: 'grid', gap: '1.5rem' }}>
       {/* テーマ設定 */}
-      <SettingGroup title="🌙 テーマ" description="アプリの外観テーマを選択">
+      <SettingGroup title="テーマ" titleIcon={<Icon icon={Moon} size="sm" decorative />} description="アプリの外観テーマを選択">
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           {[
-            { value: 'light', label: 'ライト', icon: '☀️' },
-            { value: 'dark', label: 'ダーク', icon: '🌙' },
-            { value: 'auto', label: '自動', icon: '🔄' }
+            { value: 'light', label: 'ライト', icon: <Icon icon={Sun} size={14} decorative /> },
+            { value: 'dark', label: 'ダーク', icon: <Icon icon={Moon} size={14} decorative /> },
+            { value: 'auto', label: '自動', icon: <Icon icon={RefreshCw} size={14} decorative /> }
           ].map(theme => (
             <button
               key={theme.value}
@@ -486,7 +523,7 @@ const DisplayTab: React.FC<{
       </SettingGroup>
 
       {/* 表示オプション */}
-      <SettingGroup title="👁️ 表示オプション" description="画面表示に関する設定">
+      <SettingGroup title="表示オプション" titleIcon={<Icon icon={Eye} size="sm" decorative />} description="画面表示に関する設定">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <ToggleSetting
             label="コンパクト表示"
@@ -518,11 +555,14 @@ const DataTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333' }}>💾 データ設定</h3>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <Icon icon={Save} size="sm" decorative />
+      データ設定
+    </h3>
 
     <div style={{ display: 'grid', gap: '1.5rem' }}>
       {/* 自動保存 */}
-      <SettingGroup title="💾 自動保存" description="データの自動保存設定">
+      <SettingGroup title="自動保存" titleIcon={<Icon icon={Save} size="sm" decorative />} description="データの自動保存設定">
         <ToggleSetting
           label="自動保存を有効にする"
           description="入力内容を自動的に保存"
@@ -532,7 +572,7 @@ const DataTab: React.FC<{
       </SettingGroup>
 
       {/* エクスポート形式 */}
-      <SettingGroup title="📤 エクスポート形式" description="デフォルトのエクスポート形式">
+      <SettingGroup title="エクスポート形式" titleIcon={<Icon icon={FileText} size="sm" decorative />} description="デフォルトのエクスポート形式">
         <select
           value={settings.exportFormat}
           onChange={(e) => onSettingChange('exportFormat', e.target.value as 'json' | 'csv')}
@@ -549,7 +589,7 @@ const DataTab: React.FC<{
       </SettingGroup>
 
       {/* データ保持期間 */}
-      <SettingGroup title="🗓️ データ保持期間" description="データを保持する期間（日数）">
+      <SettingGroup title="データ保持期間" titleIcon={<Icon icon={CalendarDays} size="sm" decorative />} description="データを保持する期間（日数）">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <input
             type="number"
@@ -573,7 +613,7 @@ const DataTab: React.FC<{
       </SettingGroup>
 
       {/* 写真設定 */}
-      <SettingGroup title="📷 写真設定" description="写真の保存に関する設定">
+      <SettingGroup title="写真設定" titleIcon={<Icon icon={Camera} size="sm" decorative />} description="写真の保存に関する設定">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
@@ -626,11 +666,14 @@ const PrivacyTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333' }}>🔒 プライバシー設定</h3>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <Icon icon={Lock} size="sm" decorative />
+      プライバシー設定
+    </h3>
 
     <div style={{ display: 'grid', gap: '1.5rem' }}>
       {/* 位置情報 */}
-      <SettingGroup title="📍 位置情報" description="GPS位置情報の利用設定">
+      <SettingGroup title="位置情報" titleIcon={<Icon icon={MapPin} size="sm" decorative />} description="GPS位置情報の利用設定">
         <ToggleSetting
           label="自動位置取得を有効にする"
           description="記録作成時に現在位置を自動取得"
@@ -640,7 +683,7 @@ const PrivacyTab: React.FC<{
       </SettingGroup>
 
       {/* 通知設定 */}
-      <SettingGroup title="🔔 通知" description="アプリからの通知設定">
+      <SettingGroup title="通知" titleIcon={<Icon icon={Bell} size="sm" decorative />} description="アプリからの通知設定">
         <ToggleSetting
           label="通知を有効にする"
           description="重要な更新やリマインダーを受け取る"
@@ -656,7 +699,10 @@ const PrivacyTab: React.FC<{
         borderRadius: '6px',
         border: '1px solid #90caf9'
       }}>
-        <h4 style={{ margin: '0 0 0.5rem 0', color: '#1976d2' }}>📋 データの取り扱いについて</h4>
+        <h4 style={{ margin: '0 0 0.5rem 0', color: '#1976d2', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Icon icon={FileText} size="sm" decorative />
+          データの取り扱いについて
+        </h4>
         <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.85rem', color: '#1976d2' }}>
           <li>すべてのデータはお使いのデバイス内にのみ保存されます</li>
           <li>外部サーバーにデータが送信されることはありません</li>
@@ -676,11 +722,14 @@ const AdvancedTab: React.FC<{
   onReset: () => void;
 }> = ({ onClearData, onReset }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333' }}>🔧 詳細設定</h3>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <Icon icon={Wrench} size="sm" decorative />
+      詳細設定
+    </h3>
 
     <div style={{ display: 'grid', gap: '1.5rem' }}>
       {/* アプリ情報 */}
-      <SettingGroup title="ℹ️ アプリ情報" description="アプリケーションの詳細情報">
+      <SettingGroup title="アプリ情報" titleIcon={<Icon icon={Info} size="sm" decorative />} description="アプリケーションの詳細情報">
         <div style={{
           padding: '1rem',
           backgroundColor: '#f8f9fa',
@@ -700,7 +749,7 @@ const AdvancedTab: React.FC<{
       </SettingGroup>
 
       {/* データ管理 */}
-      <SettingGroup title="🗂️ データ管理" description="データの管理とメンテナンス">
+      <SettingGroup title="データ管理" titleIcon={<Icon icon={FolderOpen} size="sm" decorative />} description="データの管理とメンテナンス">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <button
             onClick={onReset}
@@ -717,7 +766,7 @@ const AdvancedTab: React.FC<{
               gap: '0.5rem'
             }}
           >
-            🔄 設定をリセット
+            <Icon icon={RefreshCw} size="sm" decorative /> 設定をリセット
           </button>
           <button
             onClick={onClearData}
@@ -734,13 +783,13 @@ const AdvancedTab: React.FC<{
               gap: '0.5rem'
             }}
           >
-            🗑️ すべてのデータを削除
+            <Icon icon={Trash2} size="sm" decorative /> すべてのデータを削除
           </button>
         </div>
       </SettingGroup>
 
       {/* 実験的機能 */}
-      <SettingGroup title="🧪 実験的機能" description="開発中の新機能（注意して使用）">
+      <SettingGroup title="実験的機能" titleIcon={<Icon icon={FlaskConical} size="sm" decorative />} description="開発中の新機能（注意して使用）">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div style={{
             padding: '1rem',
@@ -750,7 +799,7 @@ const AdvancedTab: React.FC<{
             fontSize: '0.85rem',
             color: '#856404'
           }}>
-            <strong>⚠️ 注意:</strong> 実験的機能は予期しない動作をする可能性があります。
+            <strong style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon icon={AlertTriangle} size={14} decorative /> 注意:</strong> 実験的機能は予期しない動作をする可能性があります。
             重要なデータは事前にバックアップを取ることをお勧めします。
           </div>
         </div>
@@ -762,16 +811,18 @@ const AdvancedTab: React.FC<{
 // 設定グループコンポーネント
 const SettingGroup: React.FC<{
   title: string;
+  titleIcon?: ReactNode;
   description: string;
   children: React.ReactNode;
-}> = ({ title, description, children }) => (
+}> = ({ title, titleIcon, description, children }) => (
   <div style={{
     padding: '1rem',
     backgroundColor: 'white',
     borderRadius: '8px',
     border: '1px solid #dee2e6'
   }}>
-    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', color: '#333' }}>
+    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      {titleIcon}
       {title}
     </h4>
     <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: '#666' }}>
