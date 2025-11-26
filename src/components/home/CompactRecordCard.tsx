@@ -9,6 +9,7 @@ import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 import { Skeleton } from '../ui/Skeleton';
 import type { FishingRecord } from '../../types';
+import { logger } from '../../lib/errors/logger';
 
 interface CompactRecordCardProps {
   record: FishingRecord;
@@ -48,10 +49,10 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
           photoUrlRef.current = url;
           setPhotoUrl(url);
         } else if (photoResult.error) {
-          console.error('CompactRecordCard: 写真取得失敗', photoResult.error);
+          logger.error('CompactRecordCard: 写真取得失敗', { error: photoResult.error });
         }
       } catch (error) {
-        console.error('CompactRecordCard: 写真の読み込みエラー:', error);
+        logger.error('CompactRecordCard: 写真の読み込みエラー', { error });
       } finally {
         if (isMounted) {
           setPhotoLoading(false);

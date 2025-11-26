@@ -11,6 +11,7 @@ import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 import { photoService } from '../../lib/photo-service';
 import type { FishingRecord } from '../../types';
+import { logger } from '../../lib/errors/logger';
 
 // Leafletのデフォルトアイコン修正
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -316,7 +317,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           setPhotoUrl(url);
         }
       } catch (error) {
-        console.error('写真の読み込みエラー:', error);
+        logger.error('写真の読み込みエラー', { error });
       } finally {
         if (isMounted) {
           setPhotoLoading(false);

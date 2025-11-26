@@ -17,6 +17,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import type { FishSpecies } from '../types';
 import { fishSpeciesSearchEngine } from '../lib/fish-species-service';
 import './FishSpeciesAutocomplete.css';
+import { logger } from '../lib/errors/logger';
 
 interface FishSpeciesAutocompleteProps {
   /**
@@ -83,7 +84,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
     try {
       return fishSpeciesSearchEngine.search(inputValue, { limit: 10 });
     } catch (error) {
-      console.error('検索エラー:', error);
+      logger.error('検索エラー', { error });
       return [];
     }
   }, [inputValue]);

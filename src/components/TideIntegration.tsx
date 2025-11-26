@@ -13,6 +13,7 @@ import { TideChart } from './chart/tide/TideChart';
 import type { TideChartData } from './chart/tide/types';
 import type { FishingRecord } from '../types/entities';
 import type { TideInfo, TideGraphData } from '../types/tide';
+import { logger } from '../lib/errors/logger';
 
 interface TideIntegrationProps {
   fishingRecord: FishingRecord;
@@ -187,7 +188,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
       setTideAnalysis(analysis);
 
     } catch (err) {
-      console.error('潮汐計算エラー:', err);
+      logger.error('潮汐計算エラー', { error: err });
       setError(err instanceof Error ? err.message : '潮汐情報の取得に失敗しました');
     } finally {
       setLoading(false);
@@ -200,7 +201,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
       const tideInfo = await onCalculateTide(coordinates, time);
       return tideInfo.currentLevel;
     } catch (error) {
-      console.warn('個別時刻の潮位計算でエラー:', error);
+      logger.warn('個別時刻の潮位計算でエラー', { error });
       // フォールバック: 基準データから補間計算
       return calculateSmoothTideLevel(time, tideInfo?.events || []);
     }

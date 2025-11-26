@@ -52,6 +52,7 @@ import type {
   LineDotProps,
 } from './types';
 import styles from './TideChart.module.css';
+import { logger } from '../../../lib/errors/logger';
 
 // ARIA accessibility constants
 const ARIA_DESCRIPTION_ID = 'tide-chart-description';
@@ -421,8 +422,9 @@ const performanceTracker = {
 
     // パフォーマンス警告
     if (renderTime > 1000) {
-      console.warn(
-        `Performance warning: TideChart render took ${renderTime.toFixed(2)}ms`
+      logger.warn(
+        'Performance warning: TideChart render exceeded threshold',
+        { renderTime: renderTime.toFixed(2) }
       );
     }
 
@@ -832,7 +834,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
   // 釣果マーカーのデバッグログ
   useEffect(() => {
     if (import.meta.env.DEV && fishingTimes.length > 0) {
-      console.log('[Dev] 🎣 Fishing times received:', fishingTimes);
+      logger.debug('Fishing times received', { fishingTimes });
     }
   }, [fishingTimes]);
 
@@ -872,7 +874,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
         originalSize: data.length,
       };
     } catch (err) {
-      console.error('Data processing failed:', err);
+      logger.error('Data processing failed', { error: err });
       return {
         valid: [],
         invalid: [],
@@ -970,9 +972,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
       // パフォーマンス警告（コンポーネント固有の計測値を使用）
       if (renderTime > 1000) {
-        console.warn(
-          `Performance warning: TideChart render took ${renderTime.toFixed(2)}ms`
-        );
+        logger.warn(`Performance warning: TideChart render took ${renderTime.toFixed(2)}ms`);
       }
 
       // メトリクスをグローバルに保存（テスト用）
@@ -1746,7 +1746,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
       </main>
     );
   } catch (error) {
-    console.error('CHART_RENDERING_FAILED:', error);
+    logger.error('CHART_RENDERING_FAILED', { error });
     return (
       <div
         className={`tide-chart ${className || ''}`}

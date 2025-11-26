@@ -8,6 +8,7 @@ import React from 'react';
 import { useFormStore } from '../stores/form-store';
 import { useAppStore } from '../stores/app-store';
 import { createFishingRecordSchema, appSettingsSchema, recordFilterSchema } from '../lib/validation';
+import { logger } from '../lib/errors/logger';
 
 // カスタムフックの型定義
 interface UseValidatedFormOptions<T extends FieldValues> {
@@ -71,7 +72,7 @@ export function useValidatedForm<T extends FieldValues>({
 
       const isValid = await form.trigger();
       if (!isValid) {
-        console.warn('Form validation failed:', form.formState.errors);
+        logger.warn('Form validation failed', { errors: form.formState.errors });
         return;
       }
 
@@ -82,7 +83,7 @@ export function useValidatedForm<T extends FieldValues>({
       setHasUnsavedChanges(false);
 
     } catch (error) {
-      console.error('Form submission failed:', error);
+      logger.error('Form submission failed', { error });
       throw error;
     } finally {
       setIsSubmitting(false);
@@ -106,7 +107,7 @@ export function useValidatedForm<T extends FieldValues>({
 
       return undefined;
     } catch (error) {
-      console.error('Field validation failed:', error);
+      logger.error('Field validation failed', { error });
       return 'バリデーションエラー';
     }
   }, [schema]);

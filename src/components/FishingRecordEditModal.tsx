@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { FishingRecordForm } from './FishingRecordForm';
 import type { FishingRecord } from '../types';
 import type { CreateFishingRecordFormData } from '../lib/validation';
+import { logger } from '../lib/errors/logger';
 
 interface FishingRecordEditModalProps {
   record: FishingRecord;
@@ -46,7 +47,7 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
       await onSave(record.id, data);
       onClose();
     } catch (error) {
-      console.error('Failed to save record:', error);
+      logger.error('Failed to save record', { error });
     } finally {
       setIsSubmitting(false);
     }

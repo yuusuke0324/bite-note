@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { usePWA } from '../hooks/usePWA';
 import { colors } from '../theme/colors';
+import { logger } from '../lib/errors/logger';
 
 interface PWAInstallPromptProps {
   onDismiss?: () => void;
@@ -40,7 +41,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
         setIsVisible(false);
       }
     } catch (error) {
-      console.warn('[PWA] Failed to read localStorage:', error);
+      logger.warn('Failed to read localStorage', { error });
     }
   }, []);
 
@@ -101,7 +102,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
     try {
       localStorage.setItem('pwa-install-dismissed', 'true');
     } catch (error) {
-      console.warn('[PWA] Failed to save dismiss state:', error);
+      logger.warn('Failed to save dismiss state', { error });
     }
     onDismiss?.();
   }, [onDismiss]);
@@ -135,7 +136,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
 
     // エッジケース: フォーカス可能要素がない場合は警告ログ
     if (focusableElements.length === 0) {
-      console.warn('[PWA] No focusable elements in main prompt');
+      logger.warn('No focusable elements in main prompt');
       return;
     }
 
@@ -176,7 +177,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
 
     // エッジケース: フォーカス可能要素がない場合は警告ログ
     if (focusableElements.length === 0) {
-      console.warn('[PWA] No focusable elements in iOS modal');
+      logger.warn('No focusable elements in iOS modal');
       return;
     }
 
@@ -216,7 +217,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
         onDismiss?.();
       }
     } catch (error) {
-      console.error('Install failed:', error);
+      logger.error('Install failed', { error });
     } finally {
       setIsInstalling(false);
       isInstallingRef.current = false;

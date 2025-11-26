@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAppStore, selectSettings, selectActions } from '../stores/app-store';
 import type { AppSettings } from '../types';
+import { logger } from '../lib/errors/logger';
 
 interface SettingsModalProps {
   isVisible: boolean;
@@ -70,7 +71,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       await updateSettings(localSettings);
       setHasChanges(false);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      logger.error('Failed to save settings', { error });
       alert('設定の保存に失敗しました。');
     } finally {
       setIsSaving(false);
@@ -114,7 +115,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           // データクリア処理（実装は後で行う）
           alert('データのクリア機能は実装中です。');
         } catch (error) {
-          console.error('Failed to clear data:', error);
+          logger.error('Failed to clear data', { error });
           alert('データのクリアに失敗しました。');
         }
       }

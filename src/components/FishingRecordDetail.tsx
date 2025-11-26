@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 // import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
 import { TideIntegration } from './TideIntegration';
+import { logger } from '../lib/errors/logger';
 
 interface FishingRecordDetailProps {
   record: FishingRecord;
@@ -525,7 +526,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   return result;
 
                 } catch (error) {
-                  console.error('❌ 実データ潮汐計算失敗:', {
+                  logger.error('実データ潮汐計算失敗', {
                     recordId: record.id.slice(0, 8),
                     error: error,
                     coordinates,
