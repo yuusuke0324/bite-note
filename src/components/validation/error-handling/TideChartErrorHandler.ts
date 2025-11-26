@@ -6,6 +6,7 @@
  */
 
 import type { ValidationResult, ValidationError } from '../types';
+import type { TideChartData } from '../../../utils/validation/types';
 import type {
   ErrorDisplayInfo,
   FallbackType,
@@ -122,7 +123,7 @@ export class TideChartErrorHandler {
    * @param errors エラー一覧
    * @returns フォールバック方式
    */
-  determineFallback(validData: any[], errors: ValidationError[]): FallbackType {
+  determineFallback(validData: TideChartData[], errors: ValidationError[]): FallbackType {
     const validityPercentage = this.calculateDataValidityPercentage(validData, errors);
 
     if (validityPercentage > 80) {
@@ -234,7 +235,7 @@ export class TideChartErrorHandler {
   /**
    * データ有効性計算（private）
    */
-  private calculateDataValidityPercentage(validData: any[], errors: ValidationError[]): number {
+  private calculateDataValidityPercentage(validData: TideChartData[], errors: ValidationError[]): number {
     // validDataの長さがエラー除外後の有効データ数
     // エラー数は実際のエラー数
     const validCount = validData.length;

@@ -242,7 +242,7 @@ export class PhotoMetadataService {
   /**
    * GPS座標を抽出
    */
-  private extractGPSCoordinates(tags: any): Coordinates | null {
+  private extractGPSCoordinates(tags: Record<string, unknown>): Coordinates | null {
     try {
       // 複数のフォーマットでGPS情報を取得
       const lat = tags.GPSLatitude?.description || tags.GPSLatitude?.value;
@@ -288,7 +288,7 @@ export class PhotoMetadataService {
   /**
    * 撮影日時を抽出
    */
-  private extractDateTime(tags: any): Date | null {
+  private extractDateTime(tags: Record<string, unknown>): Date | null {
     try {
       // 複数の日時フィールドを試行（優先順位順）
       const dateFields = [
@@ -336,7 +336,7 @@ export class PhotoMetadataService {
   /**
    * カメラ情報を抽出
    */
-  private extractCameraInfo(tags: any): CameraInfo | null {
+  private extractCameraInfo(tags: Record<string, unknown>): CameraInfo | null {
     try {
       const cameraInfo: CameraInfo = {};
 

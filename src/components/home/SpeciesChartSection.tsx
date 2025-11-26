@@ -85,9 +85,9 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
   }, [records]);
 
   // カスタムツールチップ
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: SpeciesData }> }) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload as SpeciesData;
+      const data = payload[0].payload;
       return (
         <div
           style={{
@@ -127,7 +127,14 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
     innerRadius,
     outerRadius,
     percent,
-  }: any) => {
+  }: {
+    cx: number;
+    cy: number;
+    midAngle: number;
+    innerRadius: number;
+    outerRadius: number;
+    percent: number;
+  }) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -218,7 +225,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
           }}>
             <PieChart width={280} height={280}>
               <Pie
-                data={speciesChartData as any}
+                data={speciesChartData}
                 cx={140}
                 cy={140}
                 labelLine={false}

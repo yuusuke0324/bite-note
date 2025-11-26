@@ -269,7 +269,7 @@ export class RegionalCorrectionEngine {
 
     // M2からM4を生成（浅海効果による倍音）
     const m2 = harmonicConstants.find(c => c.constituent === 'M2');
-    const depth = (regionData as any).depth || 30; // デフォルト深度30m
+    const depth = regionData.depth ?? 30; // デフォルト深度30m
     if (m2 && depth < 50) { // 50m以下で浅海効果
       const depthFactor = Math.max(0, 1 - depth / 50);
 
@@ -339,8 +339,8 @@ export class RegionalCorrectionEngine {
     const resonanceEffects: ResonanceEffect[] = [];
 
     // 湾の固有周期に基づく共鳴効果
-    const bayLength = (regionData as any).bayLength || 50; // デフォルト50km
-    const depth = (regionData as any).depth || 20; // デフォルト20m
+    const bayLength = regionData.bayLength ?? 50; // デフォルト50km
+    const depth = regionData.depth ?? 20; // デフォルト20m
 
     // 湾の固有周期計算（Merian公式の簡略版）
     const waveSpeed = Math.sqrt(9.81 * depth); // 浅水波速度
@@ -363,8 +363,8 @@ export class RegionalCorrectionEngine {
 
       // 湾や内海では一般的に振幅が増大する傾向があるため、
       // ベースとなる増幅を適用
-      const regionType = (regionData as any).regionType;
-      const regionName = (regionData as any).regionName || regionData.name;
+      const regionType = regionData.regionType;
+      const regionName = regionData.regionName ?? regionData.name;
       if (regionType === 'bay' || regionName.includes('湾')) {
         amplificationFactor = 1.2; // 基本的な湾効果
 
@@ -425,8 +425,8 @@ export class RegionalCorrectionEngine {
     const straitEffects: StraitEffect[] = [];
 
     // 海峡効果（瀬戸内海などの狭い水路での効果）
-    const regionType = (regionData as any).regionType;
-    const regionName = (regionData as any).regionName || regionData.name;
+    const regionType = regionData.regionType;
+    const regionName = regionData.regionName ?? regionData.name;
     const isStraitRegion = regionType === 'strait' ||
                           regionName.includes('瀬戸内') ||
                           regionName.includes('海峡');
@@ -451,8 +451,8 @@ export class RegionalCorrectionEngine {
    * 位相遅れを計算
    */
   private calculatePhaseDelay(regionData: RegionalDataRecord, constituent: string): number {
-    const distance = (regionData as any).distanceFromOcean || 0;
-    const depth = (regionData as any).depth || 20;
+    const distance = regionData.distanceFromOcean ?? 0;
+    const depth = regionData.depth ?? 20;
 
     // 水路での波速度
     const waveSpeed = Math.sqrt(9.81 * depth);
@@ -475,8 +475,8 @@ export class RegionalCorrectionEngine {
    * 減衰を計算
    */
   private calculateAttenuation(regionData: RegionalDataRecord, __constituent: string): number {
-    const distance = (regionData as any).distanceFromOcean || 0;
-    const depth = (regionData as any).depth || 20;
+    const distance = regionData.distanceFromOcean ?? 0;
+    const depth = regionData.depth ?? 20;
 
     // 摩擦による減衰
     const frictionCoeff = 0.01; // 摩擦係数

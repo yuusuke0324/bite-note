@@ -166,7 +166,7 @@ export class OfflineQueueService {
    */
   private async syncFishingRecord(
     _type: OfflineQueueItem['type'],
-    _payload: any,
+    _payload: unknown,
     _entityId?: string
   ): Promise<void> {
     // IndexedDBローカル実装のため、同期処理は不要
@@ -179,7 +179,7 @@ export class OfflineQueueService {
    */
   private async syncFishingSpot(
     _type: OfflineQueueItem['type'],
-    _payload: any,
+    _payload: unknown,
     _entityId?: string
   ): Promise<void> {
     // IndexedDBローカル実装のため、同期処理は不要
@@ -191,7 +191,7 @@ export class OfflineQueueService {
    */
   private async syncPhoto(
     _type: OfflineQueueItem['type'],
-    _payload: any,
+    _payload: unknown,
     _entityId?: string
   ): Promise<void> {
     // IndexedDBローカル実装のため、同期処理は不要
@@ -256,7 +256,7 @@ export class OfflineQueueService {
   /**
    * エラーを分類（リトライ可否判定）
    */
-  private categorizeError(error: any): ErrorInfo {
+  private categorizeError(error: unknown): ErrorInfo {
     // ネットワークエラー → リトライ推奨
     if (error instanceof TypeError && error.message.includes('fetch')) {
       return {
@@ -267,29 +267,31 @@ export class OfflineQueueService {
     }
 
     // HTTPステータスコード別
-    if (error.status) {
-      if (error.status >= 400 && error.status < 500) {
+    if (typeof error === 'object' && error !== null && 'status' in error) {
+      const httpError = error as { status: number; message?: string };
+      if (httpError.status >= 400 && httpError.status < 500) {
         // クライアントエラー → リトライ不要
         return {
-          code: `HTTP_${error.status}`,
-          message: error.message || 'クライアントエラー',
+          code: `HTTP_${httpError.status}`,
+          message: httpError.message || 'クライアントエラー',
           shouldRetry: false,
         };
       }
-      if (error.status >= 500) {
+      if (httpError.status >= 500) {
         // サーバーエラー → リトライ推奨
         return {
-          code: `HTTP_${error.status}`,
-          message: error.message || 'サーバーエラー',
+          code: `HTTP_${httpError.status}`,
+          message: httpError.message || 'サーバーエラー',
           shouldRetry: true,
         };
       }
     }
 
     // その他のエラー → リトライ推奨
+    const errorMessage = error instanceof Error ? error.message : (typeof error === 'object' && error !== null && 'message' in error ? String((error as { message: unknown }).message) : '不明なエラー');
     return {
       code: 'UNKNOWN_ERROR',
-      message: error.message || '不明なエラー',
+      message: errorMessage,
       shouldRetry: true,
     };
   }

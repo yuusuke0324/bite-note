@@ -13,7 +13,7 @@ import type { TideInfo } from '../../types/tide';
 import { logger } from '../../lib/errors/logger';
 
 // カスタムツールチップコンポーネント
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { name: string; value: number } }> }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -408,7 +408,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   <LabelList
                     dataKey="percentage"
                     position="right"
-                    formatter={(value: any) => `${value}%`}
+                    formatter={(value: number) => `${value}%`}
                     style={{ fill: colors.primary[700], fontSize: '0.9rem', fontWeight: '600' }}
                   />
                 </Bar>
@@ -474,7 +474,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   <LabelList
                     dataKey="percentage"
                     position="right"
-                    formatter={(value: any) => `${value}%`}
+                    formatter={(value: number) => `${value}%`}
                     style={{ fill: colors.secondary[700], fontSize: '0.9rem', fontWeight: '600' }}
                   />
                 </Bar>

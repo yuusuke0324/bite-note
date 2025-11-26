@@ -73,6 +73,7 @@ export type {
 // 魚種関連（2025年10月追加）
 export type {
   FishSpecies,
+  FishSpeciesJson,
   FishCategory,
   Season,
   Habitat,

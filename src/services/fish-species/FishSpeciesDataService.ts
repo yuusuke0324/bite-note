@@ -9,7 +9,7 @@
  * @since 2025-10-25
  */
 
-import type { FishSpecies } from '../../types';
+import type { FishSpecies, FishSpeciesJson } from '../../types';
 import { logger } from '../../lib/errors';
 import fishSpeciesData from '../../data/fish-species.json';
 
@@ -66,7 +66,7 @@ export class FishSpeciesDataService {
       }
 
       // JSONデータをFishSpecies型に変換
-      const species: FishSpecies[] = fishSpeciesData.species.map(s => ({
+      const species: FishSpecies[] = (fishSpeciesData.species as FishSpeciesJson[]).map(s => ({
         id: s.id,
         standardName: s.standardName,
         scientificName: s.scientificName,
@@ -76,11 +76,11 @@ export class FishSpeciesDataService {
         season: s.season as FishSpecies['season'],
         habitat: s.habitat as FishSpecies['habitat'],
         popularity: s.popularity,
-        image: (s as any).image,
-        source: s.source as 'official' | 'user',
+        image: s.image,
+        source: s.source,
         // JSONでは日付を文字列として保存しているため、必要に応じてDate型に変換
-        createdAt: (s as any).createdAt ? new Date((s as any).createdAt) : undefined,
-        updatedAt: (s as any).updatedAt ? new Date((s as any).updatedAt) : new Date(fishSpeciesData.updatedAt)
+        createdAt: s.createdAt ? new Date(s.createdAt) : undefined,
+        updatedAt: s.updatedAt ? new Date(s.updatedAt) : new Date(fishSpeciesData.updatedAt)
       }));
 
       // ソースフィルタを適用

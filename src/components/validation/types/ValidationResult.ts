@@ -47,7 +47,7 @@ export interface ValidationError {
   message: string;                         // ユーザー向けメッセージ
   field?: string;                          // エラー発生フィールド
   index?: number;                          // エラー発生インデックス
-  context?: any;                           // 追加コンテキスト情報
+  context?: Record<string, unknown>;       // 追加コンテキスト情報
 }
 
 /**

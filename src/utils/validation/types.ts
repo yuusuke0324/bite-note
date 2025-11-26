@@ -47,7 +47,9 @@ export type ValidationErrorCode =
   | 'DUPLICATE_TIMESTAMP'
   | 'STRUCTURE_ERROR'
   | 'DATA_QUALITY_WARNING'
-  | 'PROCESSING_TIMEOUT';
+  | 'PROCESSING_TIMEOUT'
+  | 'TIDE_PRECISION_ERROR'
+  | 'TIMEZONE_ERROR';
 
 // ==========================================
 // エラーコンテキスト型定義
@@ -63,8 +65,12 @@ export interface ErrorContext {
   timeValue?: string;
   /** エラーとなった潮位値 */
   tideValue?: number;
+  /** タイムアウト時間（ミリ秒） */
+  timeoutMs?: number;
   /** 追加のメタデータ */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
+  /** 任意の追加プロパティを許可 */
+  [key: string]: unknown;
 }
 
 // ==========================================

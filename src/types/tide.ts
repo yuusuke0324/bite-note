@@ -441,6 +441,9 @@ export interface TideCacheRecord {
   lastAccessed: Date;      // 最終アクセス
 }
 
+/** 地域タイプ */
+export type RegionType = 'bay' | 'strait' | 'ocean' | 'open_sea' | 'other';
+
 /** 地域データテーブル */
 export interface RegionalDataRecord {
   id?: number;             // 自動採番ID
@@ -471,7 +474,7 @@ export interface RegionalDataRecord {
   // 地形情報
   depth?: number;          // 水深 (m)
   bayLength?: number;      // 湾の長さ (km)
-  regionType?: string;     // 地域タイプ ('bay', 'strait', 'open_sea')
+  regionType?: RegionType; // 地域タイプ
   distanceFromOcean?: number; // 外洋からの距離 (km)
 }
 
@@ -504,7 +507,7 @@ export interface TideCalculationResult {
 export interface TideError {
   code: 'INVALID_COORDINATES' | 'CALCULATION_FAILED' | 'CACHE_ERROR' | 'REGIONAL_DATA_NOT_FOUND';
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
   timestamp: Date;
 }
 
