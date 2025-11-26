@@ -44,6 +44,29 @@ export type FishDataSource =
   | "user";     // ユーザー追加データ
 
 /**
+ * JSONファイルから読み込む魚種データの型定義
+ *
+ * @description
+ * fish-species.jsonのスキーマ定義
+ * createdAtとupdatedAtはISO 8601文字列として保存されている
+ */
+export interface FishSpeciesJson {
+  id: string;
+  standardName: string;
+  scientificName: string;
+  aliases: string[];
+  regionalNames: string[];
+  category: string; // FishCategoryにキャスト必要
+  season: string[]; // Season[]にキャスト必要
+  habitat: string[]; // Habitat[]にキャスト必要
+  popularity: number;
+  image?: string;
+  source: 'official' | 'user';
+  createdAt?: string; // ISO 8601文字列
+  updatedAt?: string; // ISO 8601文字列
+}
+
+/**
  * 魚種マスターデータ
  *
  * @description

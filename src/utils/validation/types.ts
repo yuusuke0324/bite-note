@@ -64,7 +64,7 @@ export interface ErrorContext {
   /** エラーとなった潮位値 */
   tideValue?: number;
   /** 追加のメタデータ */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // ==========================================
