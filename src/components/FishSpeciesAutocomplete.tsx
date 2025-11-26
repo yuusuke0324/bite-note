@@ -75,6 +75,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 検索結果の計算（派生状態）
   // Issue #38: グローバルシングルトンを使用してact()警告を解決
@@ -154,8 +155,13 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
 
   /**
    * フォーカスハンドラ
+   * Note: blur時のタイマーをキャンセルして状態リセットを防止
    */
   const handleFocus = useCallback(() => {
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = null;
+    }
     setIsOpen(true);
   }, []);
 
@@ -165,9 +171,10 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
    * キーイベント処理後にドロップダウンを閉じる
    */
   const handleBlur = useCallback(() => {
-    setTimeout(() => {
+    blurTimeoutRef.current = setTimeout(() => {
       setIsOpen(false);
       setSelectedIndex(-1);
+      blurTimeoutRef.current = null;
     }, 150);
   }, []);
 
