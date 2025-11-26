@@ -3,7 +3,7 @@
  * エラーメッセージを画面下部に表示
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { AppError, ErrorSeverity } from '../../lib/errors/ErrorTypes';
 
 export interface ErrorToastProps {
@@ -90,6 +90,15 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
     }
   };
 
+  // handleCloseをuseCallbackでメモ化（useEffectより前に定義）
+  const handleClose = useCallback(() => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setIsVisible(false);
+      onClose();
+    }, 300); // アニメーション時間
+  }, [onClose]);
+
   // 自動非表示
   useEffect(() => {
     if (autoHideDuration && autoHideDuration > 0) {
@@ -99,15 +108,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [autoHideDuration]);
-
-  const handleClose = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      onClose();
-    }, 300); // アニメーション時間
-  };
+  }, [autoHideDuration, handleClose]);
 
   if (!isVisible) return null;
 

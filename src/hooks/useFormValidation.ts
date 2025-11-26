@@ -51,7 +51,8 @@ export function useValidatedForm<T extends FieldValues>({
   React.useEffect(() => {
     // 初期値でバリデーションを実行して isValid を正しく設定
     form.trigger();
-  }, []); // 空の依存配列で初回のみ実行
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 初回マウント時のみ実行（formは安定した参照）
 
   const { formState, reset } = form;
 
@@ -110,7 +111,7 @@ export function useValidatedForm<T extends FieldValues>({
       logger.error('Field validation failed', { error });
       return 'バリデーションエラー';
     }
-  }, [schema]);
+  }, []); // schemaは使用していないため依存配列は空
 
   // 確認付きリセット
   const resetWithConfirm = useCallback(async (): Promise<boolean> => {
