@@ -255,7 +255,6 @@ export class RegionalDataService {
   ): Promise<RegionalDataRecord | null> {
     return performanceMonitor.measureAsync(
       'getBestRegionForCoordinates',
-      { coordinates },
       async () => {
         const nearestStations = await this.findNearestStations(coordinates, {
           limit: 3,
@@ -265,7 +264,7 @@ export class RegionalDataService {
         });
 
         if (nearestStations.length === 0) {
-          // フォールバック：距離制限なしで最も近い地域を検索
+          // フォールバック:距離制限なしで最も近い地域を検索
           const allStations = await this.findNearestStations(coordinates, {
             limit: 1,
             dataQuality: 'any',
