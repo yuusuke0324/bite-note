@@ -10,6 +10,7 @@ import { textStyles } from '../../theme/typography';
 import ModernCard from '../ui/ModernCard';
 import type { FishingRecord } from '../../types';
 import type { TideInfo } from '../../types/tide';
+import { logger } from '../../lib/errors/logger';
 
 // カスタムツールチップコンポーネント
 const CustomTooltip = ({ active, payload }: any) => {
@@ -171,7 +172,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
       const recordsWithCoordinates = records.filter(r => r.coordinates);
 
       if (recordsWithCoordinates.length === 0) {
-        console.warn('⚠️ GPS座標を持つ記録がないため、潮汐統計を表示できません');
+        logger.warn('GPS座標を持つ記録がないため、潮汐統計を表示できません');
         setLoading(false);
         return;
       }
@@ -228,7 +229,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
 
         setTideStats(stats);
       } catch (err) {
-        console.error('潮汐統計計算エラー:', err);
+        logger.error('潮汐統計計算エラー', { error: err });
         setError(err instanceof Error ? err.message : '潮汐統計の計算に失敗しました');
       } finally {
         setLoading(false);

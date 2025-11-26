@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import { offlineQueueService } from '../../lib/offline-queue-service';
 import { useToastStore } from '../../stores/toast-store';
 import { TestIds } from '../../constants/testIds';
+import { logger } from '../../lib/errors/logger';
 
 interface OfflineIndicatorProps {
   isOnline: boolean;
@@ -82,7 +83,7 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
         showError('同期に失敗しました');
       }
     } catch (error) {
-      console.error('[OfflineIndicator] Manual sync error:', error);
+      logger.error('OfflineIndicator: Manual sync error', { error });
       // unmount後はトースト表示をスキップ
       if (!isMountedRef.current) return;
       showError('同期中にエラーが発生しました');

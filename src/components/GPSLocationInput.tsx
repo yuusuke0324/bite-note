@@ -5,6 +5,7 @@ import { LocationDisplay } from './LocationDisplay';
 import { useToastStore } from '../stores/toast-store';
 import { TestIds } from '../constants/testIds';
 import type { Coordinates } from '../types';
+import { logger } from '../lib/errors/logger';
 
 interface GPSLocationInputProps {
   value?: Coordinates;
@@ -71,7 +72,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
       showSuccess('GPS位置を取得しました');
 
     } catch (error) {
-      console.error('GPS取得エラー:', error);
+      logger.error('GPS取得エラー', { error });
 
       // product-manager決定版のエラーメッセージを使用
       showError(

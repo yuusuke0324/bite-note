@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { logger } from '../lib/errors/logger';
 
 interface PWAInstallBannerProps {
   className?: string;
@@ -80,7 +81,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
       const result = await deferredPrompt.prompt();
 
       if (import.meta.env.DEV) {
-        console.log('[Dev] PWA install prompt result:', result);
+        logger.debug('PWA install prompt result', { result });
       }
 
       if (result.outcome === 'accepted') {
@@ -88,11 +89,11 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
         try {
           localStorage.setItem('pwa-banner-dismissed', 'true');
         } catch (error) {
-          console.warn('Could not save banner state:', error);
+          logger.warn('Could not save banner state', { error });
         }
       }
     } catch (error) {
-      console.error('Error during PWA installation:', error);
+      logger.error('Error during PWA installation', { error });
     }
 
     setDeferredPrompt(null);
@@ -104,7 +105,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
     try {
       localStorage.setItem('pwa-banner-dismissed', 'true');
     } catch (error) {
-      console.warn('Could not save banner state:', error);
+      logger.warn('Could not save banner state', { error });
     }
   }, []);
 

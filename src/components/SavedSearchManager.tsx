@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { SearchFilters } from './AdvancedSearchFilter';
+import { logger } from '../lib/errors/logger';
 
 interface SavedSearch {
   id: string;
@@ -89,7 +90,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
 
     // 成功メッセージ（実際の実装では通知システムを使用）
     if (import.meta.env.DEV) {
-      console.log(`[Dev] 検索クエリ「${newSearchName}」を保存しました`);
+      logger.debug('検索クエリ保存しました', { searchName: newSearchName });
     }
   };
 

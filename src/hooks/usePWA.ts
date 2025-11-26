@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { offlineQueueService } from '../lib/offline-queue-service';
+import { logger } from '../lib/errors/logger';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -125,10 +126,10 @@ export const usePWA = () => {
       });
 
       if (import.meta.env.DEV) {
-        console.log('[Dev] [PWA] Service Worker registered successfully');
+        logger.debug('Service Worker registered successfully');
       }
     } catch (error) {
-      console.error('[PWA] Service Worker registration failed:', error);
+      logger.error('Service Worker registration failed', { error });
     }
   };
 
@@ -142,7 +143,7 @@ export const usePWA = () => {
 
     const handleAppInstalled = () => {
       if (import.meta.env.DEV) {
-        console.log('[Dev] [PWA] App was installed');
+        logger.debug('App was installed');
       }
       setDeferredPrompt(null);
       setInstallState(prev => ({
@@ -165,7 +166,7 @@ export const usePWA = () => {
   // アプリのインストール
   const installApp = useCallback(async (): Promise<boolean> => {
     if (!deferredPrompt) {
-      console.warn('[PWA] No install prompt available');
+      logger.warn('No install prompt available');
       return false;
     }
 
@@ -174,7 +175,7 @@ export const usePWA = () => {
       const { outcome } = await deferredPrompt.userChoice;
 
       if (import.meta.env.DEV) {
-        console.log(`[Dev] [PWA] User response to install prompt: ${outcome}`);
+        logger.debug('User response to install prompt', { outcome });
       }
 
       setDeferredPrompt(null);
@@ -182,7 +183,7 @@ export const usePWA = () => {
 
       return outcome === 'accepted';
     } catch (error) {
-      console.error('[PWA] Install prompt failed:', error);
+      logger.error('Install prompt failed', { error });
       return false;
     }
   }, [deferredPrompt]);
@@ -190,7 +191,7 @@ export const usePWA = () => {
   // Service Worker の更新
   const updateApp = useCallback(async (): Promise<void> => {
     if (!updateState.registration) {
-      console.warn('[PWA] No service worker registration found');
+      logger.warn('No service worker registration found');
       return;
     }
 
@@ -219,12 +220,12 @@ export const usePWA = () => {
         const result = await offlineQueueService.syncQueue();
 
         if (!result.success) {
-          console.error('[PWA] Sync failed:', result.error);
+          logger.error('Sync failed', { error: result.error });
         } else if (result.failedCount && result.failedCount > 0) {
-          console.warn(`[PWA] Sync partial failure: ${result.failedCount} items failed`);
+          logger.warn('Sync partial failure', { failedCount: result.failedCount });
         }
       } catch (error) {
-        console.error('[PWA] Sync error:', error);
+        logger.error('Sync error', { error });
       } finally {
         setIsSyncing(false);
       }

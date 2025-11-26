@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { FishingRecord } from '../types';
 import type { SearchFilters } from '../components/AdvancedSearchFilter';
+import { logger } from '../lib/errors/logger';
 
 const DEFAULT_FILTERS: SearchFilters = {
   searchQuery: '',
@@ -217,7 +218,7 @@ export const useAdvancedSearch = (records: FishingRecord[]) => {
       });
       localStorage.setItem('savedSearches', JSON.stringify(saved));
     } catch (error) {
-      console.error('Failed to save search:', error);
+      logger.error('Failed to save search', { error });
     }
 
     return newSearch.id;
@@ -243,7 +244,7 @@ export const useAdvancedSearch = (records: FishingRecord[]) => {
       const updated = saved.filter((s: any) => s.id !== searchId);
       localStorage.setItem('savedSearches', JSON.stringify(updated));
     } catch (error) {
-      console.error('Failed to delete saved search:', error);
+      logger.error('Failed to delete saved search', { error });
     }
   }, []);
 
@@ -257,7 +258,7 @@ export const useAdvancedSearch = (records: FishingRecord[]) => {
       }));
       setSavedSearches(loadedSearches);
     } catch (error) {
-      console.error('Failed to load saved searches:', error);
+      logger.error('Failed to load saved searches', { error });
     }
   }, []);
 

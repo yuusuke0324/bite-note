@@ -1,6 +1,7 @@
 // オンライン/オフラインステータスフック
 
 import { useState, useEffect } from 'react';
+import { logger } from '../lib/errors/logger';
 
 /**
  * オンライン/オフラインステータスを監視するフック
@@ -14,13 +15,13 @@ export const useOnlineStatus = () => {
   useEffect(() => {
     // オンラインになった時のハンドラー
     const handleOnline = () => {
-      console.log('[useOnlineStatus] Online');
+      logger.debug('Online');
       setIsOnline(true);
     };
 
     // オフラインになった時のハンドラー
     const handleOffline = () => {
-      console.log('[useOnlineStatus] Offline');
+      logger.debug('Offline');
       setIsOnline(false);
     };
 

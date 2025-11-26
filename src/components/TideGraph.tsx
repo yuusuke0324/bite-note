@@ -17,6 +17,7 @@ import type { ResponsiveGraphConfig } from '../utils/responsive';
 import { TestIds } from '../constants/testIds';
 import { DynamicScaleCalculator } from '../utils/scale/DynamicScaleCalculator';
 import { ScaleRenderer } from '../utils/scale/ScaleRenderer';
+import { logger } from '../lib/errors/logger';
 
 interface TideGraphProps {
   data: TideGraphData;
@@ -112,7 +113,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
     const isValid = validPoints.length > 0;
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 TideGraph: データ検証結果', {
+      logger.debug('TideGraph: データ検証結果', {
         totalPoints: data?.points?.length || 0,
         validPoints: validPoints.length,
         invalidPoints: (data?.points?.length || 0) - validPoints.length,
@@ -150,7 +151,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
 
   // デバッグログ: 負の値が発生した場合のみ表示（通常は発生しない）
   if (rawChartWidth < 0 || rawChartHeight < 0) {
-    console.warn('🚨 TideGraph: 予期しないSVGサイズ不足', {
+    logger.warn('TideGraph: 予期しないSVGサイズ不足', {
       rawChart: { width: rawChartWidth, height: rawChartHeight },
       margin,
       svgSize: { width: svgDimensions.viewBoxWidth, height: svgDimensions.viewBoxHeight }
@@ -185,7 +186,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
 
     // デバッグログ（開発時のみ表示）
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 TASK-101統合: yScale関数更新', {
+      logger.debug('TASK-101統合: yScale関数更新', {
         oldRange: `${data.minLevel} - ${data.maxLevel}`,
         newRange: `${calculatedScale.min} - ${calculatedScale.max}`,
         dynamicInterval: calculatedScale.interval
@@ -237,7 +238,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
     });
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 TideGraph: 時間軸ラベル生成完了', {
+      logger.debug('TideGraph: 時間軸ラベル生成完了', {
         labelCount: labels.length,
         labels: labels.map(l => ({ x: l.x, label: l.label })),
         dateRange: {
@@ -271,7 +272,7 @@ export const TideGraph: React.FC<TideGraphProps> = ({
 
     // デバッグログ（開発時のみ表示）
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 TASK-101統合: ラベル生成完了', {
+      logger.debug('TASK-101統合: ラベル生成完了', {
         tickCount: svgElements.labels.length,
         labels: svgElements.labels.map(l => l.text),
         yPositions: svgElements.labels.map(l => l.y),

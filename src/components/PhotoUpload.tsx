@@ -8,6 +8,7 @@ import { useToastStore } from '../stores/toast-store';
 import { TestIds } from '../constants/testIds';
 import { Skeleton } from './ui/Skeleton';
 import type { PhotoMetadata, AutoFillData } from '../types';
+import { logger } from '../lib/errors/logger';
 
 interface PhotoUploadProps {
   value?: File;
@@ -103,7 +104,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
         }
       }
     } catch (error) {
-      console.error('メタデータ抽出エラー:', error);
+      logger.error('メタデータ抽出エラー', { error });
     } finally {
       setExtractingMetadata(false);
     }

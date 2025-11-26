@@ -18,6 +18,7 @@ import { ModernCard } from '../ui/ModernCard';
 import Button from '../ui/Button';
 import { colors } from '../../theme/colors';
 import { textStyles, typography } from '../../theme/typography';
+import { logger } from '../../lib/errors/logger';
 import type { FishingRecord } from '../../types';
 
 interface StorageInfo {
@@ -55,7 +56,7 @@ export const DataManagementPanel = () => {
             usagePercent,
           });
         } catch (error) {
-          console.error('[DataManagement] Storage estimate error:', error);
+          logger.error('Storage estimate error', { error });
         }
       }
     };
@@ -77,7 +78,7 @@ export const DataManagementPanel = () => {
       setShowDeleteConfirm(false);
       setDeletingRecordId(null);
     } catch (error) {
-      console.error('[DataManagement] Delete error:', error);
+      logger.error('Delete error', { error });
     } finally {
       setIsDeleting(false);
     }

@@ -9,6 +9,7 @@ import { photoService } from '../lib/photo-service';
 import type { PhotoMetadata, AutoFillData, FishSpecies } from '../types';
 import type { TideInfo } from '../types/tide';
 import { TestIds } from '../constants/testIds';
+import { logger } from '../lib/errors/logger';
 
 interface FishingRecordFormProps {
   onSubmit: (data: CreateFishingRecordFormData) => Promise<void>;
@@ -107,11 +108,11 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         if (result.success && result.data) {
           setValue('photoId', result.data.id, { shouldValidate: true });
         } else {
-          console.error('写真保存失敗:', result.error);
+          logger.error('写真保存失敗', { error: result.error });
           setValue('photoId', undefined, { shouldValidate: true });
         }
       } catch (error) {
-        console.error('写真保存エラー:', error);
+        logger.error('写真保存エラー', { error });
         setValue('photoId', undefined, { shouldValidate: true });
       } finally {
         setPhotoUploading(false);
@@ -240,7 +241,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
 
         setTideInfo(calculatedTideInfo);
       } catch (error) {
-        console.error('潮汐情報の計算エラー:', error);
+        logger.error('潮汐情報の計算エラー', { error });
         setTideInfo(null);
       } finally {
         setTideLoading(false);

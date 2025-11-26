@@ -5,6 +5,7 @@ import { photoService } from '../lib/photo-service';
 import { colors } from '../theme/colors';
 import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
+import { logger } from '../lib/errors/logger';
 
 interface PhotoBasedRecordCardProps {
   record: FishingRecord;
@@ -53,17 +54,17 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
           photoUrlRef.current = url;
           setPhotoUrl(url);
         } else if (photoResult.error) {
-          console.error('PhotoBasedRecordCard: 写真の取得に失敗:', photoResult.error);
+          logger.error('PhotoBasedRecordCard: 写真の取得に失敗', { error: photoResult.error });
           if (isMounted) {
             setPhotoError(true);
           }
         }
       } catch (error) {
-        console.error('PhotoBasedRecordCard: 写真の読み込みでエラー:', error);
+        logger.error('PhotoBasedRecordCard: 写真の読み込みでエラー', { error });
         if (isMounted) {
           setPhotoError(true);
         }
-      } finally {
+      } finally{
         if (isMounted) {
           setPhotoLoading(false);
         }

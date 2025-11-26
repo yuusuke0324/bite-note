@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { LocationDisplay } from './LocationDisplay';
 import { photoService } from '../lib/photo-service';
 import type { FishingRecord } from '../types';
+import { logger } from '../lib/errors/logger';
 
 interface FishingRecordCardProps {
   record: FishingRecord;
@@ -38,7 +39,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
           }
         })
         .catch((error) => {
-          console.error('写真の読み込みエラー:', error);
+          logger.error('写真の読み込みエラー', { error });
         })
         .finally(() => {
           if (isMounted) {
