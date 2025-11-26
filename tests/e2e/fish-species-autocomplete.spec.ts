@@ -109,6 +109,7 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
   test.describe('キーボード操作', () => {
     test('↓キーで候補を下に移動できる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
+      const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
 
       await input.fill('あ');
 
@@ -122,25 +123,21 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // Playwrightの自動リトライ機構を活用（CI環境考慮で10秒タイムアウト）
       await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
+      await expect(selectedOptions).toHaveCount(1);
 
       // ステップ2: 2回目の↓キー → 2番目を選択
       await input.press('ArrowDown');
 
-      // 段階的検証: 2番目が選択される → 1番目が選択解除される
+      // 選択が1つだけであることを先に確認（React状態更新の完了を待つ）
+      await expect(selectedOptions).toHaveCount(1, { timeout: 10000 });
       await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
-      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
-
-      // 選択が1つだけであることを確認
-      const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
-      await expect(selectedOptions).toHaveCount(1);
     });
 
-    // TODO: Issue #246 - CI環境（特にshard 1）でフレーキーなため一時スキップ
-    // ローカルでは安定して動作するが、CI環境でArrowUpキーイベントが
-    // 処理されないケースがある。根本原因の調査が必要。
-    test.skip('↑キーで候補を上に移動できる', async ({ page }) => {
+    // Issue #246: コンポーネント側でhandleKeyDownにclearTimeout追加で修正済み
+    test('↑キーで候補を上に移動できる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
       const suggestions = page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`);
+      const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
 
       // 「マ」で検索すると複数の候補（マアジ、マダイ等）が表示される
       await input.fill('マ');
@@ -153,27 +150,23 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       // 候補が2つ以上あることを確認（上下移動をテストするため）
       expect(optionCount).toBeGreaterThanOrEqual(2);
 
-      // fill()後は入力がフォーカスされているので、そのままキー操作を実行
       // ステップ1: ↓で1番目を選択
       await input.press('ArrowDown');
-      await page.waitForFunction(
-        () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
-        { timeout: 10000 }
-      );
+      // Playwrightの自動リトライ機構を活用（CI環境考慮で10秒タイムアウト）
+      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
+      await expect(selectedOptions).toHaveCount(1);
 
       // ステップ2: ↓で2番目を選択
       await input.press('ArrowDown');
-      await page.waitForFunction(
-        () => document.querySelector('[role="option"]:nth-child(2)')?.getAttribute('aria-selected') === 'true',
-        { timeout: 10000 }
-      );
+      // 選択が1つだけであることを先に確認（React状態更新の完了を待つ）
+      await expect(selectedOptions).toHaveCount(1, { timeout: 10000 });
+      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
 
       // ステップ3: ↑で1番目に戻る
       await input.press('ArrowUp');
-      await page.waitForFunction(
-        () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
-        { timeout: 10000 }
-      );
+      // 選択が1つだけであることを先に確認（React状態更新の完了を待つ）
+      await expect(selectedOptions).toHaveCount(1, { timeout: 10000 });
+      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {

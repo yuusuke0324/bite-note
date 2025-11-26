@@ -37,8 +37,8 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only - リトライなしで高速化 (Issue #129) */
-  retries: 0,  // 1 → 0に削減（Sharding導入により不要）
+  /* Retry on CI only - CI環境のフレーキー対策 (Issue #246) */
+  retries: process.env.CI ? 1 : 0,  // CI環境でのみリトライ
   /* CI環境でワーカー数を8に増加 (Issue #129 - Sharding) */
   workers: process.env.CI ? 8 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */

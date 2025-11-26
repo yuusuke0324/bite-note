@@ -112,8 +112,16 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
 
   /**
    * キーボード操作ハンドラ
+   * Note: キーボード操作時はblurタイマーをキャンセルして状態更新の競合を防止
    */
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Issue #246: キーボード操作時はblurタイマーをキャンセル
+    // CI環境ではReact状態更新が遅延し、blurタイマーと競合する可能性がある
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = null;
+    }
+
     if (!isOpen) {
       if (e.key === 'ArrowDown' || e.key === 'Enter') {
         setIsOpen(true);
