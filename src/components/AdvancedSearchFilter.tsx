@@ -2,6 +2,8 @@
 
 import React, { useCallback, useMemo } from 'react';
 import type { FishingRecord } from '../types';
+import { Icon } from './ui/Icon';
+import { Search, Type, Calendar, Ruler, MapPin, Fish, Settings, Camera, Map, BarChart3, X } from 'lucide-react';
 
 export interface SearchFilters {
   // テキスト検索
@@ -134,7 +136,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             gap: '0.5rem'
           }}
         >
-          🔍 高度な検索
+          <Icon icon={Search} size={16} decorative /> 高度な検索
           {activeFilterCount > 0 && (
             <span style={{
               backgroundColor: '#007bff',
@@ -177,7 +179,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
           fontWeight: 'bold',
           color: '#333'
         }}>
-          🔍 高度な検索・フィルター
+          <Icon icon={Search} size={20} decorative /> 高度な検索・フィルター
         </h3>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           {activeFilterCount > 0 && (
@@ -207,7 +209,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               padding: '0.25rem'
             }}
           >
-            ✕
+            <Icon icon={X} size={20} decorative />
           </button>
         </div>
       </div>
@@ -226,7 +228,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             fontSize: '0.875rem',
             color: '#333'
           }}>
-            🔤 キーワード検索
+            <Icon icon={Type} size={14} decorative /> キーワード検索
           </label>
           <input
             type="text"
@@ -252,7 +254,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             fontSize: '0.875rem',
             color: '#333'
           }}>
-            📅 日付範囲
+            <Icon icon={Calendar} size={14} decorative /> 日付範囲
           </label>
           <div style={{
             display: 'grid',
@@ -295,7 +297,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             fontSize: '0.875rem',
             color: '#333'
           }}>
-            📏 サイズ範囲 (cm)
+            <Icon icon={Ruler} size={14} decorative /> サイズ範囲 (cm)
           </label>
           <div style={{
             display: 'grid',
@@ -345,7 +347,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               fontSize: '0.875rem',
               color: '#333'
             }}>
-              📍 場所 ({filters.locations.length}件選択中)
+              <Icon icon={MapPin} size={14} decorative /> 場所 ({filters.locations.length}件選択中)
             </label>
             <div style={{
               display: 'flex',
@@ -384,7 +386,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               fontSize: '0.875rem',
               color: '#333'
             }}>
-              🐟 魚種 ({filters.fishSpecies.length}件選択中)
+              <Icon icon={Fish} size={14} decorative /> 魚種 ({filters.fishSpecies.length}件選択中)
             </label>
             <div style={{
               display: 'flex',
@@ -422,7 +424,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             fontSize: '0.875rem',
             color: '#333'
           }}>
-            ⚙️ 追加オプション
+            <Icon icon={Settings} size={14} decorative /> 追加オプション
           </label>
           <div style={{
             display: 'flex',
@@ -445,7 +447,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
                   height: '18px'
                 }}
               />
-              <span style={{ fontSize: '0.875rem' }}>📷 写真付きのみ</span>
+              <span style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={Camera} size={14} decorative /> 写真付きのみ</span>
             </label>
 
             {/* GPS座標の有無 */}
@@ -464,7 +466,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
                   height: '18px'
                 }}
               />
-              <span style={{ fontSize: '0.875rem' }}>🗺️ GPS位置情報付きのみ</span>
+              <span style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={Map} size={14} decorative /> GPS位置情報付きのみ</span>
             </label>
           </div>
         </div>
@@ -480,7 +482,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
           fontSize: '0.875rem',
           color: '#1976d2'
         }}>
-          📊 {activeFilterCount}個のフィルターが適用中
+          <Icon icon={BarChart3} size={14} decorative /> {activeFilterCount}個のフィルターが適用中
         </div>
       )}
     </div>
