@@ -429,7 +429,7 @@ export class PhotoMetadataService {
       }
 
       // 度分秒形式 "DD° MM' SS.SS\"" の処理（記号必須）
-      const dmsMatch = coordStr.match(/(\d+)°\s*(\d+)'\s*([\d.]+)\"/);
+      const dmsMatch = coordStr.match(/(\d+)°\s*(\d+)'\s*([\d.]+)"/);
       if (dmsMatch) {
         const degrees = parseInt(dmsMatch[1]);
         const minutes = parseInt(dmsMatch[2]);

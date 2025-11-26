@@ -105,7 +105,7 @@ export class TideDebugger {
         : String(record.date).substring(0, 10);
 
       return `${lat},${lng}@${dateStr}`;
-    } catch (error) {
+    } catch (_error) {
       return `error_${record.id}_${Date.now()}`;
     }
   }

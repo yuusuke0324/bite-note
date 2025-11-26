@@ -124,7 +124,7 @@ export class TideDataValidator {
       if (validData.length > 0) {
         try {
           transformedData = this.tideDataTransformer.transform(validData);
-        } catch (error) {
+        } catch (_error) {
           // 変換エラーは構造エラーとして扱う
           return this.createCriticalErrorResult(
             [this.createStructureError()],
@@ -156,7 +156,7 @@ export class TideDataValidator {
         summary
       };
 
-    } catch (error) {
+    } catch (_error) {
       return this.createCriticalErrorResult(
         [this.createStructureError()],
         performance.now() - startTime
