@@ -41,7 +41,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
     };
 
@@ -84,7 +84,8 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
     if (!deferredPrompt) return;
 
     try {
-      const result = await deferredPrompt.prompt();
+      await deferredPrompt.prompt();
+      const result = await deferredPrompt.userChoice;
 
       if (import.meta.env.DEV) {
         logger.debug('PWA install prompt result', { result });
