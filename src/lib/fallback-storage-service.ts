@@ -246,7 +246,7 @@ export class FallbackStorageService {
           for (const record of records) {
             try {
               // IDを除外して追加（新しいIDが生成される）
-              const { id, ...recordData } = record;
+              const { id: _id, ...recordData } = record;
               await db.fishing_records.add({
                 ...recordData,
                 id: crypto.randomUUID(), // 新しいIDを生成

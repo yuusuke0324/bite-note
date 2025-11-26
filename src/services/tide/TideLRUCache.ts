@@ -139,7 +139,7 @@ export class TideLRUCache {
       if (isNaN(testDate.getTime())) {
         throw new Error('Invalid date format');
       }
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Invalid date format');
     }
 

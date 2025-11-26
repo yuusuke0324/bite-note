@@ -1050,7 +1050,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
       const dataLength = validatedData.valid.length;
 
       switch (event.key) {
-        case 'ArrowRight':
+        case 'ArrowRight': {
           event.preventDefault();
           // Record navigation history
           if (focusManagerRef.current) {
@@ -1080,8 +1080,9 @@ const TideChartBase: React.FC<TideChartProps> = ({
             });
           }
           break;
+        }
 
-        case 'ArrowLeft':
+        case 'ArrowLeft': {
           event.preventDefault();
           // Record navigation history
           if (focusManagerRef.current) {
@@ -1110,8 +1111,9 @@ const TideChartBase: React.FC<TideChartProps> = ({
             });
           }
           break;
+        }
 
-        case 'ArrowUp':
+        case 'ArrowUp': {
           event.preventDefault();
           // Focus on higher value data point
           const higherValueIndex = findDataPointByValue(
@@ -1129,8 +1131,9 @@ const TideChartBase: React.FC<TideChartProps> = ({
             setFocusedPointIndex(higherValueIndex);
           }
           break;
+        }
 
-        case 'ArrowDown':
+        case 'ArrowDown': {
           event.preventDefault();
           // Focus on lower value data point
           const lowerValueIndex = findDataPointByValue(
@@ -1148,6 +1151,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
             setFocusedPointIndex(lowerValueIndex);
           }
           break;
+        }
 
         case 'Home':
           event.preventDefault();
@@ -1160,7 +1164,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           setFocusedPointIndex(0);
           break;
 
-        case 'End':
+        case 'End': {
           event.preventDefault();
           const lastIndex = dataLength - 1;
           setNavigationState((prev) => ({
@@ -1171,6 +1175,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }));
           setFocusedPointIndex(lastIndex);
           break;
+        }
 
         case 'Enter':
           event.preventDefault();
