@@ -28,7 +28,6 @@ import {
   CheckCircle2,
   XCircle,
   FileText,
-  Thermometer,
   Fish,
 } from 'lucide-react';
 
