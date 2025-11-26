@@ -8,6 +8,21 @@ import { photoMetadataService, PhotoMetadataService } from '../lib/photo-metadat
 import type { Coordinates } from '../types';
 import ExifReader from 'exifreader';
 import { db } from '../lib/database';
+import { logger } from '../lib/errors';
+
+// loggerをモック
+vi.mock('../lib/errors', async () => {
+  const actual = await vi.importActual('../lib/errors');
+  return {
+    ...actual,
+    logger: {
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+      debug: vi.fn(),
+    },
+  };
+});
 
 // ExifReader.loadのモック
 vi.mock('exifreader', () => ({
@@ -423,13 +438,11 @@ describe('PhotoMetadataService', () => {
       expect(result).toBeNull();
     });
 
-    it('エラー発生: nullを返す（console.error呼び出し確認）', () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    it('エラー発生: nullを返す（logger.error呼び出し確認）', () => {
       const tags = null; // tagsがnullでエラー発生
       const result = (photoMetadataService as any).extractGPSCoordinates(tags);
       expect(result).toBeNull();
-      expect(consoleErrorSpy).toHaveBeenCalledWith('GPS座標抽出エラー:', expect.any(Error));
-      consoleErrorSpy.mockRestore();
+      expect(logger.error).toHaveBeenCalledWith('GPS座標抽出エラー', expect.objectContaining({ error: expect.any(Error) }));
     });
   });
 
@@ -551,13 +564,11 @@ describe('PhotoMetadataService', () => {
       expect(result).toBeNull();
     });
 
-    it('エラー発生: nullを返す（console.error呼び出し確認）', () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    it('エラー発生: nullを返す（logger.error呼び出し確認）', () => {
       const tags = null; // tagsがnullでエラー発生
       const result = (photoMetadataService as any).extractDateTime(tags);
       expect(result).toBeNull();
-      expect(consoleErrorSpy).toHaveBeenCalledWith('撮影日時抽出エラー:', expect.any(Error));
-      consoleErrorSpy.mockRestore();
+      expect(logger.error).toHaveBeenCalledWith('撮影日時抽出エラー', expect.objectContaining({ error: expect.any(Error) }));
     });
   });
 
@@ -662,13 +673,11 @@ describe('PhotoMetadataService', () => {
       expect(result).toBeNull();
     });
 
-    it('エラー発生: nullを返す（console.error呼び出し確認）', () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    it('エラー発生: nullを返す（logger.error呼び出し確認）', () => {
       const tags = null; // tagsがnullでエラー発生
       const result = (photoMetadataService as any).extractCameraInfo(tags);
       expect(result).toBeNull();
-      expect(consoleErrorSpy).toHaveBeenCalledWith('カメラ情報抽出エラー:', expect.any(Error));
-      consoleErrorSpy.mockRestore();
+      expect(logger.error).toHaveBeenCalledWith('カメラ情報抽出エラー', expect.objectContaining({ error: expect.any(Error) }));
     });
   });
 

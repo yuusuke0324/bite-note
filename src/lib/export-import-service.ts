@@ -4,6 +4,7 @@ import { fishingRecordService } from './fishing-record-service';
 import { photoService } from './photo-service';
 import { settingsService } from './settings-service';
 import { imageProcessingService } from './image-processing';
+import { logger } from './errors';
 import type {
   ExportData,
   ExportPhotoData,
@@ -554,7 +555,7 @@ export class ExportImportService {
 
     // バージョン互換性の確認
     if (importData.version !== '1.0.0') {
-      console.warn(`Importing from different version: ${importData.version}`);
+      logger.warn(`Importing from different version: ${importData.version}`);
     }
 
     return { success: true };

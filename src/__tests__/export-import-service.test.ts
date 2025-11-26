@@ -2,6 +2,21 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ExportImportService } from '../lib/export-import-service';
+import { logger } from '../lib/errors';
+
+// loggerをモック
+vi.mock('../lib/errors', async () => {
+  const actual = await vi.importActual('../lib/errors');
+  return {
+    ...actual,
+    logger: {
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+      debug: vi.fn(),
+    },
+  };
+});
 
 // モック設定
 vi.mock('../lib/fishing-record-service', () => ({
@@ -341,14 +356,10 @@ describe('ExportImportService', () => {
       const settingsService = await import('../lib/settings-service');
       vi.mocked(settingsService.settingsService.updateSettings).mockResolvedValue();
 
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
       const result = await service.importData(jsonString);
 
       expect(result.success).toBe(true);
-      expect(consoleSpy).toHaveBeenCalledWith('Importing from different version: 2.0.0');
-
-      consoleSpy.mockRestore();
+      expect(logger.warn).toHaveBeenCalledWith('Importing from different version: 2.0.0');
     });
   });
 

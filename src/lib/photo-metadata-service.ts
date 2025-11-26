@@ -9,6 +9,7 @@ import type {
   Coordinates
 } from '../types';
 import { db } from './database';
+import { logger } from './errors';
 
 export class PhotoMetadataService {
   // キャッシュ有効期限（30分）
@@ -75,7 +76,7 @@ export class PhotoMetadataService {
       };
 
     } catch (error) {
-      console.error('❌ メタデータ抽出エラー:', error);
+      logger.error('メタデータ抽出エラー', { error });
       return {
         success: false,
         error: {
@@ -201,7 +202,7 @@ export class PhotoMetadataService {
       };
 
     } catch (error) {
-      console.error('Nominatim APIエラー:', error);
+      logger.error('Nominatim APIエラー', { error });
       return {
         success: false,
         error: {
@@ -279,7 +280,7 @@ export class PhotoMetadataService {
       };
 
     } catch (error) {
-      console.error('GPS座標抽出エラー:', error);
+      logger.error('GPS座標抽出エラー', { error });
       return null;
     }
   }
@@ -327,7 +328,7 @@ export class PhotoMetadataService {
       return null;
 
     } catch (error) {
-      console.error('撮影日時抽出エラー:', error);
+      logger.error('撮影日時抽出エラー', { error });
       return null;
     }
   }
@@ -391,7 +392,7 @@ export class PhotoMetadataService {
       return null;
 
     } catch (error) {
-      console.error('カメラ情報抽出エラー:', error);
+      logger.error('カメラ情報抽出エラー', { error });
       return null;
     }
   }
@@ -435,7 +436,7 @@ export class PhotoMetadataService {
       return null;
 
     } catch (error) {
-      console.error('座標変換エラー:', error);
+      logger.error('座標変換エラー', { error });
       return null;
     }
   }

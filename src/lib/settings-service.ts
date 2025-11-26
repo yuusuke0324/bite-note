@@ -1,6 +1,7 @@
 // アプリケーション設定管理サービス
 
 import { db } from './database';
+import { logger } from './errors';
 import type {
   AppSettings,
   Theme,
@@ -247,7 +248,7 @@ export class SettingsService {
 
       // バージョンチェック（将来の互換性のため）
       if (importData.version && importData.version !== '1.0.0') {
-        console.warn(`Importing from different version: ${importData.version}`);
+        logger.warn(`Importing from different version: ${importData.version}`);
       }
 
       // 設定の更新

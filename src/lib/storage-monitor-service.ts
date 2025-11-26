@@ -11,6 +11,7 @@
 
 import { useEffect } from 'react';
 import { useToastStore } from '../stores/toast-store';
+import { logger } from './errors';
 
 export interface StorageEstimate {
   usage: number; // Bytes used
@@ -43,7 +44,7 @@ class StorageMonitorService {
    */
   async getStorageEstimate(): Promise<StorageEstimate | null> {
     if (!('storage' in navigator) || !('estimate' in navigator.storage)) {
-      console.warn('[StorageMonitor] Storage Manager API not supported');
+      logger.warn('[StorageMonitor] Storage Manager API not supported');
       return null;
     }
 
@@ -59,7 +60,7 @@ class StorageMonitorService {
         usagePercent,
       };
     } catch (error) {
-      console.error('[StorageMonitor] Failed to estimate storage:', error);
+      logger.error('[StorageMonitor] Failed to estimate storage', { error });
       return null;
     }
   }
@@ -170,7 +171,7 @@ class StorageMonitorService {
       this.checkStorageStatus();
     }, this.config.checkInterval);
 
-    console.log('[StorageMonitor] Started with config:', this.config);
+    logger.debug('[StorageMonitor] Started with config', { config: this.config });
   }
 
   /**
@@ -180,7 +181,7 @@ class StorageMonitorService {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
-      console.log('[StorageMonitor] Stopped');
+      logger.debug('[StorageMonitor] Stopped');
     }
   }
 
@@ -189,7 +190,7 @@ class StorageMonitorService {
    */
   updateConfig(config: Partial<StorageMonitorConfig>): void {
     this.config = { ...this.config, ...config };
-    console.log('[StorageMonitor] Config updated:', this.config);
+    logger.debug('[StorageMonitor] Config updated', { config: this.config });
 
     // 監視中の場合は再起動
     if (this.intervalId) {

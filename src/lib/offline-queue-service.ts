@@ -1,6 +1,7 @@
 // オフライン書き込みキューサービス
 
 import { db } from './database';
+import { logger } from './errors';
 import type {
   OfflineQueueItem,
   ErrorInfo,
@@ -29,7 +30,7 @@ export class OfflineQueueService {
     }
 
     if (count >= this.QUEUE_WARNING_SIZE) {
-      console.warn('[OfflineQueue] Queue is 75% full:', count);
+      logger.warn('[OfflineQueue] Queue is 75% full', { count });
       // NOTE: ユーザーに警告表示（useStoreで管理）
     }
 

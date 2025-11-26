@@ -1,5 +1,7 @@
 // パフォーマンス監視ユーティリティ
 
+import { logger } from './errors';
+
 interface PerformanceMeasurement {
   name: string;
   duration: number;
@@ -276,7 +278,7 @@ export class PerformanceMonitor {
         entries.forEach(callback);
       }
     } catch (error) {
-      console.warn(`Failed to observe ${entryType}:`, error);
+      logger.warn(`Failed to observe ${entryType}`, { error });
     }
   }
 }

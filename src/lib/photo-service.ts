@@ -3,6 +3,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { db } from './database';
 import { imageProcessingService } from './image-processing';
+import { logger } from './errors';
 import type {
   PhotoData,
   DatabaseResult,
@@ -20,7 +21,7 @@ export class PhotoService {
       // 元ファイルサイズ制限チェック（20MB - 処理前の制限を緩和）
       const maxOriginalSize = 20 * 1024 * 1024;
       if (file.size > maxOriginalSize) {
-        console.error('❌ ファイルサイズオーバー:', Math.round(file.size / 1024 / 1024), 'MB');
+        logger.error('ファイルサイズオーバー', { sizeMB: Math.round(file.size / 1024 / 1024) });
         return {
           success: false,
           error: {
@@ -46,7 +47,7 @@ export class PhotoService {
       // 画像処理
       const processResult = await imageProcessingService.processImage(file, options);
       if (!processResult.success || !processResult.blob) {
-        console.error('❌ 画像処理失敗:', processResult.error);
+        logger.error('画像処理失敗', { error: processResult.error });
         return {
           success: false,
           error: {
@@ -59,7 +60,7 @@ export class PhotoService {
       // サムネイル生成
       const thumbnailResult = await imageProcessingService.generateThumbnail(file, 150);
       if (!thumbnailResult.success || !thumbnailResult.blob) {
-        console.error('❌ サムネイル生成失敗:', thumbnailResult.error);
+        logger.error('サムネイル生成失敗', { error: thumbnailResult.error });
         return {
           success: false,
           error: {
@@ -92,7 +93,7 @@ export class PhotoService {
         data: photoData
       };
     } catch (error) {
-      console.error('写真保存エラー:', error);
+      logger.error('写真保存エラー', { error });
       return {
         success: false,
         error: {

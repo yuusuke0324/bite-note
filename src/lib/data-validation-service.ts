@@ -6,7 +6,7 @@
 import { db } from './database';
 import type { FishingRecord, PhotoData } from '../types';
 import type { DatabaseResult } from '../types/database';
-import { AppError, ErrorSeverity, ErrorCategory } from './errors/ErrorTypes';
+import { AppError, ErrorSeverity, ErrorCategory, logger } from './errors';
 
 /**
  * フィールド検証結果
@@ -216,7 +216,7 @@ export class DataValidationService {
       const photo = await db.photos.get(photoId);
       return !!photo;
     } catch (error) {
-      console.error('Photo reference check failed:', error);
+      logger.error('Photo reference check failed', { error });
       return false;
     }
   }

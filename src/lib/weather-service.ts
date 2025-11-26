@@ -9,6 +9,7 @@ import type {
   ApiUsage,
   Coordinates
 } from '../types';
+import { logger } from './errors';
 
 // Open-Meteo API レスポンス型定義
 interface OpenMeteoHistoricalResponse {
@@ -83,7 +84,7 @@ export class WeatherService {
       };
 
     } catch (error) {
-      console.error('天気情報取得エラー:', error);
+      logger.error('天気情報取得エラー', { error });
 
       // エラー時はダミーデータを返す
       return this.getDummyWeatherData();
@@ -113,7 +114,7 @@ export class WeatherService {
       return this.getCurrentWeather(coordinates);
 
     } catch (error) {
-      console.error('過去天気情報取得エラー:', error);
+      logger.error('過去天気情報取得エラー', { error });
       return this.getCurrentWeather(coordinates);
     }
   }
@@ -157,7 +158,7 @@ export class WeatherService {
       };
 
     } catch (error) {
-      console.error('Open-Meteo履歴天気取得エラー:', error);
+      logger.error('Open-Meteo履歴天気取得エラー', { error });
       // エラー時は現在の天気を使用
       return this.getCurrentWeather(coordinates);
     }
@@ -497,7 +498,7 @@ export class WeatherService {
       };
 
     } catch (error) {
-      console.error('海洋データ取得エラー:', error);
+      logger.error('海洋データ取得エラー', { error });
       return {
         success: false,
         error: {

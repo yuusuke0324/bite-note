@@ -2,6 +2,7 @@
 // Phase 3-4: IndexedDB非対応・障害時の代替保存
 
 import { db } from './database';
+import { logger } from './errors';
 import type { DatabaseResult, FishingRecord } from '../types';
 
 export type StorageMode = 'indexeddb' | 'localstorage' | 'sessionstorage' | 'memory';
@@ -45,7 +46,7 @@ export class FallbackStorageService {
       await db.fishing_records.limit(1).count();
       return true;
     } catch (error) {
-      console.error('[FallbackStorage] IndexedDB test failed', error);
+      logger.error('[FallbackStorage] IndexedDB test failed', { error });
       return false;
     }
   }
@@ -105,7 +106,7 @@ export class FallbackStorageService {
         }
       }
     } catch (error) {
-      console.error('[FallbackStorage] Failed to calculate localStorage usage', error);
+      logger.error('[FallbackStorage] Failed to calculate localStorage usage', { error });
     }
 
     const total = this.LOCALSTORAGE_LIMIT;
@@ -147,7 +148,7 @@ export class FallbackStorageService {
       return { success: true };
     } catch (error) {
       // QuotaExceededError等
-      console.error('[FallbackStorage] Failed to save to localStorage', error);
+      logger.error('[FallbackStorage] Failed to save to localStorage', { error });
 
       return {
         success: false,
@@ -193,7 +194,7 @@ export class FallbackStorageService {
         data: records,
       };
     } catch (error) {
-      console.error('[FallbackStorage] Failed to load from localStorage', error);
+      logger.error('[FallbackStorage] Failed to load from localStorage', { error });
 
       return {
         success: false,
@@ -253,13 +254,13 @@ export class FallbackStorageService {
               migratedRecords++;
             } catch (error) {
               const errorMsg = `Failed to migrate record ${record.id}: ${error}`;
-              console.error(errorMsg);
+              logger.error(errorMsg, { recordId: record.id, error });
               errors.push(errorMsg);
             }
           }
         });
       } catch (error) {
-        console.error('[FallbackStorage] Migration transaction failed', error);
+        logger.error('[FallbackStorage] Migration transaction failed', { error });
         return {
           success: false,
           error: {
@@ -286,7 +287,7 @@ export class FallbackStorageService {
         data: result,
       };
     } catch (error) {
-      console.error('[FallbackStorage] Migration failed', error);
+      logger.error('[FallbackStorage] Migration failed', { error });
       return {
         success: false,
         error: {
@@ -317,7 +318,7 @@ export class FallbackStorageService {
     try {
       localStorage.removeItem(this.LOCALSTORAGE_KEY);
     } catch (error) {
-      console.error('[FallbackStorage] Failed to clear localStorage', error);
+      logger.error('[FallbackStorage] Failed to clear localStorage', { error });
     }
   }
 

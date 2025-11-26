@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { sessionService } from '../lib/session-service';
 import { fallbackStorageService, type StorageMode } from '../lib/fallback-storage-service';
+import { logger } from '../lib/errors';
 import { useToastStore } from './toast-store';
 
 export type SessionStatus = 'active' | 'expired' | 'reconnecting';
@@ -66,9 +67,7 @@ export const useSessionStore = create<SessionStore>()(
     actions: {
       // セッション管理の開始
       startSession: () => {
-        if (import.meta.env.DEV) {
-          console.log('[SessionStore] Starting session at:', new Date().toISOString());
-        }
+        logger.debug('[SessionStore] Starting session', { timestamp: new Date().toISOString() });
 
         // 既存のリスナーがあれば削除（二重登録防止）
         if (sessionExpiredHandler) {
@@ -83,10 +82,10 @@ export const useSessionStore = create<SessionStore>()(
         // メモリリーク防止のため、ハンドラー参照を保持
         sessionExpiredHandler = (event: Event) => {
           const customEvent = event as CustomEvent<SessionExpiredDetail>;
-          if (import.meta.env.DEV) {
-            console.log('[SessionStore] Session expired event received', customEvent.detail);
-            console.log('[SessionStore] Current state before expireSession:', get().sessionStatus);
-          }
+          logger.debug('[SessionStore] Session expired event received', {
+            detail: customEvent.detail,
+            currentStatus: get().sessionStatus
+          });
           const { actions } = get();
           actions.expireSession();
         };
@@ -94,9 +93,7 @@ export const useSessionStore = create<SessionStore>()(
 
         set({ sessionStatus: 'active', lastActivityAt: Date.now() });
 
-        if (import.meta.env.DEV) {
-          console.log('[SessionStore] Session started - listener registered');
-        }
+        logger.debug('[SessionStore] Session started - listener registered');
 
         // E2Eテスト用フラグ設定
         // main.tsxで事前に初期化されたフラグをtrueに更新
@@ -172,7 +169,7 @@ export const useSessionStore = create<SessionStore>()(
             return true;
           } else {
             // 再接続失敗時はlocalStorageに切り替え
-            console.warn('[SessionStore] Reconnection failed, switching to localStorage');
+            logger.warn('[SessionStore] Reconnection failed, switching to localStorage');
             actions.switchToLocalStorage();
 
             // エラートースト表示
@@ -183,7 +180,7 @@ export const useSessionStore = create<SessionStore>()(
             return false;
           }
         } catch (error) {
-          console.error('[SessionStore] Reconnection error', error);
+          logger.error('[SessionStore] Reconnection error', { error });
           actions.updateSessionStatus('expired');
 
           // エラートースト表示
@@ -197,9 +194,7 @@ export const useSessionStore = create<SessionStore>()(
 
       // セッション期限切れ処理
       expireSession: () => {
-        if (import.meta.env.DEV) {
-          console.warn('[SessionStore] Session expired - BEFORE set');
-        }
+        logger.warn('[SessionStore] Session expired - processing');
 
         // 現在の未保存データ数を保持（テストやアプリケーションで事前に設定されている可能性がある）
         const currentUnsavedCount = get().unsavedDataCount;
@@ -211,14 +206,11 @@ export const useSessionStore = create<SessionStore>()(
           unsavedDataCount: currentUnsavedCount,
         });
 
-        if (import.meta.env.DEV) {
-          const state = get();
-          console.warn('[SessionStore] Session expired - AFTER set', {
-            sessionStatus: state.sessionStatus,
-            isSessionExpiredModalOpen: state.isSessionExpiredModalOpen,
-            unsavedDataCount: state.unsavedDataCount,
-          });
-        }
+        logger.debug('[SessionStore] Session expired - state updated', {
+          sessionStatus: get().sessionStatus,
+          isSessionExpiredModalOpen: get().isSessionExpiredModalOpen,
+          unsavedDataCount: get().unsavedDataCount,
+        });
       },
 
       // ストレージモードの初期化
@@ -231,7 +223,7 @@ export const useSessionStore = create<SessionStore>()(
           : false;
 
         if (!isIndexedDBWorking) {
-          console.warn('[SessionStore] IndexedDB is not available, using localStorage');
+          logger.warn('[SessionStore] IndexedDB is not available, using localStorage');
 
           set({
             storageMode: 'localstorage',
@@ -303,7 +295,7 @@ export const useSessionStore = create<SessionStore>()(
             return false;
           }
         } catch (error) {
-          console.error('[SessionStore] Migration error', error);
+          logger.error('[SessionStore] Migration error', { error });
           useToastStore.getState().showError('データ移行中にエラーが発生しました');
           return false;
         }
@@ -311,22 +303,17 @@ export const useSessionStore = create<SessionStore>()(
 
       // セッション期限切れモーダルの表示
       showSessionExpiredModal: (unsavedCount: number) => {
-        if (import.meta.env.DEV) {
-          console.warn('[SessionStore] showSessionExpiredModal called - BEFORE set');
-        }
+        logger.debug('[SessionStore] showSessionExpiredModal called', { unsavedCount });
 
         set({
           isSessionExpiredModalOpen: true,
           unsavedDataCount: unsavedCount,
         });
 
-        if (import.meta.env.DEV) {
-          const state = get();
-          console.warn('[SessionStore] showSessionExpiredModal - AFTER set', {
-            isSessionExpiredModalOpen: state.isSessionExpiredModalOpen,
-            unsavedDataCount: state.unsavedDataCount,
-          });
-        }
+        logger.debug('[SessionStore] showSessionExpiredModal - state updated', {
+          isSessionExpiredModalOpen: get().isSessionExpiredModalOpen,
+          unsavedDataCount: get().unsavedDataCount,
+        });
       },
 
       // セッション期限切れモーダルの非表示
@@ -359,7 +346,5 @@ if (typeof window !== 'undefined') {
   window.__sessionStore = useSessionStore;
 
   // デバッグ用: グローバル露出を確認
-  if (import.meta.env.DEV) {
-    console.log('[SessionStore] Exposed to window.__sessionStore');
-  }
+  logger.debug('[SessionStore] Exposed to window.__sessionStore');
 }

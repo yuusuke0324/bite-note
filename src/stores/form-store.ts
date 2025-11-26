@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { fishingRecordService } from '../lib/fishing-record-service';
 import { photoService } from '../lib/photo-service';
 import { geolocationService } from '../lib/geolocation-service';
+import { logger } from '../lib/errors';
 import { useAppStore } from './app-store';
 import type {
   CreateFishingRecordForm,
@@ -294,7 +295,7 @@ export const useFormStore = create<FormStore>()((set, get) => ({
           throw new Error(result.error?.message || '記録の保存に失敗しました');
         }
       } catch (error) {
-        console.error('Form submission failed:', error);
+        logger.error('Form submission failed', { error });
 
         // エラーをアプリストアに設定
         const appActions = useAppStore.getState().actions;

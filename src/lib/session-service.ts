@@ -2,6 +2,7 @@
 // Phase 3-4: セッション管理機能実装
 
 import { db } from './database';
+import { logger } from './errors';
 import type { DatabaseResult } from '../types';
 
 export interface SessionState {
@@ -132,7 +133,7 @@ export class SessionService {
     this.heartbeatIntervalId = window.setInterval(async () => {
       const isValid = await this.checkSession();
       if (!isValid) {
-        console.warn('[SessionService] Session expired detected by heartbeat');
+        logger.warn('[SessionService] Session expired detected by heartbeat');
         // セッション期限切れイベントを発火
         this.dispatchSessionExpiredEvent();
       }
@@ -157,7 +158,7 @@ export class SessionService {
     // タイムアウトチェック
     const elapsed = Date.now() - this.lastActivityAt;
     if (elapsed > this.config.timeoutMs) {
-      console.warn('[SessionService] Session timeout detected', {
+      logger.warn('[SessionService] Session timeout detected', {
         elapsed,
         timeout: this.config.timeoutMs,
       });
@@ -167,7 +168,7 @@ export class SessionService {
     // IndexedDB接続チェック
     const isConnected = await this.checkIndexedDBConnection();
     if (!isConnected) {
-      console.warn('[SessionService] IndexedDB connection lost');
+      logger.warn('[SessionService] IndexedDB connection lost');
       return false;
     }
 
@@ -184,7 +185,7 @@ export class SessionService {
       await db.fishing_records.limit(1).count();
       return true;
     } catch (error) {
-      console.error('[SessionService] IndexedDB connection check failed', error);
+      logger.error('[SessionService] IndexedDB connection check failed', { error });
       return false;
     }
   }
@@ -219,7 +220,7 @@ export class SessionService {
 
       return { success: true };
     } catch (error) {
-      console.error('[SessionService] Reconnection failed', error);
+      logger.error('[SessionService] Reconnection failed', { error });
       return {
         success: false,
         error: {
