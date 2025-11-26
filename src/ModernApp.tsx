@@ -1613,18 +1613,21 @@ function ModernApp() {
     // 利用可能な魚種と場所を抽出（全記録から）
     const availableSpecies = useMemo(() =>
       Array.from(new Set(records.map(r => r.fishSpecies))).sort(),
-      [records]
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [records] // Zustandセレクタから取得した値は適切に変更検知される
     );
 
     const availableLocations = useMemo(() =>
       Array.from(new Set(records.map(r => r.location))).sort(),
-      [records]
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [records] // Zustandセレクタから取得した値は適切に変更検知される
     );
 
     // フィルター適用済みの記録を計算（メモ化）
     const filteredRecords = useMemo(() =>
       applyFilters(records, filters),
-      [records, filters]
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [records, filters] // Zustandセレクタから取得した値は適切に変更検知される
     );
 
     // 記録を月別にグループ化

@@ -25,10 +25,10 @@ export const LocationDisplay: React.FC<LocationDisplayProps> = ({
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [addressError, setAddressError] = useState<string>('');
 
-  const geolocationService = new GeolocationService();
-
   useEffect(() => {
     if (!coordinates || !showAddress) return;
+
+    const geolocationService = new GeolocationService();
 
     const fetchAddress = async () => {
       setLoadingAddress(true);

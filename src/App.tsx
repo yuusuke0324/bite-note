@@ -211,10 +211,15 @@ function App() {
         formActions.updateField('fishSpecies', 'テスト魚種');
         const validationResult = formActions.validateForm();
 
+        // 初期化完了後、最新の状態を取得
+        const currentState = useAppStore.getState();
+        const currentRecords = selectRecords(currentState);
+        const currentSettings = selectSettings(currentState);
+
         setStoreStatus('success');
         setStoreMessage(
-          `ストア正常動作！記録数: ${records.length}件, ` +
-          `テーマ: ${settings.theme}, ` +
+          `ストア正常動作！記録数: ${currentRecords.length}件, ` +
+          `テーマ: ${currentSettings.theme}, ` +
           `フォーム有効: ${validationResult.isValid ? 'Yes' : 'No'}`
         );
       } catch (error) {
@@ -224,7 +229,7 @@ function App() {
     };
 
     initializeApp();
-  }, [appActions, formActions]); // records.length, settings.theme を削除（再レンダリングループ防止）
+  }, [appActions, formActions]);
 
   // Phase 3-4: セッション管理の初期化
   useEffect(() => {

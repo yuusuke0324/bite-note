@@ -218,10 +218,14 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
     }
   };
 
+  // フォーム値を監視（潮汐情報計算用）
+  const watchedCoordinatesForTide = watch('coordinates');
+  const watchedDateForTide = watch('date');
+
   // 潮汐情報の自動計算
   React.useEffect(() => {
-    const coords = watch('coordinates');
-    const dateStr = watch('date');
+    const coords = watchedCoordinatesForTide;
+    const dateStr = watchedDateForTide;
 
     if (!coords || !dateStr) {
       setTideInfo(null);
@@ -249,7 +253,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
     };
 
     calculateTide();
-  }, [watch('coordinates'), watch('date')]);
+  }, [watchedCoordinatesForTide, watchedDateForTide]);
 
   // メモリリーク防止のためのクリーンアップ
   React.useEffect(() => {

@@ -134,7 +134,11 @@ export const TideTooltip: React.FC<TideTooltipProps> = ({
    * オブジェクトリテラルの比較による無限ループを回避
    * @see https://github.com/[repo]/issues/249 - テストハング問題の修正
    */
-  const stableOffset = useMemo(() => offset, [offset.x, offset.y]);
+  const stableOffset = useMemo(
+    () => offset,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [offset.x, offset.y] // offsetオブジェクトではなく、プリミティブ値で依存管理
+  );
 
   // 位置計算
   const calculatePosition = useCallback(() => {

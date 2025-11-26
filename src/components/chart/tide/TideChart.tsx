@@ -1002,6 +1002,45 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
   // 設定の統合（既に chartConfiguration で処理済みなので削除）
 
+  // Helper function to find data points by value
+  const findDataPointByValue = useCallback(
+    (
+      data: TideChartData[],
+      currentIndex: number,
+      direction: 'higher' | 'lower'
+    ): number => {
+      const currentValue = data[currentIndex]?.tide;
+      if (currentValue === undefined) return -1;
+
+      let bestIndex = -1;
+      let bestValue = direction === 'higher' ? Infinity : -Infinity;
+
+      for (let i = 0; i < data.length; i++) {
+        if (i === currentIndex) continue;
+
+        const value = data[i].tide;
+        if (
+          direction === 'higher' &&
+          value > currentValue &&
+          value < bestValue
+        ) {
+          bestValue = value;
+          bestIndex = i;
+        } else if (
+          direction === 'lower' &&
+          value < currentValue &&
+          value > bestValue
+        ) {
+          bestValue = value;
+          bestIndex = i;
+        }
+      }
+
+      return bestIndex !== -1 ? bestIndex : currentIndex;
+    },
+    []
+  );
+
   // Enhanced Keyboard Navigation Handler
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -1198,46 +1237,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
       onDataPointClick,
       screenReaderContent,
       selectedDataPoint,
+      findDataPointByValue,
     ]
-  );
-
-  // Helper function to find data points by value
-  const findDataPointByValue = useCallback(
-    (
-      data: TideChartData[],
-      currentIndex: number,
-      direction: 'higher' | 'lower'
-    ): number => {
-      const currentValue = data[currentIndex]?.tide;
-      if (currentValue === undefined) return -1;
-
-      let bestIndex = -1;
-      let bestValue = direction === 'higher' ? Infinity : -Infinity;
-
-      for (let i = 0; i < data.length; i++) {
-        if (i === currentIndex) continue;
-
-        const value = data[i].tide;
-        if (
-          direction === 'higher' &&
-          value > currentValue &&
-          value < bestValue
-        ) {
-          bestValue = value;
-          bestIndex = i;
-        } else if (
-          direction === 'lower' &&
-          value < currentValue &&
-          value > bestValue
-        ) {
-          bestValue = value;
-          bestIndex = i;
-        }
-      }
-
-      return bestIndex !== -1 ? bestIndex : currentIndex;
-    },
-    []
   );
 
   // Focus handler for WCAG 2.4.7 compliance
