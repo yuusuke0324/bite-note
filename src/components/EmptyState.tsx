@@ -1,6 +1,8 @@
 // 空状態表示コンポーネント
 
-import React from 'react';
+import React, { type ReactNode } from 'react';
+import { Icon } from './ui/Icon';
+import { Anchor, Search, MapPin, Camera, Wifi, FileText, Lightbulb } from 'lucide-react';
 
 export interface EmptyStateProps {
   type: 'noRecords' | 'noSearchResults' | 'gpsError' | 'noPhotos' | 'offline';
@@ -21,20 +23,20 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   icon,
   illustration
 }) => {
-  const getDefaultIcon = () => {
+  const getDefaultIcon = (): ReactNode => {
     switch (type) {
       case 'noRecords':
-        return '🎣';
+        return <Icon icon={Anchor} size={64} decorative />;
       case 'noSearchResults':
-        return '🔍';
+        return <Icon icon={Search} size={64} decorative />;
       case 'gpsError':
-        return '📍';
+        return <Icon icon={MapPin} size={64} decorative />;
       case 'noPhotos':
-        return '📷';
+        return <Icon icon={Camera} size={64} decorative />;
       case 'offline':
-        return '📶';
+        return <Icon icon={Wifi} size={64} decorative />;
       default:
-        return '📄';
+        return <Icon icon={FileText} size={64} decorative />;
     }
   };
 
@@ -145,7 +147,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             color: '#1976d2'
           }}
         >
-          💡 ヒント: 日付、場所、魚種、サイズなどを記録して釣果を管理しましょう
+          <Icon icon={Lightbulb} size={14} decorative /> ヒント: 日付、場所、魚種、サイズなどを記録して釣果を管理しましょう
         </div>
       )}
 

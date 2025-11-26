@@ -5,6 +5,22 @@ import React, { useState } from 'react';
 import type { FishingRecord } from '../types';
 import { TideIntegration } from './TideIntegration';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import {
+  Fish,
+  Calendar,
+  Ruler,
+  Scale,
+  MapPin,
+  MessageCircle,
+  Map,
+  Globe,
+  Edit,
+  Trash2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 
 interface FishingRecordDetailProps {
   record: FishingRecord;
@@ -193,7 +209,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   gap: '0.5rem'
                 }}
               >
-                🐟 {record.fishSpecies}
+                <Icon icon={Fish} size={24} decorative /> {record.fishSpecies}
               </h2>
 
               <button
@@ -210,7 +226,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 aria-label="詳細を閉じる"
                 title="閉じる"
               >
-                ✕
+                <Icon icon={X} size={20} decorative />
               </button>
             </div>
 
@@ -235,7 +251,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   }}
                   aria-label="前の記録"
                 >
-                  ← 前へ
+                  <Icon icon={ChevronLeft} size={16} decorative /> 前へ
                 </button>
 
                 <span style={{
@@ -259,7 +275,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   }}
                   aria-label="次の記録"
                 >
-                  次へ →
+                  次へ <Icon icon={ChevronRight} size={16} decorative />
                 </button>
               </div>
             )}
@@ -311,7 +327,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  📅 釣行日
+                  <Icon icon={Calendar} size={14} decorative /> 釣行日
                 </h4>
                 <p style={{
                   margin: 0,
@@ -335,7 +351,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  🐟 魚種
+                  <Icon icon={Fish} size={14} decorative /> 魚種
                 </h4>
                 <p style={{
                   margin: 0,
@@ -359,7 +375,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  📏 サイズ
+                  <Icon icon={Ruler} size={14} decorative /> サイズ
                 </h4>
                 <p style={{
                   margin: 0,
@@ -384,7 +400,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  ⚖️ 重量
+                  <Icon icon={Scale} size={14} decorative /> 重量
                 </h4>
                 <p style={{
                   margin: 0,
@@ -412,7 +428,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>
-                📍 釣り場
+                <Icon icon={MapPin} size={14} decorative /> 釣り場
               </h4>
               <p style={{
                 margin: '0 0 1rem 0',
@@ -425,7 +441,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
               {record.coordinates && (
                 <div style={{ marginTop: '0.75rem' }}>
                   <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
-                    📍 緯度: {record.coordinates.latitude.toFixed(6)}, 経度: {record.coordinates.longitude.toFixed(6)}
+                    <Icon icon={MapPin} size={14} decorative /> 緯度: {record.coordinates.latitude.toFixed(6)}, 経度: {record.coordinates.longitude.toFixed(6)}
                     {record.coordinates.accuracy && <span> (精度: ±{Math.round(record.coordinates.accuracy)}m)</span>}
                   </div>
                   <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -448,7 +464,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                           cursor: 'pointer'
                         }}
                       >
-                        🗺️ 地図で表示
+                        <Icon icon={Map} size={16} decorative /> 地図で表示
                       </button>
                     )}
                     <a
@@ -467,7 +483,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                         fontSize: '0.875rem'
                       }}
                     >
-                      🌐 Googleマップで表示
+                      <Icon icon={Globe} size={16} decorative /> Googleマップで表示
                     </a>
                   </div>
                 </div>
@@ -490,7 +506,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  💭 メモ
+                  <Icon icon={MessageCircle} size={14} decorative /> メモ
                 </h4>
                 <p style={{
                   margin: 0,
@@ -634,7 +650,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                     gap: '0.5rem'
                   }}
                 >
-                  ✏️ 編集
+                  <Icon icon={Edit} size={16} decorative /> 編集
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
@@ -651,7 +667,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                     gap: '0.5rem'
                   }}
                 >
-                  🗑️ 削除
+                  <Icon icon={Trash2} size={16} decorative /> 削除
                 </button>
               </>
             )}
@@ -713,7 +729,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             }}
             aria-label="写真を閉じる"
           >
-            ✕
+            <Icon icon={X} size={20} decorative />
           </button>
         </div>
       )}

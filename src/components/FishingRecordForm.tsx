@@ -10,6 +10,27 @@ import type { PhotoMetadata, AutoFillData, FishSpecies } from '../types';
 import type { TideInfo } from '../types/tide';
 import { TestIds } from '../constants/testIds';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import {
+  Anchor,
+  Camera,
+  MapPin,
+  Calendar,
+  Waves,
+  Moon,
+  BarChart3,
+  Clock,
+  Lightbulb,
+  Save,
+  RefreshCw,
+  CloudSun,
+  Globe,
+  CheckCircle2,
+  XCircle,
+  FileText,
+  Thermometer,
+  Fish,
+} from 'lucide-react';
 
 interface FishingRecordFormProps {
   onSubmit: (data: CreateFishingRecordFormData) => Promise<void>;
@@ -282,9 +303,13 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
       <h2 style={{
         textAlign: 'center',
         marginBottom: '2rem',
-        fontSize: 'clamp(1.5rem, 4vw, 2rem)'
+        fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem'
       }}>
-        🎣 釣果記録フォーム
+        <Icon icon={Anchor} size={28} decorative /> 釣果記録フォーム
       </h2>
 
       <form
@@ -324,22 +349,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              📸 写真から抽出された情報
+              <Icon icon={Camera} size={16} decorative /> 写真から抽出された情報
             </h4>
             <div style={{ fontSize: '0.9rem', color: '#1565c0' }}>
               {extractedMetadata.coordinates && (
-                <p style={{ margin: '0.25rem 0' }}>
-                  📍 GPS座標: {extractedMetadata.coordinates.latitude.toFixed(6)}, {extractedMetadata.coordinates.longitude.toFixed(6)}
+                <p style={{ margin: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Icon icon={MapPin} size={14} decorative /> GPS座標: {extractedMetadata.coordinates.latitude.toFixed(6)}, {extractedMetadata.coordinates.longitude.toFixed(6)}
                 </p>
               )}
               {extractedMetadata.datetime && (
-                <p style={{ margin: '0.25rem 0' }}>
-                  📅 撮影日時: {extractedMetadata.datetime.toLocaleString('ja-JP')}
+                <p style={{ margin: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Icon icon={Calendar} size={14} decorative /> 撮影日時: {extractedMetadata.datetime.toLocaleString('ja-JP')}
                 </p>
               )}
               {extractedMetadata.camera && (
-                <p style={{ margin: '0.25rem 0' }}>
-                  📷 カメラ: {extractedMetadata.camera.make || ''} {extractedMetadata.camera.model || ''}
+                <p style={{ margin: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Icon icon={Camera} size={14} decorative /> カメラ: {extractedMetadata.camera.make || ''} {extractedMetadata.camera.model || ''}
                 </p>
               )}
             </div>
@@ -393,7 +418,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               gap: '0.5rem',
               fontWeight: '700'
             }}>
-              🌊 潮汐情報（自動計算）
+              <Icon icon={Waves} size={16} decorative /> 潮汐情報（自動計算）
             </h4>
             <div style={{ fontSize: '0.9rem', color: '#00695c' }}>
               <div style={{
@@ -408,7 +433,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                   borderRadius: '6px',
                   border: '1px solid rgba(0, 172, 193, 0.2)'
                 }}>
-                  <strong>🌙 潮名:</strong> {tideInfo.tideType === 'spring' ? '大潮' :
+                  <strong><Icon icon={Moon} size={14} decorative /> 潮名:</strong> {tideInfo.tideType === 'spring' ? '大潮' :
                     tideInfo.tideType === 'neap' ? '小潮' :
                     tideInfo.tideType === 'medium' ? '中潮' :
                     tideInfo.tideType === 'long' ? '長潮' :
@@ -420,7 +445,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                   borderRadius: '6px',
                   border: '1px solid rgba(0, 172, 193, 0.2)'
                 }}>
-                  <strong>📊 潮の状態:</strong> {tideInfo.currentState === 'rising' ? '上げ潮' :
+                  <strong><Icon icon={BarChart3} size={14} decorative /> 潮の状態:</strong> {tideInfo.currentState === 'rising' ? '上げ潮' :
                     tideInfo.currentState === 'falling' ? '下げ潮' :
                     tideInfo.currentState === 'high' ? '満潮' : '干潮'}
                 </div>
@@ -434,7 +459,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                   border: '1px solid rgba(0, 172, 193, 0.2)',
                   marginTop: '0.75rem'
                 }}>
-                  <strong>⏰ 次の潮汐イベント:</strong>{' '}
+                  <strong><Icon icon={Clock} size={14} decorative /> 次の潮汐イベント:</strong>{' '}
                   {tideInfo.nextEvent.type === 'high' ? '満潮' : '干潮'}{' '}
                   {tideInfo.nextEvent.time.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
                 </div>
@@ -446,7 +471,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 color: '#00838f',
                 fontStyle: 'italic'
               }}>
-                💡 この潮汐情報は記録とともに自動保存されます
+                <Icon icon={Lightbulb} size={14} decorative /> この潮汐情報は記録とともに自動保存されます
               </div>
             </div>
           </div>
@@ -475,7 +500,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 borderRadius: '12px',
                 fontWeight: 'normal'
               }}>
-                📸 写真から自動入力
+                <Icon icon={Camera} size={12} decorative /> 写真から自動入力
               </span>
             )}
           </label>
@@ -547,7 +572,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 borderRadius: '12px',
                 fontWeight: 'normal'
               }}>
-                📸 県・市を自動入力
+                <Icon icon={Camera} size={12} decorative /> 県・市を自動入力
               </span>
             )}
           </label>
@@ -563,13 +588,13 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontSize: '0.9rem'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                <span style={{ color: '#4caf50', fontWeight: 'bold' }}>📍 写真から自動取得</span>
+                <span style={{ color: '#4caf50', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={MapPin} size={14} decorative /> 写真から自動取得</span>
               </div>
               <div style={{ color: '#2e7d32' }}>
                 <strong>基本住所:</strong> {watch('location')?.split(/[・、,]/, 1)[0] || watch('location')}
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.25rem' }}>
-                💡 この基本住所に詳細な場所名を追加できます
+              <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Icon icon={Lightbulb} size={12} decorative /> この基本住所に詳細な場所名を追加できます
               </div>
             </div>
           )}
@@ -615,7 +640,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             }}
           >
             {autoFilledFields.has('location')
-              ? "📷 県・市は写真から自動取得済み。詳細な場所名を追加してください（例: ○○港、△△磯、釣り堀名など）"
+              ? "県・市は写真から自動取得済み。詳細な場所名を追加してください（例: ○○港、△△磯、釣り堀名など）"
               : "例: 山口県長門市○○港、東京湾△△磯、釣り堀太郎"}
           </small>
           {errors.location && (
@@ -657,7 +682,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 borderRadius: '12px',
                 fontWeight: 'normal'
               }}>
-                📸 写真から自動入力
+                <Icon icon={Camera} size={12} decorative /> 写真から自動入力
               </span>
             )}
           </label>
@@ -739,7 +764,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 fontWeight: 'normal',
                 marginLeft: '0.5rem'
               }}>
-                📸 写真から自動入力
+                <Icon icon={Camera} size={12} decorative /> 写真から自動入力
               </span>
             )}
           </label>
@@ -789,7 +814,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontSize: '0.875rem'
             }}
           >
-            🌊 魚の活性に影響する重要な情報です（例: 22.5°C）
+            <Icon icon={Waves} size={14} decorative /> 魚の活性に影響する重要な情報です（例: 22.5°C）
           </small>
           {errors.seaTemperature && (
             <p
@@ -839,7 +864,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontSize: '0.875rem'
             }}
           >
-            💡 1文字入力すると候補が表示されます（例: あ → アジ、アオリイカ）
+            <Icon icon={Lightbulb} size={14} decorative /> 1文字入力すると候補が表示されます（例: あ → アジ、アオリイカ）
           </small>
         </div>
 
@@ -980,7 +1005,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontSize: '0.875rem'
             }}
           >
-            🦑 イカなど重量で記録する魚種に便利です（例: 350g）
+            <Icon icon={Fish} size={14} decorative /> イカなど重量で記録する魚種に便利です（例: 350g）
           </small>
           {errors.weight && (
             <p
@@ -1088,13 +1113,13 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             fontSize: '0.875rem'
           }}>
             <span>
-              入力状態: {isValid ? '✅ 有効' : '❌ 無効'}
+              入力状態: {isValid ? <><Icon icon={CheckCircle2} size={14} decorative /> 有効</> : <><Icon icon={XCircle} size={14} decorative /> 無効</>}
             </span>
             <span>
-              変更: {isDirty ? '📝 あり' : '📄 なし'}
+              変更: {isDirty ? <><Icon icon={FileText} size={14} decorative /> あり</> : <><Icon icon={FileText} size={14} decorative /> なし</>}
             </span>
             <span>
-              未保存: {hasUnsavedChanges ? '⚠️ あり' : '✅ なし'}
+              未保存: {hasUnsavedChanges ? <><Icon icon={XCircle} size={14} color="error" decorative /> あり</> : <><Icon icon={CheckCircle2} size={14} decorative /> なし</>}
             </span>
           </div>
         </div>
@@ -1162,7 +1187,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               </>
             ) : (
               <>
-                💾 記録を保存
+                <Icon icon={Save} size={16} decorative /> 記録を保存
               </>
             )}
           </button>
@@ -1205,7 +1230,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               }
             }}
           >
-            🔄 リセット
+            <Icon icon={RefreshCw} size={16} decorative /> リセット
           </button>
         </div>
 
@@ -1259,7 +1284,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                   margin: '0 auto 1rem auto'
                 }} />
                 <h3 style={{ marginTop: 0, marginBottom: '0.5rem' }}>
-                  📷 写真を解析中...
+                  <Icon icon={Camera} size={16} decorative /> 写真を解析中...
                 </h3>
                 <p style={{ color: '#666', fontSize: '0.9rem', margin: 0 }}>
                   GPS情報・天気・海面水温を取得しています
@@ -1269,7 +1294,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               // データ表示
               <>
                 <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>
-                  📷 写真から情報を自動入力しますか？
+                  <Icon icon={Camera} size={16} decorative /> 写真から情報を自動入力しますか？
                 </h3>
 
                 <div style={{ marginBottom: '1.5rem' }}>
@@ -1279,31 +1304,31 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
 
                   {pendingAutoFillData.location && (
                     <div style={{ marginBottom: '0.5rem' }}>
-                      <strong>📍 場所:</strong> {pendingAutoFillData.location}
+                      <strong><Icon icon={MapPin} size={14} decorative /> 場所:</strong> {pendingAutoFillData.location}
                     </div>
                   )}
 
                   {pendingAutoFillData.datetime && (
                     <div style={{ marginBottom: '0.5rem' }}>
-                      <strong>📅 撮影日時:</strong> {pendingAutoFillData.datetime.toLocaleString('ja-JP')}
+                      <strong><Icon icon={Calendar} size={14} decorative /> 撮影日時:</strong> {pendingAutoFillData.datetime.toLocaleString('ja-JP')}
                     </div>
                   )}
 
                   {pendingAutoFillData.coordinates && (
                     <div style={{ marginBottom: '0.5rem' }}>
-                      <strong>🌍 GPS座標:</strong> {pendingAutoFillData.coordinates.latitude.toFixed(6)}, {pendingAutoFillData.coordinates.longitude.toFixed(6)}
+                      <strong><Icon icon={Globe} size={14} decorative /> GPS座標:</strong> {pendingAutoFillData.coordinates.latitude.toFixed(6)}, {pendingAutoFillData.coordinates.longitude.toFixed(6)}
                     </div>
                   )}
 
                   {pendingAutoFillData.weather && (
                     <div style={{ marginBottom: '0.5rem' }}>
-                      <strong>🌤️ 天気:</strong> {pendingAutoFillData.weather.description} ({pendingAutoFillData.weather.temperature}°C)
+                      <strong><Icon icon={CloudSun} size={14} decorative /> 天気:</strong> {pendingAutoFillData.weather.description} ({pendingAutoFillData.weather.temperature}°C)
                     </div>
                   )}
 
                   {pendingAutoFillData.seaTemperature && (
                     <div style={{ marginBottom: '0.5rem' }}>
-                      <strong>🌊 海面水温:</strong> {pendingAutoFillData.seaTemperature}°C
+                      <strong><Icon icon={Waves} size={14} decorative /> 海面水温:</strong> {pendingAutoFillData.seaTemperature}°C
                     </div>
                   )}
                 </div>
