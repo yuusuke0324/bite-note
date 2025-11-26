@@ -65,8 +65,12 @@ export interface ErrorContext {
   timeValue?: string;
   /** エラーとなった潮位値 */
   tideValue?: number;
+  /** タイムアウト時間（ミリ秒） */
+  timeoutMs?: number;
   /** 追加のメタデータ */
   metadata?: Record<string, unknown>;
+  /** 任意の追加プロパティを許可 */
+  [key: string]: unknown;
 }
 
 // ==========================================

@@ -3,7 +3,7 @@
  * TASK-101: TideDataValidator実装
  */
 
-import type { ValidationResult, ValidationOptions, ValidationSummary } from './types';
+import type { ValidationResult, ValidationOptions, ValidationSummary, ValidationWarning, ValidationError } from './types';
 import type { RawTideData, TideChartData } from '../../utils/validation/types';
 import type { ITideDataValidator, ITideDataTransformer } from '../../utils/validation/types';
 import { TideValidationError, EmptyDataError } from '../../utils/validation/errors';
@@ -286,8 +286,8 @@ export class TideDataValidator {
   private createSummary(
     totalData: RawTideData[],
     validData: RawTideData[],
-    errors: unknown[],
-    warnings: unknown[],
+    errors: ValidationError[],
+    warnings: ValidationWarning[],
     processingTime: number
   ): ValidationSummary {
     return {
@@ -325,7 +325,7 @@ export class TideDataValidator {
    */
   private createErrorResult(
     errors: TideValidationError[],
-    warnings: unknown[],
+    warnings: ValidationWarning[],
     processingTime: number,
     totalData: RawTideData[]
   ): ValidationResult {
