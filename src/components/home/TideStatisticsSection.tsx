@@ -11,6 +11,8 @@ import ModernCard from '../ui/ModernCard';
 import type { FishingRecord } from '../../types';
 import type { TideInfo } from '../../types/tide';
 import { logger } from '../../lib/errors/logger';
+import { Icon } from '../ui/Icon';
+import { Waves, Lightbulb, Clock, Moon, BarChart3 } from 'lucide-react';
 
 // カスタムツールチップコンポーネント
 const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { name: string; value: number; percentage?: number } }> }) => {
@@ -283,7 +285,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
           fontWeight: '700',
           letterSpacing: '-0.02em',
         }}>
-          <span style={{ fontSize: '1.6rem' }}>🌊</span>
+          <Icon icon={Waves} size={26} color="primary" decorative />
           <span>潮汐パターン分析</span>
         </h2>
 
@@ -320,7 +322,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                 gap: '8px',
                 fontWeight: '500',
               }}>
-                <span style={{ fontSize: '1.3rem' }}>💡</span>
+                <Icon icon={Lightbulb} size={22} color="warning" decorative />
                 <strong>釣果が最も多かったタイミング</strong>
               </p>
               <p style={{
@@ -344,7 +346,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                 alignItems: 'center',
                 gap: '6px',
               }}>
-                <span>📊</span>
+                <Icon icon={BarChart3} size={16} color="secondary" decorative />
                 <span>{tideStats.totalRecordsWithTideData}件の記録から分析</span>
               </p>
             </div>
@@ -364,7 +366,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               gap: '8px',
               fontSize: '1.1rem',
             }}>
-              <span style={{ fontSize: '1.3rem' }}>⏰</span>
+              <Icon icon={Clock} size={22} color="primary" decorative />
               <span>潮汐タイミング別</span>
             </h3>
             <div style={{
@@ -430,7 +432,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               gap: '8px',
               fontSize: '1.1rem',
             }}>
-              <span style={{ fontSize: '1.3rem' }}>🌙</span>
+              <Icon icon={Moon} size={22} color="primary" decorative />
               <span>潮名別</span>
             </h3>
             <div style={{

@@ -20,6 +20,8 @@ import { colors } from '../../theme/colors';
 import { textStyles, typography } from '../../theme/typography';
 import { logger } from '../../lib/errors/logger';
 import type { FishingRecord } from '../../types';
+import { Icon } from '../ui/Icon';
+import { AlertTriangle, MapPin, Calendar, Ruler } from 'lucide-react';
 
 interface StorageInfo {
   usage: number; // Bytes used
@@ -209,10 +211,16 @@ export const DataManagementPanel = () => {
                   ? colors.semantic.error.dark
                   : colors.semantic.warning.dark,
                 margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}>
-                {storageInfo.usagePercent >= 90
-                  ? '⚠️ ストレージ容量が不足しています。不要なデータを削除してください。'
-                  : '⚠️ ストレージ容量が80%を超えています。データの整理を検討してください。'}
+                <Icon icon={AlertTriangle} size={16} color="warning" decorative />
+                <span>
+                  {storageInfo.usagePercent >= 90
+                    ? 'ストレージ容量が不足しています。不要なデータを削除してください。'
+                    : 'ストレージ容量が80%を超えています。データの整理を検討してください。'}
+                </span>
               </p>
             </div>
           )}
@@ -321,9 +329,17 @@ const RecordListItem = ({ record, onDelete }: RecordListItemProps) => {
           ...textStyles.body.small,
           color: colors.text.secondary,
         }}>
-          <span>📍 {record.location || '場所未設定'}</span>
-          <span>📅 {new Date(record.date).toLocaleDateString('ja-JP')}</span>
-          {record.size && <span>📏 {record.size}cm</span>}
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Icon icon={MapPin} size={14} color="secondary" decorative /> {record.location || '場所未設定'}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Icon icon={Calendar} size={14} color="secondary" decorative /> {new Date(record.date).toLocaleDateString('ja-JP')}
+          </span>
+          {record.size && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Icon icon={Ruler} size={14} color="secondary" decorative /> {record.size}cm
+            </span>
+          )}
         </div>
       </div>
 

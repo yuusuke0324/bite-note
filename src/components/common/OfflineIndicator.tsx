@@ -6,6 +6,8 @@ import { offlineQueueService } from '../../lib/offline-queue-service';
 import { useToastStore } from '../../stores/toast-store';
 import { TestIds } from '../../constants/testIds';
 import { logger } from '../../lib/errors/logger';
+import { Icon } from '../ui/Icon';
+import { Zap, Cloud } from 'lucide-react';
 
 interface OfflineIndicatorProps {
   isOnline: boolean;
@@ -111,9 +113,7 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
           aria-label="インターネット接続が切断されました。オフラインモードです。"
           className="bg-red-600 text-white px-4 py-3 text-center shadow-md flex items-center justify-center gap-2"
         >
-          <span className="inline text-lg" aria-hidden="true">
-            ⚡
-          </span>
+          <Icon icon={Zap} size={20} decorative style={{ color: 'white' }} />
           <span className="font-semibold text-base">オフライン</span>
           {pendingCount > 0 && (
             <span data-testid={TestIds.OFFLINE_BADGE} className="ml-2 px-2 py-1 bg-white bg-opacity-20 rounded-full text-xs">
@@ -132,9 +132,7 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
           aria-label={`未同期データ ${pendingCount}件`}
           className="bg-blue-50 border-b border-blue-200 px-4 py-2 text-center text-sm text-blue-900 flex items-center justify-center gap-2"
         >
-          <span className="inline text-base" aria-hidden="true">
-            ☁️
-          </span>
+          <Icon icon={Cloud} size={18} color="info" decorative />
           <span>
             {isSyncing
               ? `同期中... ${pendingCount}件のデータを処理しています`
@@ -187,9 +185,7 @@ export const OfflineSyncButton = ({
       "
       aria-label={`未同期データ ${pendingCount}件を確認`}
     >
-      <span className="text-lg" aria-hidden="true">
-        ☁️
-      </span>
+      <Icon icon={Cloud} size={20} color="info" decorative />
       <span className="text-sm font-medium text-blue-900">{pendingCount}</span>
     </button>
   );

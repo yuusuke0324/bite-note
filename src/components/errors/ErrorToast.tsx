@@ -5,6 +5,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { AppError, ErrorSeverity } from '../../lib/errors/ErrorTypes';
+import { Icon } from '../ui/Icon';
+import { Info, AlertTriangle, XCircle, AlertOctagon, X } from 'lucide-react';
 
 export interface ErrorToastProps {
   error: AppError | Error;
@@ -30,15 +32,15 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
   const getIcon = () => {
     switch (severity) {
       case ErrorSeverity.INFO:
-        return 'ℹ️';
+        return <Icon icon={Info} size={24} color="info" decorative />;
       case ErrorSeverity.WARNING:
-        return '⚠️';
+        return <Icon icon={AlertTriangle} size={24} color="warning" decorative />;
       case ErrorSeverity.ERROR:
-        return '❌';
+        return <Icon icon={XCircle} size={24} color="error" decorative />;
       case ErrorSeverity.CRITICAL:
-        return '🚨';
+        return <Icon icon={AlertOctagon} size={24} color="error" decorative />;
       default:
-        return '❌';
+        return <Icon icon={XCircle} size={24} color="error" decorative />;
     }
   };
 
@@ -135,7 +137,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
     >
       {/* アイコン */}
       {showIcon && (
-        <div style={{ fontSize: '1.5rem', flexShrink: 0 }}>
+        <div style={{ flexShrink: 0 }}>
           {getIcon()}
         </div>
       )}
@@ -200,7 +202,6 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
           backgroundColor: 'transparent',
           border: 'none',
           cursor: 'pointer',
-          fontSize: '1.2rem',
           color: getTextColor(),
           padding: '0',
           width: '24px',
@@ -213,7 +214,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
         }}
         aria-label="閉じる"
       >
-        ✕
+        <Icon icon={X} size={20} decorative />
       </button>
     </div>
   );

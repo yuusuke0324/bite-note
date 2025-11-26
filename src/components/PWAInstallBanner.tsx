@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import { Fish, X } from 'lucide-react';
 
 // BeforeInstallPromptEvent 型定義
 interface BeforeInstallPromptEvent extends Event {
@@ -144,7 +146,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-        <span style={{ fontSize: '24px' }} role="img" aria-label="アプリアイコン">🎣</span>
+        <Icon icon={Fish} size={24} decorative style={{ color: 'white' }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             fontWeight: 600,
@@ -201,7 +203,6 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
             padding: '8px',
             borderRadius: '4px',
             cursor: 'pointer',
-            fontSize: '14px',
             width: '32px',
             height: '32px',
             display: 'flex',
@@ -218,7 +219,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
           }}
           aria-label="閉じる"
         >
-          ✕
+          <Icon icon={X} size={16} decorative />
         </button>
       </div>
 

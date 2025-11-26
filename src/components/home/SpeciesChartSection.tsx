@@ -8,6 +8,8 @@ import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 import type { FishingRecord } from '../../types';
+import { Icon } from '../ui/Icon';
+import { Fish, BarChart3 } from 'lucide-react';
 
 interface SpeciesData {
   name: string;
@@ -168,10 +170,11 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
         }}
       >
         <div style={{
-          fontSize: '3rem',
           marginBottom: '12px',
+          display: 'flex',
+          justifyContent: 'center',
         }}>
-          🐟
+          <Icon icon={Fish} size={48} color="secondary" decorative />
         </div>
         <p style={{
           ...textStyles.body.medium,
@@ -195,7 +198,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
         alignItems: 'center',
         gap: '8px',
       }}>
-        <span>📊</span>
+        <Icon icon={BarChart3} size={24} color="primary" decorative />
         <span>魚種別の記録数</span>
       </h2>
 

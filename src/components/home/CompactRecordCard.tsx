@@ -10,6 +10,8 @@ import { textStyles } from '../../theme/typography';
 import { Skeleton } from '../ui/Skeleton';
 import type { FishingRecord } from '../../types';
 import { logger } from '../../lib/errors/logger';
+import { Icon } from '../ui/Icon';
+import { Fish, MapPin, Clock } from 'lucide-react';
 
 interface CompactRecordCardProps {
   record: FishingRecord;
@@ -155,12 +157,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
         )}
 
         {!photoLoading && !photoUrl && (
-          <div style={{
-            fontSize: '2rem',
-            color: colors.text.disabled,
-          }}>
-            🐟
-          </div>
+          <Icon icon={Fish} size={32} color="secondary" decorative />
         )}
       </div>
 
@@ -194,7 +191,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
           gap: '4px',
           marginBottom: '4px',
         }}>
-          <span>📍</span>
+          <Icon icon={MapPin} size={14} color="secondary" decorative />
           <span style={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -212,7 +209,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
           alignItems: 'center',
           gap: '4px',
         }}>
-          <span>🕐</span>
+          <Icon icon={Clock} size={14} color="secondary" decorative />
           <span>{formatDate(record.date)}</span>
         </div>
       </div>
