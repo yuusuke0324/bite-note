@@ -245,10 +245,15 @@ export class PhotoMetadataService {
   private extractGPSCoordinates(tags: Record<string, unknown>): Coordinates | null {
     try {
       // 複数のフォーマットでGPS情報を取得
-      const lat = tags.GPSLatitude?.description || tags.GPSLatitude?.value;
-      const lng = tags.GPSLongitude?.description || tags.GPSLongitude?.value;
-      const latRef = tags.GPSLatitudeRef?.value?.[0] || tags.GPSLatitudeRef?.description;
-      const lngRef = tags.GPSLongitudeRef?.value?.[0] || tags.GPSLongitudeRef?.description;
+      const latTag = tags.GPSLatitude as { description?: string; value?: unknown } | undefined;
+      const lngTag = tags.GPSLongitude as { description?: string; value?: unknown } | undefined;
+      const latRefTag = tags.GPSLatitudeRef as { value?: unknown[]; description?: string } | undefined;
+      const lngRefTag = tags.GPSLongitudeRef as { value?: unknown[]; description?: string } | undefined;
+
+      const lat = latTag?.description || latTag?.value;
+      const lng = lngTag?.description || lngTag?.value;
+      const latRef = (latRefTag?.value?.[0] as string) || latRefTag?.description;
+      const lngRef = (lngRefTag?.value?.[0] as string) || lngRefTag?.description;
 
       if (!lat || !lng) {
         return null;
@@ -271,7 +276,9 @@ export class PhotoMetadataService {
       }
 
       // 精度情報があれば追加
-      const accuracy = tags.GPSHorizontalPositioningError?.value || tags.GPSHPositioningError?.value;
+      const accuracyTag1 = tags.GPSHorizontalPositioningError as { value?: unknown } | undefined;
+      const accuracyTag2 = tags.GPSHPositioningError as { value?: unknown } | undefined;
+      const accuracy = accuracyTag1?.value || accuracyTag2?.value;
 
       return {
         latitude,
@@ -299,8 +306,9 @@ export class PhotoMetadataService {
       ];
 
       for (const field of dateFields) {
-        if (tags[field]) {
-          const dateStr = tags[field].description || tags[field].value;
+        const tag = tags[field] as { description?: string; value?: unknown } | undefined;
+        if (tag) {
+          const dateStr = tag.description || tag.value;
 
           if (dateStr) {
             // EXIF日時形式 "YYYY:MM:DD HH:MM:SS" を処理
@@ -341,47 +349,57 @@ export class PhotoMetadataService {
       const cameraInfo: CameraInfo = {};
 
       // メーカー名
-      if (tags.Make) {
-        cameraInfo.make = tags.Make.description || tags.Make.value;
+      const makeTag = tags.Make as { description?: string; value?: unknown } | undefined;
+      if (makeTag) {
+        cameraInfo.make = makeTag.description || (makeTag.value as string);
       }
 
       // 機種名
-      if (tags.Model) {
-        cameraInfo.model = tags.Model.description || tags.Model.value;
+      const modelTag = tags.Model as { description?: string; value?: unknown } | undefined;
+      if (modelTag) {
+        cameraInfo.model = modelTag.description || (modelTag.value as string);
       }
 
       // レンズ情報
-      if (tags.LensModel) {
-        cameraInfo.lens = tags.LensModel.description || tags.LensModel.value;
+      const lensTag = tags.LensModel as { description?: string; value?: unknown } | undefined;
+      if (lensTag) {
+        cameraInfo.lens = lensTag.description || (lensTag.value as string);
       }
 
       // F値
-      if (tags.FNumber || tags.ApertureValue) {
-        const fNum = tags.FNumber?.description || tags.ApertureValue?.description;
+      const fNumTag = tags.FNumber as { description?: string } | undefined;
+      const apertureTag = tags.ApertureValue as { description?: string } | undefined;
+      if (fNumTag || apertureTag) {
+        const fNum = fNumTag?.description || apertureTag?.description;
         if (fNum) {
           cameraInfo.aperture = fNum;
         }
       }
 
       // シャッター速度
-      if (tags.ExposureTime || tags.ShutterSpeedValue) {
-        const exposure = tags.ExposureTime?.description || tags.ShutterSpeedValue?.description;
+      const exposureTag = tags.ExposureTime as { description?: string } | undefined;
+      const shutterTag = tags.ShutterSpeedValue as { description?: string } | undefined;
+      if (exposureTag || shutterTag) {
+        const exposure = exposureTag?.description || shutterTag?.description;
         if (exposure) {
           cameraInfo.shutterSpeed = exposure;
         }
       }
 
       // ISO感度
-      if (tags.ISOSpeedRatings || tags.ISO) {
-        const iso = tags.ISOSpeedRatings?.description || tags.ISO?.description;
+      const isoRatingsTag = tags.ISOSpeedRatings as { description?: string } | undefined;
+      const isoTag = tags.ISO as { description?: string } | undefined;
+      if (isoRatingsTag || isoTag) {
+        const iso = isoRatingsTag?.description || isoTag?.description;
         if (iso) {
           cameraInfo.iso = iso;
         }
       }
 
       // 焦点距離
-      if (tags.FocalLength) {
-        cameraInfo.focalLength = tags.FocalLength.description || tags.FocalLength.value;
+      const focalTag = tags.FocalLength as { description?: string; value?: unknown } | undefined;
+      if (focalTag) {
+        cameraInfo.focalLength = focalTag.description || (focalTag.value as string);
       }
 
       // 何かしらの情報があれば返す

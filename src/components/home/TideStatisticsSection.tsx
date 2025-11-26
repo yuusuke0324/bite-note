@@ -13,7 +13,7 @@ import type { TideInfo } from '../../types/tide';
 import { logger } from '../../lib/errors/logger';
 
 // カスタムツールチップコンポーネント
-const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { name: string; value: number } }> }) => {
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { name: string; value: number; percentage?: number } }> }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -39,7 +39,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
           color: colors.primary[600],
           fontWeight: '700',
         }}>
-          {data.value}件 ({data.percentage}%)
+          {data.value}件{data.percentage ? ` (${data.percentage}%)` : ''}
         </p>
       </div>
     );
@@ -408,7 +408,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   <LabelList
                     dataKey="percentage"
                     position="right"
-                    formatter={(value: number) => `${value}%`}
+                    formatter={(value: unknown) => `${value}%`}
                     style={{ fill: colors.primary[700], fontSize: '0.9rem', fontWeight: '600' }}
                   />
                 </Bar>
@@ -474,7 +474,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   <LabelList
                     dataKey="percentage"
                     position="right"
-                    formatter={(value: number) => `${value}%`}
+                    formatter={(value: unknown) => `${value}%`}
                     style={{ fill: colors.secondary[700], fontSize: '0.9rem', fontWeight: '600' }}
                   />
                 </Bar>

@@ -121,16 +121,15 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
   };
 
   // カスタムラベル
-  const renderCustomLabel = (props: {
-    cx: number;
-    cy: number;
-    midAngle: number;
-    innerRadius: number;
-    outerRadius: number;
-    percent: number;
-    [key: string]: unknown;
-  }) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
+  const renderCustomLabel = (props: unknown) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props as {
+      cx: number;
+      cy: number;
+      midAngle: number;
+      innerRadius: number;
+      outerRadius: number;
+      percent: number;
+    };
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);

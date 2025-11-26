@@ -102,19 +102,22 @@ export class PerformanceMonitor {
 
     // First Input Delay
     this.observePerformanceEntry('first-input', (entry) => {
-      this.webVitals.FID = entry.processingStart - entry.startTime;
+      const fidEntry = entry as PerformanceEntry & { processingStart: number };
+      this.webVitals.FID = fidEntry.processingStart - fidEntry.startTime;
     });
 
     // Cumulative Layout Shift
     this.observePerformanceEntry('layout-shift', (entry) => {
-      if (!entry.hadRecentInput) {
-        this.webVitals.CLS = (this.webVitals.CLS || 0) + entry.value;
+      const clsEntry = entry as PerformanceEntry & { hadRecentInput: boolean; value: number };
+      if (!clsEntry.hadRecentInput) {
+        this.webVitals.CLS = (this.webVitals.CLS || 0) + clsEntry.value;
       }
     });
 
     // Time to First Byte
     this.observePerformanceEntry('navigation', (entry) => {
-      this.webVitals.TTFB = entry.responseStart - entry.requestStart;
+      const navEntry = entry as PerformanceEntry & { responseStart: number; requestStart: number };
+      this.webVitals.TTFB = navEntry.responseStart - navEntry.requestStart;
     });
   }
 
@@ -273,7 +276,7 @@ export class PerformanceMonitor {
 
   private observePerformanceEntry(
     entryType: string,
-    callback: (entry: PerformanceEntry) => void
+    callback: (entry: unknown) => void
   ): void {
     try {
       if ('PerformanceObserver' in window) {

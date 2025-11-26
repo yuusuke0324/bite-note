@@ -314,10 +314,10 @@ export class FishingRecordService {
 
   // プライベートメソッド: Dexieのwhere句を使うフィルタリング
   private applyWhereFilter(
-    table: Dexie.Table<FishingRecord, string>,
+    table: Dexie.Table<FishingRecord>,
     filter: RecordFilter
-  ): Dexie.Collection<FishingRecord, string> {
-    let collection: Dexie.Collection<FishingRecord, string> = table.toCollection();
+  ): Dexie.Collection<FishingRecord> {
+    let collection: Dexie.Collection<FishingRecord> = table.toCollection();
 
     // 日付範囲フィルター
     if (filter.dateRange) {
@@ -343,9 +343,9 @@ export class FishingRecordService {
 
   // プライベートメソッド: JavaScriptのfilterを使うフィルタリング
   private applyJsFilter(
-    collection: Dexie.Collection<FishingRecord, string>,
+    collection: Dexie.Collection<FishingRecord>,
     filter: RecordFilter
-  ): Dexie.Collection<FishingRecord, string> {
+  ): Dexie.Collection<FishingRecord> {
     let result = collection;
 
     // 場所フィルター（部分一致）
