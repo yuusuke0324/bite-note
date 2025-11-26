@@ -92,6 +92,7 @@ describe('WeatherService', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers(); // vi.setSystemTime()によるfake timersをリセット
   });
 
   // ============================================================================
