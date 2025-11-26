@@ -9,6 +9,7 @@
  */
 
 import type { TideInfo, CacheKey, CacheStats, TideCacheRecord } from '../../types/tide';
+import { logger } from '../../lib/errors';
 
 // LRUキャッシュのノード
 interface LRUNode {
@@ -65,7 +66,7 @@ export class TideLRUCache {
       const request = indexedDB.open(this.dbName, this.dbVersion);
 
       request.onerror = () => {
-        console.warn('IndexedDB initialization failed, using memory-only cache');
+        logger.warn('IndexedDB initialization failed, using memory-only cache');
         resolve();
       };
 
@@ -186,7 +187,7 @@ export class TideLRUCache {
 
       return node.data;
     } catch (error) {
-      console.error('Cache get error:', error);
+      logger.error('Cache get error', { error, component: 'TideLRUCache', operation: 'get' });
       this.stats.missCount++;
       return null;
     }
@@ -241,7 +242,7 @@ export class TideLRUCache {
       this.updateMemoryUsage();
 
     } catch (error) {
-      console.error('Cache set error:', error);
+      logger.error('Cache set error', { error, component: 'TideLRUCache', operation: 'set' });
     }
   }
 

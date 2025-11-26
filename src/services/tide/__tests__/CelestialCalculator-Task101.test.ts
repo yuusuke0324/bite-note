@@ -8,7 +8,8 @@
  * - パフォーマンス要件（50ms以内）
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { logger } from '../../../lib/errors';
 import { CelestialCalculator } from '../CelestialCalculator';
 
 // NOTE: 高精度要件（±0.1日）は現在の実装で達成していないためskip
@@ -279,21 +280,19 @@ describe.skip('TASK-101: 天体計算エンジン要件テスト', () => {
 
   describe('エラーハンドリングと境界値', () => {
     it('T101-E001: 計算範囲外での適切な警告', () => {
-      // コンソール警告のスパイ
-      const originalWarn = console.warn;
-      let warnCalled = false;
-      console.warn = () => { warnCalled = true; };
+      // loggerのwarnメソッドをスパイ
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
       try {
         // 範囲外の日付（1850年）
         const oldDate = new Date('1850-01-01T00:00:00Z');
         const result = calculator.calculateMoonPhase(oldDate);
 
-        expect(warnCalled).toBe(true);
+        expect(warnSpy).toHaveBeenCalled();
         expect(result.age).toBeGreaterThanOrEqual(0);
         expect(result.age).toBeLessThan(30);
       } finally {
-        console.warn = originalWarn;
+        warnSpy.mockRestore();
       }
     });
 

@@ -24,9 +24,21 @@ const mockDb = vi.hoisted(() => ({
   }
 }));
 
+// パフォーマンスモニターのモック
+const mockPerformanceMonitor = vi.hoisted(() => ({
+  measureAsync: vi.fn(async (name: string, fn: () => Promise<any>) => {
+    return fn();
+  })
+}));
+
 // データベースモック
 vi.mock('../../../lib/database', () => ({
   db: mockDb
+}));
+
+// パフォーマンスモニターモック
+vi.mock('../../../lib/performance-monitor', () => ({
+  performanceMonitor: mockPerformanceMonitor
 }));
 
 describe('RegionalDataService', () => {

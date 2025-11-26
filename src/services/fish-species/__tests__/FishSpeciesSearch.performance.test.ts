@@ -13,6 +13,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
+import { logger } from '../../../lib/errors';
 import { FishSpeciesSearchEngine } from '../FishSpeciesSearchEngine';
 import type { FishSpecies } from '../../../types';
 
@@ -90,7 +91,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 100魚種のインデックス構築時間: ${duration.toFixed(2)}ms`);
+      if (import.meta.env.DEV) {
+        logger.info(`100魚種のインデックス構築時間: ${duration.toFixed(2)}ms`);
+      }
       expect(duration).toBeLessThan(50);
     });
 
@@ -100,7 +103,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 単一文字検索時間 (100魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`単一文字検索時間 (100魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(1);
     });
 
@@ -110,7 +115,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 複数文字検索時間 (100魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`複数文字検索時間 (100魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(1);
     });
 
@@ -130,10 +137,12 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const maxTime = Math.max(...times);
       const minTime = Math.min(...times);
 
-      console.log(`📊 1000回検索統計 (100魚種):`);
-      console.log(`   平均: ${avgTime.toFixed(4)}ms`);
-      console.log(`   最大: ${maxTime.toFixed(4)}ms`);
-      console.log(`   最小: ${minTime.toFixed(4)}ms`);
+      if (import.meta.env.DEV) {
+        logger.info(`1000回検索統計 (100魚種):
+   平均: ${avgTime.toFixed(4)}ms
+   最大: ${maxTime.toFixed(4)}ms
+   最小: ${minTime.toFixed(4)}ms`);
+      }
 
       expect(avgTime).toBeLessThan(1);
       expect(maxTime).toBeLessThan(10); // Adjusted for prefix matching implementation
@@ -157,7 +166,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 500魚種のインデックス構築時間: ${duration.toFixed(2)}ms`);
+      if (import.meta.env.DEV) {
+        logger.info(`500魚種のインデックス構築時間: ${duration.toFixed(2)}ms`);
+      }
       expect(duration).toBeLessThan(100);
     });
 
@@ -167,7 +178,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 単一文字検索時間 (500魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`単一文字検索時間 (500魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(2);
     });
 
@@ -177,7 +190,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 複数文字検索時間 (500魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`複数文字検索時間 (500魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(2);
     });
 
@@ -191,7 +206,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 フィルタリング検索時間 (500魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`フィルタリング検索時間 (500魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(3);
     });
   });
@@ -213,7 +230,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 1000魚種のインデックス構築時間: ${duration.toFixed(2)}ms`);
+      if (import.meta.env.DEV) {
+        logger.info(`1000魚種のインデックス構築時間: ${duration.toFixed(2)}ms`);
+      }
       expect(duration).toBeLessThan(200);
     });
 
@@ -223,7 +242,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 単一文字検索時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`単一文字検索時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(3);
     });
 
@@ -233,7 +254,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 複数文字検索時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`複数文字検索時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(3);
     });
 
@@ -243,7 +266,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 詳細検索時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`詳細検索時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(5);
     });
 
@@ -253,7 +278,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 カテゴリ別取得時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      if (import.meta.env.DEV) {
+        logger.info(`カテゴリ別取得時間 (1000魚種): ${duration.toFixed(4)}ms, 結果数: ${results.length}`);
+      }
       expect(duration).toBeLessThan(2);
     });
   });
@@ -334,18 +361,20 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
         });
       });
 
-      console.log('📊 スケーラビリティ分析:');
-      results.forEach(r => {
-        console.log(`   ${r.size}魚種: インデックス=${r.indexTime.toFixed(2)}ms, 検索=${r.searchTime.toFixed(4)}ms`);
-      });
+      if (import.meta.env.DEV) {
+        logger.info('スケーラビリティ分析:');
+        results.forEach(r => {
+          logger.info(`${r.size}魚種: インデックス=${r.indexTime.toFixed(2)}ms, 検索=${r.searchTime.toFixed(4)}ms`);
+        });
 
-      // インデックス構築時間が線形的に増加することを確認
-      // （完全に線形ではないが、指数関数的ではない）
-      const indexRatio1 = results[1].indexTime / results[0].indexTime;
-      const indexRatio2 = results[2].indexTime / results[1].indexTime;
-      const indexRatio3 = results[3].indexTime / results[2].indexTime;
+        // インデックス構築時間が線形的に増加することを確認
+        // （完全に線形ではないが、指数関数的ではない）
+        const indexRatio1 = results[1].indexTime / results[0].indexTime;
+        const indexRatio2 = results[2].indexTime / results[1].indexTime;
+        const indexRatio3 = results[3].indexTime / results[2].indexTime;
 
-      console.log(`📊 インデックス構築時間の増加率: ${indexRatio1.toFixed(2)}x, ${indexRatio2.toFixed(2)}x, ${indexRatio3.toFixed(2)}x`);
+        logger.info(`インデックス構築時間の増加率: ${indexRatio1.toFixed(2)}x, ${indexRatio2.toFixed(2)}x, ${indexRatio3.toFixed(2)}x`);
+      }
 
       // 検索時間は O(1) に近いことを確認
       expect(results[0].searchTime).toBeLessThan(1);
@@ -374,7 +403,9 @@ describe('FishSpeciesSearchEngine パフォーマンスベンチマーク', () =
       const end = performance.now();
 
       const duration = end - start;
-      console.log(`📊 100並行検索時間: ${duration.toFixed(2)}ms`);
+      if (import.meta.env.DEV) {
+        logger.info(`100並行検索時間: ${duration.toFixed(2)}ms`);
+      }
 
       expect(results.length).toBe(100);
       expect(duration).toBeLessThan(100);

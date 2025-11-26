@@ -10,6 +10,7 @@
  */
 
 import type { FishSpecies } from '../../types';
+import { logger } from '../../lib/errors';
 import fishSpeciesData from '../../data/fish-species.json';
 
 /**
@@ -50,17 +51,18 @@ export class FishSpeciesDataService {
     // キャッシュがあれば返す
     if (this.cache) {
       if (this.config.debug) {
-        console.log('🐟 魚種データ: キャッシュから取得');
+        logger.debug('魚種データ: キャッシュから取得');
       }
       return this.cache;
     }
 
     try {
       if (this.config.debug) {
-        console.log('🐟 魚種データ読み込み開始...');
-        console.log(`   バージョン: ${fishSpeciesData.version}`);
-        console.log(`   更新日時: ${fishSpeciesData.updatedAt}`);
-        console.log(`   魚種数: ${fishSpeciesData.count}`);
+        logger.debug('魚種データ読み込み開始', {
+          version: fishSpeciesData.version,
+          updatedAt: fishSpeciesData.updatedAt,
+          count: fishSpeciesData.count
+        });
       }
 
       // JSONデータをFishSpecies型に変換
@@ -90,14 +92,17 @@ export class FishSpeciesDataService {
       // キャッシュに保存
       this.cache = filtered;
 
-      if (this.config.debug) {
-        console.log(`✅ 魚種データ読み込み完了: ${filtered.length}種`);
-      }
+      logger.info('魚種データ読み込み完了', {
+        speciesCount: filtered.length,
+        source: this.config.sourceFilter
+      });
 
       return filtered;
 
     } catch (error) {
-      console.error('❌ 魚種データの読み込みに失敗:', error);
+      logger.error('魚種データの読み込みに失敗', {
+        error: error instanceof Error ? error.message : '不明なエラー'
+      });
       throw new Error(`魚種データの読み込みに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`);
     }
   }
@@ -108,7 +113,7 @@ export class FishSpeciesDataService {
   clearCache(): void {
     this.cache = null;
     if (this.config.debug) {
-      console.log('🗑️  魚種データキャッシュをクリア');
+      logger.debug('魚種データキャッシュをクリア');
     }
   }
 
