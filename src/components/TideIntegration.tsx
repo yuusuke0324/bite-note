@@ -14,6 +14,17 @@ import type { TideChartData } from './chart/tide/types';
 import type { FishingRecord } from '../types/entities';
 import type { TideInfo, TideGraphData } from '../types/tide';
 import { logger } from '../lib/errors/logger';
+import { Icon } from './ui/Icon';
+import {
+  Waves,
+  AlertTriangle,
+  BarChart3,
+  Clock,
+  Fish,
+  Umbrella,
+  Lightbulb,
+  Sparkles
+} from 'lucide-react';
 
 interface TideIntegrationProps {
   fishingRecord: FishingRecord;
@@ -467,13 +478,17 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
 
       {/* セクションヘッダー */}
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">🌊 潮汐情報</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+          <Icon icon={Waves} size={20} decorative /> 潮汐情報
+        </h3>
 
         {/* 座標なしエラー */}
         {!hasCoordinates && (
           <div data-testid="coordinates-error" className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div className="flex items-center">
-              <div className="text-yellow-600 text-lg mr-3">⚠️</div>
+              <div className="text-yellow-600 mr-3">
+                <Icon icon={AlertTriangle} size={24} decorative />
+              </div>
               <div>
                 <div className="text-yellow-800 font-medium">GPS座標が未記録</div>
                 <div className="text-yellow-600 text-sm mt-1">
@@ -495,7 +510,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
             aria-controls="tide-content-section"
             className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg transition-colors duration-200"
           >
-            <span>📊</span>
+            <Icon icon={BarChart3} size={16} decorative />
             <span>
               {loading ? '計算中...' : (isExpanded ? '潮汐グラフを非表示' : '潮汐グラフを表示')}
             </span>
@@ -530,7 +545,9 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
             <div data-testid="tide-error" className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="text-red-600 text-lg mr-3">🌊</div>
+                  <div className="text-red-600 mr-3">
+                    <Icon icon={Waves} size={24} decorative />
+                  </div>
                   <div>
                     <div className="text-red-800 font-medium">実データ潮汐計算システムエラー</div>
                     <div className="text-red-600 text-sm mt-1">{error}</div>
@@ -603,12 +620,16 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
               {/* 釣果と潮汐の関係分析 */}
               {tideAnalysis && (
                 <div data-testid="tide-analysis-section" className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="text-md font-medium text-blue-800 mb-3">🎣 釣果と潮汐の関係</h4>
+                  <h4 className="text-md font-medium text-blue-800 mb-3 flex items-center gap-2">
+                    <Icon icon={Fish} size={18} decorative /> 釣果と潮汐の関係
+                  </h4>
 
                   {/* 釣行時刻分析 */}
                   <div data-testid="fishing-time-analysis" className="mb-4">
                     <div className="flex items-center mb-2">
-                      <div className="text-2xl mr-2">⏰</div>
+                      <div className="mr-2">
+                        <Icon icon={Clock} size={28} decorative />
+                      </div>
                       <div>
                         <div className="font-medium text-gray-800">
                           {fishingRecord.fishSpecies} ({fishingRecord.size}cm)
@@ -623,7 +644,9 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                         {tideAnalysis.fishingTimeRelation.analysis}
                       </div>
                       {tideAnalysis.fishingTimeRelation.optimalTiming && (
-                        <div className="text-xs text-green-600 mt-1">✨ 釣りに適したタイミングでした</div>
+                        <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                          <Icon icon={Sparkles} size={12} decorative /> 釣りに適したタイミングでした
+                        </div>
                       )}
                     </div>
                   </div>
@@ -634,8 +657,12 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                       <h5 className="font-medium text-blue-800 mb-2">次回の最適釣行時間</h5>
                       <div className="bg-white rounded-lg p-3 border border-blue-100">
                         <div className="flex items-center space-x-2">
-                          <span className="text-lg">
-                            {tideAnalysis.nextOptimalTime.tideEvent === 'high' ? '🌊' : '🏖️'}
+                          <span className="text-blue-600">
+                            {tideAnalysis.nextOptimalTime.tideEvent === 'high' ? (
+                              <Icon icon={Waves} size={20} decorative />
+                            ) : (
+                              <Icon icon={Umbrella} size={20} decorative />
+                            )}
                           </span>
                           <div>
                             <div className="font-medium text-gray-800">
@@ -652,8 +679,8 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                   )}
 
                   {/* 釣果時刻マーカー */}
-                  <div data-testid="fishing-time-marker" className="mt-4 text-xs text-blue-600">
-                    💡 グラフ上の🎣マークが釣果記録時刻を示しています
+                  <div data-testid="fishing-time-marker" className="mt-4 text-xs text-blue-600 flex items-center gap-1">
+                    <Icon icon={Lightbulb} size={12} decorative /> グラフ上の釣りマークが釣果記録時刻を示しています
                   </div>
                 </div>
               )}
