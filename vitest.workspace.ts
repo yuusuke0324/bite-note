@@ -32,6 +32,7 @@ export default defineWorkspace([
         'src/components/common/__tests__/OfflineIndicator.test.tsx', // Phase 3-3追加
         'src/components/__tests__/ReAuthPrompt.test.tsx', // Issue #216追加
         'src/components/__tests__/TideTooltip.test.tsx', // Issue #249: TC-T013修正後に有効化
+        'src/components/__tests__/Icon.test.tsx', // Issue #208: アイコンコンポーネント
       ],
       setupFiles: ['./src/setupTests.ts'],
       environment: 'jsdom',

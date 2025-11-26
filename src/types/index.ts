@@ -90,6 +90,10 @@ export type {
   LowSpecDeviceConfig,
 } from './fish-species';
 
+// アイコン関連（2025年11月追加）
+export type { IconSize, IconColor, IconCategory } from './icon';
+export { ICON_SIZES, ICON_COLORS } from './icon';
+
 // 定数のエクスポート
 export { SUPPORTED_IMAGE_TYPES } from './media';
 export { THEMES } from './state';
