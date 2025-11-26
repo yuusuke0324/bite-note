@@ -179,7 +179,7 @@ export class ErrorLogger {
 
       const parsed = JSON.parse(stored);
       // タイムスタンプを Date オブジェクトに戻す
-      this.logs = parsed.map((entry: any) => ({
+      this.logs = (parsed as Array<Omit<ErrorLogEntry, 'timestamp'> & { timestamp: string }>).map(entry => ({
         ...entry,
         timestamp: new Date(entry.timestamp),
       }));

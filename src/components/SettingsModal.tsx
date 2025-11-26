@@ -47,7 +47,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   // 設定変更の検出
   useEffect(() => {
     const changed = (Object.keys(localSettings) as Array<keyof AppSettings>).some(key => {
-      return (localSettings as any)[key] !== (settings as any)[key];
+      return localSettings[key] !== settings[key];
     });
     setHasChanges(changed);
   }, [localSettings, settings]);
@@ -123,13 +123,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   if (!isVisible) return null;
 
-  const tabs = [
+  type TabId = 'general' | 'display' | 'data' | 'privacy' | 'advanced';
+  const tabs: Array<{ id: TabId; label: string; icon: string }> = [
     { id: 'general', label: '一般', icon: '⚙️' },
     { id: 'display', label: '表示', icon: '🎨' },
     { id: 'data', label: 'データ', icon: '💾' },
     { id: 'privacy', label: 'プライバシー', icon: '🔒' },
     { id: 'advanced', label: '詳細', icon: '🔧' }
-  ] as const;
+  ];
 
   return (
     <div style={{
@@ -208,7 +209,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {tabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               style={{
                 padding: '0.75rem 1rem',
                 backgroundColor: activeTab === tab.id ? '#007bff' : 'transparent',

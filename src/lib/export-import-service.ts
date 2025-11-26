@@ -510,10 +510,10 @@ export class ExportImportService {
     }
 
     // 型ガードでデータの型安全性を確保
-    const importData = data as any;
+    const importData = data as Record<string, unknown>;
 
     // 必須フィールドの確認
-    if (!importData.version) {
+    if (!importData.version || typeof importData.version !== 'string') {
       return {
         success: false,
         error: {

@@ -405,21 +405,6 @@ export class WeatherService {
   }
 
   /**
-   * OpenWeatherMap APIレスポンスを解析（レガシー）
-   */
-  /* private __parseCurrentWeatherResponse(data: OpenWeatherMapResponse): WeatherData {
-    return {
-      condition: data.weather?.[0]?.description || '不明',
-      temperature: Math.round(data.main?.temp || 0),
-      humidity: data.main?.humidity || 0,
-      windSpeed: Math.round((data.wind?.speed || 0) * 10) / 10, // 小数点第1位まで
-      pressure: data.main?.pressure || 0,
-      icon: (data.weather?.[0] as any)?.icon || '01d',
-      description: data.weather?.[0]?.description || '天気情報なし'
-    };
-  } */
-
-  /**
    * ダミー天気データを生成（開発・テスト用）
    */
   private getDummyWeatherData(): WeatherResult {

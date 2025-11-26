@@ -1,11 +1,11 @@
 // リトライ可能アクションコンポーネント
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { RetryService } from '../lib/retry-service';
 
-export interface RetryableActionProps {
-  action: () => Promise<any>;
-  onSuccess: (result: any) => void;
+export interface RetryableActionProps<T = unknown> {
+  action: () => Promise<T>;
+  onSuccess: (result: T) => void;
   onError: (error: Error) => void;
   maxRetries: number;
   buttonText: string;
@@ -15,7 +15,7 @@ export interface RetryableActionProps {
   className?: string;
 }
 
-export const RetryableAction: React.FC<RetryableActionProps> = ({
+export const RetryableAction = <T = unknown,>({
   action,
   onSuccess,
   onError,
@@ -25,7 +25,7 @@ export const RetryableAction: React.FC<RetryableActionProps> = ({
   errorMessage,
   disabled = false,
   className = ''
-}) => {
+}: RetryableActionProps<T>) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);

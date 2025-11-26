@@ -123,7 +123,16 @@ export class PerformanceMonitor {
    */
   getMemoryInfo(): MemoryInfo | null {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as Performance & {
+        memory?: {
+          usedJSHeapSize: number;
+          totalJSHeapSize: number;
+          jsHeapSizeLimit: number;
+        };
+      }).memory;
+
+      if (!memory) return null;
+
       return {
         usedJSHeapSize: memory.usedJSHeapSize,
         totalJSHeapSize: memory.totalJSHeapSize,
@@ -264,7 +273,7 @@ export class PerformanceMonitor {
 
   private observePerformanceEntry(
     entryType: string,
-    callback: (entry: any) => void
+    callback: (entry: PerformanceEntry) => void
   ): void {
     try {
       if ('PerformanceObserver' in window) {

@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
+// BeforeInstallPromptEvent 型定義
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 interface PWAInstallBannerProps {
   className?: string;
 }
@@ -14,7 +20,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
     }
   });
 
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
@@ -24,7 +30,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
       return (
         window.matchMedia &&
         window.matchMedia('(display-mode: standalone)').matches
-      ) || (window.navigator as any).standalone;
+      ) || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
     };
 
     setIsStandalone(checkStandalone());

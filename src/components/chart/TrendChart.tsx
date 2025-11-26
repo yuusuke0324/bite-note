@@ -35,7 +35,7 @@ export interface TrendChartProps {
 /**
  * カスタムツールチップ
  */
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { month: string; count: number }; value?: number }> }) => {
   if (active && payload && payload.length) {
     return (
       <div
@@ -61,7 +61,7 @@ const CustomTooltip = ({ active, payload }: any) => {
           color: colors.primary[600],
           fontWeight: '500',
         }}>
-          🐟 {payload[0].value}件の記録
+          🐟 {payload[0].value ?? payload[0].payload.count}件の記録
         </p>
       </div>
     );
