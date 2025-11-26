@@ -90,14 +90,16 @@ export class PerformanceMonitor {
   trackWebVitals(): void {
     // First Contentful Paint
     this.observePerformanceEntry('paint', (entry) => {
-      if (entry.name === 'first-contentful-paint') {
-        this.webVitals.FCP = entry.startTime;
+      const paintEntry = entry as PerformanceEntry;
+      if (paintEntry.name === 'first-contentful-paint') {
+        this.webVitals.FCP = paintEntry.startTime;
       }
     });
 
     // Largest Contentful Paint
     this.observePerformanceEntry('largest-contentful-paint', (entry) => {
-      this.webVitals.LCP = entry.startTime;
+      const lcpEntry = entry as PerformanceEntry;
+      this.webVitals.LCP = lcpEntry.startTime;
     });
 
     // First Input Delay

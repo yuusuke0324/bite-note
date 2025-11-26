@@ -260,8 +260,8 @@ export class PhotoMetadataService {
       }
 
       // 座標を数値に変換
-      let latitude = this.parseCoordinate(lat);
-      let longitude = this.parseCoordinate(lng);
+      let latitude = this.parseCoordinate(String(lat));
+      let longitude = this.parseCoordinate(String(lng));
 
       if (latitude === null || longitude === null) {
         return null;
@@ -283,7 +283,7 @@ export class PhotoMetadataService {
       return {
         latitude,
         longitude,
-        accuracy: accuracy ? parseFloat(accuracy) : undefined
+        accuracy: accuracy ? parseFloat(String(accuracy)) : undefined
       };
 
     } catch (error) {
