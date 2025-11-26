@@ -151,8 +151,9 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       expect(optionCount).toBeGreaterThanOrEqual(2);
 
       // ステップ1: ↓で1番目を選択
-      // input.click() でフォーカスを確実に維持してからキー押下
+      // click後に必ずドロップダウンが表示されていることを確認してからキー押下
       await input.click();
+      await expect(suggestions).toBeVisible();
       await page.keyboard.press('ArrowDown');
       await page.waitForFunction(
         () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
@@ -161,6 +162,7 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // ステップ2: ↓で2番目を選択
       await input.click();
+      await expect(suggestions).toBeVisible();
       await page.keyboard.press('ArrowDown');
       await page.waitForFunction(
         () => document.querySelector('[role="option"]:nth-child(2)')?.getAttribute('aria-selected') === 'true',
@@ -169,6 +171,7 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // ステップ3: ↑で1番目に戻る
       await input.click();
+      await expect(suggestions).toBeVisible();
       await page.keyboard.press('ArrowUp');
       await page.waitForFunction(
         () => document.querySelector('[role="option"]:nth-child(1)')?.getAttribute('aria-selected') === 'true',
