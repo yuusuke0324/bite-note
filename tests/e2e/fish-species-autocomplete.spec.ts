@@ -109,6 +109,7 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
   test.describe('キーボード操作', () => {
     test('↓キーで候補を下に移動できる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
+      const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
 
       await input.fill('あ');
 
@@ -122,17 +123,14 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // Playwrightの自動リトライ機構を活用（CI環境考慮で10秒タイムアウト）
       await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
+      await expect(selectedOptions).toHaveCount(1);
 
       // ステップ2: 2回目の↓キー → 2番目を選択
       await input.press('ArrowDown');
 
-      // 段階的検証: 2番目が選択される → 1番目が選択解除される
+      // 選択が1つだけであることを先に確認（React状態更新の完了を待つ）
+      await expect(selectedOptions).toHaveCount(1, { timeout: 10000 });
       await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
-      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
-
-      // 選択が1つだけであることを確認
-      const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
-      await expect(selectedOptions).toHaveCount(1);
     });
 
     // Issue #246: コンポーネント側でhandleKeyDownにclearTimeout追加で修正済み
