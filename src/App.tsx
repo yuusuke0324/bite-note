@@ -20,6 +20,8 @@ import { ErrorDisplay } from './components/errors'
 import { ToastContainer } from './components/ToastContainer'
 import { ReAuthPrompt } from './components/features/SessionManagement/ReAuthPrompt'
 import Button from './components/ui/Button'
+import { Icon } from './components/ui/Icon'
+import { Anchor, Edit, Camera, Wrench, AlertTriangle, Loader2, CheckCircle2, XCircle, BarChart3 } from 'lucide-react'
 import { colors } from './theme/colors'
 import { textStyles, typography } from './theme/typography'
 import type { CreateFishingRecordFormData } from './lib/validation'
@@ -302,7 +304,7 @@ function App() {
     debug: TestIds.DEBUG_TAB,
   } as const;
 
-  const TabButton = ({ tab, label, emoji }: { tab: 'form' | 'list' | 'debug', label: string, emoji: string }) => (
+  const TabButton = ({ tab, label, icon }: { tab: 'form' | 'list' | 'debug', label: string, icon: React.ReactNode }) => (
     <Button
       variant={activeTab === tab ? 'primary' : 'text'}
       size="md"
@@ -317,7 +319,7 @@ function App() {
         color: activeTab === tab ? colors.text.inverse : colors.text.primary,
       }}
     >
-      <span style={{ marginRight: '0.5rem' }}>{emoji}</span>
+      <span style={{ marginRight: '0.5rem', display: 'flex', alignItems: 'center' }}>{icon}</span>
       {label}
     </Button>
   );
@@ -336,7 +338,14 @@ function App() {
           ...textStyles.headline.large,
           color: colors.semantic.error.main,
           marginBottom: '1rem',
-        }}>⚠️ アプリケーションエラー</h1>
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem',
+        }}>
+          <Icon icon={AlertTriangle} size="lg" color="error" aria-label="警告" />
+          アプリケーションエラー
+        </h1>
         <p style={{
           ...textStyles.body.large,
           color: colors.semantic.error.dark,
@@ -371,7 +380,13 @@ function App() {
             margin: 0,
             ...textStyles.headline.medium,
             color: colors.text.inverse,
-          }}>🎣 釣果記録アプリ</h1>
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}>
+            <Icon icon={Anchor} size="lg" decorative />
+            釣果記録アプリ
+          </h1>
         </div>
 
       {/* タブナビゲーション */}
@@ -386,9 +401,9 @@ function App() {
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
-          <TabButton tab="form" label="記録登録" emoji="✏️" />
-          <TabButton tab="list" label="写真で確認" emoji="📸" />
-          <TabButton tab="debug" label="デバッグ" emoji="🔧" />
+          <TabButton tab="form" label="記録登録" icon={<Icon icon={Edit} size="sm" decorative />} />
+          <TabButton tab="list" label="写真で確認" icon={<Icon icon={Camera} size="sm" decorative />} />
+          <TabButton tab="debug" label="デバッグ" icon={<Icon icon={Wrench} size="sm" decorative />} />
         </div>
       </div>
 
@@ -405,7 +420,13 @@ function App() {
               ...textStyles.headline.medium,
               color: colors.text.primary,
               marginBottom: '1.5rem',
-            }}>✏️ 新しい釣果を記録</h2>
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}>
+              <Icon icon={Edit} size="md" decorative />
+              新しい釣果を記録
+            </h2>
             <FishingRecordForm
               onSubmit={handleFormSubmit}
               isLoading={storeStatus === 'loading'}
@@ -429,7 +450,10 @@ function App() {
 
         {activeTab === 'debug' && (
           <div>
-            <h2>🔧 デバッグ情報</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Icon icon={Wrench} size="md" decorative />
+              デバッグ情報
+            </h2>
 
             <div style={{
               padding: '1rem',
@@ -439,10 +463,10 @@ function App() {
               marginBottom: '1rem'
             }}>
               <h3>データベース状態</h3>
-              <p>
-                {dbStatus === 'loading' && '⏳ データベース接続中...'}
-                {dbStatus === 'success' && '✅ ' + dbMessage}
-                {dbStatus === 'error' && '❌ ' + dbMessage}
+              <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {dbStatus === 'loading' && <><Icon icon={Loader2} size="sm" className="animate-spin" decorative /> データベース接続中...</>}
+                {dbStatus === 'success' && <><Icon icon={CheckCircle2} size="sm" color="success" decorative /> {dbMessage}</>}
+                {dbStatus === 'error' && <><Icon icon={XCircle} size="sm" color="error" decorative /> {dbMessage}</>}
               </p>
             </div>
 
@@ -454,10 +478,10 @@ function App() {
               marginBottom: '1rem'
             }}>
               <h3>Zustand Store状態</h3>
-              <p>
-                {storeStatus === 'loading' && '⏳ ストアテスト中...'}
-                {storeStatus === 'success' && '✅ ' + storeMessage}
-                {storeStatus === 'error' && '❌ ' + storeMessage}
+              <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {storeStatus === 'loading' && <><Icon icon={Loader2} size="sm" className="animate-spin" decorative /> ストアテスト中...</>}
+                {storeStatus === 'success' && <><Icon icon={CheckCircle2} size="sm" color="success" decorative /> {storeMessage}</>}
+                {storeStatus === 'error' && <><Icon icon={XCircle} size="sm" color="error" decorative /> {storeMessage}</>}
               </p>
               {error && (
                 <p style={{ color: '#dc3545', fontSize: '0.9em' }}>
@@ -498,16 +522,16 @@ function App() {
             }}>
               <h3>開発進捗</h3>
               <ul>
-                <li>✅ TASK-001: プロジェクトセットアップ</li>
-                <li>✅ TASK-002: 型定義・インターフェース</li>
-                <li>✅ TASK-003: IndexedDBセットアップ</li>
-                <li>✅ TASK-101: 釣果記録データアクセスレイヤー</li>
-                <li>✅ TASK-102: 写真データアクセスレイヤー</li>
-                <li>✅ TASK-103: 位置情報・設定管理データアクセス層</li>
-                <li>✅ TASK-201: Zustand Store実装</li>
-                <li>✅ TASK-202: React Hook Form + Zod実装</li>
-                <li>✅ TASK-301: フォーム入力UI実装</li>
-                <li>✅ TASK-302: 記録一覧表示実装</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-001: プロジェクトセットアップ</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-002: 型定義・インターフェース</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-003: IndexedDBセットアップ</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-101: 釣果記録データアクセスレイヤー</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-102: 写真データアクセスレイヤー</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-103: 位置情報・設定管理データアクセス層</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-201: Zustand Store実装</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-202: React Hook Form + Zod実装</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-301: フォーム入力UI実装</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-302: 記録一覧表示実装</li>
               </ul>
               <p style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#e3f2fd', borderRadius: '4px' }}>
                 <strong>現在:</strong> 写真ベース記録一覧UI実装完了
@@ -520,7 +544,7 @@ function App() {
                 borderRadius: '4px',
                 border: '1px solid #ffeaa7'
               }}>
-                <strong>📊 現在のデータ状況:</strong>
+                <strong style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={BarChart3} size={14} decorative /> 現在のデータ状況:</strong>
                 <br />記録数: {records.length}件
                 <br />記録詳細:
                 <pre style={{ fontSize: '0.75rem', maxHeight: '200px', overflow: 'auto', backgroundColor: '#fff', padding: '0.5rem', marginTop: '0.5rem' }}>

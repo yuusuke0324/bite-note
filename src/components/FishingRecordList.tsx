@@ -1,6 +1,6 @@
 // 釣果記録一覧コンポーネント
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, type ReactNode } from 'react';
 import { TestIds } from '../constants/testIds';
 import { FishingRecordCard } from './FishingRecordCard';
 import { AdvancedSearchFilter } from './AdvancedSearchFilter';
@@ -9,6 +9,23 @@ import { DataExportModal } from './DataExportModal';
 import { DataImportModal } from './DataImportModal';
 import { StatisticsDashboard } from './StatisticsDashboard';
 import { useAdvancedSearch } from '../hooks/useAdvancedSearch';
+import { Icon } from './ui/Icon';
+import {
+  Calendar,
+  Fish,
+  MapPin,
+  Ruler,
+  RefreshCw,
+  Anchor,
+  Plus,
+  BarChart3,
+  Search,
+  Upload,
+  Download,
+  AlertTriangle,
+  FileText,
+  Scroll,
+} from 'lucide-react';
 import type { FishingRecord } from '../types';
 
 interface FishingRecordListProps {
@@ -31,15 +48,15 @@ interface FishingRecordListProps {
 type SortOption = {
   key: keyof FishingRecord;
   label: string;
-  icon: string;
+  icon: ReactNode;
 };
 
 const sortOptions: SortOption[] = [
-  { key: 'date', label: '日付', icon: '📅' },
-  { key: 'fishSpecies', label: '魚種', icon: '🐟' },
-  { key: 'location', label: '場所', icon: '📍' },
-  { key: 'size', label: 'サイズ', icon: '📏' },
-  { key: 'updatedAt', label: '更新日時', icon: '🔄' }
+  { key: 'date', label: '日付', icon: <Icon icon={Calendar} size={14} decorative /> },
+  { key: 'fishSpecies', label: '魚種', icon: <Icon icon={Fish} size={14} decorative /> },
+  { key: 'location', label: '場所', icon: <Icon icon={MapPin} size={14} decorative /> },
+  { key: 'size', label: 'サイズ', icon: <Icon icon={Ruler} size={14} decorative /> },
+  { key: 'updatedAt', label: '更新日時', icon: <Icon icon={RefreshCw} size={14} decorative /> }
 ];
 
 export const FishingRecordList: React.FC<FishingRecordListProps> = ({
@@ -195,7 +212,8 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             fontSize: 'clamp(1.5rem, 4vw, 2rem)',
             color: '#333'
           }}>
-            🎣 釣果記録一覧
+            <Icon icon={Anchor} size="md" decorative />
+            釣果記録一覧
           </h2>
           <button
             data-testid={TestIds.ADD_RECORD_BUTTON}
@@ -214,7 +232,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
               whiteSpace: 'nowrap'
             }}
           >
-            ➕ 新規記録
+            <Icon icon={Plus} size="sm" decorative /> 新規記録
           </button>
         </div>
 
@@ -231,7 +249,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             backgroundColor: '#f8f9fa',
             borderRadius: '20px'
           }}>
-            📊 {filteredRecords.length}件
+            <Icon icon={BarChart3} size={14} decorative /> {filteredRecords.length}件
             {!isFiltersEmpty && ` / ${records.length}件中`}
           </span>
 
@@ -264,7 +282,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             aria-expanded={showFilters}
             aria-label="基本検索の表示切り替え"
           >
-            🔍 {showFilters ? '隠す' : '基本検索'}
+            <Icon icon={Search} size={14} decorative /> {showFilters ? '隠す' : '基本検索'}
           </button>
 
           <button
@@ -285,7 +303,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             aria-expanded={showAdvancedSearch}
             aria-label="高度な検索の表示切り替え"
           >
-            🔍+ {showAdvancedSearch ? '隠す' : '高度な検索'}
+            <Icon icon={Search} size={14} decorative /> {showAdvancedSearch ? '隠す' : '高度な検索'}
             {activeFilterCount > 0 && (
               <span style={{
                 position: 'absolute',
@@ -322,7 +340,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             }}
             aria-label="データエクスポート"
           >
-            📤 エクスポート
+            <Icon icon={Upload} size={14} decorative /> エクスポート
           </button>
 
           <button
@@ -341,7 +359,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             }}
             aria-label="データインポート"
           >
-            📥 インポート
+            <Icon icon={Download} size={14} decorative /> インポート
           </button>
 
           <button
@@ -362,7 +380,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             }}
             aria-label="統計ダッシュボード"
           >
-            📊 統計
+            <Icon icon={BarChart3} size={14} decorative /> 統計
           </button>
         </div>
       </div>
@@ -387,7 +405,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
                 fontSize: '0.875rem'
               }}
             >
-              🔍 検索
+              <Icon icon={Search} size={14} decorative /> 検索
             </label>
             <input
               id="search-input"
@@ -413,7 +431,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
               fontWeight: 'bold',
               fontSize: '0.875rem'
             }}>
-              📋 並び順
+              <Icon icon={FileText} size={14} decorative /> 並び順
             </label>
             <div style={{
               display: 'flex',
@@ -488,7 +506,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             fontWeight: 'bold',
             color: '#333'
           }}>
-            📊 検索結果の統計
+            <Icon icon={BarChart3} size={14} decorative /> 検索結果の統計
           </h4>
           <div style={{
             display: 'grid',
@@ -524,7 +542,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
           borderRadius: '8px',
           marginBottom: '1.5rem'
         }}>
-          ⚠️ {error}
+          <Icon icon={AlertTriangle} size={14} decorative /> {error}
         </div>
       )}
 
@@ -542,7 +560,9 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             padding: '3rem 1rem',
             color: '#6c757d'
           }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎣</div>
+            <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
+              <Icon icon={Anchor} size={48} color="secondary" decorative />
+            </div>
             <h3 style={{ margin: '0 0 0.5rem 0' }}>記録がありません</h3>
             <p style={{ margin: 0, fontSize: '0.875rem' }}>
               {searchQuery ? '検索条件に一致する記録が見つかりませんでした' : 'まだ釣果記録がありません'}
@@ -597,7 +617,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
               </>
             ) : (
               <>
-                📜 もっと見る
+                <Icon icon={Scroll} size={14} decorative /> もっと見る
               </>
             )}
           </button>
