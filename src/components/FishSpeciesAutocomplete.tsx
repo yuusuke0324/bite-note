@@ -161,11 +161,14 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
 
   /**
    * ブラーハンドラ
-   * Note: onMouseDownでblurを防ぐため、setTimeoutは不要
+   * Note: setTimeoutでキーボード操作との競合を防止
+   * キーイベント処理後にドロップダウンを閉じる
    */
   const handleBlur = useCallback(() => {
-    setIsOpen(false);
-    setSelectedIndex(-1);
+    setTimeout(() => {
+      setIsOpen(false);
+      setSelectedIndex(-1);
+    }, 150);
   }, []);
 
   /**
