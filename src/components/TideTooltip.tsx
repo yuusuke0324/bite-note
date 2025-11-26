@@ -39,6 +39,13 @@ interface TooltipTheme {
   shadow?: string;
 }
 
+/**
+ * デフォルトのオフセット値
+ * コンポーネント外で定数化することで、useCallbackの依存配列問題を回避
+ * @see https://github.com/[repo]/issues/249 - テストハング問題の根本原因
+ */
+const DEFAULT_OFFSET = { x: 10, y: -10 };
+
 interface TideTooltipProps {
   visible: boolean;
   data: TideTooltipData;
@@ -85,7 +92,7 @@ export const TideTooltip: React.FC<TideTooltipProps> = ({
   targetElement,
 
   autoPosition = false,
-  offset = { x: 10, y: -10 },
+  offset = DEFAULT_OFFSET,
   showCoordinates = false,
   size = 'medium',
 
@@ -121,6 +128,13 @@ export const TideTooltip: React.FC<TideTooltipProps> = ({
     if (!responsive) return false;
     return typeof window !== 'undefined' && window.innerWidth <= 768;
   }, [responsive]);
+
+  /**
+   * offsetを安定化（プリミティブ値の依存配列で再計算を制御）
+   * オブジェクトリテラルの比較による無限ループを回避
+   * @see https://github.com/[repo]/issues/249 - テストハング問題の修正
+   */
+  const stableOffset = useMemo(() => offset, [offset.x, offset.y]);
 
   // 位置計算
   const calculatePosition = useCallback(() => {
@@ -163,12 +177,12 @@ export const TideTooltip: React.FC<TideTooltipProps> = ({
         }
       }
 
-      setComputedPosition({ x: x + offset.x, y: y + offset.y });
+      setComputedPosition({ x: x + stableOffset.x, y: y + stableOffset.y });
       setTooltipPlacement(placement);
     } else if (typeof position === 'object') {
-      setComputedPosition({ x: position.x + offset.x, y: position.y + offset.y });
+      setComputedPosition({ x: position.x + stableOffset.x, y: position.y + stableOffset.y });
     }
-  }, [position, targetElement, autoPosition, offset]);
+  }, [position, targetElement, autoPosition, stableOffset]);
 
   // 遅延表示
   useEffect(() => {
