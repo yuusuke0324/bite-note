@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { Info, AlertTriangle, XCircle, AlertOctagon, X } from 'lucide-react';
 import { AppError, ErrorSeverity } from '../../lib/errors/ErrorTypes';
 
 export interface ErrorModalProps {
@@ -22,21 +23,15 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   const message = isAppError ? error.userMessage : error.message;
   const code = isAppError ? error.code : 'UNKNOWN_ERROR';
 
-  // アイコンの選択
-  const getIcon = () => {
-    switch (severity) {
-      case ErrorSeverity.INFO:
-        return 'ℹ️';
-      case ErrorSeverity.WARNING:
-        return '⚠️';
-      case ErrorSeverity.ERROR:
-        return '❌';
-      case ErrorSeverity.CRITICAL:
-        return '🚨';
-      default:
-        return '❌';
-    }
+  // アイコンマップの定義
+  const iconConfig = {
+    [ErrorSeverity.INFO]: { Icon: Info, color: '#3B82F6' },
+    [ErrorSeverity.WARNING]: { Icon: AlertTriangle, color: '#F59E0B' },
+    [ErrorSeverity.ERROR]: { Icon: XCircle, color: '#EF4444' },
+    [ErrorSeverity.CRITICAL]: { Icon: AlertOctagon, color: '#DC2626' },
   };
+
+  const { Icon: StatusIcon, color: iconColor } = iconConfig[severity] || iconConfig[ErrorSeverity.ERROR];
 
   // タイトル色の選択
   const getTitleColor = () => {
@@ -96,7 +91,9 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
               gap: '1rem'
             }}
           >
-            <div style={{ fontSize: '2rem' }}>{getIcon()}</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <StatusIcon size={24} color={iconColor} aria-hidden="true" />
+            </div>
             <div style={{ flex: 1 }}>
               <h2
                 style={{
@@ -129,7 +126,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '1.5rem',
                 color: '#6c757d',
                 padding: '0',
                 width: '32px',
@@ -140,7 +136,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
               }}
               aria-label="閉じる"
             >
-              ✕
+              <X size={20} aria-hidden="true" />
             </button>
           </div>
 

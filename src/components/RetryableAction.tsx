@@ -1,6 +1,7 @@
 // リトライ可能アクションコンポーネント
 
 import { useState } from 'react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { RetryService } from '../lib/retry-service';
 
 export interface RetryableActionProps<T = unknown> {
@@ -119,7 +120,7 @@ export const RetryableAction = <T = unknown,>({
     if (hasError) {
       return (
         <>
-          🔄 再試行 {retryCount > 0 && `(${retryCount}回目)`}
+          <RefreshCw size={16} aria-hidden="true" /> 再試行 {retryCount > 0 && `(${retryCount}回目)`}
         </>
       );
     }
@@ -158,7 +159,7 @@ export const RetryableAction = <T = unknown,>({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <span>⚠️</span>
+            <AlertTriangle size={20} color="#F59E0B" aria-hidden="true" />
             <strong>エラーが発生しました</strong>
           </div>
           <p style={{ margin: 0, fontSize: '0.9rem' }}>
