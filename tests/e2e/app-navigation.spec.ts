@@ -20,9 +20,9 @@ test.describe('アプリケーション基本ナビゲーション', () => {
     // ページが読み込まれるまで待機
     await expect(page.locator('#root')).toBeVisible();
 
-    // タブが存在することを確認
-    const formTab = page.locator('text=記録登録').first();
-    const listTab = page.locator('text=記録一覧').first();
+    // タブが存在することを確認（アイコンのみのナビゲーション）
+    const formTab = page.locator('[data-testid="form-tab"]');
+    const listTab = page.locator('[data-testid="list-tab"]');
 
     if (await formTab.count() > 0) {
       // force: true を使用してクリックを強制実行
@@ -75,8 +75,8 @@ test.describe('アプリケーション基本ナビゲーション', () => {
     await expect(page.locator('#root')).toBeVisible();
     await expect(page.locator('h1')).toContainText('Bite Note');
 
-    // 基本的なUIエレメントが存在することを確認（BottomNavigation）
-    await expect(page.locator('text=ホーム')).toBeVisible();
-    await expect(page.locator('text=新規記録')).toBeVisible();
+    // 基本的なUIエレメントが存在することを確認（BottomNavigation - アイコンのみ）
+    await expect(page.locator('[data-testid="home-tab"]')).toBeVisible();
+    await expect(page.locator('[data-testid="form-tab"]')).toBeVisible();
   });
 });
