@@ -92,10 +92,10 @@ export class TideDataValidator {
       let task002Errors: TideValidationError[] = [];
 
       if (validationOptions.performanceMode) {
-        // ⚡ 高速モード: 軽量な検証のみ
+        // 高速モード: 軽量な検証のみ
         task002Errors = this.validateFast(dataToProcess);
       } else if (validationOptions.strictMode) {
-        // 🔍 厳密モード: より厳しい検証
+        // 厳密モード: より厳しい検証
         task002Errors = this.validateStrictWithExtras(dataToProcess);
       } else {
         // 通常モード: 標準的な検証
