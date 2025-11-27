@@ -680,7 +680,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
 
                   {/* 釣果時刻マーカー */}
                   <div data-testid="fishing-time-marker" className="mt-4 text-xs text-blue-600 flex items-center gap-1">
-                    <Icon icon={Lightbulb} size={12} decorative /> グラフ上の釣りマークが釣果記録時刻を示しています
+                    <Icon icon={Lightbulb} size={12} decorative /> グラフ上の釣りマークが記録時刻を示しています
                   </div>
                 </div>
               )}

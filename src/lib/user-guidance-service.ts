@@ -25,12 +25,12 @@ export class UserGuidanceService {
   createFirstTimeGuidance(): Guidance {
     return {
       type: 'first-time',
-      title: '釣果記録アプリへようこそ！',
+      title: 'Bite Noteへようこそ！',
       description: 'このアプリの使い方をご紹介します',
       actionLabel: '始める',
       steps: [
         {
-          title: '釣果記録アプリへようこそ！',
+          title: 'Bite Noteへようこそ！',
           description: '釣果の記録、写真の保存、統計の確認ができます。',
           highlight: '.app-header'
         },
@@ -113,7 +113,7 @@ export class UserGuidanceService {
   createEmptyStateGuidance(emptyType: string): Guidance {
     const emptyStates = {
       'no-records': {
-        title: 'まだ釣果記録がありません',
+        title: 'まだ記録がありません',
         description: '最初の釣果を記録してみましょう！',
         actionLabel: '記録を作成'
       },

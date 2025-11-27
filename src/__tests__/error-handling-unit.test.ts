@@ -169,7 +169,7 @@ describe('UserGuidanceService', () => {
 
     expect(guidance.type).toBe('first-time');
     expect(guidance.steps).toHaveLength(4);
-    expect(guidance.steps[0].title).toBe('釣果記録アプリへようこそ！');
+    expect(guidance.steps[0].title).toBe('Bite Noteへようこそ！');
     expect(guidance.steps[0].description).toContain('釣果の記録');
   });
 
@@ -190,7 +190,7 @@ describe('UserGuidanceService', () => {
 
     expect(guidance.type).toBe('empty-state');
     expect(guidance.emptyType).toBe('no-records');
-    expect(guidance.title).toBe('まだ釣果記録がありません');
+    expect(guidance.title).toBe('まだ記録がありません');
     expect(guidance.description).toBe('最初の釣果を記録してみましょう！');
     expect(guidance.actionLabel).toBe('記録を作成');
   });

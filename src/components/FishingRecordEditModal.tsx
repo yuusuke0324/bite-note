@@ -115,7 +115,7 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
             fontWeight: 'bold',
             color: '#333'
           }}>
-            <Icon icon={Edit} size={20} decorative /> 釣果記録を編集
+            <Icon icon={Edit} size={20} decorative /> 記録を編集
           </h2>
 
           <button

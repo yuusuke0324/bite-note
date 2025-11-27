@@ -100,7 +100,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
           handleCardClick();
         }
       }}
-      aria-label={`釣果記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
+      aria-label={`記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
       style={{
         border: '1px solid #dee2e6',
         borderRadius: '8px',

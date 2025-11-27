@@ -103,7 +103,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
           handleClick();
         }
       }}
-      aria-label={`釣果記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
+      aria-label={`記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
       style={{
         display: 'flex',
         gap: '12px',

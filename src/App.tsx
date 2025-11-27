@@ -385,7 +385,7 @@ function App() {
             gap: '0.5rem',
           }}>
             <Icon icon={Anchor} size="lg" decorative />
-            釣果記録アプリ
+            Bite Note
           </h1>
         </div>
 

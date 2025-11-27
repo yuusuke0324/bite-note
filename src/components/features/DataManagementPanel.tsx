@@ -227,7 +227,7 @@ export const DataManagementPanel = () => {
         </div>
       </ModernCard>
 
-      {/* 釣果記録リスト */}
+      {/* 記録リスト */}
       <ModernCard variant="outlined" size="lg">
         <div>
           <div style={{
@@ -241,7 +241,7 @@ export const DataManagementPanel = () => {
               color: colors.text.primary,
               margin: 0,
             }}>
-              釣果記録一覧
+              記録一覧
             </h2>
             <span style={{
               ...textStyles.body.medium,
@@ -261,7 +261,7 @@ export const DataManagementPanel = () => {
                 ...textStyles.body.large,
                 margin: 0,
               }}>
-                まだ釣果記録がありません
+                まだ記録がありません
               </p>
             </div>
           ) : (

@@ -5,13 +5,13 @@ test.describe('アプリケーション基本ナビゲーション', () => {
     await page.goto('/');
 
     // ページタイトルを確認
-    await expect(page).toHaveTitle(/釣果記録アプリ/);
+    await expect(page).toHaveTitle(/Bite Note/);
 
     // アプリケーションコンテナが表示されることを確認
     await expect(page.locator('#root')).toBeVisible();
 
-    // ヘッダーが表示されることを確認（ホーム画面では「釣果記録」のみ表示）
-    await expect(page.locator('h1')).toContainText('釣果記録');
+    // ヘッダーが表示されることを確認（ホーム画面では「Bite Note」が表示）
+    await expect(page.locator('h1')).toContainText('Bite Note');
   });
 
   test('タブナビゲーションが正常に動作する', async ({ page }) => {
