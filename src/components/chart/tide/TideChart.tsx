@@ -53,6 +53,8 @@ import type {
 } from './types';
 import styles from './TideChart.module.css';
 import { logger } from '../../../lib/errors/logger';
+import { StackedMarkerOverlay } from './markers/StackedMarkerOverlay';
+import type { FishingMarkerData } from './markers/types';
 
 // ARIA accessibility constants
 const ARIA_DESCRIPTION_ID = 'tide-chart-description';
@@ -769,7 +771,13 @@ const TideChartBase: React.FC<TideChartProps> = ({
   onDataPointClick,
   className,
   style,
-  fishingTimes = [],
+
+  // Fishing marker props (Issue #273)
+  fishingData = [],
+  fishingTimes = [], // Legacy support
+  markerGroupingConfig,
+  onFishingRecordClick,
+  useStackedMarkers,
 
   // Accessibility Props
   theme = 'light',
@@ -831,12 +839,48 @@ const TideChartBase: React.FC<TideChartProps> = ({
   // Type assertion is safe here because we check for activeComponents existence before rendering
   const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = (activeComponents || {}) as ChartComponents;
 
-  // 釣果マーカーのデバッグログ
-  useEffect(() => {
-    if (import.meta.env.DEV && fishingTimes.length > 0) {
-      logger.debug('Fishing times received', { fishingTimes });
+  // Determine if we should use stacked markers (Issue #273)
+  // Use stacked markers when: fishingData is provided OR useStackedMarkers is explicitly true
+  const shouldUseStackedMarkers = useMemo(() => {
+    if (useStackedMarkers !== undefined) {
+      return useStackedMarkers;
     }
-  }, [fishingTimes]);
+    return fishingData.length > 0;
+  }, [useStackedMarkers, fishingData.length]);
+
+  // Convert legacy fishingTimes to FishingMarkerData format for backward compatibility
+  const normalizedFishingData = useMemo((): FishingMarkerData[] => {
+    if (fishingData.length > 0) {
+      return fishingData;
+    }
+    // Convert legacy format
+    return fishingTimes.map((time, index) => ({
+      id: `legacy-${index}`,
+      time,
+    }));
+  }, [fishingData, fishingTimes]);
+
+  // Get marker theme based on chart theme
+  const markerTheme = useMemo(() => {
+    if (theme === 'dark' || theme === 'dark-high-contrast') {
+      return 'dark';
+    }
+    if (theme === 'accessibility-high-contrast') {
+      return 'high-contrast';
+    }
+    return 'light';
+  }, [theme]) as 'light' | 'dark' | 'high-contrast';
+
+  // Debug logging for fishing markers
+  useEffect(() => {
+    if (import.meta.env.DEV && (fishingData.length > 0 || fishingTimes.length > 0)) {
+      logger.debug('Fishing markers received', {
+        fishingData: fishingData.length,
+        fishingTimes: fishingTimes.length,
+        useStackedMarkers: shouldUseStackedMarkers,
+      });
+    }
+  }, [fishingData, fishingTimes, shouldUseStackedMarkers]);
 
   // パフォーマンス追跡開始
   useEffect(() => {
@@ -1590,7 +1634,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
             </div>
           )}
 
-          <div data-testid="tide-graph-canvas">
+          <div data-testid="tide-graph-canvas" style={{ position: 'relative' }}>
             <LineChart
               data={validatedData.valid}
               margin={chartConfiguration.margin}
@@ -1702,8 +1746,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
                 )}
                 data-testid="line"
               />
-              {/* 釣果マーカー */}
-              {ReferenceLine && fishingTimes.map((time, index) => (
+              {/* Legacy fishing markers (when useStackedMarkers is false) */}
+              {!shouldUseStackedMarkers && ReferenceLine && fishingTimes.map((time, index) => (
                 <ReferenceLine
                   key={`fishing-${index}`}
                   x={time}
@@ -1711,7 +1755,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
                   strokeWidth={3}
                   strokeDasharray="5 5"
                   label={{
-                    value: '🎣',
+                    value: '',
                     position: 'top',
                     fill: '#00CC66',
                     fontSize: 20,
@@ -1722,6 +1766,21 @@ const TideChartBase: React.FC<TideChartProps> = ({
               ))}
               {showTooltip && Tooltip && <Tooltip content={<CustomTooltip />} />}
             </LineChart>
+
+            {/* Glassmorphism Stacked Markers (Issue #273) */}
+            {shouldUseStackedMarkers && normalizedFishingData.length > 0 && (
+              <StackedMarkerOverlay
+                fishingData={normalizedFishingData}
+                chartData={validatedData.valid}
+                chartWidth={chartConfiguration.actualWidth}
+                chartHeight={chartConfiguration.actualHeight}
+                chartMargin={chartConfiguration.margin}
+                theme={markerTheme}
+                groupingConfig={markerGroupingConfig}
+                onRecordClick={onFishingRecordClick}
+                testId="stacked-marker-overlay"
+              />
+            )}
           </div>
 
           {/* Additional WCAG compliance elements */}

@@ -1,0 +1,377 @@
+/**
+ * StackedMarkerCard.module.css - Glassmorphism Stacked Marker Styles
+ * Issue #273: TideChart fishing marker enhancement
+ *
+ * Browser Compatibility:
+ * - Chrome 76+ (backdrop-filter)
+ * - Firefox 103+ (backdrop-filter)
+ * - Safari 9+ (-webkit-backdrop-filter)
+ * - Edge 79+ (backdrop-filter)
+ */
+
+/* Glassmorphism Card Base */
+.card {
+  position: absolute;
+  /* Fallback for browsers without backdrop-filter support */
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(200, 200, 200, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.2);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
+    background-color 0.15s ease;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  user-select: none;
+  touch-action: manipulation; /* Prevent double-tap zoom on mobile */
+
+  /* Transform origin for animation */
+  transform-origin: center bottom;
+
+  /* GPU acceleration */
+  will-change: transform, box-shadow;
+}
+
+/* Progressive enhancement: Glassmorphism for supporting browsers */
+@supports (backdrop-filter: blur(10px)) {
+  .card {
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Dark mode support */
+.cardDark {
+  background-color: rgba(30, 30, 30, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Hover state */
+.card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px 0 rgba(31, 38, 135, 0.3);
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.cardDark:hover {
+  background-color: rgba(50, 50, 50, 0.85);
+}
+
+/* Focus state for accessibility */
+.card:focus {
+  outline: none;
+}
+
+.card:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.3);
+}
+
+.cardDark:focus-visible {
+  outline-color: #66ccff;
+  box-shadow: 0 0 0 4px rgba(102, 204, 255, 0.3);
+}
+
+/* Active/pressed state */
+.card:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Expanded state */
+.cardExpanded {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 32px 0 rgba(31, 38, 135, 0.35);
+}
+
+.cardDark.cardExpanded {
+  background-color: rgba(40, 40, 40, 0.9);
+}
+
+/* Icon container */
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: #00cc66;
+}
+
+.cardDark .icon {
+  color: #66ff99;
+}
+
+/* Badge for count */
+.badge {
+  background-color: #0066cc;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.cardDark .badge {
+  background-color: #66ccff;
+  color: #000000;
+}
+
+/* High contrast mode */
+.cardHighContrast {
+  background-color: rgba(0, 0, 0, 0.9);
+  border: 2px solid #ffff00;
+  color: #ffffff;
+}
+
+.cardHighContrast .badge {
+  background-color: #ffff00;
+  color: #000000;
+}
+
+.cardHighContrast .icon {
+  color: #00ff00;
+}
+
+.cardHighContrast:focus-visible {
+  outline: 4px solid #00ff00;
+  outline-offset: 3px;
+}
+
+/* Expanded list container */
+.listContainer {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 200px;
+  max-width: 280px;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.35);
+  padding: 12px;
+  z-index: 100;
+
+  /* Animation */
+  animation: slideIn 0.2s ease-out;
+}
+
+.listContainerDark {
+  background-color: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* List header */
+.listHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+}
+
+.listContainerDark .listHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.listTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0;
+}
+
+.listContainerDark .listTitle {
+  color: #ffffff;
+}
+
+.listCount {
+  font-size: 12px;
+  color: #666666;
+}
+
+.listContainerDark .listCount {
+  color: #cccccc;
+}
+
+/* Individual record item */
+.recordItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.recordItem:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.listContainerDark .recordItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.recordItem:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 1px;
+}
+
+.recordTime {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666666;
+  min-width: 44px;
+}
+
+.listContainerDark .recordTime {
+  color: #aaaaaa;
+}
+
+.recordSpecies {
+  font-size: 14px;
+  color: #333333;
+  flex: 1;
+}
+
+.listContainerDark .recordSpecies {
+  color: #ffffff;
+}
+
+.recordSize {
+  font-size: 12px;
+  color: #888888;
+  padding: 2px 6px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.listContainerDark .recordSize {
+  color: #cccccc;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Close button */
+.closeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  /* WCAG 2.1 AA: minimum 44x44px tap target */
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666666;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #333333;
+}
+
+.listContainerDark .closeButton {
+  color: #aaaaaa;
+}
+
+.listContainerDark .closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 1px;
+}
+
+/* Screen reader only text */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .card {
+    padding: 6px 10px;
+  }
+
+  .listContainer {
+    min-width: 160px;
+    max-width: 240px;
+    padding: 10px;
+  }
+
+  .recordItem {
+    padding: 6px;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .listContainer {
+    animation: none;
+  }
+}
+
+/* Print styles - hide markers */
+@media print {
+  .card,
+  .listContainer {
+    display: none;
+  }
+}
