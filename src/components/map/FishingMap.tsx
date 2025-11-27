@@ -113,12 +113,22 @@ const createCustomIcon = (species: string, size?: number) => {
             justify-content: center;
             transform: rotate(45deg);
           ">
-            <span style="
-              color: white;
-              font-size: ${iconSize * 0.5}px;
-              font-weight: bold;
-              filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
-            ">🐟</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="${iconSize * 0.5}"
+              height="${iconSize * 0.5}"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));"
+            >
+              <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6-3.56 0-7.56-2.53-8.5-6Z"/>
+              <circle cx="15" cy="12" r="1"/>
+              <path d="M2 12S5.5 8 6.5 12s-4.5 0-4.5 0Z"/>
+            </svg>
           </div>
         </div>
         <div class="marker-dot" style="
