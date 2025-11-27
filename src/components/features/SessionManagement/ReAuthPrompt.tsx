@@ -2,6 +2,7 @@
 // Phase 3-4: セッション管理機能実装
 
 import React, { useEffect, useRef } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { TestIds } from '../../../constants/testIds';
 
 interface ReAuthPromptProps {
@@ -122,13 +123,13 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
         >
           <div
             style={{
-              fontSize: '3rem',
               marginBottom: '1rem',
-              color: '#FBBC04',
+              display: 'flex',
+              justifyContent: 'center',
             }}
             aria-hidden="true"
           >
-            ⚠️
+            <AlertTriangle size={48} color="#FBBC04" />
           </div>
           <h2
             id="modal-title"

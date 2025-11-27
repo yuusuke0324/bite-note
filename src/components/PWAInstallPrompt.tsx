@@ -1,6 +1,7 @@
 // PWAインストールプロンプトコンポーネント
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Fish, Smartphone, X } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
 import { colors } from '../theme/colors';
 import { logger } from '../lib/errors/logger';
@@ -261,10 +262,16 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
         }}>
           {/* アイコン */}
           <div style={{
-            fontSize: '2rem',
-            flexShrink: 0
+            flexShrink: 0,
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            backgroundColor: '#D1FAE5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
-            🎣
+            <Fish size={28} color="#10B981" aria-hidden="true" />
           </div>
 
           {/* コンテンツ */}
@@ -340,7 +347,8 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                   </>
                 ) : (
                   <>
-                    📱 {installState.platform === 'ios' ? '追加方法を見る' : 'インストール'}
+                    <Smartphone size={16} aria-hidden="true" />
+                    {installState.platform === 'ios' ? '追加方法を見る' : 'インストール'}
                   </>
                 )}
               </button>
@@ -383,7 +391,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
             }}
             aria-label="インストールプロンプトを閉じる"
           >
-            ✕
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -422,7 +430,9 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
+              <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
+                <Smartphone size={48} color="#10B981" aria-hidden="true" />
+              </div>
               <h2
                 id="ios-modal-title"
                 style={{

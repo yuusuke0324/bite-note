@@ -124,7 +124,7 @@ describe('PWAInstallPrompt - 基本機能', () => {
 
     vi.useRealTimers(); // クリック前にリアルタイマーに戻す
 
-    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /インストール$/ });
 
     await act(async () => {
       await user.click(installButton);
@@ -242,7 +242,7 @@ describe('PWAInstallPrompt - アクセシビリティ', () => {
 
     vi.useRealTimers();
 
-    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /インストール$/ });
 
     // クリックとローディング状態確認
     await act(async () => {
@@ -319,7 +319,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
 
     vi.useRealTimers();
 
-    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /インストール$/ });
 
     await act(async () => {
       await user.click(installButton);
@@ -385,7 +385,7 @@ describe('PWAInstallPrompt - エラーハンドリング', () => {
 
     vi.useRealTimers();
 
-    const installButton = within(result.container).getByRole('button', { name: /^📱.*インストール$/ });
+    const installButton = within(result.container).getByRole('button', { name: /インストール$/ });
 
     // 連打
     await act(async () => {
