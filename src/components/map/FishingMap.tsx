@@ -550,7 +550,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        backgroundColor: isDarkMode ? '#1a1a2e' : colors.background.primary,
+        backgroundColor: colors.background.primary,
         outline: 'none',
       }}
     >
@@ -570,13 +570,11 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           maxBounds={JAPAN_BOUNDS}
           maxBoundsViscosity={0.9}
         >
-          {/* Issue #296: ダークモード対応タイルレイヤー */}
+          {/* マップタイルは常に明るいOSM Japan（可読性重視） */}
+          {/* Issue #296: ダークモードはUIオーバーレイのみ対応 */}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url={isDarkMode
-              ? "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
-              : "https://tile.openstreetmap.jp/styles/osm-bright-ja/{z}/{x}/{y}.png"
-            }
+            url="https://tile.openstreetmap.jp/styles/osm-bright-ja/{z}/{x}/{y}.png"
             maxZoom={18}
           />
 
