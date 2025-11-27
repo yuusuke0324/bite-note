@@ -11,13 +11,19 @@
 import type { TideEvent, TideType } from '../types/tide';
 
 /**
+ * 潮汐タイプ別Lucideアイコン名の型定義
+ * サービス層では文字列としてアイコン名を返し、UI層でレンダリングする
+ */
+export type TideIconName = 'Waves' | 'Minus' | 'Droplet' | 'Circle';
+
+/**
  * 潮汐タイプ別のカラー情報
  */
 export interface TideTypeColorInfo {
-  bg: string;      // 背景色（Tailwind class）
-  text: string;    // テキスト色（Tailwind class）
-  icon: string;    // アイコン（絵文字）
-  label: string;   // 日本語ラベル
+  bg: string;        // 背景色（Tailwind class）
+  text: string;      // テキスト色（Tailwind class）
+  iconName: TideIconName;  // Lucideアイコン名
+  label: string;     // 日本語ラベル
 }
 
 /**
@@ -42,31 +48,31 @@ export function getTideTypeColor(tideType: TideType): TideTypeColorInfo {
     spring: {
       bg: 'bg-emerald-50',
       text: 'text-emerald-700',
-      icon: '🌊',
+      iconName: 'Waves',
       label: '大潮'
     },
     medium: {
       bg: 'bg-sky-50',
       text: 'text-sky-700',
-      icon: '〰️',
+      iconName: 'Minus',
       label: '中潮'
     },
     neap: {
       bg: 'bg-slate-50',
       text: 'text-slate-600',
-      icon: '💧',
+      iconName: 'Droplet',
       label: '小潮'
     },
     long: {
       bg: 'bg-gray-50',
       text: 'text-gray-600',
-      icon: '➖',
+      iconName: 'Minus',
       label: '長潮'
     },
     young: {
       bg: 'bg-gray-50',
       text: 'text-gray-600',
-      icon: '🔵',
+      iconName: 'Circle',
       label: '若潮'
     }
   };

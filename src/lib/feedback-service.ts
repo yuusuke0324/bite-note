@@ -1,10 +1,17 @@
 // フィードバックサービス
 
+/**
+ * Lucideアイコン名の型定義
+ * サービス層では文字列としてアイコン名を返し、UI層でレンダリングする
+ */
+export type FeedbackIconName = 'Check' | 'X' | 'AlertTriangle' | 'Info';
+
 export interface Feedback {
   type: 'success' | 'error' | 'warning' | 'info';
   message: string;
   duration: number;
-  icon: string;
+  /** Lucideアイコン名 */
+  iconName: FeedbackIconName;
   dismissible?: boolean;
   actions?: Array<{
     label: string;
@@ -21,7 +28,7 @@ export class FeedbackService {
       type: 'success',
       message,
       duration,
-      icon: '✓',
+      iconName: 'Check',
       dismissible: true
     };
   }
@@ -34,7 +41,7 @@ export class FeedbackService {
       type: 'error',
       message,
       duration,
-      icon: '✗',
+      iconName: 'X',
       dismissible: true
     };
   }
@@ -47,7 +54,7 @@ export class FeedbackService {
       type: 'warning',
       message,
       duration,
-      icon: '⚠',
+      iconName: 'AlertTriangle',
       dismissible: true
     };
   }
@@ -60,7 +67,7 @@ export class FeedbackService {
       type: 'info',
       message,
       duration,
-      icon: 'ℹ',
+      iconName: 'Info',
       dismissible: true
     };
   }
@@ -74,18 +81,18 @@ export class FeedbackService {
     actions: Feedback['actions'],
     duration: number = 6000
   ): Feedback {
-    const baseIcons = {
-      success: '✓',
-      error: '✗',
-      warning: '⚠',
-      info: 'ℹ'
+    const baseIconNames: Record<Feedback['type'], FeedbackIconName> = {
+      success: 'Check',
+      error: 'X',
+      warning: 'AlertTriangle',
+      info: 'Info'
     };
 
     return {
       type,
       message,
       duration,
-      icon: baseIcons[type],
+      iconName: baseIconNames[type],
       dismissible: true,
       actions
     };

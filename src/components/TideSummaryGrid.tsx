@@ -14,16 +14,31 @@
  */
 
 import React from 'react';
+import { Waves, Minus, Droplet, Circle, ChevronUp, ChevronDown, ArrowDown } from 'lucide-react';
 import type { TideInfo } from '../types/tide';
-import { getTideTypeColor, getTideStrengthColor } from '../lib/tide-helpers';
+import { getTideTypeColor, getTideStrengthColor, type TideIconName } from '../lib/tide-helpers';
+import { Icon } from './ui/Icon';
 
 interface TideSummaryGridProps {
   tideInfo: TideInfo;
 }
 
+// アイコン名からLucideアイコンコンポーネントを取得
+const TIDE_ICON_MAP = {
+  Waves,
+  Minus,
+  Droplet,
+  Circle,
+} as const;
+
+const getTideIcon = (iconName: TideIconName) => {
+  return TIDE_ICON_MAP[iconName];
+};
+
 export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) => {
   const tideTypeColor = getTideTypeColor(tideInfo.tideType);
   const strengthColor = getTideStrengthColor(tideInfo.tideStrength);
+  const TideIcon = getTideIcon(tideTypeColor.iconName);
 
   // 現在の潮汐状態の日本語表示
   const getCurrentStateLabel = (state: string): string => {
@@ -47,8 +62,8 @@ export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) =>
         className={`${tideTypeColor.bg} ${tideTypeColor.text} p-4 rounded-lg`}
       >
         <div className="flex items-center space-x-2">
-          <span data-testid="tide-type-icon" className="text-2xl">
-            {tideTypeColor.icon}
+          <span data-testid="tide-type-icon">
+            <Icon icon={TideIcon} size={24} decorative />
           </span>
           <div>
             <div className="text-xs opacity-80">潮汐タイプ</div>
@@ -63,8 +78,13 @@ export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) =>
         className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg"
       >
         <div className="flex items-center space-x-2">
-          <span data-testid="current-state-icon" className="text-2xl">
-            {tideInfo.currentState === 'rising' || tideInfo.currentState === 'high' ? '⬆️' : '⬇️'}
+          <span data-testid="current-state-icon">
+            <Icon
+              icon={tideInfo.currentState === 'rising' || tideInfo.currentState === 'high' ? ChevronUp : ChevronDown}
+              size={24}
+              className="text-blue-600"
+              decorative
+            />
           </span>
           <div>
             <div className="text-xs text-gray-600">現在の状態</div>
@@ -89,8 +109,13 @@ export const TideSummaryGrid: React.FC<TideSummaryGridProps> = ({ tideInfo }) =>
       >
         {tideInfo.nextEvent ? (
           <div className="flex items-center space-x-2">
-            <span className="text-2xl">
-              {tideInfo.nextEvent.type === 'high' ? '🌊' : '🏖️'}
+            <span>
+              <Icon
+                icon={tideInfo.nextEvent.type === 'high' ? Waves : ArrowDown}
+                size={24}
+                className="text-indigo-600"
+                decorative
+              />
             </span>
             <div>
               <div className="text-xs text-gray-600">次のイベント</div>
