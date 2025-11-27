@@ -1,6 +1,5 @@
 import React from 'react';
 import { colors } from '../../theme/colors';
-import { textStyles } from '../../theme/typography';
 
 interface NavigationItem {
   id: string;
@@ -24,7 +23,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
 }) => {
   const navigationStyles: React.CSSProperties = {
     display: 'flex',
-    height: '64px',
+    height: '56px',
     backgroundColor: colors.surface.primary,
     borderTop: `1px solid ${colors.border.light}`,
     boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
@@ -34,39 +33,31 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   const itemStyles = (active: boolean): React.CSSProperties => ({
     flex: 1,
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '8px 4px',
+    padding: '8px',
     cursor: 'pointer',
     position: 'relative',
     transition: 'all 0.2s ease',
     backgroundColor: active ? colors.primary[50] : 'transparent',
     color: active ? colors.primary[600] : colors.text.secondary,
-    borderRadius: '8px',
-    margin: '4px',
-    ...(active && {
-      transform: 'translateY(-1px)',
-    }),
+    borderRadius: '12px',
+    margin: '6px 4px',
   });
 
   const iconStyles: React.CSSProperties = {
-    marginBottom: '2px',
-    fontSize: '20px',
+    fontSize: '24px',
     transition: 'transform 0.2s ease',
-  };
-
-  const labelStyles: React.CSSProperties = {
-    ...textStyles.label.small,
-    fontSize: '11px',
-    lineHeight: 1,
-    textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   const badgeStyles: React.CSSProperties = {
     position: 'absolute',
-    top: '6px',
-    right: '12px',
+    top: '4px',
+    right: '50%',
+    transform: 'translateX(12px)',
     backgroundColor: colors.semantic.error.main,
     color: colors.text.inverse,
     borderRadius: '10px',
@@ -112,9 +103,6 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div style={iconStyles}>
             {item.icon}
           </div>
-          <span style={labelStyles}>
-            {item.label}
-          </span>
 
           {/* バッジ */}
           {item.badge && item.badge > 0 && (

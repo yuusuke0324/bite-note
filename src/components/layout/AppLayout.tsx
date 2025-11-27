@@ -85,7 +85,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <main style={{
             flex: 1,
             padding: '0',
-            paddingBottom: navigation ? '64px' : '0',
+            paddingBottom: navigation ? '56px' : '0',
             overflow: 'auto',
           }}>
             {children}
