@@ -85,7 +85,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <main style={{
             flex: 1,
             padding: '0',
-            overflow: 'hidden',
+            paddingBottom: navigation ? '64px' : '0',
+            overflow: 'auto',
           }}>
             {children}
           </main>
@@ -106,8 +107,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       {/* ボトムナビゲーション（モバイルのみ） */}
       {navigation && (
         <nav style={{
-          position: 'sticky',
+          position: 'fixed',
           bottom: 0,
+          left: 0,
+          right: 0,
           zIndex: 100,
           backgroundColor: colors.surface.primary,
           borderTop: `1px solid ${colors.border.light}`,
