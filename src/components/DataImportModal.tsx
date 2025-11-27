@@ -1,6 +1,7 @@
 // データインポートモーダルコンポーネント
 
 import React, { useState, useCallback, useRef } from 'react';
+import { Download, X, Lightbulb, FileText, Paperclip, CheckCircle, XCircle, AlertTriangle, Loader } from 'lucide-react';
 import { exportImportService } from '../lib/export-import-service';
 import type { ImportResult } from '../types';
 
@@ -179,22 +180,29 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333'
+            color: '#333',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}>
-            📥 データインポート
+            <Download size={24} color="#6366F1" aria-hidden="true" />
+            データインポート
           </h2>
           <button
             onClick={handleClose}
+            aria-label="閉じる"
             style={{
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              fontSize: '1.5rem',
               color: '#6c757d',
-              padding: '0.25rem'
+              padding: '0.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
-            ✕
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -210,9 +218,13 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           <h4 style={{
             margin: '0 0 0.5rem 0',
             fontSize: '0.9rem',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}>
-            💡 インポート可能なファイル形式
+            <Lightbulb size={18} color="#1976d2" aria-hidden="true" />
+            インポート可能なファイル形式
           </h4>
           <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
             <li>JSON形式: 全データ（記録、写真、設定）</li>
@@ -247,7 +259,9 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
 
           {selectedFile ? (
             <div>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📁</div>
+              <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+                <FileText size={40} color="#28a745" aria-hidden="true" />
+              </div>
               <div style={{
                 fontWeight: 'bold',
                 fontSize: '1rem',
@@ -265,7 +279,9 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             </div>
           ) : (
             <div>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📎</div>
+              <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+                <Paperclip size={40} color="#6c757d" aria-hidden="true" />
+              </div>
               <div style={{
                 fontSize: '1rem',
                 color: '#333',
@@ -298,7 +314,12 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               fontWeight: 'bold',
               color: importResult.success ? '#155724' : '#721c24'
             }}>
-              {importResult.success ? '✅ インポート完了' : '❌ インポート失敗'}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {importResult.success
+                  ? <><CheckCircle size={20} color="#10B981" aria-hidden="true" /> インポート完了</>
+                  : <><XCircle size={20} color="#EF4444" aria-hidden="true" /> インポート失敗</>
+                }
+              </span>
             </h4>
 
             {importResult.success && (
@@ -347,7 +368,10 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           color: '#856404',
           border: '1px solid #ffeaa7'
         }}>
-          <strong>⚠️ 注意:</strong> インポートにより既存のデータが上書きされる場合があります。
+          <span style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+            <AlertTriangle size={18} color="#F59E0B" aria-hidden="true" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <span><strong>注意:</strong> インポートにより既存のデータが上書きされる場合があります。</span>
+          </span>
           重要なデータは事前にエクスポートしてバックアップを取ることをお勧めします。
         </div>
 
@@ -390,7 +414,15 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
                 gap: '0.5rem'
               }}
             >
-              {isImporting ? '⏳ インポート中...' : '📥 インポート'}
+              {isImporting ? (
+                <>
+                  <Loader size={18} className="animate-spin" aria-hidden="true" /> インポート中...
+                </>
+              ) : (
+                <>
+                  <Download size={18} aria-hidden="true" /> インポート
+                </>
+              )}
             </button>
           )}
         </div>

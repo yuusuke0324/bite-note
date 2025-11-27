@@ -1,6 +1,7 @@
 // GPS位置取得・手動入力コンポーネント
 
 import React, { useState, useCallback } from 'react';
+import { MapPin, Pencil, Trash2, ExternalLink, AlertTriangle } from 'lucide-react';
 import { LocationDisplay } from './LocationDisplay';
 import { useToastStore } from '../stores/toast-store';
 import { TestIds } from '../constants/testIds';
@@ -194,7 +195,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                 </>
               ) : (
                 <>
-                  📍 現在位置を取得
+                  <MapPin size={18} aria-hidden="true" /> 現在位置を取得
                 </>
               )}
             </button>
@@ -203,6 +204,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
               type="button"
               onClick={handleToggleManualMode}
               disabled={disabled}
+              aria-label="手動入力"
               style={{
                 padding: '0.75rem 1rem',
                 backgroundColor: '#6c757d',
@@ -210,10 +212,13 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                 border: 'none',
                 borderRadius: '4px',
                 cursor: disabled ? 'not-allowed' : 'pointer',
-                marginRight: '0.5rem'
+                marginRight: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
               }}
             >
-              ✏️ 手動入力
+              <Pencil size={16} aria-hidden="true" /> 手動入力
             </button>
 
             {value && (
@@ -221,16 +226,20 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                 type="button"
                 onClick={handleClearLocation}
                 disabled={disabled}
+                aria-label="位置情報をクリア"
                 style={{
                   padding: '0.75rem 1rem',
                   backgroundColor: '#dc3545',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
-                  cursor: disabled ? 'not-allowed' : 'pointer'
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
                 }}
               >
-                🗑️ クリア
+                <Trash2 size={16} aria-hidden="true" /> クリア
               </button>
             )}
           </div>
@@ -354,7 +363,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                     gap: '0.25rem'
                   }}
                 >
-                  🗺️ Googleマップで表示
+                  <ExternalLink size={14} aria-hidden="true" /> Googleマップで表示
                 </a>
               </div>
             )}
@@ -371,7 +380,9 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
               borderRadius: '4px',
               fontSize: '0.9rem'
             }}>
-              ⚠️ {error}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <AlertTriangle size={16} color="#F59E0B" aria-hidden="true" /> {error}
+              </span>
             </div>
           )}
         </div>

@@ -1,6 +1,7 @@
 // 写真アップロード・プレビューコンポーネント
 
 import React, { useCallback, useState } from 'react';
+import { Camera, MapPin, CheckCircle, Smartphone, AlertTriangle } from 'lucide-react';
 import { customValidationRules } from '../hooks/useFormValidation';
 import { photoMetadataService } from '../lib/photo-metadata-service';
 import { weatherService } from '../lib/weather-service';
@@ -303,11 +304,11 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           ) : (
             <div>
               <div style={{
-                fontSize: '2rem',
                 marginBottom: '1rem',
-                color: disabled ? '#6c757d' : '#007bff'
+                display: 'flex',
+                justifyContent: 'center'
               }}>
-                📷
+                <Camera size={40} color={disabled ? '#6c757d' : '#007bff'} aria-hidden="true" />
               </div>
               <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold' }}>
                 {dragOver ? 'ここにドロップ' : '写真をアップロード'}
@@ -315,15 +316,19 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
               <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#666' }}>
                 ドラッグ&amp;ドロップまたはクリックして選択
               </p>
-              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#007bff', fontWeight: 'bold' }}>
-                📍 GPS情報付きの写真なら位置・日時・天気・海面水温を自動入力！
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#007bff', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                <MapPin size={14} color="#10B981" aria-hidden="true" /> GPS情報付きの写真なら位置・日時・天気・海面水温を自動入力!
               </p>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>
                 対応形式: JPEG, PNG, WebP (最大{maxSizeMB}MB)
               </p>
               <div style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#888' }}>
-                <p style={{ margin: 0 }}>✅ GPS付き写真: 位置・日時・天気・海面水温を自動抽出</p>
-                <p style={{ margin: 0 }}>📱 位置情報ONで撮影した写真がおすすめ</p>
+                <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <CheckCircle size={12} color="#10B981" aria-hidden="true" /> GPS付き写真: 位置・日時・天気・海面水温を自動抽出
+                </p>
+                <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <Smartphone size={12} color="#6B7280" aria-hidden="true" /> 位置情報ONで撮影した写真がおすすめ
+                </p>
               </div>
             </div>
           )}
@@ -384,7 +389,9 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
             gap: '1rem'
           }}
         >
-          <span>⚠️ {error || uploadError}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <AlertTriangle size={16} color="#F59E0B" aria-hidden="true" /> {error || uploadError}
+          </span>
           {uploadError && (
             <button
               type="button"

@@ -116,8 +116,14 @@
 }
 
 .fish-species-autocomplete .error-message::before {
-  content: '⚠';
-  font-size: 1rem;
+  content: '';
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3'/%3E%3Cpath d='M12 9v4'/%3E%3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
 }
 
 @keyframes slideDown {
@@ -292,10 +298,14 @@
 }
 
 .fish-species-autocomplete .no-results::before {
-  content: '🔍';
+  content: '';
   display: block;
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto 0.5rem auto;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
   opacity: 0.5;
 }
 
