@@ -167,13 +167,7 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
   // Issue #298: ズームレベルに応じたサイズ調整
   const baseSize = fishSize ? Math.min(Math.max(fishSize / 8, 44), 56) : 48;
   const iconSize = getMarkerSizeForZoom(zoomLevel, baseSize);
-  const dotSize = Math.max(8, iconSize * 0.2); // ズームに応じてドットサイズも調整
   const fishIconUrl = createFishIconDataUri('white');
-
-  // Issue #296: ダークモード時のスタイル調整
-  const shadowColor = isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)';
-  const borderColor = isDarkMode ? 'rgba(255,255,255,0.3)' : 'transparent';
-  const glowEffect = isDarkMode ? `0 0 8px ${color}88` : '';
 
   // Issue #292: ARIA用のラベル生成
   const sizeLabel = fishSize ? `${fishSize}cm` : weight ? `${weight}g` : '';
@@ -182,10 +176,10 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
   // Issue #295: 最近の釣果にはパルスアニメーションクラスを追加
   const recentClass = isRecent ? ' marker-recent' : '';
 
-  // Issue #296: ダークモード対応のbox-shadow
-  const boxShadow = isDarkMode
-    ? `0 4px 12px ${shadowColor}, inset 0 -2px 4px rgba(0,0,0,0.2), ${glowEffect}`
-    : `0 4px 12px ${shadowColor}, inset 0 -2px 4px rgba(0,0,0,0.15)`;
+  // Google Maps 2024スタイル: ソフトシャドウ（2層）
+  const primaryShadow = isDarkMode
+    ? '0 2px 8px rgba(0,0,0,0.4), 0 8px 20px rgba(0,0,0,0.25)'
+    : '0 2px 8px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1)';
 
   return L.divIcon({
     className: `custom-marker${isDarkMode ? ' dark-mode' : ''}`,
@@ -196,50 +190,29 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
            aria-label="${ariaLabel}"
            data-marker-id="${species}">
         <div class="marker-pin" style="
-          background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
+          background: ${color};
           width: ${iconSize}px;
           height: ${iconSize}px;
-          border-radius: 50% 50% 0 50%;
-          box-shadow: ${boxShadow};
-          border: 2px solid ${borderColor};
+          border-radius: 50%;
+          box-shadow: ${primaryShadow};
+          border: 3px solid rgba(255,255,255,0.9);
           display: flex;
           align-items: center;
           justify-content: center;
           position: relative;
-          transition: transform 0.2s ease-out;
+          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         ">
-          <div class="marker-inner" style="
-            background: rgba(255,255,255,0.3);
-            width: ${iconSize * 0.65}px;
-            height: ${iconSize * 0.65}px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          ">
-            <img src="${fishIconUrl}" alt="" style="
-              width: ${iconSize * 0.45}px;
-              height: ${iconSize * 0.45}px;
-              filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-            " />
-          </div>
+          <img src="${fishIconUrl}" alt="" style="
+            width: ${iconSize * 0.5}px;
+            height: ${iconSize * 0.5}px;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+          " />
         </div>
-        <div class="marker-dot" style="
-          position: absolute;
-          bottom: -${dotSize / 2}px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: ${dotSize}px;
-          height: ${dotSize}px;
-          background: radial-gradient(circle, ${color} 0%, ${color}88 100%);
-          border-radius: 50%;
-          box-shadow: 0 2px 6px ${shadowColor};
-        "></div>
       </div>
     `,
-    iconSize: [iconSize, iconSize + dotSize],
-    iconAnchor: [iconSize / 2, iconSize + dotSize],
-    popupAnchor: [0, -(iconSize + dotSize)],
+    iconSize: [iconSize, iconSize],
+    iconAnchor: [iconSize / 2, iconSize / 2],
+    popupAnchor: [0, -iconSize / 2 - 10],
   });
 };
 
@@ -636,7 +609,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           >
             {recordsWithAdjustedCoordinates.map((record, index) => (
               <Marker
-                key={record.id}
+                key={`${record.id}-marker-v3`}
                 position={[record.adjustedLat, record.adjustedLng]}
                 icon={createCustomIcon({
                   species: record.fishSpecies,
@@ -1060,56 +1033,103 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
       {/* CSSアニメーション */}
       <style>{`
-        /* Leafletのデフォルトスタイルをリセット */
+        /* Leafletのデフォルトスタイルをリセット（背景・ボーダーのみ） */
+        .leaflet-marker-icon.custom-marker {
+          background: none !important;
+          border: none !important;
+          overflow: visible !important;
+        }
+
         .custom-marker {
           background: none !important;
           border: none !important;
         }
 
-        @keyframes float {
+        /* marker-pin を強制的に正円にする */
+        .marker-pin {
+          width: 48px !important;
+          height: 48px !important;
+          min-width: 48px !important;
+          min-height: 48px !important;
+          aspect-ratio: 1 / 1 !important;
+          border-radius: 50% !important;
+        }
+
+        /* cluster-marker を強制的に正円にする */
+        .cluster-marker {
+          width: 44px !important;
+          height: 44px !important;
+          min-width: 44px !important;
+          min-height: 44px !important;
+          max-width: 44px !important;
+          max-height: 44px !important;
+          aspect-ratio: 1 / 1 !important;
+          border-radius: 50% !important;
+          box-sizing: border-box !important;
+        }
+
+        /* クラスターアイコンのLeafletコンテナをリセット */
+        .leaflet-marker-icon.custom-cluster {
+          background: none !important;
+          border: none !important;
+          overflow: visible !important;
+          width: 44px !important;
+          height: 44px !important;
+        }
+
+        /* MarkerClusterGroupのデフォルトスタイルを完全にリセット */
+        .marker-cluster,
+        .marker-cluster-small,
+        .marker-cluster-medium,
+        .marker-cluster-large {
+          background: none !important;
+          border: none !important;
+        }
+
+        .marker-cluster div,
+        .marker-cluster-small div,
+        .marker-cluster-medium div,
+        .marker-cluster-large div {
+          background: none !important;
+          border: none !important;
+        }
+
+        /* Google Maps 2024スタイル: 緩やかなフロート */
+        @keyframes gentleFloat {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
+          50% { transform: translateY(-2px); }
         }
 
-        /* Issue #293: クリック時バウンスアニメーション */
-        @keyframes markerBounce {
-          0%, 100% { transform: scale(1); }
-          25% { transform: scale(1.2); }
-          50% { transform: scale(0.95); }
-          75% { transform: scale(1.1); }
-        }
-
-        /* Issue #295: 最近の釣果用パルスアニメーション */
-        @keyframes recentPulse {
+        /* 最近の釣果用パルスアニメーション */
+        @keyframes modernPulse {
           0%, 100% {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25),
-                        inset 0 -2px 4px rgba(0,0,0,0.15),
-                        0 0 0 0 rgba(26, 115, 232, 0.7);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15),
+                        0 8px 16px rgba(0,0,0,0.1),
+                        0 0 0 0 rgba(26, 115, 232, 0.5);
           }
           50% {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25),
-                        inset 0 -2px 4px rgba(0,0,0,0.15),
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15),
+                        0 8px 16px rgba(0,0,0,0.1),
                         0 0 0 12px rgba(26, 115, 232, 0);
           }
         }
 
         .marker-wrapper {
-          animation: float 3s ease-in-out infinite;
+          animation: gentleFloat 4s ease-in-out infinite;
         }
 
-        /* Issue #295: 最近の釣果（1週間以内）にパルスアニメーション */
+        /* 最近の釣果（1週間以内）にパルスアニメーション */
         .marker-wrapper.marker-recent .marker-pin {
-          animation: recentPulse 2s ease-in-out infinite;
+          animation: modernPulse 2.5s ease-in-out infinite;
         }
 
         .marker-wrapper:hover .marker-pin {
-          transform: scale(1.1);
-          transition: transform 0.2s ease-out;
+          transform: scale(1.12);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.18), 0 12px 24px rgba(0,0,0,0.12);
         }
 
-        /* Issue #293: クリック時のバウンスアニメーション */
         .marker-wrapper:active .marker-pin {
-          animation: markerBounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          transform: scale(0.95);
         }
 
         .marker-wrapper:focus .marker-pin {
@@ -1117,22 +1137,16 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           outline-offset: 2px;
         }
 
-        /* Issue #297: キーボードナビゲーション用フォーカススタイル */
+        /* キーボードナビゲーション用フォーカススタイル */
         .marker-wrapper:focus-visible .marker-pin {
           outline: 4px solid #FFD700;
           outline-offset: 4px;
           transform: scale(1.15);
         }
 
-        /* Issue #296: ダークモード用スタイル */
-        .custom-marker.dark-mode .marker-wrapper {
-          filter: brightness(1.1);
-        }
-
         @media (prefers-color-scheme: dark) {
           .marker-wrapper .marker-pin {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5),
-                        inset 0 -2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 8px 20px rgba(0,0,0,0.25);
           }
 
           .marker-wrapper:focus .marker-pin {
