@@ -73,7 +73,7 @@ test.describe('アプリケーション基本ナビゲーション', () => {
 
     // アプリケーションが読み込まれることを確認
     await expect(page.locator('#root')).toBeVisible();
-    await expect(page.locator('h1')).toContainText('釣果記録');
+    await expect(page.locator('h1')).toContainText('Bite Note');
 
     // 基本的なUIエレメントが存在することを確認（BottomNavigation）
     await expect(page.locator('text=ホーム')).toBeVisible();
