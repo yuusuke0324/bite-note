@@ -79,30 +79,23 @@ const getFishSpeciesColor = (species: string): string => {
   return colorMap[species] || colors.primary[500];
 };
 
-// 背景色の明度を計算してアイコン色を決定
-const getBrightness = (hex: string): number => {
-  const rgb = parseInt(hex.slice(1), 16);
-  const r = (rgb >> 16) & 0xff;
-  const g = (rgb >> 8) & 0xff;
-  const b = (rgb >> 0) & 0xff;
-  return (r * 299 + g * 587 + b * 114) / 1000;
+// Fish SVGアイコンをBase64エンコード（Lucide Fish icon）
+const createFishIconDataUri = (color: string = 'white') => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6-3.56 0-7.56-2.53-8.5-6Z"/><circle cx="15" cy="12" r="1"/><path d="M2 12S5.5 8 6.5 12s-4.5 0-4.5 0Z"/></svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
 };
 
-// モダンなカスタムピンアイコン（修正版）
-const createCustomIcon = (species: string, size?: number, isSelected?: boolean) => {
+// モダンなカスタムピンアイコン
+const createCustomIcon = (species: string, size?: number) => {
   const color = getFishSpeciesColor(species);
-  // 最小タッチターゲットサイズを44pxに修正（iOS HIG / Material Design 3推奨）
-  const iconSize = size ? Math.min(Math.max(size / 8, 44), 56) : 48;
-  const dotSize = 8; // 固定サイズで視認性向上
-  const scale = isSelected ? 1.3 : 1; // 選択時に拡大
-
-  // 背景色の明度に応じてアイコン色を自動調整（WCAG 2.1コントラスト比対応）
-  const iconColor = getBrightness(color) > 128 ? '#000000' : '#ffffff';
+  const iconSize = size ? Math.min(Math.max(size / 8, 28), 44) : 36;
+  const dotSize = iconSize * 0.25;
+  const fishIconUrl = createFishIconDataUri('white');
 
   return L.divIcon({
     className: 'custom-marker',
     html: `
-      <div class="marker-wrapper" style="transform: scale(${scale}); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+      <div class="marker-wrapper">
         <div class="marker-pin" style="
           background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
           width: ${iconSize}px;
@@ -110,41 +103,28 @@ const createCustomIcon = (species: string, size?: number, isSelected?: boolean) 
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
           box-shadow:
-            0 4px 12px rgba(0,0,0,0.25),
-            inset 0 -2px 4px rgba(0,0,0,0.2)${isSelected ? `, 0 0 0 4px ${color}44, 0 0 20px ${color}66` : ''};
+            0 3px 8px rgba(0,0,0,0.3),
+            inset 0 -2px 4px rgba(0,0,0,0.2);
           display: flex;
           align-items: center;
           justify-content: center;
           position: relative;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         ">
           <div class="marker-inner" style="
-            background: rgba(255,255,255,0.3);
-            backdrop-filter: blur(4px);
-            width: ${iconSize * 0.65}px;
-            height: ${iconSize * 0.65}px;
+            background: rgba(255,255,255,0.25);
+            width: ${iconSize * 0.7}px;
+            height: ${iconSize * 0.7}px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             transform: rotate(45deg);
           ">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="${iconSize * 0.45}"
-              height="${iconSize * 0.45}"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="${iconColor}"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));"
-            >
-              <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6-3.56 0-7.56-2.53-8.5-6Z"></path>
-              <circle cx="15" cy="12" r="1"></circle>
-              <path d="M2 12S5.5 8 6.5 12s-4.5 0-4.5 0Z"></path>
-            </svg>
+            <img src="${fishIconUrl}" alt="" style="
+              width: ${iconSize * 0.5}px;
+              height: ${iconSize * 0.5}px;
+              filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+            " />
           </div>
         </div>
         <div class="marker-dot" style="
@@ -156,7 +136,7 @@ const createCustomIcon = (species: string, size?: number, isSelected?: boolean) 
           height: ${dotSize}px;
           background: radial-gradient(circle, ${color} 0%, ${color}88 100%);
           border-radius: 50%;
-          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         "></div>
       </div>
     `,
@@ -449,11 +429,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             <Marker
               key={record.id}
               position={[record.adjustedLat, record.adjustedLng]}
-              icon={createCustomIcon(
-                record.fishSpecies,
-                record.size || record.weight,
-                selectedRecord?.id === record.id
-              )}
+              icon={createCustomIcon(record.fishSpecies, record.size || record.weight)}
               eventHandlers={{
                 click: () => {
                   setSelectedRecord(record);
@@ -865,6 +841,12 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
       {/* CSSアニメーション */}
       <style>{`
+        /* Leafletのデフォルトスタイルをリセット */
+        .custom-marker {
+          background: none !important;
+          border: none !important;
+        }
+
         @keyframes float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-4px); }
@@ -872,7 +854,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
         .marker-wrapper {
           animation: float 3s ease-in-out infinite;
-          position: relative;
         }
 
         .marker-wrapper:hover .marker-pin {
