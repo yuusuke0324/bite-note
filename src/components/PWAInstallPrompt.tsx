@@ -1,7 +1,7 @@
 // PWAインストールプロンプトコンポーネント
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Fish, Smartphone, X } from 'lucide-react';
+import { Smartphone, X } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
 import { colors } from '../theme/colors';
 import { logger } from '../lib/errors/logger';
@@ -260,19 +260,17 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
           alignItems: 'flex-start',
           gap: '1rem'
         }}>
-          {/* アイコン */}
-          <div style={{
-            flexShrink: 0,
-            width: '48px',
-            height: '48px',
-            borderRadius: '12px',
-            backgroundColor: '#D1FAE5',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Fish size={28} color="#10B981" aria-hidden="true" />
-          </div>
+          {/* アプリアイコン */}
+          <img
+            src="/icons/icon-96x96.png"
+            alt="Bite Note"
+            style={{
+              flexShrink: 0,
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px'
+            }}
+          />
 
           {/* コンテンツ */}
           <div style={{ flex: 1 }}>
