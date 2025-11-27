@@ -28,7 +28,7 @@ test.describe('アプリケーション基本ナビゲーション', () => {
       // force: true を使用してクリックを強制実行
       await formTab.click({ force: true });
       // フォームコンテンツが表示されることを確認
-      await expect(page.locator('text=日付')).toBeVisible();
+      await expect(page.locator('text=釣行日時')).toBeVisible();
     }
 
     if (await listTab.count() > 0) {
