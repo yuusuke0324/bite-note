@@ -14,6 +14,7 @@
  */
 
 import React from 'react';
+import { Calendar, Waves, Palmtree } from 'lucide-react';
 import type { TideEvent } from '../types/tide';
 import { filterTodayEvents } from '../lib/tide-helpers';
 
@@ -37,7 +38,9 @@ export const TideEventsList: React.FC<TideEventsListProps> = ({
         data-testid="empty-events-state"
         className="text-center py-8 text-gray-500"
       >
-        <div className="text-4xl mb-2">📅</div>
+        <div className="flex justify-center mb-2">
+          <Calendar size={40} color="#6B7280" aria-hidden="true" />
+        </div>
         <div className="text-sm">今日の潮汐イベントがありません</div>
       </div>
     );
@@ -67,9 +70,13 @@ export const TideEventsList: React.FC<TideEventsListProps> = ({
             {/* アイコン */}
             <div
               data-testid={isHighTide ? 'high-tide-icon' : 'low-tide-icon'}
-              className="flex-shrink-0 text-2xl"
+              className="flex-shrink-0 flex items-center justify-center"
             >
-              {isHighTide ? '🌊' : '🏖️'}
+              {isHighTide ? (
+                <Waves size={24} color="#0EA5E9" aria-hidden="true" />
+              ) : (
+                <Palmtree size={24} color="#F59E0B" aria-hidden="true" />
+              )}
             </div>
 
             {/* イベント詳細 */}

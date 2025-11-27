@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { Fish } from 'lucide-react';
 import type { TideGraphData } from '../types/tide';
 import { useResizeObserver } from '../hooks/useResizeObserver';
 import { calculateSVGDimensions, createResponsiveConfig } from '../utils/responsive';
@@ -639,14 +640,16 @@ export const TideGraph: React.FC<TideGraphProps> = ({
                 stroke="white"
                 strokeWidth="2"
               />
-              <text
-                x={xScale(marker)}
-                y={-5}
-                textAnchor="middle"
-                className="text-xs font-medium fill-amber-600"
+              <foreignObject
+                x={xScale(marker) - 10}
+                y={-18}
+                width="20"
+                height="20"
               >
-                🎣
-              </text>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Fish size={16} color="#10B981" aria-hidden="true" />
+                </div>
+              </foreignObject>
             </g>
           ))}
 

@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { ModernCard } from './ui/ModernCard';
 import { TideSummaryGrid } from './TideSummaryGrid';
 import { TideEventsList } from './TideEventsList';
@@ -53,7 +54,9 @@ export const TideSummaryCard: React.FC<TideSummaryCardProps> = ({
     return (
       <ModernCard className={className}>
         <div data-testid="summary-card-error" className="p-6 text-center">
-          <div className="text-red-500 text-lg mb-2">⚠️</div>
+          <div className="flex justify-center mb-2">
+            <AlertTriangle size={28} color="#F59E0B" aria-hidden="true" />
+          </div>
           <div className="text-red-600 font-medium">潮汐データエラー</div>
           <div className="text-red-500 text-sm mt-1">
             {error || '潮汐情報を取得できませんでした'}
