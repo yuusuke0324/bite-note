@@ -195,8 +195,9 @@ describe('StackedMarkerCard', () => {
 
       const { container } = render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
 
-      const button = container.querySelector('button');
-      button?.focus();
+      const button = container.querySelector('button') as HTMLElement;
+      // Use tab to focus instead of direct focus() for CI stability
+      await userEvent.tab();
       await userEvent.keyboard('{Enter}');
 
       expect(onClick).toHaveBeenCalledWith(0);
@@ -208,8 +209,9 @@ describe('StackedMarkerCard', () => {
 
       const { container } = render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
 
-      const button = container.querySelector('button');
-      button?.focus();
+      const button = container.querySelector('button') as HTMLElement;
+      // Use tab to focus instead of direct focus() for CI stability
+      await userEvent.tab();
       await userEvent.keyboard(' ');
 
       expect(onClick).toHaveBeenCalledWith(0);
@@ -231,8 +233,8 @@ describe('StackedMarkerCard', () => {
         />
       );
 
-      const button = container.querySelector('button[aria-label*="fishing records"]');
-      button?.focus();
+      // When expanded, focus is moved to first record
+      // Press Escape to close
       await userEvent.keyboard('{Escape}');
 
       expect(onClose).toHaveBeenCalledWith(0);
@@ -330,21 +332,29 @@ describe('StackedMarkerCard', () => {
 
       const { container } = render(<StackedMarkerCard group={group} index={0} isExpanded={true} />);
 
-      // First record should be focused initially
+      // First record should be focused initially (aria-selected=true)
       const recordButtons = container.querySelectorAll('[role="option"]');
       expect(recordButtons[0]).toHaveAttribute('aria-selected', 'true');
 
+      // Focus the listbox first for keyboard navigation
+      const listbox = container.querySelector('[role="listbox"]') as HTMLElement;
+      listbox?.focus();
+
       // Navigate down
       await userEvent.keyboard('{ArrowDown}');
-      expect(recordButtons[1]).toHaveAttribute('aria-selected', 'true');
+      // Re-query to get updated state
+      const updatedButtons1 = container.querySelectorAll('[role="option"]');
+      expect(updatedButtons1[1]).toHaveAttribute('aria-selected', 'true');
 
       // Navigate to end
       await userEvent.keyboard('{End}');
-      expect(recordButtons[2]).toHaveAttribute('aria-selected', 'true');
+      const updatedButtons2 = container.querySelectorAll('[role="option"]');
+      expect(updatedButtons2[2]).toHaveAttribute('aria-selected', 'true');
 
       // Navigate to home
       await userEvent.keyboard('{Home}');
-      expect(recordButtons[0]).toHaveAttribute('aria-selected', 'true');
+      const updatedButtons3 = container.querySelectorAll('[role="option"]');
+      expect(updatedButtons3[0]).toHaveAttribute('aria-selected', 'true');
     });
   });
 
