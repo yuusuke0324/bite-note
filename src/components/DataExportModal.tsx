@@ -1,6 +1,7 @@
 // データエクスポートモーダルコンポーネント
 
 import React, { useState, useCallback } from 'react';
+import { Upload, X, FileText, FileSpreadsheet, Calendar, Image, CheckCircle, XCircle, Loader } from 'lucide-react';
 import { exportImportService } from '../lib/export-import-service';
 import type { FishingRecord } from '../types';
 
@@ -127,22 +128,29 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333'
+            color: '#333',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}>
-            📤 データエクスポート
+            <Upload size={24} color="#6366F1" aria-hidden="true" />
+            データエクスポート
           </h2>
           <button
             onClick={onClose}
+            aria-label="閉じる"
             style={{
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              fontSize: '1.5rem',
               color: '#6c757d',
-              padding: '0.25rem'
+              padding: '0.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
-            ✕
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -174,7 +182,9 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 checked={exportFormat === 'json'}
                 onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
-              <span>📄 JSON (全データ)</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={18} color="#6366F1" aria-hidden="true" /> JSON (全データ)
+              </span>
             </label>
             <label style={{
               display: 'flex',
@@ -188,7 +198,9 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 checked={exportFormat === 'csv'}
                 onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
-              <span>📊 CSV (記録のみ)</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileSpreadsheet size={18} color="#6366F1" aria-hidden="true" /> CSV (記録のみ)
+              </span>
             </label>
           </div>
         </div>
@@ -202,7 +214,9 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             fontSize: '0.9rem',
             color: '#333'
           }}>
-            📅 日付範囲（オプション）
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Calendar size={20} color="#8B5CF6" aria-hidden="true" /> 日付範囲（オプション）
+            </span>
           </label>
           <div style={{
             display: 'grid',
@@ -263,7 +277,9 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                   height: '18px'
                 }}
               />
-              <span style={{ fontSize: '0.9rem' }}>📷 写真データを含める</span>
+              <span style={{ fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Image size={18} color="#6B7280" aria-hidden="true" /> 写真データを含める
+              </span>
             </label>
           </div>
         )}
@@ -307,7 +323,13 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             color: exportStatus.type === 'success' ? '#155724' : '#721c24',
             border: `1px solid ${exportStatus.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
           }}>
-            {exportStatus.type === 'success' ? '✅' : '❌'} {exportStatus.message}
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {exportStatus.type === 'success'
+                ? <CheckCircle size={20} color="#10B981" aria-hidden="true" />
+                : <XCircle size={20} color="#EF4444" aria-hidden="true" />
+              }
+              {exportStatus.message}
+            </span>
           </div>
         )}
 
@@ -349,7 +371,15 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               gap: '0.5rem'
             }}
           >
-            {isExporting ? '⏳ エクスポート中...' : '📤 エクスポート'}
+            {isExporting ? (
+              <>
+                <Loader size={18} className="animate-spin" aria-hidden="true" /> エクスポート中...
+              </>
+            ) : (
+              <>
+                <Upload size={18} aria-hidden="true" /> エクスポート
+              </>
+            )}
           </button>
         </div>
       </div>
