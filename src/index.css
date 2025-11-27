@@ -158,6 +158,9 @@ input, textarea, select {
   --color-scrollbar-track: #2d2d2d;
   --color-scrollbar-thumb: #555;
   --color-scrollbar-thumb-hover: #777;
+
+  /* Loading overlay */
+  --color-loading-overlay: rgba(15, 23, 42, 0.8);
 }
 
 /* Light Theme */
@@ -197,6 +200,9 @@ body.light-theme {
   --color-scrollbar-track: #f1f1f1;
   --color-scrollbar-thumb: #c1c1c1;
   --color-scrollbar-thumb-hover: #a8a8a8;
+
+  /* Loading overlay */
+  --color-loading-overlay: rgba(248, 250, 252, 0.8);
 }
 
 /* 全ての要素に対する横スクロール防止の適用 */

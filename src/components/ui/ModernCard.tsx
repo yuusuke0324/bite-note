@@ -61,20 +61,20 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   const getVariantStyles = (): React.CSSProperties => {
     const variants = {
       elevated: {
-        backgroundColor: '#1e293b',
+        backgroundColor: 'var(--color-surface-primary)',
         boxShadow: isHovered
           ? '0 14px 28px rgba(0,0,0,0.4), 0 10px 10px rgba(0,0,0,0.3)'
           : '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
         transform: isHovered && (interactive || onClick) ? 'translateY(-2px)' : 'translateY(0)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        border: '1px solid var(--color-border-light)',
       },
       outlined: {
-        backgroundColor: '#1e293b',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
+        backgroundColor: 'var(--color-surface-primary)',
+        border: '1px solid var(--color-border-light)',
         boxShadow: 'none',
       },
       filled: {
-        backgroundColor: '#334155',
+        backgroundColor: 'var(--color-surface-secondary)',
         boxShadow: 'none',
       },
     };
@@ -87,7 +87,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    backgroundColor: 'var(--color-loading-overlay)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

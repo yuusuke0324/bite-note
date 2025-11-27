@@ -24,9 +24,9 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   const navigationStyles: React.CSSProperties = {
     display: 'flex',
     height: '56px',
-    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-    boxShadow: '0 -2px 8px rgba(0,0,0,0.3)',
+    background: 'var(--color-background-primary)',
+    borderTop: '1px solid var(--color-border-light)',
+    boxShadow: '0 -2px 8px var(--color-border-light)',
     position: 'relative',
   };
 

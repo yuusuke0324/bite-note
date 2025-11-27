@@ -23,8 +23,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     display: 'flex',
     flexDirection: 'column',
     fontFamily: 'Inter, system-ui, sans-serif',
-    backgroundColor: '#0f172a',
-    color: '#f1f5f9',
+    backgroundColor: 'var(--color-background-primary)',
+    color: 'var(--color-text-primary)',
   };
 
   const mainContentStyles: React.CSSProperties = {
@@ -43,8 +43,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
   const sidebarStyles: React.CSSProperties = {
     width: '280px',
-    backgroundColor: '#1e293b',
-    borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'var(--color-surface-primary)',
+    borderRight: '1px solid var(--color-border-light)',
     flexShrink: 0,
     position: 'sticky',
     top: 0,
@@ -90,8 +90,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           {/* フッター */}
           {footer && (
             <footer style={{
-              backgroundColor: '#1e293b',
-              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+              backgroundColor: 'var(--color-surface-primary)',
+              borderTop: '1px solid var(--color-border-light)',
               padding: '1rem',
             }}>
               {footer}
