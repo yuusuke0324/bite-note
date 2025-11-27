@@ -87,7 +87,7 @@ describe('TASK-202: 潮汐計算パフォーマンスベンチマーク', () => 
         Test: r.testName,
         'Time (ms)': r.metrics.executionTime.toFixed(1),
         'Memory (MB)': (r.metrics.memoryUsage.delta / 1024 / 1024).toFixed(2),
-        'Within Threshold': r.isWithinThreshold ? '✅' : '❌'
+        'Within Threshold': r.isWithinThreshold ? 'PASS' : 'FAIL'
       })));
     });
 
@@ -111,7 +111,7 @@ describe('TASK-202: 潮汐計算パフォーマンスベンチマーク', () => 
       expect(totalTime).toBeLessThan(4000);
       expect(results).toHaveLength(batchSize);
 
-      console.log(`✅ バッチ計算性能: ${batchSize}件を${totalTime.toFixed(1)}msで処理`);
+      console.log(`[PASS] バッチ計算性能: ${batchSize}件を${totalTime.toFixed(1)}msで処理`);
     });
   });
 
@@ -161,7 +161,7 @@ describe('TASK-202: 潮汐計算パフォーマンスベンチマーク', () => 
       const avgOptimizedTime = optimizedResults.reduce((sum, r) => sum + r.executionTime, 0) / optimizedResults.length;
       const overhead = ((avgOptimizedTime - avgBaselineTime) / avgBaselineTime) * 100;
 
-      console.log(`📊 パフォーマンス比較:
+      console.log(`[INFO] パフォーマンス比較:
         - ベースライン平均: ${avgBaselineTime.toFixed(1)}ms
         - 最適化版平均: ${avgOptimizedTime.toFixed(1)}ms
         - オーバーヘッド: ${overhead.toFixed(1)}%`);
@@ -191,7 +191,7 @@ describe('TASK-202: 潮汐計算パフォーマンスベンチマーク', () => 
       const finalStats = enhancedCache.getStats();
       const hitRateImprovement = finalStats.hitRate - initialHitRate;
 
-      console.log(`🚀 キャッシュ効率:
+      console.log(`[INFO] キャッシュ効率:
         - 初期ヒット率: ${(initialHitRate * 100).toFixed(1)}%
         - 最終ヒット率: ${(finalStats.hitRate * 100).toFixed(1)}%
         - 改善: +${(hitRateImprovement * 100).toFixed(1)}%
