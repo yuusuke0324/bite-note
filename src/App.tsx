@@ -579,7 +579,7 @@ function App() {
                           ctx.font = '20px Arial';
                           ctx.textAlign = 'center';
                           ctx.fillText('テスト釣果写真', 200, 100);
-                          ctx.fillText('🐟', 200, 150);
+                          ctx.fillText('Fish', 200, 150);
                         }
 
                         canvas.toBlob(async (blob) => {

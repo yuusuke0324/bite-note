@@ -1,6 +1,7 @@
 // PWA更新通知コンポーネント
 
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
 
 export const PWAUpdateNotification: React.FC = () => {
@@ -80,7 +81,7 @@ export const PWAUpdateNotification: React.FC = () => {
           }}
           title="閉じる"
         >
-          ✕
+          <X size={16} aria-hidden="true" />
         </button>
       </div>
 

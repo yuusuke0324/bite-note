@@ -41,7 +41,7 @@ import { OfflineIndicator } from './components/common/OfflineIndicator';
 // アイコン
 import Icons from './components/icons/Icons';
 import { Icon } from './components/ui/Icon';
-import { Search, Sliders, ChevronDown, Fish, MapPin, Ruler, Trophy, TrendingUp, Calendar, Scale } from 'lucide-react';
+import { Search, Sliders, ChevronDown, Fish, MapPin, Ruler, Trophy, TrendingUp, Calendar, Scale, X } from 'lucide-react';
 
 // テスト用定数
 import { TestIds } from './constants/testIds';
@@ -619,7 +619,7 @@ function ModernApp() {
             }}
             title="クリア"
           >
-            ✕
+            <X size={14} aria-hidden="true" />
           </button>
         )}
       </div>
