@@ -100,35 +100,6 @@ function calculateXPosition(
 }
 
 /**
- * Calculate Y coordinate for a time value on the chart
- * Uses the tide value at that time
- */
-function calculateYPosition(
-  time: string,
-  chartData: Array<{ time: string; tide: number }>,
-  chartHeight: number,
-  margin: { top: number; bottom: number }
-): number {
-  const plotHeight = chartHeight - margin.top - margin.bottom;
-  const dataPoint = chartData.find((d) => d.time === time);
-
-  if (!dataPoint) {
-    // Default to top area if time not found
-    return margin.top + plotHeight * 0.1;
-  }
-
-  // Calculate Y based on tide value
-  const tideValues = chartData.map((d) => d.tide);
-  const minTide = Math.min(...tideValues);
-  const maxTide = Math.max(...tideValues);
-  const tideRange = maxTide - minTide || 1;
-
-  // Invert Y (SVG Y increases downward)
-  const normalizedTide = (dataPoint.tide - minTide) / tideRange;
-  return margin.top + plotHeight * (1 - normalizedTide);
-}
-
-/**
  * Hook for Intersection Observer based virtualization
  * Only renders markers that are visible in viewport
  */
