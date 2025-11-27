@@ -3,8 +3,8 @@
  * Material Design 3とGlass Morphismを採用した次世代デザイン
  */
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -97,6 +97,8 @@ interface CreateCustomIconOptions {
   location?: string;
   weight?: number;
   isRecent?: boolean; // Issue #295: 1週間以内の釣果
+  zoomLevel?: number; // Issue #298: ズームレベル連動サイズ
+  isDarkMode?: boolean; // Issue #296: ダークモード対応
 }
 
 // Issue #295: 最近の釣果判定（1週間以内）
@@ -107,6 +109,49 @@ const isRecentCatch = (date: Date | string): boolean => {
   return catchDate >= oneWeekAgo;
 };
 
+// Issue #296: ダークモード検出フック
+const useDarkMode = (): boolean => {
+  const [isDark, setIsDark] = useState(() =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  return isDark;
+};
+
+// Issue #298: ズームレベル追跡コンポーネント
+const ZoomTracker: React.FC<{ onZoomChange: (zoom: number) => void }> = ({ onZoomChange }) => {
+  const map = useMapEvents({
+    zoomend: () => {
+      onZoomChange(map.getZoom());
+    },
+  });
+
+  useEffect(() => {
+    onZoomChange(map.getZoom());
+  }, [map, onZoomChange]);
+
+  return null;
+};
+
+// Issue #298: ズームレベルに基づくマーカーサイズ計算
+const getMarkerSizeForZoom = (zoom: number, baseSize: number = 48): number => {
+  // ズームレベル5（広域）〜17（詳細）に対応
+  // 広域では小さく、詳細では大きく
+  if (zoom <= 8) return Math.max(baseSize * 0.7, 32);
+  if (zoom <= 10) return Math.max(baseSize * 0.8, 36);
+  if (zoom <= 12) return Math.max(baseSize * 0.9, 40);
+  if (zoom <= 14) return baseSize;
+  return Math.min(baseSize * 1.15, 56); // 最大56px
+};
+
 const createCustomIcon = (options: CreateCustomIconOptions | string, size?: number) => {
   // 後方互換性のため、文字列引数もサポート
   const species = typeof options === 'string' ? options : options.species;
@@ -114,12 +159,21 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
   const location = typeof options === 'string' ? undefined : options.location;
   const weight = typeof options === 'string' ? undefined : options.weight;
   const isRecent = typeof options === 'string' ? false : options.isRecent ?? false;
+  const zoomLevel = typeof options === 'string' ? 14 : options.zoomLevel ?? 14;
+  const isDarkMode = typeof options === 'string' ? false : options.isDarkMode ?? false;
 
   const color = getFishSpeciesColor(species);
   // Issue #290: タッチターゲットサイズ拡大（44-56px、デフォルト48px）
-  const iconSize = fishSize ? Math.min(Math.max(fishSize / 8, 44), 56) : 48;
-  const dotSize = 10; // 固定サイズで視認性向上
+  // Issue #298: ズームレベルに応じたサイズ調整
+  const baseSize = fishSize ? Math.min(Math.max(fishSize / 8, 44), 56) : 48;
+  const iconSize = getMarkerSizeForZoom(zoomLevel, baseSize);
+  const dotSize = Math.max(8, iconSize * 0.2); // ズームに応じてドットサイズも調整
   const fishIconUrl = createFishIconDataUri('white');
+
+  // Issue #296: ダークモード時のスタイル調整
+  const shadowColor = isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)';
+  const borderColor = isDarkMode ? 'rgba(255,255,255,0.3)' : 'transparent';
+  const glowEffect = isDarkMode ? `0 0 8px ${color}88` : '';
 
   // Issue #292: ARIA用のラベル生成
   const sizeLabel = fishSize ? `${fishSize}cm` : weight ? `${weight}g` : '';
@@ -128,25 +182,31 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
   // Issue #295: 最近の釣果にはパルスアニメーションクラスを追加
   const recentClass = isRecent ? ' marker-recent' : '';
 
+  // Issue #296: ダークモード対応のbox-shadow
+  const boxShadow = isDarkMode
+    ? `0 4px 12px ${shadowColor}, inset 0 -2px 4px rgba(0,0,0,0.2), ${glowEffect}`
+    : `0 4px 12px ${shadowColor}, inset 0 -2px 4px rgba(0,0,0,0.15)`;
+
   return L.divIcon({
-    className: 'custom-marker',
+    className: `custom-marker${isDarkMode ? ' dark-mode' : ''}`,
     html: `
       <div class="marker-wrapper${recentClass}"
            role="button"
            tabindex="0"
-           aria-label="${ariaLabel}">
+           aria-label="${ariaLabel}"
+           data-marker-id="${species}">
         <div class="marker-pin" style="
           background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
           width: ${iconSize}px;
           height: ${iconSize}px;
           border-radius: 50% 50% 0 50%;
-          box-shadow:
-            0 4px 12px rgba(0,0,0,0.25),
-            inset 0 -2px 4px rgba(0,0,0,0.15);
+          box-shadow: ${boxShadow};
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
           position: relative;
+          transition: transform 0.2s ease-out;
         ">
           <div class="marker-inner" style="
             background: rgba(255,255,255,0.3);
@@ -173,7 +233,7 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
           height: ${dotSize}px;
           background: radial-gradient(circle, ${color} 0%, ${color}88 100%);
           border-radius: 50%;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+          box-shadow: 0 2px 6px ${shadowColor};
         "></div>
       </div>
     `,
@@ -235,6 +295,19 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoLoading, setPhotoLoading] = useState(false);
   const photoUrlRef = React.useRef<string | null>(null);
+
+  // Issue #296: ダークモード検出
+  const isDarkMode = useDarkMode();
+
+  // Issue #298: ズームレベル追跡
+  const [zoomLevel, setZoomLevel] = useState(14);
+  const handleZoomChange = useCallback((zoom: number) => {
+    setZoomLevel(zoom);
+  }, []);
+
+  // Issue #297: キーボードナビゲーション用のフォーカスインデックス
+  const [focusedMarkerIndex, setFocusedMarkerIndex] = useState(-1);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const recordsWithCoordinates = useMemo(
     () => records.filter(r => r.coordinates),
@@ -336,6 +409,51 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
     return { totalRecords, uniqueLocations, uniqueSpecies, biggestCatch };
   }, [recordsWithCoordinates]);
 
+  // Issue #297: キーボードナビゲーション
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (recordsWithAdjustedCoordinates.length === 0) return;
+
+    const { key } = event;
+
+    if (key === 'ArrowRight' || key === 'ArrowDown') {
+      event.preventDefault();
+      setFocusedMarkerIndex(prev => {
+        const next = prev + 1;
+        return next >= recordsWithAdjustedCoordinates.length ? 0 : next;
+      });
+    } else if (key === 'ArrowLeft' || key === 'ArrowUp') {
+      event.preventDefault();
+      setFocusedMarkerIndex(prev => {
+        const next = prev - 1;
+        return next < 0 ? recordsWithAdjustedCoordinates.length - 1 : next;
+      });
+    } else if (key === 'Enter' || key === ' ') {
+      event.preventDefault();
+      if (focusedMarkerIndex >= 0 && focusedMarkerIndex < recordsWithAdjustedCoordinates.length) {
+        const record = recordsWithAdjustedCoordinates[focusedMarkerIndex];
+        setSelectedRecord(record);
+        setFlyToCoords({
+          latitude: record.adjustedLat,
+          longitude: record.adjustedLng,
+        });
+      }
+    } else if (key === 'Escape') {
+      setSelectedRecord(null);
+      setFocusedMarkerIndex(-1);
+    }
+  }, [recordsWithAdjustedCoordinates, focusedMarkerIndex]);
+
+  // Issue #297: フォーカスされたマーカーに移動
+  useEffect(() => {
+    if (focusedMarkerIndex >= 0 && focusedMarkerIndex < recordsWithAdjustedCoordinates.length) {
+      const record = recordsWithAdjustedCoordinates[focusedMarkerIndex];
+      setFlyToCoords({
+        latitude: record.adjustedLat,
+        longitude: record.adjustedLng,
+      });
+    }
+  }, [focusedMarkerIndex, recordsWithAdjustedCoordinates]);
+
   // 選択されたレコードの写真を読み込む
   useEffect(() => {
     let isMounted = true;
@@ -420,14 +538,22 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
   }
 
   return (
-    <div style={{
-      height: '100%',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-      backgroundColor: colors.background.primary,
-    }}>
+    <div
+      ref={mapContainerRef}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      role="application"
+      aria-label="釣果マップ。矢印キーでマーカー間を移動、Enterで選択"
+      style={{
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        backgroundColor: isDarkMode ? '#1a1a2e' : colors.background.primary,
+        outline: 'none',
+      }}
+    >
       {/* フルスクリーン地図 */}
       <div style={{
         flex: 1,
@@ -444,11 +570,18 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           maxBounds={JAPAN_BOUNDS}
           maxBoundsViscosity={0.9}
         >
+          {/* Issue #296: ダークモード対応タイルレイヤー */}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://tile.openstreetmap.jp/styles/osm-bright-ja/{z}/{x}/{y}.png"
+            url={isDarkMode
+              ? "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
+              : "https://tile.openstreetmap.jp/styles/osm-bright-ja/{z}/{x}/{y}.png"
+            }
             maxZoom={18}
           />
+
+          {/* Issue #298: ズームレベル追跡 */}
+          <ZoomTracker onZoomChange={handleZoomChange} />
 
           <AutoBounds records={recordsWithCoordinates} />
 
@@ -471,21 +604,29 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             iconCreateFunction={(cluster: L.MarkerCluster) => {
               const count = cluster.getChildCount();
               const size = count < 10 ? 44 : count < 50 ? 52 : 60;
+              // Issue #296: ダークモード対応のクラスタスタイル
+              const clusterBg = isDarkMode
+                ? `linear-gradient(135deg, ${colors.primary[400]} 0%, ${colors.primary[500]} 100%)`
+                : `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`;
+              const clusterBorder = isDarkMode ? 'rgba(255,255,255,0.5)' : 'white';
+              const clusterShadow = isDarkMode
+                ? `0 4px 16px rgba(0,0,0,0.5), 0 0 12px ${colors.primary[400]}66`
+                : '0 4px 16px rgba(0,0,0,0.3)';
               return L.divIcon({
                 html: `
                   <div class="cluster-marker" style="
                     width: ${size}px;
                     height: ${size}px;
                     border-radius: 50%;
-                    background: linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%);
+                    background: ${clusterBg};
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     color: white;
                     font-weight: 700;
                     font-size: ${size / 3}px;
-                    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-                    border: 3px solid white;
+                    box-shadow: ${clusterShadow};
+                    border: 3px solid ${clusterBorder};
                   ">
                     ${count}
                   </div>
@@ -495,7 +636,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               });
             }}
           >
-            {recordsWithAdjustedCoordinates.map((record) => (
+            {recordsWithAdjustedCoordinates.map((record, index) => (
               <Marker
                 key={record.id}
                 position={[record.adjustedLat, record.adjustedLng]}
@@ -505,10 +646,13 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   weight: record.weight,
                   location: record.location,
                   isRecent: isRecentCatch(record.date), // Issue #295
+                  zoomLevel, // Issue #298
+                  isDarkMode, // Issue #296
                 })}
                 eventHandlers={{
                   click: () => {
                     setSelectedRecord(record);
+                    setFocusedMarkerIndex(index); // Issue #297
                     // 地図をその位置に移動
                     setFlyToCoords({
                       latitude: record.adjustedLat,
@@ -973,6 +1117,29 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
         .marker-wrapper:focus .marker-pin {
           outline: 3px solid #1A73E8;
           outline-offset: 2px;
+        }
+
+        /* Issue #297: キーボードナビゲーション用フォーカススタイル */
+        .marker-wrapper:focus-visible .marker-pin {
+          outline: 4px solid #FFD700;
+          outline-offset: 4px;
+          transform: scale(1.15);
+        }
+
+        /* Issue #296: ダークモード用スタイル */
+        .custom-marker.dark-mode .marker-wrapper {
+          filter: brightness(1.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .marker-wrapper .marker-pin {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5),
+                        inset 0 -2px 4px rgba(0,0,0,0.2);
+          }
+
+          .marker-wrapper:focus .marker-pin {
+            outline-color: #4DA3FF;
+          }
         }
 
         /* Issue #294: クラスタマーカーのスタイル */
