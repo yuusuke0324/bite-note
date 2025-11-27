@@ -15,7 +15,7 @@ import type { FishingRecord } from '../types/entities';
 import type { TideInfo, TideGraphData } from '../types/tide';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
-import { colors } from '../theme/colors';
+import { colors, getTheme } from '../theme/colors';
 import {
   Waves,
   AlertTriangle,
@@ -613,7 +613,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                         keyboardNavigationEnabled={true}
                         focusManagementEnabled={true}
                         enablePerformanceMonitoring={false}
-                        theme="dark"
+                        theme={getTheme()}
                       />
                     </div>
                   </div>
@@ -657,7 +657,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                   {/* 次回最適時間提案 */}
                   {tideAnalysis.nextOptimalTime && (
                     <div data-testid="next-optimal-time">
-                      <h5 className="font-medium text-blue-800 mb-2">次回の最適釣行時間</h5>
+                      <h5 className="font-medium mb-2" style={{ color: colors.chart.primary }}>次回の最適釣行時間</h5>
                       <div className="rounded-lg p-3" style={{ backgroundColor: colors.surface.primary, border: `1px solid ${colors.border.focus}` }}>
                         <div className="flex items-center space-x-2">
                           <span className="text-blue-600">

@@ -136,7 +136,7 @@ input, textarea, select {
   --color-text-secondary: rgba(255, 255, 255, 0.7);
   --color-text-tertiary: rgba(255, 255, 255, 0.5);
   --color-text-disabled: rgba(255, 255, 255, 0.3);
-  --color-text-inverse: #0f172a;
+  --color-text-inverse: #ffffff; /* ボタン/バッジ上のテキスト用（常に白） */
 
   --color-border-light: rgba(255, 255, 255, 0.1);
   --color-border-medium: rgba(255, 255, 255, 0.15);
@@ -183,7 +183,7 @@ body.light-theme {
   --color-text-secondary: rgba(30, 41, 59, 0.7);
   --color-text-tertiary: rgba(30, 41, 59, 0.5);
   --color-text-disabled: rgba(30, 41, 59, 0.3);
-  --color-text-inverse: #f1f5f9;
+  --color-text-inverse: #ffffff; /* ボタン/バッジ上のテキスト用（常に白） */
 
   --color-border-light: rgba(0, 0, 0, 0.1);
   --color-border-medium: rgba(0, 0, 0, 0.15);
