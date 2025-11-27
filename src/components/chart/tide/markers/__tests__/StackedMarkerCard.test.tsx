@@ -1,22 +1,38 @@
 /**
  * StackedMarkerCard.test.tsx - Unit tests for StackedMarkerCard component
  * Issue #273: TideChart fishing marker enhancement
+ *
+ * CI環境での並列実行時のDOM参照問題を回避するため、
+ * `screen` → `container.querySelector` パターンを採用
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StackedMarkerCard } from '../StackedMarkerCard';
 import type { MarkerGroup, FishingMarkerData } from '../types';
 
-// Ensure cleanup after each test for CI environment stability
-afterEach(() => {
-  cleanup();
+// CI環境でのJSDOM初期化待機
+beforeEach(async () => {
+  if (process.env.CI) {
+    await waitFor(
+      () => {
+        if (!document.body || document.body.children.length === 0) {
+          throw new Error('JSDOM not ready');
+        }
+      },
+      { timeout: 5000, interval: 100 }
+    );
+  } else {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
 });
 
-// Reset body before each test to ensure clean state in CI
-beforeEach(() => {
-  document.body.innerHTML = '';
+// CI環境ではroot containerを保持
+afterEach(() => {
+  if (!process.env.CI) {
+    document.body.innerHTML = '';
+  }
 });
 
 // Helper to create test data
@@ -50,10 +66,11 @@ describe('StackedMarkerCard', () => {
     it('should render single record marker', () => {
       const group = createGroup('12:00', [createRecord('1', '12:00', 'Bass')]);
 
-      render(<StackedMarkerCard group={group} index={0} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} />);
 
       // Should show fish icon but no badge for single record
-      expect(screen.queryByText('1')).not.toBeInTheDocument();
+      const badge = container.querySelector('[class*="badge"]');
+      expect(badge).toBeNull();
     });
 
     it('should render multiple records with badge', () => {
@@ -63,10 +80,12 @@ describe('StackedMarkerCard', () => {
         createRecord('3', '12:05', 'Salmon'),
       ]);
 
-      render(<StackedMarkerCard group={group} index={0} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} />);
 
       // Should show count badge
-      expect(screen.getByText('3')).toBeInTheDocument();
+      const badge = container.querySelector('[class*="badge"]');
+      expect(badge).toBeInTheDocument();
+      expect(badge?.textContent).toBe('3');
     });
 
     it('should apply correct positioning', () => {
@@ -83,16 +102,16 @@ describe('StackedMarkerCard', () => {
     it('should apply theme classes', () => {
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      const { rerender } = render(
+      const { container, rerender } = render(
         <StackedMarkerCard group={group} index={0} theme="light" />
       );
 
-      let button = screen.getByRole('button');
-      expect(button.className).not.toContain('Dark');
+      let button = container.querySelector('button');
+      expect(button?.className).not.toContain('Dark');
 
       rerender(<StackedMarkerCard group={group} index={0} theme="dark" />);
-      button = screen.getByRole('button');
-      expect(button.className).toContain('Dark');
+      button = container.querySelector('button');
+      expect(button?.className).toContain('Dark');
     });
   });
 
@@ -102,9 +121,9 @@ describe('StackedMarkerCard', () => {
         createRecord('1', '12:00', 'Bass', 30),
       ]);
 
-      render(<StackedMarkerCard group={group} index={0} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} />);
 
-      const button = screen.getByRole('button');
+      const button = container.querySelector('button');
       expect(button).toHaveAttribute(
         'aria-label',
         expect.stringContaining('12:00 fishing record')
@@ -117,9 +136,9 @@ describe('StackedMarkerCard', () => {
         createRecord('2', '12:03', 'Trout'),
       ]);
 
-      render(<StackedMarkerCard group={group} index={0} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} />);
 
-      const button = screen.getByRole('button');
+      const button = container.querySelector('button');
       expect(button).toHaveAttribute(
         'aria-label',
         expect.stringContaining('2 catches')
@@ -132,30 +151,28 @@ describe('StackedMarkerCard', () => {
         createRecord('2', '12:03'),
       ]);
 
-      const { rerender } = render(
+      const { container, rerender } = render(
         <StackedMarkerCard group={group} index={0} isExpanded={false} />
       );
 
-      let button = screen.getByRole('button', { name: /fishing records/i });
+      let button = container.querySelector('button[aria-label*="fishing records"]');
       expect(button).toHaveAttribute('aria-expanded', 'false');
 
       rerender(
         <StackedMarkerCard group={group} index={0} isExpanded={true} />
       );
-      button = screen.getByRole('button', { name: /fishing records/i });
+      button = container.querySelector('button[aria-label*="fishing records"]');
       expect(button).toHaveAttribute('aria-expanded', 'true');
     });
 
     it('should have minimum tap target size (44x44px)', () => {
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      render(<StackedMarkerCard group={group} index={0} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} />);
 
-      const button = screen.getByRole('button');
-      const styles = window.getComputedStyle(button);
-
+      const button = container.querySelector('button');
       // Check min-width and min-height in CSS
-      expect(button.className).toContain('card');
+      expect(button?.className).toContain('card');
     });
   });
 
@@ -164,10 +181,10 @@ describe('StackedMarkerCard', () => {
       const onClick = vi.fn();
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      await userEvent.click(button);
+      const button = container.querySelector('button');
+      await userEvent.click(button!);
 
       expect(onClick).toHaveBeenCalledWith(0);
     });
@@ -176,10 +193,10 @@ describe('StackedMarkerCard', () => {
       const onClick = vi.fn();
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      const button = container.querySelector('button');
+      button?.focus();
       await userEvent.keyboard('{Enter}');
 
       expect(onClick).toHaveBeenCalledWith(0);
@@ -189,10 +206,10 @@ describe('StackedMarkerCard', () => {
       const onClick = vi.fn();
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} onClick={onClick} />);
 
-      const button = screen.getByRole('button');
-      button.focus();
+      const button = container.querySelector('button');
+      button?.focus();
       await userEvent.keyboard(' ');
 
       expect(onClick).toHaveBeenCalledWith(0);
@@ -205,7 +222,7 @@ describe('StackedMarkerCard', () => {
         createRecord('2', '12:03'),
       ]);
 
-      render(
+      const { container } = render(
         <StackedMarkerCard
           group={group}
           index={0}
@@ -214,8 +231,8 @@ describe('StackedMarkerCard', () => {
         />
       );
 
-      const button = screen.getByRole('button', { name: /fishing records/i });
-      button.focus();
+      const button = container.querySelector('button[aria-label*="fishing records"]');
+      button?.focus();
       await userEvent.keyboard('{Escape}');
 
       expect(onClose).toHaveBeenCalledWith(0);
@@ -229,11 +246,12 @@ describe('StackedMarkerCard', () => {
         createRecord('2', '12:03', 'Trout', 25),
       ]);
 
-      render(<StackedMarkerCard group={group} index={0} isExpanded={true} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} isExpanded={true} />);
 
-      expect(screen.getByRole('listbox')).toBeInTheDocument();
-      expect(screen.getByText('Bass')).toBeInTheDocument();
-      expect(screen.getByText('Trout')).toBeInTheDocument();
+      const listbox = container.querySelector('[role="listbox"]');
+      expect(listbox).toBeInTheDocument();
+      expect(container.textContent).toContain('Bass');
+      expect(container.textContent).toContain('Trout');
     });
 
     it('should not show list when collapsed', () => {
@@ -242,9 +260,10 @@ describe('StackedMarkerCard', () => {
         createRecord('2', '12:03', 'Trout'),
       ]);
 
-      render(<StackedMarkerCard group={group} index={0} isExpanded={false} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} isExpanded={false} />);
 
-      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      const listbox = container.querySelector('[role="listbox"]');
+      expect(listbox).toBeNull();
     });
 
     it('should show record details', () => {
@@ -252,11 +271,11 @@ describe('StackedMarkerCard', () => {
         createRecord('1', '12:00', 'Bass', 30),
       ]);
 
-      render(<StackedMarkerCard group={group} index={0} isExpanded={true} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} isExpanded={true} />);
 
-      expect(screen.getByText('12:00')).toBeInTheDocument();
-      expect(screen.getByText('Bass')).toBeInTheDocument();
-      expect(screen.getByText('30cm')).toBeInTheDocument();
+      expect(container.textContent).toContain('12:00');
+      expect(container.textContent).toContain('Bass');
+      expect(container.textContent).toContain('30cm');
     });
 
     it('should call onRecordClick when record is clicked', async () => {
@@ -264,7 +283,7 @@ describe('StackedMarkerCard', () => {
       const record = createRecord('1', '12:00', 'Bass');
       const group = createGroup('12:00', [record]);
 
-      render(
+      const { container } = render(
         <StackedMarkerCard
           group={group}
           index={0}
@@ -273,8 +292,9 @@ describe('StackedMarkerCard', () => {
         />
       );
 
-      const recordButton = screen.getByText('Bass').closest('button');
-      await userEvent.click(recordButton!);
+      // Find the record button in the listbox
+      const recordButtons = container.querySelectorAll('[role="option"]');
+      await userEvent.click(recordButtons[0]);
 
       expect(onRecordClick).toHaveBeenCalledWith(record);
     });
@@ -286,7 +306,7 @@ describe('StackedMarkerCard', () => {
         createRecord('2', '12:03'),
       ]);
 
-      render(
+      const { container } = render(
         <StackedMarkerCard
           group={group}
           index={0}
@@ -295,8 +315,8 @@ describe('StackedMarkerCard', () => {
         />
       );
 
-      const closeButton = screen.getByLabelText('Close record list');
-      await userEvent.click(closeButton);
+      const closeButton = container.querySelector('[aria-label="Close record list"]');
+      await userEvent.click(closeButton!);
 
       expect(onClose).toHaveBeenCalledWith(0);
     });
@@ -308,25 +328,23 @@ describe('StackedMarkerCard', () => {
         createRecord('3', '12:05', 'Salmon'),
       ]);
 
-      render(<StackedMarkerCard group={group} index={0} isExpanded={true} />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} isExpanded={true} />);
 
       // First record should be focused initially
-      const firstRecord = screen.getByText('Bass').closest('button');
-      expect(firstRecord).toHaveAttribute('aria-selected', 'true');
+      const recordButtons = container.querySelectorAll('[role="option"]');
+      expect(recordButtons[0]).toHaveAttribute('aria-selected', 'true');
 
       // Navigate down
       await userEvent.keyboard('{ArrowDown}');
-      const secondRecord = screen.getByText('Trout').closest('button');
-      expect(secondRecord).toHaveAttribute('aria-selected', 'true');
+      expect(recordButtons[1]).toHaveAttribute('aria-selected', 'true');
 
       // Navigate to end
       await userEvent.keyboard('{End}');
-      const lastRecord = screen.getByText('Salmon').closest('button');
-      expect(lastRecord).toHaveAttribute('aria-selected', 'true');
+      expect(recordButtons[2]).toHaveAttribute('aria-selected', 'true');
 
       // Navigate to home
       await userEvent.keyboard('{Home}');
-      expect(firstRecord).toHaveAttribute('aria-selected', 'true');
+      expect(recordButtons[0]).toHaveAttribute('aria-selected', 'true');
     });
   });
 
@@ -334,31 +352,31 @@ describe('StackedMarkerCard', () => {
     it('should render light theme correctly', () => {
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      render(<StackedMarkerCard group={group} index={0} theme="light" />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} theme="light" />);
 
-      const button = screen.getByRole('button');
-      expect(button.className).not.toContain('Dark');
-      expect(button.className).not.toContain('HighContrast');
+      const button = container.querySelector('button');
+      expect(button?.className).not.toContain('Dark');
+      expect(button?.className).not.toContain('HighContrast');
     });
 
     it('should render dark theme correctly', () => {
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      render(<StackedMarkerCard group={group} index={0} theme="dark" />);
+      const { container } = render(<StackedMarkerCard group={group} index={0} theme="dark" />);
 
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('Dark');
+      const button = container.querySelector('button');
+      expect(button?.className).toContain('Dark');
     });
 
     it('should render high-contrast theme correctly', () => {
       const group = createGroup('12:00', [createRecord('1', '12:00')]);
 
-      render(
+      const { container } = render(
         <StackedMarkerCard group={group} index={0} theme="high-contrast" />
       );
 
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('HighContrast');
+      const button = container.querySelector('button');
+      expect(button?.className).toContain('HighContrast');
     });
   });
 });
