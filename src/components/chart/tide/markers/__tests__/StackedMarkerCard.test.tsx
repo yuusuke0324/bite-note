@@ -3,11 +3,21 @@
  * Issue #273: TideChart fishing marker enhancement
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StackedMarkerCard } from '../StackedMarkerCard';
 import type { MarkerGroup, FishingMarkerData } from '../types';
+
+// Ensure cleanup after each test for CI environment stability
+afterEach(() => {
+  cleanup();
+});
+
+// Reset body before each test to ensure clean state in CI
+beforeEach(() => {
+  document.body.innerHTML = '';
+});
 
 // Helper to create test data
 const createRecord = (
