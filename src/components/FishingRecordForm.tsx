@@ -11,6 +11,7 @@ import type { TideInfo } from '../types/tide';
 import { TestIds } from '../constants/testIds';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
+import { colors } from '../theme/colors';
 import {
   Anchor,
   Camera,
@@ -293,11 +294,11 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
       maxWidth: '700px',
       margin: '0 auto',
       padding: '2rem',
-      paddingBottom: '2rem', // 標準的な余白に戻す
-      backgroundColor: '#ffffff',
+      paddingBottom: '2rem',
+      backgroundColor: colors.surface.primary,
       borderRadius: '12px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      border: '1px solid #e0e0e0'
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      border: `1px solid ${colors.border.light}`
     }}>
       <h2 style={{
         textAlign: 'center',
@@ -306,7 +307,8 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '0.5rem'
+        gap: '0.5rem',
+        color: colors.text.primary
       }}>
         <Icon icon={Anchor} size={28} decorative /> 新規記録
       </h2>
@@ -336,13 +338,13 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <div style={{
             marginBottom: '2rem',
             padding: '1rem',
-            backgroundColor: '#e3f2fd',
-            border: '1px solid #2196f3',
+            backgroundColor: 'rgba(96, 165, 250, 0.15)',
+            border: `1px solid ${colors.border.focus}`,
             borderRadius: '8px'
           }}>
             <h4 style={{
               margin: '0 0 0.75rem 0',
-              color: '#1976d2',
+              color: '#60a5fa',
               fontSize: '1rem',
               display: 'flex',
               alignItems: 'center',
@@ -350,7 +352,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             }}>
               <Icon icon={Camera} size={16} decorative /> 写真から抽出された情報
             </h4>
-            <div style={{ fontSize: '0.9rem', color: '#1565c0' }}>
+            <div style={{ fontSize: '0.9rem', color: '#93c5fd' }}>
               {extractedMetadata.coordinates && (
                 <p style={{ margin: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                   <Icon icon={MapPin} size={14} decorative /> GPS座標: {extractedMetadata.coordinates.latitude.toFixed(6)}, {extractedMetadata.coordinates.longitude.toFixed(6)}
@@ -375,22 +377,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <div style={{
             marginBottom: '2rem',
             padding: '1rem',
-            backgroundColor: '#e0f7fa',
-            border: '1px solid #00acc1',
+            backgroundColor: 'rgba(0, 172, 193, 0.15)',
+            border: '1px solid rgba(0, 172, 193, 0.4)',
             borderRadius: '8px'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              color: '#00838f',
+              color: '#4dd0e1',
               fontSize: '0.9rem'
             }}>
               <div style={{
                 width: '16px',
                 height: '16px',
                 border: '2px solid transparent',
-                borderTop: '2px solid #00838f',
+                borderTop: '2px solid #4dd0e1',
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite'
               }} />
@@ -403,14 +405,14 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <div style={{
             marginBottom: '2rem',
             padding: '1.25rem',
-            background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%)',
-            border: '2px solid #00acc1',
+            background: 'linear-gradient(135deg, rgba(0, 172, 193, 0.2) 0%, rgba(0, 172, 193, 0.1) 100%)',
+            border: '2px solid rgba(0, 172, 193, 0.4)',
             borderRadius: '12px',
-            boxShadow: '0 2px 8px rgba(0, 172, 193, 0.15)'
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
           }}>
             <h4 style={{
               margin: '0 0 1rem 0',
-              color: '#00838f',
+              color: '#4dd0e1',
               fontSize: '1.05rem',
               display: 'flex',
               alignItems: 'center',
@@ -419,7 +421,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             }}>
               <Icon icon={Waves} size={16} decorative /> 潮汐情報（自動計算）
             </h4>
-            <div style={{ fontSize: '0.9rem', color: '#00695c' }}>
+            <div style={{ fontSize: '0.9rem', color: colors.text.primary }}>
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -427,10 +429,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 marginBottom: '0.75rem'
               }}>
                 <div style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: 'rgba(0, 172, 193, 0.15)',
                   padding: '0.5rem 0.75rem',
                   borderRadius: '6px',
-                  border: '1px solid rgba(0, 172, 193, 0.2)'
+                  border: '1px solid rgba(0, 172, 193, 0.3)'
                 }}>
                   <strong><Icon icon={Moon} size={14} decorative /> 潮名:</strong> {tideInfo.tideType === 'spring' ? '大潮' :
                     tideInfo.tideType === 'neap' ? '小潮' :
@@ -439,10 +441,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                     tideInfo.tideType === 'young' ? '若潮' : tideInfo.tideType}
                 </div>
                 <div style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: 'rgba(0, 172, 193, 0.15)',
                   padding: '0.5rem 0.75rem',
                   borderRadius: '6px',
-                  border: '1px solid rgba(0, 172, 193, 0.2)'
+                  border: '1px solid rgba(0, 172, 193, 0.3)'
                 }}>
                   <strong><Icon icon={BarChart3} size={14} decorative /> 潮の状態:</strong> {tideInfo.currentState === 'rising' ? '上げ潮' :
                     tideInfo.currentState === 'falling' ? '下げ潮' :
@@ -452,10 +454,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
 
               {tideInfo.nextEvent && (
                 <div style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: 'rgba(0, 172, 193, 0.15)',
                   padding: '0.75rem',
                   borderRadius: '6px',
-                  border: '1px solid rgba(0, 172, 193, 0.2)',
+                  border: '1px solid rgba(0, 172, 193, 0.3)',
                   marginTop: '0.75rem'
                 }}>
                   <strong><Icon icon={Clock} size={14} decorative /> 次の潮汐イベント:</strong>{' '}
@@ -467,7 +469,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               <div style={{
                 marginTop: '0.75rem',
                 fontSize: '0.8rem',
-                color: '#00838f',
+                color: '#4dd0e1',
                 fontStyle: 'italic'
               }}>
                 <Icon icon={Lightbulb} size={14} decorative /> この潮汐情報は記録とともに自動保存されます
@@ -486,13 +488,14 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontWeight: 'bold',
               fontSize: '1.1rem',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              color: colors.text.primary
             }}
           >
-            釣行日時 <span style={{ color: '#dc3545' }} aria-label="必須項目">*</span>
+            釣行日時 <span style={{ color: '#ef4444' }} aria-label="必須項目">*</span>
             {autoFilledFields.has('date') && (
               <span style={{
-                backgroundColor: '#4caf50',
+                backgroundColor: colors.secondary[500],
                 color: 'white',
                 fontSize: '0.75rem',
                 padding: '0.25rem 0.5rem',
@@ -513,22 +516,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               width: '100%',
               padding: '1rem',
-              border: `2px solid ${errors.date ? '#dc3545' : '#e0e0e0'}`,
+              border: `2px solid ${errors.date ? '#ef4444' : colors.border.medium}`,
               borderRadius: '8px',
               fontSize: '1.1rem',
               transition: 'all 0.15s ease-in-out',
-              backgroundColor: '#ffffff',
-              color: '#000000',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#007bff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(0,123,255,0.25)';
+              e.target.style.borderColor = colors.border.focus;
+              e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.date ? '#dc3545' : '#e0e0e0';
-              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.target.style.borderColor = errors.date ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
           {errors.date && (
@@ -537,7 +540,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               data-testid={TestIds.FIELD_ERROR('date')}
               role="alert"
               style={{
-                color: '#dc3545',
+                color: '#ef4444',
                 fontSize: '0.875rem',
                 marginTop: '0.25rem',
                 marginBottom: 0
@@ -558,13 +561,14 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontWeight: 'bold',
               fontSize: '1.1rem',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              color: colors.text.primary
             }}
           >
-            釣り場 <span style={{ color: '#dc3545' }} aria-label="必須項目">*</span>
+            釣り場 <span style={{ color: '#ef4444' }} aria-label="必須項目">*</span>
             {autoFilledFields.has('location') && (
               <span style={{
-                backgroundColor: '#4caf50',
+                backgroundColor: colors.secondary[500],
                 color: 'white',
                 fontSize: '0.75rem',
                 padding: '0.25rem 0.5rem',
@@ -581,18 +585,18 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             <div style={{
               marginBottom: '0.75rem',
               padding: '0.75rem',
-              backgroundColor: '#e8f5e8',
-              border: '1px solid #4caf50',
+              backgroundColor: 'rgba(52, 168, 83, 0.15)',
+              border: `1px solid ${colors.secondary[500]}`,
               borderRadius: '6px',
               fontSize: '0.9rem'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                <span style={{ color: '#4caf50', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={MapPin} size={14} decorative /> 写真から自動取得</span>
+                <span style={{ color: colors.secondary[400], fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={MapPin} size={14} decorative /> 写真から自動取得</span>
               </div>
-              <div style={{ color: '#2e7d32' }}>
+              <div style={{ color: colors.text.primary }}>
                 <strong>基本住所:</strong> {watch('location')?.split(/[・、,]/, 1)[0] || watch('location')}
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <div style={{ fontSize: '0.8rem', color: colors.text.secondary, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                 <Icon icon={Lightbulb} size={12} decorative /> この基本住所に詳細な場所名を追加できます
               </div>
             </div>
@@ -611,22 +615,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               width: '100%',
               padding: '1rem',
-              border: `2px solid ${errors.location ? '#dc3545' : '#e0e0e0'}`,
+              border: `2px solid ${errors.location ? '#ef4444' : colors.border.medium}`,
               borderRadius: '8px',
               fontSize: '1.1rem',
               transition: 'all 0.15s ease-in-out',
-              backgroundColor: '#ffffff',
-              color: '#000000',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#007bff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(0,123,255,0.25)';
+              e.target.style.borderColor = colors.border.focus;
+              e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.location ? '#dc3545' : '#e0e0e0';
-              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.target.style.borderColor = errors.location ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
           <small
@@ -634,7 +638,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               display: 'block',
               marginTop: '0.25rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               fontSize: '0.875rem'
             }}
           >
@@ -647,7 +651,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               id="location-error"
               role="alert"
               style={{
-                color: '#dc3545',
+                color: '#ef4444',
                 fontSize: '0.875rem',
                 marginTop: '0.25rem',
                 marginBottom: 0
@@ -668,13 +672,14 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontWeight: 'bold',
               fontSize: '1.1rem',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              color: colors.text.primary
             }}
           >
             天気
             {autoFilledFields.has('weather') && (
               <span style={{
-                backgroundColor: '#4caf50',
+                backgroundColor: colors.secondary[500],
                 color: 'white',
                 fontSize: '0.75rem',
                 padding: '0.25rem 0.5rem',
@@ -696,22 +701,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               width: '100%',
               padding: '1rem',
-              border: `2px solid ${errors.weather ? '#dc3545' : '#e0e0e0'}`,
+              border: `2px solid ${errors.weather ? '#ef4444' : colors.border.medium}`,
               borderRadius: '8px',
               fontSize: '1.1rem',
               transition: 'all 0.15s ease-in-out',
-              backgroundColor: '#ffffff',
-              color: '#000000',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#007bff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(0,123,255,0.25)';
+              e.target.style.borderColor = colors.border.focus;
+              e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.weather ? '#dc3545' : '#e0e0e0';
-              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.target.style.borderColor = errors.weather ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
           <small
@@ -719,7 +724,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               display: 'block',
               marginTop: '0.25rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               fontSize: '0.875rem'
             }}
           >
@@ -730,7 +735,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               id="weather-error"
               role="alert"
               style={{
-                color: '#dc3545',
+                color: '#ef4444',
                 fontSize: '0.875rem',
                 marginTop: '0.25rem',
                 marginBottom: 0
@@ -749,13 +754,14 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               display: 'block',
               marginBottom: '0.5rem',
               fontWeight: 'bold',
-              fontSize: '1.1rem'
+              fontSize: '1.1rem',
+              color: colors.text.primary
             }}
           >
             海面水温 (°C)
             {autoFilledFields.has('seaTemperature') && (
               <span style={{
-                backgroundColor: '#4caf50',
+                backgroundColor: colors.secondary[500],
                 color: 'white',
                 fontSize: '0.75rem',
                 padding: '0.25rem 0.5rem',
@@ -786,22 +792,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               width: '100%',
               padding: '1rem',
-              border: `2px solid ${errors.seaTemperature ? '#dc3545' : '#e0e0e0'}`,
+              border: `2px solid ${errors.seaTemperature ? '#ef4444' : colors.border.medium}`,
               borderRadius: '8px',
               fontSize: '1.1rem',
               transition: 'all 0.15s ease-in-out',
-              backgroundColor: '#ffffff',
-              color: '#000000',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#007bff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(0,123,255,0.25)';
+              e.target.style.borderColor = colors.border.focus;
+              e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.seaTemperature ? '#dc3545' : '#e0e0e0';
-              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.target.style.borderColor = errors.seaTemperature ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
           <small
@@ -809,7 +815,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               display: 'block',
               marginTop: '0.25rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               fontSize: '0.875rem'
             }}
           >
@@ -820,7 +826,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               id="seaTemperature-error"
               role="alert"
               style={{
-                color: '#dc3545',
+                color: '#ef4444',
                 fontSize: '0.875rem',
                 marginTop: '0.25rem',
                 marginBottom: 0
@@ -839,10 +845,11 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               display: 'block',
               marginBottom: '0.5rem',
               fontWeight: 'bold',
-              fontSize: '1.1rem'
+              fontSize: '1.1rem',
+              color: colors.text.primary
             }}
           >
-            魚種 <span style={{ color: '#dc3545' }} aria-label="必須項目">*</span>
+            魚種 <span style={{ color: '#ef4444' }} aria-label="必須項目">*</span>
           </label>
           <FishSpeciesAutocomplete
             value={watch('fishSpecies')}
@@ -859,7 +866,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               display: 'block',
               marginTop: '0.5rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               fontSize: '0.875rem'
             }}
           >
@@ -875,7 +882,8 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               display: 'block',
               marginBottom: '0.5rem',
               fontWeight: 'bold',
-              fontSize: '1.1rem'
+              fontSize: '1.1rem',
+              color: colors.text.primary
             }}
           >
             サイズ (cm)
@@ -900,22 +908,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               width: '100%',
               padding: '1rem',
-              border: `2px solid ${errors.size ? '#dc3545' : '#e0e0e0'}`,
+              border: `2px solid ${errors.size ? '#ef4444' : colors.border.medium}`,
               borderRadius: '8px',
               fontSize: '1.1rem',
               transition: 'all 0.15s ease-in-out',
-              backgroundColor: '#ffffff',
-              color: '#000000',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#007bff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(0,123,255,0.25)';
+              e.target.style.borderColor = colors.border.focus;
+              e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.size ? '#dc3545' : '#e0e0e0';
-              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.target.style.borderColor = errors.size ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
           <small
@@ -923,7 +931,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               display: 'block',
               marginTop: '0.25rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               fontSize: '0.875rem'
             }}
           >
@@ -934,7 +942,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               id="size-error"
               role="alert"
               style={{
-                color: '#dc3545',
+                color: '#ef4444',
                 fontSize: '0.875rem',
                 marginTop: '0.25rem',
                 marginBottom: 0
@@ -953,7 +961,8 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               display: 'block',
               marginBottom: '0.5rem',
               fontWeight: 'bold',
-              fontSize: '1.1rem'
+              fontSize: '1.1rem',
+              color: colors.text.primary
             }}
           >
             重量 (g)
@@ -977,22 +986,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               width: '100%',
               padding: '1rem',
-              border: `2px solid ${errors.weight ? '#dc3545' : '#e0e0e0'}`,
+              border: `2px solid ${errors.weight ? '#ef4444' : colors.border.medium}`,
               borderRadius: '8px',
               fontSize: '1.1rem',
               transition: 'all 0.15s ease-in-out',
-              backgroundColor: '#ffffff',
-              color: '#000000',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#007bff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(0,123,255,0.25)';
+              e.target.style.borderColor = colors.border.focus;
+              e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.weight ? '#dc3545' : '#e0e0e0';
-              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.target.style.borderColor = errors.weight ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
           <small
@@ -1000,7 +1009,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               display: 'block',
               marginTop: '0.25rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               fontSize: '0.875rem'
             }}
           >
@@ -1011,7 +1020,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               id="weight-error"
               role="alert"
               style={{
-                color: '#dc3545',
+                color: '#ef4444',
                 fontSize: '0.875rem',
                 marginTop: '0.25rem',
                 marginBottom: 0
@@ -1032,7 +1041,8 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               fontWeight: 'bold',
               fontSize: '1.1rem',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              color: colors.text.primary
             }}
           >
             メモ
@@ -1048,25 +1058,25 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               width: '100%',
               padding: '1rem',
-              border: `2px solid ${errors.notes ? '#dc3545' : '#e0e0e0'}`,
+              border: `2px solid ${errors.notes ? '#ef4444' : colors.border.medium}`,
               borderRadius: '8px',
               fontSize: '1.1rem',
               resize: 'vertical',
               minHeight: '120px',
               transition: 'all 0.15s ease-in-out',
-              backgroundColor: '#ffffff',
-              color: '#000000',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none',
               fontFamily: 'inherit'
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#007bff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(0,123,255,0.25)';
+              e.target.style.borderColor = colors.border.focus;
+              e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.notes ? '#dc3545' : '#e0e0e0';
-              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              e.target.style.borderColor = errors.notes ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
           <small
@@ -1074,7 +1084,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             style={{
               display: 'block',
               marginTop: '0.25rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               fontSize: '0.875rem'
             }}
           >
@@ -1085,7 +1095,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               id="notes-error"
               role="alert"
               style={{
-                color: '#dc3545',
+                color: '#ef4444',
                 fontSize: '0.875rem',
                 marginTop: '0.25rem',
                 marginBottom: 0
@@ -1100,16 +1110,17 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         <div style={{
           marginBottom: '2rem',
           padding: '1rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: colors.surface.secondary,
           borderRadius: '6px',
-          border: '1px solid #dee2e6'
+          border: `1px solid ${colors.border.light}`
         }}>
-          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem' }}>フォーム状態</h4>
+          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: colors.text.primary }}>フォーム状態</h4>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
             gap: '0.5rem',
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            color: colors.text.secondary
           }}>
             <span>
               入力状態: {isValid ? <><Icon icon={CheckCircle2} size={14} decorative /> 有効</> : <><Icon icon={XCircle} size={14} decorative /> 無効</>}
@@ -1238,7 +1249,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           style={{
             display: 'block',
             marginTop: '1rem',
-            color: '#6c757d',
+            color: colors.text.secondary,
             fontSize: '0.875rem',
             textAlign: 'center'
           }}
@@ -1255,20 +1266,21 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000
         }}>
           <div style={{
-            backgroundColor: 'white',
+            backgroundColor: colors.surface.primary,
             padding: '2rem',
             borderRadius: '8px',
             maxWidth: '500px',
             width: '90%',
             maxHeight: '90%',
-            overflow: 'auto'
+            overflow: 'auto',
+            border: `1px solid ${colors.border.light}`
           }}>
             {!pendingAutoFillData ? (
               // ローディング表示
@@ -1276,57 +1288,57 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 <div style={{
                   width: '48px',
                   height: '48px',
-                  border: '4px solid #f3f3f3',
-                  borderTop: '4px solid #007bff',
+                  border: `4px solid ${colors.border.light}`,
+                  borderTop: '4px solid #60a5fa',
                   borderRadius: '50%',
                   animation: 'spin 1s linear infinite',
                   margin: '0 auto 1rem auto'
                 }} />
-                <h3 style={{ marginTop: 0, marginBottom: '0.5rem' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '0.5rem', color: colors.text.primary }}>
                   <Icon icon={Camera} size={16} decorative /> 写真を解析中...
                 </h3>
-                <p style={{ color: '#666', fontSize: '0.9rem', margin: 0 }}>
+                <p style={{ color: colors.text.secondary, fontSize: '0.9rem', margin: 0 }}>
                   GPS情報・天気・海面水温を取得しています
                 </p>
               </div>
             ) : (
               // データ表示
               <>
-                <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: colors.text.primary }}>
                   <Icon icon={Camera} size={16} decorative /> 写真から情報を自動入力しますか？
                 </h3>
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <p style={{ marginBottom: '1rem', color: '#666' }}>
+                  <p style={{ marginBottom: '1rem', color: colors.text.secondary }}>
                     写真から以下の情報が抽出されました：
                   </p>
 
                   {pendingAutoFillData.location && (
-                    <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ marginBottom: '0.5rem', color: colors.text.primary }}>
                       <strong><Icon icon={MapPin} size={14} decorative /> 場所:</strong> {pendingAutoFillData.location}
                     </div>
                   )}
 
                   {pendingAutoFillData.datetime && (
-                    <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ marginBottom: '0.5rem', color: colors.text.primary }}>
                       <strong><Icon icon={Calendar} size={14} decorative /> 撮影日時:</strong> {pendingAutoFillData.datetime.toLocaleString('ja-JP')}
                     </div>
                   )}
 
                   {pendingAutoFillData.coordinates && (
-                    <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ marginBottom: '0.5rem', color: colors.text.primary }}>
                       <strong><Icon icon={Globe} size={14} decorative /> GPS座標:</strong> {pendingAutoFillData.coordinates.latitude.toFixed(6)}, {pendingAutoFillData.coordinates.longitude.toFixed(6)}
                     </div>
                   )}
 
                   {pendingAutoFillData.weather && (
-                    <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ marginBottom: '0.5rem', color: colors.text.primary }}>
                       <strong><Icon icon={CloudSun} size={14} decorative /> 天気:</strong> {pendingAutoFillData.weather.description} ({pendingAutoFillData.weather.temperature}°C)
                     </div>
                   )}
 
                   {pendingAutoFillData.seaTemperature && (
-                    <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ marginBottom: '0.5rem', color: colors.text.primary }}>
                       <strong><Icon icon={Waves} size={14} decorative /> 海面水温:</strong> {pendingAutoFillData.seaTemperature}°C
                     </div>
                   )}
@@ -1342,9 +1354,9 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                     onClick={handleAutoFillCancel}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      backgroundColor: '#6c757d',
-                      color: 'white',
-                      border: 'none',
+                      backgroundColor: colors.surface.secondary,
+                      color: colors.text.secondary,
+                      border: `1px solid ${colors.border.light}`,
                       borderRadius: '4px',
                       cursor: 'pointer'
                     }}
@@ -1356,7 +1368,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                     onClick={handleAutoFillConfirm}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      backgroundColor: '#007bff',
+                      backgroundColor: colors.primary[500],
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',

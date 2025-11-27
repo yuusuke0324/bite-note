@@ -4,6 +4,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { TestIds } from '../../../constants/testIds';
+import { colors } from '../../../theme/colors';
 
 interface ReAuthPromptProps {
   unsavedCount: number;
@@ -99,7 +100,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
         aria-describedby="modal-description"
         aria-modal="true"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: colors.surface.primary,
           borderRadius: '12px',
           padding: '2rem',
           width: '100%',
@@ -107,7 +108,8 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
           maxHeight: '90vh',
           overflowY: 'auto',
           boxShadow:
-            '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+          border: `1px solid ${colors.border.light}`,
           animation: 'modalFadeInScale 0.25s ease-out',
           position: 'relative',
         }}
@@ -137,7 +139,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               margin: 0,
               fontSize: '1.5rem',
               fontWeight: 'bold',
-              color: '#333',
+              color: colors.text.primary,
               marginBottom: '0.5rem',
             }}
           >
@@ -151,7 +153,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
           style={{
             marginBottom: '1.5rem',
             fontSize: '0.9rem',
-            color: '#5F6368',
+            color: colors.text.secondary,
             lineHeight: '1.6',
           }}
         >
@@ -194,7 +196,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               width: '100%',
               minHeight: '48px',
               padding: '0.75rem 1.5rem',
-              backgroundColor: isReconnecting ? '#8AB4F8' : '#1A73E8',
+              backgroundColor: isReconnecting ? '#3b82f6' : '#60a5fa',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -238,9 +240,9 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               width: '100%',
               minHeight: '48px',
               padding: '0.75rem 1.5rem',
-              backgroundColor: isReconnecting ? '#E8EAED' : 'white',
-              color: isReconnecting ? '#9AA0A6' : '#1A73E8',
-              border: `2px solid ${isReconnecting ? '#DADCE0' : '#1A73E8'}`,
+              backgroundColor: isReconnecting ? colors.surface.secondary : colors.surface.primary,
+              color: isReconnecting ? colors.text.secondary : '#60a5fa',
+              border: `2px solid ${isReconnecting ? colors.border.medium : '#60a5fa'}`,
               borderRadius: '6px',
               cursor: isReconnecting ? 'not-allowed' : 'pointer',
               fontSize: '1rem',
@@ -277,7 +279,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.5rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               opacity: isReconnecting ? 0.5 : 1,
               transition: 'all 0.15s ease',
             }}
@@ -315,13 +317,13 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
         }
 
         button:focus {
-          outline: 2px solid #1A73E8;
+          outline: 2px solid #60a5fa;
           outline-offset: 2px;
         }
 
         /* 閉じるボタンのホバーエフェクト */
         button[aria-label="閉じる"]:not(:disabled):hover {
-          background-color: #f1f3f4;
+          background-color: ${colors.surface.secondary};
         }
 
         /* デスクトップでボタンを横並びに */

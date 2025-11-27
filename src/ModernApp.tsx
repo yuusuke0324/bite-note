@@ -52,7 +52,7 @@ import { fishingRecordService } from './lib/fishing-record-service';
 import { exportImportService } from './lib/export-import-service';
 
 // テーマ
-import { colors } from './theme/colors';
+import { colors, initializeTheme } from './theme/colors';
 import { textStyles } from './theme/typography';
 
 // 型定義
@@ -170,6 +170,11 @@ const applyFilters = (records: FishingRecord[], filters: FilterState): FishingRe
 };
 
 function ModernApp() {
+  // テーマ初期化（アプリ起動時に一度だけ実行）
+  useEffect(() => {
+    initializeTheme();
+  }, []);
+
   // 状態管理
   const [activeTab, setActiveTab] = useState<'home' | 'form' | 'list' | 'map' | 'debug'>('home');
   const [selectedRecord, setSelectedRecord] = useState<FishingRecord | null>(null);
@@ -440,7 +445,7 @@ function ModernApp() {
   const getHeaderSubtitle = () => {
     const recordsWithCoordinates = records.filter(r => r.coordinates).length;
     switch (activeTab) {
-      case 'home': return `${records.length}件の記録`;
+      case 'home': return undefined;
       case 'list': return '写真で振り返る';
       case 'map': return `${recordsWithCoordinates}箇所の釣り場`;
       case 'form': return '新しい釣果を記録';
@@ -1993,6 +1998,21 @@ function ModernApp() {
           <ModernHeader
             title={getHeaderTitle()}
             subtitle={getHeaderSubtitle()}
+            activeTab={activeTab}
+            logo={activeTab === 'home' ? (
+              <img
+                src="/icons/icon-96x96.png"
+                alt="Bite Note"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  objectFit: 'cover',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 8px rgba(255, 255, 255, 0.3)',
+                }}
+              />
+            ) : undefined}
             actions={
               <FloatingActionButton
                 icon={<Icons.Add />}

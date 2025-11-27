@@ -2,6 +2,8 @@ import React, { type ReactNode } from 'react';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 
+type TabType = 'home' | 'form' | 'list' | 'map' | 'debug';
+
 interface ModernHeaderProps {
   title: string;
   subtitle?: string;
@@ -10,6 +12,8 @@ interface ModernHeaderProps {
   onMenuClick?: () => void;
   showMenu?: boolean;
   className?: string;
+  logo?: ReactNode;
+  activeTab?: TabType;
 }
 
 export const ModernHeader: React.FC<ModernHeaderProps> = ({
@@ -19,17 +23,20 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
   avatar,
   onMenuClick,
   showMenu = false,
-  className = ''
+  className = '',
+  logo,
+  activeTab: _activeTab
 }) => {
   const headerStyles: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 16px',
-    backgroundColor: colors.surface.primary,
-    borderBottom: `1px solid ${colors.border.light}`,
+    padding: '12px 20px',
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.5)',
     minHeight: '64px',
     position: 'relative',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   };
 
   const leftSectionStyles: React.CSSProperties = {
@@ -48,24 +55,35 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
     flex: 1,
   };
 
+  const titleRowStyles: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  };
+
   const titleStyles: React.CSSProperties = {
     ...textStyles.headline.small,
-    color: colors.text.primary,
+    color: '#FFFFFF',
     margin: 0,
-    fontWeight: 700,
-    fontSize: '20px',
+    fontWeight: 800,
+    fontSize: '22px',
     lineHeight: 1.2,
+    letterSpacing: '-0.02em',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
   };
 
   const subtitleStyles: React.CSSProperties = {
     ...textStyles.body.small,
-    color: colors.text.secondary,
+    color: 'rgba(255, 255, 255, 0.75)',
     margin: 0,
-    fontSize: '14px',
-    lineHeight: 1.2,
+    marginTop: '2px',
+    fontSize: '13px',
+    fontWeight: 500,
+    lineHeight: 1.4,
+    letterSpacing: '0.01em',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -88,7 +106,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
     backgroundColor: 'transparent',
     border: 'none',
     cursor: 'pointer',
-    color: colors.text.primary,
+    color: '#FFFFFF',
     transition: 'all 0.2s ease',
     fontSize: '20px',
   };
@@ -121,7 +139,10 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 
         {/* タイトルセクション */}
         <div style={titleSectionStyles}>
-          <h1 style={titleStyles}>{title}</h1>
+          <div style={titleRowStyles}>
+            {logo}
+            <h1 style={titleStyles}>{title}</h1>
+          </div>
           {subtitle && (
             <p style={subtitleStyles}>{subtitle}</p>
           )}

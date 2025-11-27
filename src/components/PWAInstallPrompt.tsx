@@ -244,11 +244,11 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
           bottom: '1rem',
           left: '1rem',
           right: '1rem',
-          backgroundColor: 'white',
+          backgroundColor: colors.surface.primary,
           borderRadius: '12px',
           padding: '1rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-          border: '1px solid #e1e5e9',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          border: `1px solid ${colors.border.light}`,
           zIndex: 1000,
           animation: 'slideUp 0.3s ease-out',
           maxWidth: '400px',
@@ -418,18 +418,19 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
             aria-modal="true"
             aria-labelledby="ios-modal-title"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: colors.surface.primary,
               borderRadius: '12px',
               padding: '2rem',
               width: '100%',
               maxWidth: '400px',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)',
+              border: `1px solid ${colors.border.light}`
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
               <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
-                <Smartphone size={48} color="#10B981" aria-hidden="true" />
+                <Smartphone size={48} color="#60a5fa" aria-hidden="true" />
               </div>
               <h2
                 id="ios-modal-title"
@@ -454,8 +455,9 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                     gap: '1rem',
                     marginBottom: '1rem',
                     padding: '0.75rem',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '8px'
+                    backgroundColor: colors.surface.secondary,
+                    borderRadius: '8px',
+                    border: `1px solid ${colors.border.light}`
                   }}
                 >
                   <div style={{

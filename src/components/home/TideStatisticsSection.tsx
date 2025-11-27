@@ -14,31 +14,31 @@ import { logger } from '../../lib/errors/logger';
 import { Icon } from '../ui/Icon';
 import { Waves, Lightbulb, Clock, Moon, BarChart3 } from 'lucide-react';
 
-// カスタムツールチップコンポーネント
+// カスタムツールチップコンポーネント（ダークテーマ対応）
 const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { name: string; value: number; percentage?: number } }> }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
       <div style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+        backgroundColor: colors.chart.tooltip.bg,
         padding: '12px 16px',
         borderRadius: '12px',
-        border: `2px solid ${colors.primary[200]}`,
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+        border: `2px solid ${colors.chart.tooltip.border}`,
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
         backdropFilter: 'blur(10px)',
       }}>
         <p style={{
           margin: '0 0 6px 0',
           fontWeight: '600',
           fontSize: '0.9rem',
-          color: colors.text.primary,
+          color: colors.chart.tooltip.text,
         }}>
           {data.name}
         </p>
         <p style={{
           margin: 0,
           fontSize: '1.1rem',
-          color: colors.primary[600],
+          color: colors.chart.primary,
           fontWeight: '700',
         }}>
           {data.value}件{data.percentage ? ` (${data.percentage}%)` : ''}
@@ -289,15 +289,15 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
           <span>潮汐パターン分析</span>
         </h2>
 
-        {/* サマリーカード */}
+        {/* サマリーカード（ダークテーマ対応） */}
         {tideStats.bestTidePhase && tideStats.bestTideType && (
           <div style={{
-            background: `linear-gradient(135deg, ${colors.primary[50]} 0%, ${colors.secondary[50]} 100%)`,
+            background: colors.highlight.gradient,
             padding: '24px',
             borderRadius: '16px',
             marginBottom: '32px',
-            border: `2px solid ${colors.primary[100]}`,
-            boxShadow: '0 4px 12px rgba(26, 115, 232, 0.08)',
+            border: `2px solid ${colors.highlight.border}`,
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
             position: 'relative',
             overflow: 'hidden',
           }}>
@@ -308,7 +308,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               right: '-20px',
               width: '100px',
               height: '100px',
-              background: `radial-gradient(circle, ${colors.primary[100]}40 0%, transparent 70%)`,
+              background: 'radial-gradient(circle, rgba(96, 165, 250, 0.2) 0%, transparent 70%)',
               borderRadius: '50%',
             }} />
 
@@ -316,7 +316,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               <p style={{
                 ...textStyles.body.medium,
                 margin: '0 0 12px 0',
-                color: colors.text.primary,
+                color: colors.highlight.text,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -328,10 +328,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               <p style={{
                 ...textStyles.headline.small,
                 margin: '0 0 12px 0',
-                background: `linear-gradient(135deg, ${colors.primary[700]} 0%, ${colors.secondary[600]} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                color: colors.chart.primary,
                 fontWeight: '700',
                 fontSize: '1.4rem',
                 letterSpacing: '-0.02em',
@@ -341,7 +338,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               <p style={{
                 ...textStyles.body.small,
                 margin: 0,
-                color: colors.text.secondary,
+                color: colors.highlight.textSecondary,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
@@ -411,7 +408,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                     dataKey="percentage"
                     position="right"
                     formatter={(value: unknown) => `${value}%`}
-                    style={{ fill: colors.primary[700], fontSize: '0.9rem', fontWeight: '600' }}
+                    style={{ fill: colors.chart.label, fontSize: '0.9rem', fontWeight: '600' }}
                   />
                 </Bar>
               </BarChart>
@@ -477,7 +474,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                     dataKey="percentage"
                     position="right"
                     formatter={(value: unknown) => `${value}%`}
-                    style={{ fill: colors.secondary[700], fontSize: '0.9rem', fontWeight: '600' }}
+                    style={{ fill: colors.chart.secondary, fontSize: '0.9rem', fontWeight: '600' }}
                   />
                 </Bar>
               </BarChart>

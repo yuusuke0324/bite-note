@@ -340,8 +340,8 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
         }}>
           {record.weather && (
             <span style={{
-              backgroundColor: '#e3f2fd',
-              color: '#1976d2',
+              backgroundColor: 'rgba(96, 165, 250, 0.2)',
+              color: '#60a5fa',
               padding: '2px 6px',
               borderRadius: '8px',
               fontSize: '0.75rem',
@@ -356,8 +356,8 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
 
           {record.temperature && (
             <span style={{
-              backgroundColor: '#e8f5e8',
-              color: '#2e7d32',
+              backgroundColor: 'rgba(52, 211, 153, 0.2)',
+              color: '#34d399',
               padding: '2px 6px',
               borderRadius: '8px',
               fontSize: '0.75rem',

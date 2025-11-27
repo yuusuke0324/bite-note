@@ -296,9 +296,13 @@ Auto-fill Form Fields (日時・位置情報)
 
 ### デザインシステム
 
-- **カラーパレット**: Tailwind CSS デフォルトカラー
+- **カラーパレット**: ダークテーマベース（`src/theme/colors.ts`で一元管理）
+  - Surface: Slate系（#1e293b, #334155）
+  - Text: Light系（#f1f5f9）
+  - Accent: Blue系（#60a5fa）
+  - Semantic: Success/Warning/Error/Info
 - **タイポグラフィ**: システムフォント（SF Pro, Roboto）
-- **アイコン**: カスタムSVGアイコン
+- **アイコン**: Lucide React アイコン
 - **レスポンシブ**: モバイルファースト設計
 
 ### コンポーネント階層
@@ -458,8 +462,8 @@ interface FormState {
   "description": "釣果記録PWAアプリ",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#3b82f6",
-  "background_color": "#ffffff"
+  "theme_color": "#1A73E8",
+  "background_color": "#0f172a"
 }
 ```
 

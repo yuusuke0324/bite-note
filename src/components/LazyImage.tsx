@@ -1,6 +1,7 @@
 // 遅延読み込み対応画像コンポーネント
 
 import React, { useState, useRef, useEffect } from 'react';
+import { colors } from '../theme/colors';
 
 export interface LazyImageProps {
   src: string;
@@ -150,11 +151,11 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         style={{
           width,
           height,
-          backgroundColor: '#f0f0f0',
+          backgroundColor: colors.surface.secondary,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#666',
+          color: colors.text.secondary,
           fontSize: '0.9rem',
           position: 'relative',
           overflow: 'hidden',
@@ -172,13 +173,13 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       style={{
         width,
         height,
-        backgroundColor: '#f8f8f8',
+        backgroundColor: colors.surface.secondary,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#999',
+        color: colors.text.secondary,
         fontSize: '0.9rem',
-        border: '1px solid #ddd'
+        border: `1px solid ${colors.border.light}`
       }}
     >
       画像を読み込めませんでした

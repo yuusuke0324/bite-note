@@ -10,6 +10,7 @@ import { TestIds } from '../constants/testIds';
 import { Skeleton } from './ui/Skeleton';
 import type { PhotoMetadata, AutoFillData } from '../types';
 import { logger } from '../lib/errors/logger';
+import { colors } from '../theme/colors';
 
 interface PhotoUploadProps {
   value?: File;
@@ -230,10 +231,10 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
       {preview && (
         <div style={{
           marginBottom: '1rem',
-          border: '1px solid #dee2e6',
+          border: `1px solid ${colors.border.light}`,
           borderRadius: '8px',
           padding: '1rem',
-          backgroundColor: '#f8f9fa'
+          backgroundColor: colors.surface.secondary
         }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
             <img
@@ -244,14 +245,14 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
                 maxHeight: '200px',
                 objectFit: 'cover',
                 borderRadius: '4px',
-                border: '1px solid #ccc'
+                border: `1px solid ${colors.border.medium}`
               }}
             />
             <div style={{ flex: 1 }}>
-              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#666' }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: colors.text.secondary }}>
                 {value?.name || 'プレビュー画像'}
               </p>
-              <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', color: '#666' }}>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', color: colors.text.secondary }}>
                 サイズ: {value ? (value.size / 1024 / 1024).toFixed(2) : '不明'}MB
               </p>
               <button
@@ -260,7 +261,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
                 disabled={disabled || isUploading}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#dc3545',
+                  backgroundColor: '#ef4444',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
@@ -283,11 +284,11 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           onDrop={handleDrop}
           style={{
             position: 'relative',
-            border: `2px dashed ${dragOver ? '#007bff' : error ? '#dc3545' : '#ccc'}`,
+            border: `2px dashed ${dragOver ? '#60a5fa' : error ? '#ef4444' : colors.border.medium}`,
             borderRadius: '8px',
             padding: '2rem',
             textAlign: 'center',
-            backgroundColor: dragOver ? '#f8f9fa' : disabled ? '#e9ecef' : '#fff',
+            backgroundColor: dragOver ? colors.surface.secondary : disabled ? colors.surface.secondary : colors.surface.primary,
             cursor: disabled ? 'not-allowed' : 'pointer',
             transition: 'all 0.2s ease'
           }}
@@ -297,7 +298,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
               <div style={{ marginBottom: '1rem' }}>
                 <Skeleton width="100%" height="200px" borderRadius="8px" />
               </div>
-              <p style={{ margin: 0, color: '#666', textAlign: 'center' }}>
+              <p style={{ margin: 0, color: colors.text.secondary, textAlign: 'center' }}>
                 {extractingMetadata ? 'メタデータを解析中...' : 'アップロード中...'}
               </p>
             </div>
@@ -308,21 +309,21 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
                 display: 'flex',
                 justifyContent: 'center'
               }}>
-                <Camera size={40} color={disabled ? '#6c757d' : '#007bff'} aria-hidden="true" />
+                <Camera size={40} color={disabled ? colors.text.secondary : '#60a5fa'} aria-hidden="true" />
               </div>
-              <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold' }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: colors.text.primary }}>
                 {dragOver ? 'ここにドロップ' : '写真をアップロード'}
               </p>
-              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#666' }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: colors.text.secondary }}>
                 ドラッグ&amp;ドロップまたはクリックして選択
               </p>
-              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#007bff', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#60a5fa', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
                 <MapPin size={14} color="#10B981" aria-hidden="true" /> GPS情報付きの写真なら位置・日時・天気・海面水温を自動入力!
               </p>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: colors.text.secondary }}>
                 対応形式: JPEG, PNG, WebP (最大{maxSizeMB}MB)
               </p>
-              <div style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#888' }}>
+              <div style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.5)' }}>
                 <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
                   <CheckCircle size={12} color="#10B981" aria-hidden="true" /> GPS付き写真: 位置・日時・天気・海面水温を自動抽出
                 </p>
@@ -378,9 +379,9 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           style={{
             marginTop: '1rem',
             padding: '0.75rem',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            border: '1px solid #f5c6cb',
+            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+            color: '#ef4444',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
             borderRadius: '4px',
             fontSize: '0.9rem',
             display: 'flex',
@@ -402,7 +403,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
               }}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: '#721c24',
+                backgroundColor: '#ef4444',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',

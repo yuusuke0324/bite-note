@@ -1,5 +1,4 @@
 import React, { type ReactNode, useState } from 'react';
-import { colors } from '../../theme/colors';
 
 interface ModernCardProps {
   children: ReactNode;
@@ -62,19 +61,20 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   const getVariantStyles = (): React.CSSProperties => {
     const variants = {
       elevated: {
-        backgroundColor: colors.surface.primary,
+        backgroundColor: '#1e293b',
         boxShadow: isHovered
-          ? '0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)'
-          : '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+          ? '0 14px 28px rgba(0,0,0,0.4), 0 10px 10px rgba(0,0,0,0.3)'
+          : '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
         transform: isHovered && (interactive || onClick) ? 'translateY(-2px)' : 'translateY(0)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
       },
       outlined: {
-        backgroundColor: colors.surface.primary,
-        border: `1px solid ${colors.border.light}`,
+        backgroundColor: '#1e293b',
+        border: '1px solid rgba(255, 255, 255, 0.15)',
         boxShadow: 'none',
       },
       filled: {
-        backgroundColor: colors.surface.secondary,
+        backgroundColor: '#334155',
         boxShadow: 'none',
       },
     };
@@ -87,7 +87,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(15, 23, 42, 0.8)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -105,8 +105,8 @@ export const ModernCard: React.FC<ModernCardProps> = ({
       style={{
         width: '24px',
         height: '24px',
-        border: '2px solid #f3f3f3',
-        borderTop: `2px solid ${colors.primary[500]}`,
+        border: '2px solid rgba(255, 255, 255, 0.2)',
+        borderTop: '2px solid #60a5fa',
         borderRadius: '50%',
         animation: 'spin 1s linear infinite',
       }}

@@ -5,6 +5,7 @@ import { GeolocationService } from '../lib/geolocation-service';
 import type { Coordinates } from '../types';
 import { Icon } from './ui/Icon';
 import { MapPin, Globe, Ruler } from 'lucide-react';
+import { colors } from '../theme/colors';
 
 interface LocationDisplayProps {
   coordinates?: Coordinates;
@@ -53,7 +54,7 @@ export const LocationDisplay: React.FC<LocationDisplayProps> = ({
   if (!coordinates) {
     return (
       <div style={style}>
-        <span style={{ color: '#666', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+        <span style={{ color: colors.text.secondary, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           <Icon icon={MapPin} size={16} color="secondary" decorative /> 位置情報なし
         </span>
       </div>
@@ -89,22 +90,22 @@ export const LocationDisplay: React.FC<LocationDisplayProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={MapPin} size={16} color="primary" decorative />
           {loadingAddress ? (
-            <span style={{ color: '#666' }}>住所を取得中...</span>
+            <span style={{ color: colors.text.secondary }}>住所を取得中...</span>
           ) : addressError ? (
-            <span style={{ color: '#dc3545', fontSize: '0.8rem' }}>
+            <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>
               {addressError}
             </span>
           ) : address ? (
-            <span style={{ color: '#333' }}>{address}</span>
+            <span style={{ color: colors.text.primary }}>{address}</span>
           ) : (
-            <span style={{ color: '#666' }}>住所不明</span>
+            <span style={{ color: colors.text.secondary }}>住所不明</span>
           )}
         </div>
       )}
 
       {showCoordinates && (
         <div style={{
-          color: '#666',
+          color: colors.text.secondary,
           fontSize: compact ? '0.75rem' : '0.8rem',
           fontFamily: 'monospace',
           display: 'flex',
@@ -117,7 +118,7 @@ export const LocationDisplay: React.FC<LocationDisplayProps> = ({
 
       {showAccuracy && coordinates.accuracy && (
         <div style={{
-          color: '#666',
+          color: colors.text.secondary,
           fontSize: compact ? '0.75rem' : '0.8rem',
           display: 'flex',
           alignItems: 'center',

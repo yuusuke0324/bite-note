@@ -6,6 +6,7 @@ import type { FishingRecord } from '../types';
 import { TideIntegration } from './TideIntegration';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
+import { colors } from '../theme/colors';
 import {
   Fish,
   Calendar,
@@ -122,18 +123,20 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
         zIndex: 1000
       }}>
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: colors.surface.primary,
           borderRadius: '8px',
           padding: '2rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '1rem'
+          gap: '1rem',
+          border: `1px solid ${colors.border.light}`,
+          color: colors.text.primary
         }}>
           <div style={{
             width: '32px',
             height: '32px',
-            border: '3px solid #f3f3f3',
-            borderTop: '3px solid #007bff',
+            border: `3px solid ${colors.surface.secondary}`,
+            borderTop: '3px solid #60a5fa',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }} />
@@ -170,13 +173,14 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       >
         <div
           style={{
-            backgroundColor: 'white',
+            backgroundColor: colors.surface.primary,
             borderRadius: '12px',
             maxWidth: '600px',
             width: '100%',
             maxHeight: '90vh',
             overflow: 'auto',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+            border: `1px solid ${colors.border.light}`
           }}
           role="dialog"
           aria-labelledby="record-title"
@@ -185,10 +189,10 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           {/* ヘッダー */}
           <div style={{
             padding: '1.5rem',
-            borderBottom: '1px solid #dee2e6',
+            borderBottom: `1px solid ${colors.border.light}`,
             position: 'sticky',
             top: 0,
-            backgroundColor: 'white',
+            backgroundColor: colors.surface.primary,
             borderRadius: '12px 12px 0 0'
           }}>
             <div style={{
@@ -203,7 +207,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   margin: 0,
                   fontSize: '1.75rem',
                   fontWeight: 'bold',
-                  color: '#333',
+                  color: colors.text.primary,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem'
@@ -219,7 +223,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   border: 'none',
                   fontSize: '1.5rem',
                   cursor: 'pointer',
-                  color: '#6c757d',
+                  color: colors.text.secondary,
                   padding: '0.5rem',
                   borderRadius: '4px'
                 }}
@@ -242,8 +246,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   disabled={!hasPrevious}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: hasPrevious ? '#007bff' : '#e9ecef',
-                    color: hasPrevious ? 'white' : '#6c757d',
+                    backgroundColor: hasPrevious ? '#60a5fa' : colors.surface.secondary,
+                    color: hasPrevious ? 'white' : colors.text.tertiary,
                     border: 'none',
                     borderRadius: '4px',
                     cursor: hasPrevious ? 'pointer' : 'not-allowed',
@@ -256,7 +260,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
                 <span style={{
                   fontSize: '0.875rem',
-                  color: '#6c757d'
+                  color: colors.text.secondary
                 }}>
                   記録詳細
                 </span>
@@ -266,8 +270,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   disabled={!hasNext}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: hasNext ? '#007bff' : '#e9ecef',
-                    color: hasNext ? 'white' : '#6c757d',
+                    backgroundColor: hasNext ? '#60a5fa' : colors.surface.secondary,
+                    color: hasNext ? 'white' : colors.text.tertiary,
                     border: 'none',
                     borderRadius: '4px',
                     cursor: hasNext ? 'pointer' : 'not-allowed',
@@ -289,8 +293,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 marginBottom: '1.5rem',
                 borderRadius: '8px',
                 overflow: 'hidden',
-                border: '1px solid #dee2e6',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                border: `1px solid ${colors.border.light}`,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
               }}>
                 <img
                   src={photoUrl}
@@ -316,14 +320,14 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             }}>
               <div style={{
                 padding: '1rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: colors.surface.secondary,
                 borderRadius: '8px',
-                border: '1px solid #dee2e6'
+                border: `1px solid ${colors.border.light}`
               }}>
                 <h4 style={{
                   margin: '0 0 0.5rem 0',
                   fontSize: '0.875rem',
-                  color: '#6c757d',
+                  color: colors.text.secondary,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -332,7 +336,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 <p style={{
                   margin: 0,
                   fontSize: '1.125rem',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  color: colors.text.primary
                 }}>
                   {formatDate(record.date)}
                 </p>
@@ -340,14 +345,14 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
               <div style={{
                 padding: '1rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: colors.surface.secondary,
                 borderRadius: '8px',
-                border: '1px solid #dee2e6'
+                border: `1px solid ${colors.border.light}`
               }}>
                 <h4 style={{
                   margin: '0 0 0.5rem 0',
                   fontSize: '0.875rem',
-                  color: '#6c757d',
+                  color: colors.text.secondary,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -356,7 +361,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 <p style={{
                   margin: 0,
                   fontSize: '1.125rem',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  color: colors.text.primary
                 }}>
                   {record.fishSpecies}
                 </p>
@@ -364,14 +370,14 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
               <div style={{
                 padding: '1rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: colors.surface.secondary,
                 borderRadius: '8px',
-                border: '1px solid #dee2e6'
+                border: `1px solid ${colors.border.light}`
               }}>
                 <h4 style={{
                   margin: '0 0 0.5rem 0',
                   fontSize: '0.875rem',
-                  color: '#6c757d',
+                  color: colors.text.secondary,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -381,7 +387,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   margin: 0,
                   fontSize: '1.25rem',
                   fontWeight: 'bold',
-                  color: record.size ? '#28a745' : '#6c757d'
+                  color: record.size ? '#34d399' : colors.text.tertiary
                 }}>
                   {formatSize(record.size)}
                 </p>
@@ -389,14 +395,14 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
               <div style={{
                 padding: '1rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: colors.surface.secondary,
                 borderRadius: '8px',
-                border: '1px solid #dee2e6'
+                border: `1px solid ${colors.border.light}`
               }}>
                 <h4 style={{
                   margin: '0 0 0.5rem 0',
                   fontSize: '0.875rem',
-                  color: '#6c757d',
+                  color: colors.text.secondary,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -406,7 +412,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   margin: 0,
                   fontSize: '1.25rem',
                   fontWeight: 'bold',
-                  color: record.weight ? '#28a745' : '#6c757d'
+                  color: record.weight ? '#34d399' : colors.text.tertiary
                 }}>
                   {formatWeight(record.weight)}
                 </p>
@@ -416,15 +422,15 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             {/* 場所情報 */}
             <div style={{
               padding: '1rem',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: colors.surface.secondary,
               borderRadius: '8px',
-              border: '1px solid #dee2e6',
+              border: `1px solid ${colors.border.light}`,
               marginBottom: '1.5rem'
             }}>
               <h4 style={{
                 margin: '0 0 0.75rem 0',
                 fontSize: '0.875rem',
-                color: '#6c757d',
+                color: colors.text.secondary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>
@@ -433,14 +439,15 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
               <p style={{
                 margin: '0 0 1rem 0',
                 fontSize: '1.125rem',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                color: colors.text.primary
               }}>
                 {record.location}
               </p>
 
               {record.coordinates && (
                 <div style={{ marginTop: '0.75rem' }}>
-                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: colors.text.secondary }}>
                     <Icon icon={MapPin} size={14} decorative /> 緯度: {record.coordinates.latitude.toFixed(6)}, 経度: {record.coordinates.longitude.toFixed(6)}
                     {record.coordinates.accuracy && <span> (精度: ±{Math.round(record.coordinates.accuracy)}m)</span>}
                   </div>
@@ -456,7 +463,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                           alignItems: 'center',
                           gap: '0.5rem',
                           padding: '0.5rem 1rem',
-                          backgroundColor: '#007bff',
+                          backgroundColor: '#60a5fa',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
@@ -494,15 +501,15 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             {record.notes && (
               <div style={{
                 padding: '1rem',
-                backgroundColor: '#fff3cd',
+                backgroundColor: 'rgba(251, 191, 36, 0.15)',
                 borderRadius: '8px',
-                border: '1px solid #ffeaa7',
+                border: '1px solid rgba(251, 191, 36, 0.3)',
                 marginBottom: '1.5rem'
               }}>
                 <h4 style={{
                   margin: '0 0 0.75rem 0',
                   fontSize: '0.875rem',
-                  color: '#856404',
+                  color: '#fbbf24',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -512,7 +519,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   margin: 0,
                   fontSize: '1rem',
                   lineHeight: 1.6,
-                  whiteSpace: 'pre-wrap'
+                  whiteSpace: 'pre-wrap',
+                  color: colors.text.primary
                 }}>
                   {record.notes}
                 </p>
@@ -558,11 +566,11 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             {/* メタデータ */}
             <div style={{
               padding: '1rem',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: colors.surface.secondary,
               borderRadius: '8px',
-              border: '1px solid #dee2e6',
+              border: `1px solid ${colors.border.light}`,
               fontSize: '0.875rem',
-              color: '#6c757d',
+              color: colors.text.secondary,
               marginTop: '1.5rem'
             }}>
               <div style={{
@@ -586,20 +594,20 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           {/* フッター */}
           <div style={{
             padding: '1.5rem',
-            borderTop: '1px solid #dee2e6',
+            borderTop: `1px solid ${colors.border.light}`,
             display: 'flex',
             gap: '1rem',
             justifyContent: 'flex-end',
             position: 'sticky',
             bottom: 0,
-            backgroundColor: 'white',
+            backgroundColor: colors.surface.primary,
             borderRadius: '0 0 12px 12px'
           }}>
             {showDeleteConfirm ? (
               <>
                 <span style={{
                   flex: 1,
-                  color: '#dc3545',
+                  color: '#ef4444',
                   fontSize: '0.875rem',
                   display: 'flex',
                   alignItems: 'center'

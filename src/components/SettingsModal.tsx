@@ -5,6 +5,7 @@ import { useAppStore, selectSettings, selectActions } from '../stores/app-store'
 import type { AppSettings } from '../types';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
+import { colors, setTheme, getTheme, type ThemeMode } from '../theme/colors';
 import {
   Settings,
   Palette,
@@ -176,14 +177,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       padding: '1rem'
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: colors.surface.primary,
         borderRadius: '12px',
         width: '95%',
         maxWidth: '800px',
         height: '90%',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        border: `1px solid ${colors.border.light}`
       }}>
         {/* ヘッダー */}
         <div style={{
@@ -191,13 +193,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '1.5rem',
-          borderBottom: '1px solid #dee2e6'
+          borderBottom: `1px solid ${colors.border.light}`
         }}>
           <h2 style={{
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333',
+            color: colors.text.primary,
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -209,9 +211,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {hasChanges && (
               <span style={{
                 fontSize: '0.8rem',
-                color: '#ffc107',
+                color: '#fbbf24',
                 padding: '0.25rem 0.5rem',
-                backgroundColor: '#fff3cd',
+                backgroundColor: 'rgba(251, 191, 36, 0.2)',
                 borderRadius: '4px'
               }}>
                 未保存の変更があります
@@ -223,7 +225,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: '#6c757d',
+                color: colors.text.secondary,
                 padding: '0.25rem',
                 display: 'flex',
                 alignItems: 'center',
@@ -238,7 +240,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* タブナビゲーション */}
         <div style={{
           display: 'flex',
-          borderBottom: '1px solid #dee2e6',
+          borderBottom: `1px solid ${colors.border.light}`,
           overflowX: 'auto'
         }}>
           {tabs.map(tab => (
@@ -247,8 +249,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               onClick={() => setActiveTab(tab.id)}
               style={{
                 padding: '0.75rem 1rem',
-                backgroundColor: activeTab === tab.id ? '#007bff' : 'transparent',
-                color: activeTab === tab.id ? 'white' : '#333',
+                backgroundColor: activeTab === tab.id ? '#60a5fa' : 'transparent',
+                color: activeTab === tab.id ? 'white' : colors.text.primary,
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '0.9rem',
@@ -256,7 +258,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                borderBottom: activeTab === tab.id ? '3px solid #007bff' : '3px solid transparent'
+                borderBottom: activeTab === tab.id ? '3px solid #60a5fa' : '3px solid transparent'
               }}
             >
               {tab.icon} {tab.label}
@@ -307,7 +309,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* フッター */}
         <div style={{
           padding: '1rem 1.5rem',
-          borderTop: '1px solid #dee2e6',
+          borderTop: `1px solid ${colors.border.light}`,
           display: 'flex',
           justifyContent: 'flex-end',
           gap: '0.75rem'
@@ -358,7 +360,7 @@ const GeneralTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Settings} size="sm" decorative />
       一般設定
     </h3>
@@ -371,9 +373,11 @@ const GeneralTab: React.FC<{
           onChange={(e) => onSettingChange('language', e.target.value as 'ja' | 'en')}
           style={{
             padding: '0.5rem',
-            border: '1px solid #ced4da',
+            border: `1px solid ${colors.border.medium}`,
             borderRadius: '4px',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            backgroundColor: colors.surface.secondary,
+            color: colors.text.primary
           }}
         >
           <option value="ja">日本語</option>
@@ -388,9 +392,11 @@ const GeneralTab: React.FC<{
           onChange={(e) => onSettingChange('dateFormat', e.target.value as 'YYYY/MM/DD' | 'DD/MM/YYYY' | 'MM/DD/YYYY')}
           style={{
             padding: '0.5rem',
-            border: '1px solid #ced4da',
+            border: `1px solid ${colors.border.medium}`,
             borderRadius: '4px',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            backgroundColor: colors.surface.secondary,
+            color: colors.text.primary
           }}
         >
           <option value="YYYY/MM/DD">YYYY/MM/DD</option>
@@ -404,15 +410,17 @@ const GeneralTab: React.FC<{
       <SettingGroup title="単位設定" titleIcon={<Icon icon={Ruler} size="sm" decorative />} description="測定単位を選択">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <label style={{ minWidth: '80px', fontSize: '0.9rem' }}>気温:</label>
+            <label style={{ minWidth: '80px', fontSize: '0.9rem', color: colors.text.primary }}>気温:</label>
             <select
               value={settings.temperatureUnit}
               onChange={(e) => onSettingChange('temperatureUnit', e.target.value as 'celsius' | 'fahrenheit')}
               style={{
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${colors.border.medium}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: colors.surface.secondary,
+                color: colors.text.primary
               }}
             >
               <option value="celsius">摂氏 (°C)</option>
@@ -420,15 +428,17 @@ const GeneralTab: React.FC<{
             </select>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <label style={{ minWidth: '80px', fontSize: '0.9rem' }}>サイズ:</label>
+            <label style={{ minWidth: '80px', fontSize: '0.9rem', color: colors.text.primary }}>サイズ:</label>
             <select
               value={settings.sizeUnit}
               onChange={(e) => onSettingChange('sizeUnit', e.target.value as 'cm' | 'inch')}
               style={{
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${colors.border.medium}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: colors.surface.secondary,
+                color: colors.text.primary
               }}
             >
               <option value="cm">センチメートル (cm)</option>
@@ -442,7 +452,7 @@ const GeneralTab: React.FC<{
       <SettingGroup title="デフォルト値" titleIcon={<Icon icon={Target} size="sm" decorative />} description="新規記録作成時のデフォルト値">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
               デフォルト釣り場:
             </label>
             <input
@@ -453,14 +463,16 @@ const GeneralTab: React.FC<{
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${colors.border.medium}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: colors.surface.secondary,
+                color: colors.text.primary
               }}
             />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
               デフォルト魚種:
             </label>
             <input
@@ -471,9 +483,11 @@ const GeneralTab: React.FC<{
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${colors.border.medium}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: colors.surface.secondary,
+                color: colors.text.primary
               }}
             />
           </div>
@@ -487,41 +501,69 @@ const GeneralTab: React.FC<{
 const DisplayTab: React.FC<{
   settings: AppSettings;
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
-}> = ({ settings, onSettingChange }) => (
+}> = ({ settings, onSettingChange }) => {
+  const [currentTheme, setCurrentTheme] = useState<ThemeMode>(getTheme());
+
+  const handleThemeToggle = useCallback(() => {
+    const newTheme: ThemeMode = currentTheme === 'dark' ? 'light' : 'dark';
+    setCurrentTheme(newTheme);
+    setTheme(newTheme);
+    // 設定にも保存（将来的な同期用）
+    onSettingChange('theme', newTheme);
+  }, [currentTheme, onSettingChange]);
+
+  return (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Palette} size="sm" decorative />
       表示設定
     </h3>
 
     <div style={{ display: 'grid', gap: '1.5rem' }}>
       {/* テーマ設定 */}
-      <SettingGroup title="テーマ" titleIcon={<Icon icon={Moon} size="sm" decorative />} description="アプリの外観テーマを選択">
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {[
-            { value: 'light', label: 'ライト', icon: <Icon icon={Sun} size={14} decorative /> },
-            { value: 'dark', label: 'ダーク', icon: <Icon icon={Moon} size={14} decorative /> },
-            { value: 'auto', label: '自動', icon: <Icon icon={RefreshCw} size={14} decorative /> }
-          ].map(theme => (
-            <button
-              key={theme.value}
-              onClick={() => onSettingChange('theme', theme.value as 'light' | 'dark' | 'auto')}
+      <SettingGroup title="テーマ" titleIcon={<Icon icon={Moon} size="sm" decorative />} description="アプリの外観テーマを切り替え">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Icon icon={Sun} size={20} style={{ color: currentTheme === 'light' ? '#fbbf24' : colors.text.tertiary }} />
+          <button
+            onClick={handleThemeToggle}
+            role="switch"
+            aria-checked={currentTheme === 'dark'}
+            aria-label={`テーマ切り替え: 現在${currentTheme === 'dark' ? 'ダーク' : 'ライト'}モード`}
+            style={{
+              position: 'relative',
+              width: '56px',
+              height: '28px',
+              backgroundColor: currentTheme === 'dark' ? '#3b82f6' : '#e2e8f0',
+              borderRadius: '14px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s ease',
+              padding: 0,
+            }}
+          >
+            <span
               style={{
-                padding: '0.75rem 1rem',
-                backgroundColor: settings.theme === theme.value ? '#007bff' : '#f8f9fa',
-                color: settings.theme === theme.value ? 'white' : '#333',
-                border: '1px solid #ced4da',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '0.9rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
+                position: 'absolute',
+                top: '2px',
+                left: currentTheme === 'dark' ? '30px' : '2px',
+                width: '24px',
+                height: '24px',
+                backgroundColor: '#ffffff',
+                borderRadius: '50%',
+                transition: 'left 0.3s ease',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
               }}
-            >
-              {theme.icon} {theme.label}
-            </button>
-          ))}
+            />
+          </button>
+          <Icon icon={Moon} size={20} style={{ color: currentTheme === 'dark' ? '#60a5fa' : colors.text.tertiary }} />
+          <span style={{
+            marginLeft: '0.5rem',
+            fontSize: '0.9rem',
+            color: colors.text.primary,
+            fontWeight: 500
+          }}>
+            {currentTheme === 'dark' ? 'ダークモード' : 'ライトモード'}
+          </span>
         </div>
       </SettingGroup>
 
@@ -550,7 +592,8 @@ const DisplayTab: React.FC<{
       </SettingGroup>
     </div>
   </div>
-);
+  );
+};
 
 // データタブ
 const DataTab: React.FC<{
@@ -558,7 +601,7 @@ const DataTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Save} size="sm" decorative />
       データ設定
     </h3>
@@ -581,9 +624,11 @@ const DataTab: React.FC<{
           onChange={(e) => onSettingChange('exportFormat', e.target.value as 'json' | 'csv')}
           style={{
             padding: '0.5rem',
-            border: '1px solid #ced4da',
+            border: `1px solid ${colors.border.medium}`,
             borderRadius: '4px',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            backgroundColor: colors.surface.secondary,
+            color: colors.text.primary
           }}
         >
           <option value="json">JSON (完全データ)</option>
@@ -603,14 +648,16 @@ const DataTab: React.FC<{
             style={{
               width: '100px',
               padding: '0.5rem',
-              border: '1px solid #ced4da',
+              border: `1px solid ${colors.border.medium}`,
               borderRadius: '4px',
-              fontSize: '0.9rem'
+              fontSize: '0.9rem',
+              backgroundColor: colors.surface.secondary,
+              color: colors.text.primary
             }}
           />
-          <span style={{ fontSize: '0.9rem', color: '#666' }}>日間</span>
+          <span style={{ fontSize: '0.9rem', color: colors.text.secondary }}>日間</span>
         </div>
-        <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.25rem' }}>
+        <div style={{ fontSize: '0.8rem', color: colors.text.secondary, marginTop: '0.25rem' }}>
           0を設定すると無期限で保持されます
         </div>
       </SettingGroup>
@@ -619,7 +666,7 @@ const DataTab: React.FC<{
       <SettingGroup title="写真設定" titleIcon={<Icon icon={Camera} size="sm" decorative />} description="写真の保存に関する設定">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
               最大ファイルサイズ (MB):
             </label>
             <input
@@ -631,14 +678,16 @@ const DataTab: React.FC<{
               style={{
                 width: '100px',
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${colors.border.medium}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: colors.surface.secondary,
+                color: colors.text.primary
               }}
             />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
               画質 (0.1 - 1.0):
             </label>
             <input
@@ -651,9 +700,11 @@ const DataTab: React.FC<{
               style={{
                 width: '100px',
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${colors.border.medium}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: colors.surface.secondary,
+                color: colors.text.primary
               }}
             />
           </div>
@@ -669,7 +720,7 @@ const PrivacyTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Lock} size="sm" decorative />
       プライバシー設定
     </h3>
@@ -698,15 +749,15 @@ const PrivacyTab: React.FC<{
       {/* データの取り扱い */}
       <div style={{
         padding: '1rem',
-        backgroundColor: '#e3f2fd',
+        backgroundColor: 'rgba(96, 165, 250, 0.15)',
         borderRadius: '6px',
-        border: '1px solid #90caf9'
+        border: '1px solid rgba(96, 165, 250, 0.3)'
       }}>
-        <h4 style={{ margin: '0 0 0.5rem 0', color: '#1976d2', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h4 style={{ margin: '0 0 0.5rem 0', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={FileText} size="sm" decorative />
           データの取り扱いについて
         </h4>
-        <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.85rem', color: '#1976d2' }}>
+        <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.85rem', color: '#93c5fd' }}>
           <li>すべてのデータはお使いのデバイス内にのみ保存されます</li>
           <li>外部サーバーにデータが送信されることはありません</li>
           <li>位置情報は記録の精度向上のためにのみ使用されます</li>
@@ -725,7 +776,7 @@ const AdvancedTab: React.FC<{
   onReset: () => void;
 }> = ({ onClearData, onReset }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Wrench} size="sm" decorative />
       詳細設定
     </h3>
@@ -735,9 +786,10 @@ const AdvancedTab: React.FC<{
       <SettingGroup title="アプリ情報" titleIcon={<Icon icon={Info} size="sm" decorative />} description="アプリケーションの詳細情報">
         <div style={{
           padding: '1rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: colors.surface.tertiary,
           borderRadius: '6px',
-          fontSize: '0.9rem'
+          fontSize: '0.9rem',
+          color: colors.text.primary
         }}>
           <div style={{ marginBottom: '0.5rem' }}>
             <strong>バージョン:</strong> 1.0.0
@@ -796,11 +848,11 @@ const AdvancedTab: React.FC<{
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div style={{
             padding: '1rem',
-            backgroundColor: '#fff3cd',
+            backgroundColor: 'rgba(251, 191, 36, 0.2)',
             borderRadius: '6px',
-            border: '1px solid #ffeaa7',
+            border: '1px solid rgba(251, 191, 36, 0.3)',
             fontSize: '0.85rem',
-            color: '#856404'
+            color: '#fbbf24'
           }}>
             <strong style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon icon={AlertTriangle} size={14} decorative /> 注意:</strong> 実験的機能は予期しない動作をする可能性があります。
             重要なデータは事前にバックアップを取ることをお勧めします。
@@ -820,15 +872,15 @@ const SettingGroup: React.FC<{
 }> = ({ title, titleIcon, description, children }) => (
   <div style={{
     padding: '1rem',
-    backgroundColor: 'white',
+    backgroundColor: colors.surface.secondary,
     borderRadius: '8px',
-    border: '1px solid #dee2e6'
+    border: `1px solid ${colors.border.light}`
   }}>
-    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       {titleIcon}
       {title}
     </h4>
-    <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: '#666' }}>
+    <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: colors.text.secondary }}>
       {description}
     </p>
     {children}
@@ -849,7 +901,7 @@ const ToggleSetting: React.FC<{
     cursor: 'pointer',
     padding: '0.5rem',
     borderRadius: '4px',
-    backgroundColor: checked ? '#e3f2fd' : 'transparent'
+    backgroundColor: checked ? 'rgba(96, 165, 250, 0.2)' : 'transparent'
   }}>
     <input
       type="checkbox"
@@ -861,10 +913,10 @@ const ToggleSetting: React.FC<{
       }}
     />
     <div style={{ flex: 1 }}>
-      <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#333' }}>
+      <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: colors.text.primary }}>
         {label}
       </div>
-      <div style={{ fontSize: '0.8rem', color: '#666' }}>
+      <div style={{ fontSize: '0.8rem', color: colors.text.secondary }}>
         {description}
       </div>
     </div>

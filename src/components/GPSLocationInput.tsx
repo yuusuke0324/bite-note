@@ -7,6 +7,7 @@ import { useToastStore } from '../stores/toast-store';
 import { TestIds } from '../constants/testIds';
 import type { Coordinates } from '../types';
 import { logger } from '../lib/errors/logger';
+import { colors } from '../theme/colors';
 
 interface GPSLocationInputProps {
   value?: Coordinates;
@@ -154,11 +155,11 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
       {useGPS && (
         <div style={{
           padding: '1rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: colors.surface.secondary,
           borderRadius: '8px',
-          border: '1px solid #dee2e6'
+          border: `1px solid ${colors.border.light}`
         }}>
-          <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>GPS位置情報</h4>
+          <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem', color: colors.text.primary }}>GPS位置情報</h4>
 
           {/* GPS取得ボタン */}
           <div style={{ marginBottom: '1rem' }}>
@@ -170,7 +171,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
               aria-label="現在位置を取得"
               style={{
                 padding: '0.75rem 1rem',
-                backgroundColor: disabled || isLoading ? '#6c757d' : '#007bff',
+                backgroundColor: disabled || isLoading ? colors.surface.secondary : '#60a5fa',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -207,9 +208,9 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
               aria-label="手動入力"
               style={{
                 padding: '0.75rem 1rem',
-                backgroundColor: '#6c757d',
-                color: 'white',
-                border: 'none',
+                backgroundColor: colors.surface.primary,
+                color: colors.text.primary,
+                border: `1px solid ${colors.border.medium}`,
                 borderRadius: '4px',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 marginRight: '0.5rem',
@@ -249,15 +250,15 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
             <div style={{
               marginBottom: '1rem',
               padding: '1rem',
-              backgroundColor: '#fff',
+              backgroundColor: colors.surface.primary,
               borderRadius: '4px',
-              border: '1px solid #ccc'
+              border: `1px solid ${colors.border.medium}`
             }}>
-              <h5 style={{ margin: '0 0 1rem 0' }}>手動で位置を入力</h5>
+              <h5 style={{ margin: '0 0 1rem 0', color: colors.text.primary }}>手動で位置を入力</h5>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: colors.text.secondary }}>
                     緯度 (Latitude)
                   </label>
                   <input
@@ -270,14 +271,16 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                     style={{
                       width: '100%',
                       padding: '0.5rem',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px'
+                      border: `1px solid ${colors.border.medium}`,
+                      borderRadius: '4px',
+                      backgroundColor: colors.surface.secondary,
+                      color: colors.text.primary
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: colors.text.secondary }}>
                     経度 (Longitude)
                   </label>
                   <input
@@ -290,8 +293,10 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                     style={{
                       width: '100%',
                       padding: '0.5rem',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px'
+                      border: `1px solid ${colors.border.medium}`,
+                      borderRadius: '4px',
+                      backgroundColor: colors.surface.secondary,
+                      color: colors.text.primary
                     }}
                   />
                 </div>
@@ -303,7 +308,7 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                   onClick={handleApplyManualInput}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: '#28a745',
+                    backgroundColor: '#34d399',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
@@ -318,9 +323,9 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
                   onClick={() => setManualMode(false)}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
-                    border: 'none',
+                    backgroundColor: colors.surface.secondary,
+                    color: colors.text.primary,
+                    border: `1px solid ${colors.border.medium}`,
                     borderRadius: '4px',
                     cursor: 'pointer'
                   }}
@@ -333,12 +338,12 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
 
           {/* 現在の位置情報表示 */}
           <div style={{
-            backgroundColor: '#fff',
+            backgroundColor: colors.surface.primary,
             padding: '1rem',
             borderRadius: '4px',
-            border: '1px solid #ccc'
+            border: `1px solid ${colors.border.medium}`
           }}>
-            <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>位置情報</h5>
+            <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: colors.text.primary }}>位置情報</h5>
 
             <LocationDisplay
               coordinates={value}
@@ -349,13 +354,13 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
             />
 
             {value && (
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #eee' }}>
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: `1px solid ${colors.border.light}` }}>
                 <a
                   href={`https://maps.google.com/?q=${value.latitude},${value.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    color: '#007bff',
+                    color: '#60a5fa',
                     fontSize: '0.85rem',
                     textDecoration: 'none',
                     display: 'flex',
@@ -374,9 +379,9 @@ export const GPSLocationInput: React.FC<GPSLocationInputProps> = ({
             <div style={{
               marginTop: '1rem',
               padding: '0.75rem',
-              backgroundColor: '#f8d7da',
-              color: '#721c24',
-              border: '1px solid #f5c6cb',
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+              color: '#ef4444',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
               borderRadius: '4px',
               fontSize: '0.9rem'
             }}>

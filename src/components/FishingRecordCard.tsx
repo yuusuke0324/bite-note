@@ -7,6 +7,7 @@ import type { FishingRecord } from '../types';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { Fish, Calendar, Ruler, Map, MessageCircle, Camera, Edit, Trash2 } from 'lucide-react';
+import { colors } from '../theme/colors';
 
 interface FishingRecordCardProps {
   record: FishingRecord;
@@ -102,15 +103,15 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
       }}
       aria-label={`記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
       style={{
-        border: '1px solid #dee2e6',
+        border: `1px solid ${colors.border.light}`,
         borderRadius: '8px',
         padding: '1rem',
         marginBottom: '1rem',
-        backgroundColor: '#fff',
+        backgroundColor: colors.surface.primary,
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         position: 'relative',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
       }}
     >
       {/* ヘッダー部分 */}
@@ -129,13 +130,13 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             flexShrink: 0,
             borderRadius: '8px',
             overflow: 'hidden',
-            backgroundColor: '#f0f0f0',
+            backgroundColor: colors.surface.secondary,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
             {photoLoading ? (
-              <div style={{ color: '#999', fontSize: '0.75rem' }}>読込中...</div>
+              <div style={{ color: colors.text.tertiary, fontSize: '0.75rem' }}>読込中...</div>
             ) : photoUrl ? (
               <img
                 src={photoUrl}
@@ -157,7 +158,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             margin: '0 0 0.25rem 0',
             fontSize: '1.25rem',
             fontWeight: 'bold',
-            color: '#333',
+            color: colors.text.primary,
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -167,7 +168,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
           <p style={{
             margin: '0',
             fontSize: '0.875rem',
-            color: '#6c757d'
+            color: colors.text.secondary
           }}>
             <Icon icon={Calendar} size={14} decorative /> {formatDate(record.date)}
           </p>
@@ -175,8 +176,8 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
 
         {/* サイズ表示 */}
         <div style={{
-          backgroundColor: record.size ? '#e3f2fd' : '#f8f9fa',
-          color: record.size ? '#1976d2' : '#6c757d',
+          backgroundColor: record.size ? 'rgba(96, 165, 250, 0.2)' : colors.surface.secondary,
+          color: record.size ? '#60a5fa' : colors.text.secondary,
           padding: '0.25rem 0.75rem',
           borderRadius: '20px',
           fontSize: '0.875rem',
@@ -194,7 +195,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
       }}>
         <div style={{
           fontSize: '0.875rem',
-          color: '#333',
+          color: colors.text.primary,
           marginBottom: '0.25rem'
         }}>
           <Icon icon={Map} size={14} decorative /> {formatLocation(record.location)}
@@ -216,10 +217,10 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             onClick={(e) => e.stopPropagation()}
             style={{
               fontSize: '0.75rem',
-              color: '#007bff',
+              color: '#60a5fa',
               textDecoration: 'none',
               padding: '0.125rem 0.375rem',
-              backgroundColor: '#e3f2fd',
+              backgroundColor: 'rgba(96, 165, 250, 0.2)',
               borderRadius: '12px'
             }}
             title="Googleマップで表示"
@@ -234,14 +235,14 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
         <div style={{
           marginBottom: '0.75rem',
           padding: '0.5rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: colors.surface.secondary,
           borderRadius: '4px',
-          borderLeft: '3px solid #dee2e6'
+          borderLeft: `3px solid ${colors.border.medium}`
         }}>
           <p style={{
             margin: '0',
             fontSize: '0.875rem',
-            color: '#666',
+            color: colors.text.secondary,
             fontStyle: 'italic',
             lineHeight: '1.4',
             maxHeight: '3em',
@@ -263,11 +264,11 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
         alignItems: 'center',
         marginTop: '0.75rem',
         paddingTop: '0.75rem',
-        borderTop: '1px solid #f0f0f0'
+        borderTop: `1px solid ${colors.border.light}`
       }}>
         <div style={{
           fontSize: '0.75rem',
-          color: '#999'
+          color: colors.text.tertiary
         }}>
           {record.updatedAt.toLocaleDateString('ja-JP')} {record.updatedAt.toLocaleTimeString('ja-JP', {
             hour: '2-digit',
@@ -328,7 +329,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
       {/* ホバーエフェクト用のスタイル */}
       <style>{`
         .fishing-record-card:hover {
-          box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
           transform: translateY(-2px);
         }
 
@@ -337,7 +338,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
         }
 
         .fishing-record-card button:focus {
-          outline: 2px solid #007bff;
+          outline: 2px solid #60a5fa;
           outline-offset: 2px;
         }
 

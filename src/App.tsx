@@ -22,13 +22,18 @@ import { ReAuthPrompt } from './components/features/SessionManagement/ReAuthProm
 import Button from './components/ui/Button'
 import { Icon } from './components/ui/Icon'
 import { Anchor, Edit, Camera, Wrench, AlertTriangle, Loader2, CheckCircle2, XCircle, BarChart3 } from 'lucide-react'
-import { colors } from './theme/colors'
+import { colors, initializeTheme } from './theme/colors'
 import { textStyles, typography } from './theme/typography'
 import type { CreateFishingRecordFormData } from './lib/validation'
 import type { FishingRecord } from './types'
 import './App.css'
 
 function App() {
+  // テーマ初期化（アプリ起動時に一度だけ実行）
+  useEffect(() => {
+    initializeTheme();
+  }, []);
+
   const [appError, setAppError] = useState<string | null>(null)
   const [dbStatus, setDbStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [dbMessage, setDbMessage] = useState<string>('')
@@ -458,11 +463,11 @@ function App() {
             <div style={{
               padding: '1rem',
               borderRadius: '8px',
-              backgroundColor: dbStatus === 'success' ? '#d4edda' : dbStatus === 'error' ? '#f8d7da' : '#fff3cd',
-              border: `1px solid ${dbStatus === 'success' ? '#c3e6cb' : dbStatus === 'error' ? '#f5c6cb' : '#ffeaa7'}`,
+              backgroundColor: dbStatus === 'success' ? 'rgba(52, 211, 153, 0.2)' : dbStatus === 'error' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(251, 191, 36, 0.2)',
+              border: `1px solid ${dbStatus === 'success' ? 'rgba(52, 211, 153, 0.5)' : dbStatus === 'error' ? 'rgba(239, 68, 68, 0.5)' : 'rgba(251, 191, 36, 0.5)'}`,
               marginBottom: '1rem'
             }}>
-              <h3>データベース状態</h3>
+              <h3 style={{ color: colors.text.primary }}>データベース状態</h3>
               <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 {dbStatus === 'loading' && <><Icon icon={Loader2} size="sm" className="animate-spin" decorative /> データベース接続中...</>}
                 {dbStatus === 'success' && <><Icon icon={CheckCircle2} size="sm" color="success" decorative /> {dbMessage}</>}
@@ -473,11 +478,11 @@ function App() {
             <div style={{
               padding: '1rem',
               borderRadius: '8px',
-              backgroundColor: storeStatus === 'success' ? '#d4edda' : storeStatus === 'error' ? '#f8d7da' : '#fff3cd',
-              border: `1px solid ${storeStatus === 'success' ? '#c3e6cb' : storeStatus === 'error' ? '#f5c6cb' : '#ffeaa7'}`,
+              backgroundColor: storeStatus === 'success' ? 'rgba(52, 211, 153, 0.2)' : storeStatus === 'error' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(251, 191, 36, 0.2)',
+              border: `1px solid ${storeStatus === 'success' ? 'rgba(52, 211, 153, 0.5)' : storeStatus === 'error' ? 'rgba(239, 68, 68, 0.5)' : 'rgba(251, 191, 36, 0.5)'}`,
               marginBottom: '1rem'
             }}>
-              <h3>Zustand Store状態</h3>
+              <h3 style={{ color: colors.text.primary }}>Zustand Store状態</h3>
               <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 {storeStatus === 'loading' && <><Icon icon={Loader2} size="sm" className="animate-spin" decorative /> ストアテスト中...</>}
                 {storeStatus === 'success' && <><Icon icon={CheckCircle2} size="sm" color="success" decorative /> {storeMessage}</>}
@@ -493,21 +498,21 @@ function App() {
             <div style={{
               padding: '1rem',
               borderRadius: '8px',
-              backgroundColor: '#f8f9fa',
-              border: '1px solid #dee2e6',
+              backgroundColor: colors.surface.secondary,
+              border: `1px solid ${colors.border.light}`,
               marginBottom: '1rem'
             }}>
-              <h3>フォーム状態テスト</h3>
+              <h3 style={{ color: colors.text.primary }}>フォーム状態テスト</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.9em' }}>
                 <div>
-                  <strong>フォームデータ:</strong>
-                  <pre style={{ fontSize: '0.8em', backgroundColor: '#fff', padding: '0.5rem', borderRadius: '4px' }}>
+                  <strong style={{ color: colors.text.primary }}>フォームデータ:</strong>
+                  <pre style={{ fontSize: '0.8em', backgroundColor: colors.surface.primary, color: colors.text.primary, padding: '0.5rem', borderRadius: '4px' }}>
                     {JSON.stringify(formData, null, 2)}
                   </pre>
                 </div>
                 <div>
-                  <strong>バリデーション:</strong>
-                  <pre style={{ fontSize: '0.8em', backgroundColor: '#fff', padding: '0.5rem', borderRadius: '4px' }}>
+                  <strong style={{ color: colors.text.primary }}>バリデーション:</strong>
+                  <pre style={{ fontSize: '0.8em', backgroundColor: colors.surface.primary, color: colors.text.primary, padding: '0.5rem', borderRadius: '4px' }}>
                     {JSON.stringify(validation, null, 2)}
                   </pre>
                 </div>
@@ -517,10 +522,10 @@ function App() {
             <div style={{
               padding: '1rem',
               borderRadius: '8px',
-              backgroundColor: '#f8f9fa',
-              border: '1px solid #dee2e6'
+              backgroundColor: colors.surface.secondary,
+              border: `1px solid ${colors.border.light}`
             }}>
-              <h3>開発進捗</h3>
+              <h3 style={{ color: colors.text.primary }}>開発進捗</h3>
               <ul>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-001: プロジェクトセットアップ</li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-002: 型定義・インターフェース</li>
@@ -533,21 +538,22 @@ function App() {
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-301: フォーム入力UI実装</li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={CheckCircle2} size={14} color="success" decorative /> TASK-302: 記録一覧表示実装</li>
               </ul>
-              <p style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#e3f2fd', borderRadius: '4px' }}>
+              <p style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'rgba(96, 165, 250, 0.2)', borderRadius: '4px', color: colors.text.primary }}>
                 <strong>現在:</strong> 写真ベース記録一覧UI実装完了
               </p>
 
               <div style={{
                 marginTop: '1rem',
                 padding: '1rem',
-                backgroundColor: '#fff3cd',
+                backgroundColor: 'rgba(251, 191, 36, 0.2)',
                 borderRadius: '4px',
-                border: '1px solid #ffeaa7'
+                border: '1px solid rgba(251, 191, 36, 0.5)',
+                color: colors.text.primary
               }}>
                 <strong style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={BarChart3} size={14} decorative /> 現在のデータ状況:</strong>
                 <br />記録数: {records.length}件
                 <br />記録詳細:
-                <pre style={{ fontSize: '0.75rem', maxHeight: '200px', overflow: 'auto', backgroundColor: '#fff', padding: '0.5rem', marginTop: '0.5rem' }}>
+                <pre style={{ fontSize: '0.75rem', maxHeight: '200px', overflow: 'auto', backgroundColor: colors.surface.primary, color: colors.text.primary, padding: '0.5rem', marginTop: '0.5rem' }}>
                   {JSON.stringify(records, null, 2)}
                 </pre>
 
