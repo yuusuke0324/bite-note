@@ -97,6 +97,20 @@ export default defineWorkspace([
         '**/*.red.test.{ts,tsx}', // TDD Red Phase テストを除外
       ],
       setupFiles: ['./src/setupTests.ts'],
+      environment: 'jsdom',
+      environmentOptions: {
+        jsdom: {
+          resources: 'usable',
+          runScripts: 'dangerously',
+        },
+      },
+      pool: 'forks',
+      poolOptions: {
+        forks: {
+          singleFork: false,
+          execArgv: ['--max-old-space-size=4096'],
+        },
+      },
       testTimeout: 20000,
     },
   },
