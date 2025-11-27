@@ -5,6 +5,7 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { colors } from '../../theme/colors';
@@ -89,12 +90,22 @@ const createFishIconDataUri = (color: string = 'white') => {
 // Issue #290: タッチターゲットサイズ44-56px（WCAG 2.1 AA準拠）
 // Issue #291: 標準的な逆さティアドロップ形状
 // Issue #292: ARIA属性追加（アクセシビリティ対応）
+// Issue #295: 最近の釣果にパルスアニメーション
 interface CreateCustomIconOptions {
   species: string;
   size?: number;
   location?: string;
   weight?: number;
+  isRecent?: boolean; // Issue #295: 1週間以内の釣果
 }
+
+// Issue #295: 最近の釣果判定（1週間以内）
+const isRecentCatch = (date: Date | string): boolean => {
+  const catchDate = typeof date === 'string' ? new Date(date) : date;
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  return catchDate >= oneWeekAgo;
+};
 
 const createCustomIcon = (options: CreateCustomIconOptions | string, size?: number) => {
   // 後方互換性のため、文字列引数もサポート
@@ -102,6 +113,7 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
   const fishSize = typeof options === 'string' ? size : options.size;
   const location = typeof options === 'string' ? undefined : options.location;
   const weight = typeof options === 'string' ? undefined : options.weight;
+  const isRecent = typeof options === 'string' ? false : options.isRecent ?? false;
 
   const color = getFishSpeciesColor(species);
   // Issue #290: タッチターゲットサイズ拡大（44-56px、デフォルト48px）
@@ -113,10 +125,13 @@ const createCustomIcon = (options: CreateCustomIconOptions | string, size?: numb
   const sizeLabel = fishSize ? `${fishSize}cm` : weight ? `${weight}g` : '';
   const ariaLabel = [species, location, sizeLabel].filter(Boolean).join('、');
 
+  // Issue #295: 最近の釣果にはパルスアニメーションクラスを追加
+  const recentClass = isRecent ? ' marker-recent' : '';
+
   return L.divIcon({
     className: 'custom-marker',
     html: `
-      <div class="marker-wrapper"
+      <div class="marker-wrapper${recentClass}"
            role="button"
            tabindex="0"
            aria-label="${ariaLabel}">
@@ -447,28 +462,63 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             <FlyToLocation coordinates={flyToCoords} />
           )}
 
-          {recordsWithAdjustedCoordinates.map((record) => (
-            <Marker
-              key={record.id}
-              position={[record.adjustedLat, record.adjustedLng]}
-              icon={createCustomIcon({
-                species: record.fishSpecies,
-                size: record.size,
-                weight: record.weight,
-                location: record.location,
-              })}
-              eventHandlers={{
-                click: () => {
-                  setSelectedRecord(record);
-                  // 地図をその位置に移動
-                  setFlyToCoords({
-                    latitude: record.adjustedLat,
-                    longitude: record.adjustedLng,
-                  });
-                },
-              }}
-            />
-          ))}
+          {/* Issue #294: クラスタリング実装 */}
+          <MarkerClusterGroup
+            chunkedLoading
+            maxClusterRadius={60}
+            spiderfyOnMaxZoom={true}
+            showCoverageOnHover={false}
+            iconCreateFunction={(cluster: L.MarkerCluster) => {
+              const count = cluster.getChildCount();
+              const size = count < 10 ? 44 : count < 50 ? 52 : 60;
+              return L.divIcon({
+                html: `
+                  <div class="cluster-marker" style="
+                    width: ${size}px;
+                    height: ${size}px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: 700;
+                    font-size: ${size / 3}px;
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+                    border: 3px solid white;
+                  ">
+                    ${count}
+                  </div>
+                `,
+                className: 'custom-cluster',
+                iconSize: L.point(size, size),
+              });
+            }}
+          >
+            {recordsWithAdjustedCoordinates.map((record) => (
+              <Marker
+                key={record.id}
+                position={[record.adjustedLat, record.adjustedLng]}
+                icon={createCustomIcon({
+                  species: record.fishSpecies,
+                  size: record.size,
+                  weight: record.weight,
+                  location: record.location,
+                  isRecent: isRecentCatch(record.date), // Issue #295
+                })}
+                eventHandlers={{
+                  click: () => {
+                    setSelectedRecord(record);
+                    // 地図をその位置に移動
+                    setFlyToCoords({
+                      latitude: record.adjustedLat,
+                      longitude: record.adjustedLng,
+                    });
+                  },
+                }}
+              />
+            ))}
+          </MarkerClusterGroup>
         </MapContainer>
 
         {/* 選択された釣果のサマリパネル（上部中央） */}
@@ -879,8 +929,35 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           50% { transform: translateY(-4px); }
         }
 
+        /* Issue #293: クリック時バウンスアニメーション */
+        @keyframes markerBounce {
+          0%, 100% { transform: scale(1); }
+          25% { transform: scale(1.2); }
+          50% { transform: scale(0.95); }
+          75% { transform: scale(1.1); }
+        }
+
+        /* Issue #295: 最近の釣果用パルスアニメーション */
+        @keyframes recentPulse {
+          0%, 100% {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25),
+                        inset 0 -2px 4px rgba(0,0,0,0.15),
+                        0 0 0 0 rgba(26, 115, 232, 0.7);
+          }
+          50% {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25),
+                        inset 0 -2px 4px rgba(0,0,0,0.15),
+                        0 0 0 12px rgba(26, 115, 232, 0);
+          }
+        }
+
         .marker-wrapper {
           animation: float 3s ease-in-out infinite;
+        }
+
+        /* Issue #295: 最近の釣果（1週間以内）にパルスアニメーション */
+        .marker-wrapper.marker-recent .marker-pin {
+          animation: recentPulse 2s ease-in-out infinite;
         }
 
         .marker-wrapper:hover .marker-pin {
@@ -888,9 +965,27 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           transition: transform 0.2s ease-out;
         }
 
+        /* Issue #293: クリック時のバウンスアニメーション */
+        .marker-wrapper:active .marker-pin {
+          animation: markerBounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         .marker-wrapper:focus .marker-pin {
           outline: 3px solid #1A73E8;
           outline-offset: 2px;
+        }
+
+        /* Issue #294: クラスタマーカーのスタイル */
+        .custom-cluster {
+          background: transparent !important;
+        }
+
+        .cluster-marker {
+          transition: transform 0.2s ease-out;
+        }
+
+        .cluster-marker:hover {
+          transform: scale(1.1);
         }
 
         .leaflet-popup-content-wrapper {
