@@ -86,44 +86,66 @@ const createFishIconDataUri = (color: string = 'white') => {
 };
 
 // モダンなカスタムピンアイコン
-const createCustomIcon = (species: string, size?: number) => {
+// Issue #290: タッチターゲットサイズ44-56px（WCAG 2.1 AA準拠）
+// Issue #291: 標準的な逆さティアドロップ形状
+// Issue #292: ARIA属性追加（アクセシビリティ対応）
+interface CreateCustomIconOptions {
+  species: string;
+  size?: number;
+  location?: string;
+  weight?: number;
+}
+
+const createCustomIcon = (options: CreateCustomIconOptions | string, size?: number) => {
+  // 後方互換性のため、文字列引数もサポート
+  const species = typeof options === 'string' ? options : options.species;
+  const fishSize = typeof options === 'string' ? size : options.size;
+  const location = typeof options === 'string' ? undefined : options.location;
+  const weight = typeof options === 'string' ? undefined : options.weight;
+
   const color = getFishSpeciesColor(species);
-  const iconSize = size ? Math.min(Math.max(size / 8, 28), 44) : 36;
-  const dotSize = iconSize * 0.25;
+  // Issue #290: タッチターゲットサイズ拡大（44-56px、デフォルト48px）
+  const iconSize = fishSize ? Math.min(Math.max(fishSize / 8, 44), 56) : 48;
+  const dotSize = 10; // 固定サイズで視認性向上
   const fishIconUrl = createFishIconDataUri('white');
+
+  // Issue #292: ARIA用のラベル生成
+  const sizeLabel = fishSize ? `${fishSize}cm` : weight ? `${weight}g` : '';
+  const ariaLabel = [species, location, sizeLabel].filter(Boolean).join('、');
 
   return L.divIcon({
     className: 'custom-marker',
     html: `
-      <div class="marker-wrapper">
+      <div class="marker-wrapper"
+           role="button"
+           tabindex="0"
+           aria-label="${ariaLabel}">
         <div class="marker-pin" style="
           background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
           width: ${iconSize}px;
           height: ${iconSize}px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
+          border-radius: 50% 50% 0 50%;
           box-shadow:
-            0 3px 8px rgba(0,0,0,0.3),
-            inset 0 -2px 4px rgba(0,0,0,0.2);
+            0 4px 12px rgba(0,0,0,0.25),
+            inset 0 -2px 4px rgba(0,0,0,0.15);
           display: flex;
           align-items: center;
           justify-content: center;
           position: relative;
         ">
           <div class="marker-inner" style="
-            background: rgba(255,255,255,0.25);
-            width: ${iconSize * 0.7}px;
-            height: ${iconSize * 0.7}px;
+            background: rgba(255,255,255,0.3);
+            width: ${iconSize * 0.65}px;
+            height: ${iconSize * 0.65}px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transform: rotate(45deg);
           ">
             <img src="${fishIconUrl}" alt="" style="
-              width: ${iconSize * 0.5}px;
-              height: ${iconSize * 0.5}px;
-              filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+              width: ${iconSize * 0.45}px;
+              height: ${iconSize * 0.45}px;
+              filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
             " />
           </div>
         </div>
@@ -136,13 +158,13 @@ const createCustomIcon = (species: string, size?: number) => {
           height: ${dotSize}px;
           background: radial-gradient(circle, ${color} 0%, ${color}88 100%);
           border-radius: 50%;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.35);
         "></div>
       </div>
     `,
     iconSize: [iconSize, iconSize + dotSize],
-    iconAnchor: [iconSize / 2, iconSize + dotSize / 2],
-    popupAnchor: [0, -(iconSize + dotSize / 2)],
+    iconAnchor: [iconSize / 2, iconSize + dotSize],
+    popupAnchor: [0, -(iconSize + dotSize)],
   });
 };
 
@@ -429,7 +451,12 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             <Marker
               key={record.id}
               position={[record.adjustedLat, record.adjustedLng]}
-              icon={createCustomIcon(record.fishSpecies, record.size || record.weight)}
+              icon={createCustomIcon({
+                species: record.fishSpecies,
+                size: record.size,
+                weight: record.weight,
+                location: record.location,
+              })}
               eventHandlers={{
                 click: () => {
                   setSelectedRecord(record);
@@ -857,7 +884,13 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
         }
 
         .marker-wrapper:hover .marker-pin {
-          transform: rotate(-45deg) scale(1.15);
+          transform: scale(1.1);
+          transition: transform 0.2s ease-out;
+        }
+
+        .marker-wrapper:focus .marker-pin {
+          outline: 3px solid #1A73E8;
+          outline-offset: 2px;
         }
 
         .leaflet-popup-content-wrapper {
