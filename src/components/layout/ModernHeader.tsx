@@ -63,7 +63,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 
   const titleStyles: React.CSSProperties = {
     ...textStyles.headline.small,
-    color: '#FFFFFF',
+    color: 'var(--color-text-primary)',
     margin: 0,
     fontWeight: 800,
     fontSize: '22px',
@@ -72,12 +72,11 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
   };
 
   const subtitleStyles: React.CSSProperties = {
     ...textStyles.body.small,
-    color: 'rgba(255, 255, 255, 0.75)',
+    color: 'var(--color-text-secondary)',
     margin: 0,
     marginTop: '2px',
     fontSize: '13px',
@@ -106,7 +105,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
     backgroundColor: 'transparent',
     border: 'none',
     cursor: 'pointer',
-    color: '#FFFFFF',
+    color: 'var(--color-text-primary)',
     transition: 'all 0.2s ease',
     fontSize: '20px',
   };

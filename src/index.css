@@ -161,6 +161,11 @@ input, textarea, select {
 
   /* Loading overlay */
   --color-loading-overlay: rgba(15, 23, 42, 0.8);
+
+  /* Navigation */
+  --color-nav-active-bg: rgba(59, 130, 246, 0.2);
+  --color-nav-active-text: #60a5fa;
+  --color-nav-inactive-text: rgba(255, 255, 255, 0.6);
 }
 
 /* Light Theme */
@@ -203,6 +208,11 @@ body.light-theme {
 
   /* Loading overlay */
   --color-loading-overlay: rgba(248, 250, 252, 0.8);
+
+  /* Navigation */
+  --color-nav-active-bg: rgba(59, 130, 246, 0.15);
+  --color-nav-active-text: #3b82f6;
+  --color-nav-inactive-text: rgba(30, 41, 59, 0.6);
 }
 
 /* 全ての要素に対する横スクロール防止の適用 */

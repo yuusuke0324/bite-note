@@ -39,8 +39,8 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
     cursor: 'pointer',
     position: 'relative',
     transition: 'all 0.2s ease',
-    backgroundColor: active ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-    color: active ? '#60a5fa' : 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: active ? 'var(--color-nav-active-bg)' : 'transparent',
+    color: active ? 'var(--color-nav-active-text)' : 'var(--color-nav-inactive-text)',
     borderRadius: '12px',
     margin: '6px 4px',
   });
@@ -86,7 +86,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           onClick={() => onItemClick(item.id)}
           onMouseEnter={(e) => {
             if (!item.active) {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
             }
           }}
           onMouseLeave={(e) => {
