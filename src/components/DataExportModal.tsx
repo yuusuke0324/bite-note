@@ -302,7 +302,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             エクスポート対象
           </h4>
           <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
-            <li>釣果記録: {getFilteredRecordsCount()}件</li>
+            <li>記録: {getFilteredRecordsCount()}件</li>
             {exportFormat === 'json' && (
               <>
                 <li>写真データ: {includePhotos ? '含める' : '含めない'}</li>

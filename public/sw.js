@@ -1,5 +1,5 @@
 /**
- * Service Worker - 釣果記録アプリ
+ * Service Worker - Bite Note
  * バージョン: 1.0.0
  *
  * 機能:

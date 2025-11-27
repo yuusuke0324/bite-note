@@ -428,12 +428,12 @@ function ModernApp() {
   // ヘッダー設定
   const getHeaderTitle = () => {
     switch (activeTab) {
-      case 'home': return '釣果記録';
+      case 'home': return 'Bite Note';
       case 'list': return '記録一覧';
       case 'map': return '釣り場マップ';
       case 'form': return '新規記録';
       case 'debug': return '設定';
-      default: return '釣果記録アプリ';
+      default: return 'Bite Note';
     }
   };
 

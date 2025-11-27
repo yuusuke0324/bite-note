@@ -86,7 +86,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
             <Icon icon={BarChart3} size={48} decorative color="secondary" />
           </div>
           <h3>データがありません</h3>
-          <p>統計を表示するには釣果記録が必要です。</p>
+          <p>統計を表示するには記録が必要です。</p>
           <button
             onClick={onClose}
             style={{

@@ -15,13 +15,13 @@ describe('UserGuidanceService', () => {
       const guidance = service.createFirstTimeGuidance();
 
       expect(guidance.type).toBe('first-time');
-      expect(guidance.title).toBe('釣果記録アプリへようこそ！');
+      expect(guidance.title).toBe('Bite Noteへようこそ！');
       expect(guidance.description).toBe('このアプリの使い方をご紹介します');
       expect(guidance.actionLabel).toBe('始める');
       expect(guidance.steps).toHaveLength(4);
 
       // 各ステップの内容を確認
-      expect(guidance.steps[0].title).toBe('釣果記録アプリへようこそ！');
+      expect(guidance.steps[0].title).toBe('Bite Noteへようこそ！');
       expect(guidance.steps[1].title).toBe('釣果の記録');
       expect(guidance.steps[2].title).toBe('写真の追加');
       expect(guidance.steps[3].title).toBe('記録の確認');
@@ -84,7 +84,7 @@ describe('UserGuidanceService', () => {
 
       expect(guidance.type).toBe('empty-state');
       expect(guidance.emptyType).toBe('no-records');
-      expect(guidance.title).toBe('まだ釣果記録がありません');
+      expect(guidance.title).toBe('まだ記録がありません');
       expect(guidance.description).toBe('最初の釣果を記録してみましょう！');
       expect(guidance.actionLabel).toBe('記録を作成');
       expect(guidance.steps).toHaveLength(0);

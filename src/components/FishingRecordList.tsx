@@ -213,7 +213,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             color: '#333'
           }}>
             <Icon icon={Anchor} size="md" decorative />
-            釣果記録一覧
+            記録一覧
           </h2>
           <button
             data-testid={TestIds.ADD_RECORD_BUTTON}
@@ -547,7 +547,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
       )}
 
       {/* レコード一覧 */}
-      <div data-testid={TestIds.FISHING_RECORDS_CONTAINER} role="list" aria-label="釣果記録一覧">
+      <div data-testid={TestIds.FISHING_RECORDS_CONTAINER} role="list" aria-label="記録一覧">
         {loading && sortedRecords.length === 0 ? (
           // 初回ローディング時のスケルトン
           Array.from({ length: 3 }, (_, i) => (
@@ -565,7 +565,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             </div>
             <h3 style={{ margin: '0 0 0.5rem 0' }}>記録がありません</h3>
             <p style={{ margin: 0, fontSize: '0.875rem' }}>
-              {searchQuery ? '検索条件に一致する記録が見つかりませんでした' : 'まだ釣果記録がありません'}
+              {searchQuery ? '検索条件に一致する記録が見つかりませんでした' : 'まだ記録がありません'}
             </p>
           </div>
         ) : (

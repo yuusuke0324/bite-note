@@ -165,7 +165,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
                   color: '#EA4335',
                 }}
               >
-                保存されていない釣果記録が{unsavedCount}件あります。
+                保存されていない記録が{unsavedCount}件あります。
               </strong>
             )}
           </p>

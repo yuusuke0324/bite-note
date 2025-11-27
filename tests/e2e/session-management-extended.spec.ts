@@ -96,7 +96,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       await expect(modal).toBeVisible({ timeout: 10000 });
 
       // 未保存データカウントが表示されていることを確認
-      await expect(modal).toContainText('保存されていない釣果記録が5件あります');
+      await expect(modal).toContainText('保存されていない記録が5件あります');
     });
 
     test('TC-SM-002-NO-COUNT: 未保存データが0件の場合はカウントが表示されないこと', async ({
@@ -112,7 +112,7 @@ test.describe('Session Management - Extended Tests (Phase 3-4)', () => {
       await expect(modal).toBeVisible({ timeout: 10000 });
 
       // カウントメッセージが表示されていないことを確認
-      await expect(modal).not.toContainText('保存されていない釣果記録が');
+      await expect(modal).not.toContainText('保存されていない記録が');
     });
 
     test('TC-SM-MULTI: 複数回セッション期限切れイベントが発火してもモーダルは1つだけ表示されること', async ({

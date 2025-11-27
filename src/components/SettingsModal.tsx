@@ -137,7 +137,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   // データのクリア
   const handleClearData = useCallback(async () => {
-    if (confirm('すべての釣果記録を削除しますか？この操作は取り消せません。')) {
+    if (confirm('すべての記録を削除しますか？この操作は取り消せません。')) {
       if (confirm('本当によろしいですか？すべてのデータが失われます。')) {
         try {
           // データクリア処理（実装は後で行う）

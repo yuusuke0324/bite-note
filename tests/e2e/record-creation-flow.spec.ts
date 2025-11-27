@@ -65,7 +65,7 @@ test.describe('釣果記録作成フロー', () => {
     await page.click('[data-testid="save-record-button"]');
 
     // ホーム画面に戻ることを確認
-    await expect(page.locator('h1')).toContainText('釣果記録');
+    await expect(page.locator('h1')).toContainText('Bite Note');
   });
 
   test.skip('GPS位置情報を取得できる', async ({ page }) => {
@@ -104,7 +104,7 @@ test.describe('釣果記録作成フロー', () => {
     await page.click('[data-testid="save-record-button"]');
 
     // ホーム画面に戻ることを確認（成功）
-    await expect(page.locator('h1')).toContainText('釣果記録');
+    await expect(page.locator('h1')).toContainText('Bite Note');
   });
 
   test.skip('フォームのリセット機能が動作する', async ({ page }) => {

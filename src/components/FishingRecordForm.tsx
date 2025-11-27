@@ -308,7 +308,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         justifyContent: 'center',
         gap: '0.5rem'
       }}>
-        <Icon icon={Anchor} size={28} decorative /> 釣果記録フォーム
+        <Icon icon={Anchor} size={28} decorative /> 新規記録
       </h2>
 
       <form

@@ -121,7 +121,7 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
             <Fish size={48} color="#9CA3AF" aria-hidden="true" />
           </div>
-          <h3>釣果記録がありません</h3>
+          <h3>記録がありません</h3>
           <p>デバッグタブでテスト記録を作成してみましょう！</p>
         </div>
       ) : (

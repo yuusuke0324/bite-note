@@ -139,7 +139,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
           handleCardClick();
         }
       }}
-      aria-label={`釣果記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
+      aria-label={`記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
       style={{
         borderRadius: '16px',
         overflow: 'hidden',

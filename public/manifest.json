@@ -1,6 +1,6 @@
 {
-  "name": "釣果記録アプリ",
-  "short_name": "釣果記録",
+  "name": "Bite Note",
+  "short_name": "Bite Note",
   "description": "あなたの釣果を記録・管理できるPWAアプリ",
   "start_url": "/",
   "display": "standalone",
@@ -67,21 +67,21 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "釣果記録アプリのデスクトップ表示"
+      "label": "Bite Noteのデスクトップ表示"
     },
     {
       "src": "/screenshots/mobile-screenshot.png",
       "sizes": "375x812",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "釣果記録アプリのモバイル表示"
+      "label": "Bite Noteのモバイル表示"
     }
   ],
   "shortcuts": [
     {
       "name": "新しい記録を追加",
       "short_name": "記録追加",
-      "description": "新しい釣果記録を追加します",
+      "description": "新しい記録を追加します",
       "url": "/?tab=form",
       "icons": [
         {
@@ -94,7 +94,7 @@
     {
       "name": "記録一覧を見る",
       "short_name": "記録一覧",
-      "description": "これまでの釣果記録を確認します",
+      "description": "これまでの記録を確認します",
       "url": "/?tab=list",
       "icons": [
         {
