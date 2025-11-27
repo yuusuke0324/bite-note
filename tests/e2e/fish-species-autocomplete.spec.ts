@@ -128,9 +128,11 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       // ステップ2: 2回目の↓キー → 2番目を選択
       await input.press('ArrowDown');
 
-      // 選択が1つだけであることを先に確認（React状態更新の完了を待つ）
-      await expect(selectedOptions).toHaveCount(1, { timeout: 10000 });
+      // 状態遷移を明示的に検証（旧選択が非選択になり、新選択が選択される）
+      // React状態更新の完了を確実に待つため、遷移先の状態を先に確認
       await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
+      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
+      await expect(selectedOptions).toHaveCount(1);
     });
 
     // Issue #246: コンポーネント側でhandleKeyDownにclearTimeout追加で修正済み
@@ -158,15 +160,17 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
 
       // ステップ2: ↓で2番目を選択
       await input.press('ArrowDown');
-      // 選択が1つだけであることを先に確認（React状態更新の完了を待つ）
-      await expect(selectedOptions).toHaveCount(1, { timeout: 10000 });
+      // 状態遷移を明示的に検証（旧選択が非選択になり、新選択が選択される）
       await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
+      await expect(options.nth(0)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
+      await expect(selectedOptions).toHaveCount(1);
 
       // ステップ3: ↑で1番目に戻る
       await input.press('ArrowUp');
-      // 選択が1つだけであることを先に確認（React状態更新の完了を待つ）
-      await expect(selectedOptions).toHaveCount(1, { timeout: 10000 });
+      // 状態遷移を明示的に検証（旧選択が非選択になり、新選択が選択される）
       await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true', { timeout: 10000 });
+      await expect(options.nth(1)).toHaveAttribute('aria-selected', 'false', { timeout: 10000 });
+      await expect(selectedOptions).toHaveCount(1);
     });
 
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
