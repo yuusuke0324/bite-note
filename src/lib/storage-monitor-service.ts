@@ -141,7 +141,7 @@ class StorageMonitorService {
 
     useToastStore.getState().showToast({
       type: 'error',
-      message: `⚠️ ストレージ容量が不足しています（${usagePercent.toFixed(1)}%）。不要なデータを削除してください。`,
+      message: `ストレージ容量が不足しています（${usagePercent.toFixed(1)}%）。不要なデータを削除してください。`,
       actions: [
         {
           label: 'データを管理',
@@ -255,7 +255,7 @@ class StorageMonitorService {
 
     if (usagePercent >= this.config.criticalThreshold) {
       level = 'critical';
-      message = `⚠️ ストレージ容量が不足しています（${usagePercent.toFixed(1)}%）`;
+      message = `ストレージ容量が不足しています（${usagePercent.toFixed(1)}%）`;
     } else if (usagePercent >= this.config.warningThreshold) {
       level = 'warning';
       message = `警告: ストレージ使用量が${usagePercent.toFixed(1)}%に達しています`;
