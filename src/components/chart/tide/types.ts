@@ -12,6 +12,7 @@ import type {
   Tooltip,
   ReferenceLine,
 } from 'recharts';
+import type { FishingMarkerData, MarkerGroupingConfig } from './markers/types';
 
 /**
  * 潮汐データポイント
@@ -104,7 +105,37 @@ export interface TideChartProps {
   onDataPointClick?: (data: TideChartData, index: number) => void;
   className?: string;
   style?: React.CSSProperties;
-  fishingTimes?: string[]; // "HH:mm" 形式の釣果時刻配列
+
+  /**
+   * Fishing marker data (new format with Glassmorphism stacked markers)
+   * Issue #273: TideChart fishing marker enhancement
+   */
+  fishingData?: FishingMarkerData[];
+
+  /**
+   * @deprecated Use fishingData instead. Kept for backward compatibility.
+   * Legacy fishing times array ("HH:mm" format)
+   */
+  fishingTimes?: string[];
+
+  /**
+   * Configuration for marker grouping
+   * Issue #273: TideChart fishing marker enhancement
+   */
+  markerGroupingConfig?: Partial<MarkerGroupingConfig>;
+
+  /**
+   * Callback when a fishing record marker is clicked
+   * Issue #273: TideChart fishing marker enhancement
+   */
+  onFishingRecordClick?: (record: FishingMarkerData) => void;
+
+  /**
+   * Whether to use Glassmorphism stacked markers (default: true when fishingData is provided)
+   * Set to false to use legacy emoji markers
+   * Issue #273: TideChart fishing marker enhancement
+   */
+  useStackedMarkers?: boolean;
 
   // Accessibility Props (TASK-302)
   theme?:
