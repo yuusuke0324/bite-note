@@ -232,6 +232,8 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
                 innerRadius={54}
                 fill="#8884d8"
                 dataKey="value"
+                stroke="var(--color-surface-primary)"
+                strokeWidth={2}
                 onClick={(data) => {
                   if (onSpeciesClick && data.name !== 'その他') {
                     onSpeciesClick(data.name);

@@ -169,7 +169,7 @@ input, textarea, select {
 
   /* Panel backgrounds (for floating panels with blur) */
   --color-panel-bg: rgba(30, 41, 59, 0.95);
-  --color-panel-bg-solid: rgba(30, 41, 59, 0.98);
+  --color-panel-bg-solid: #1e293b;
   --color-panel-hover: rgba(51, 65, 85, 1);
 
   /* Accent text */
@@ -224,7 +224,7 @@ body.light-theme {
 
   /* Panel backgrounds (for floating panels with blur) */
   --color-panel-bg: rgba(255, 255, 255, 0.95);
-  --color-panel-bg-solid: rgba(255, 255, 255, 0.98);
+  --color-panel-bg-solid: #ffffff;
   --color-panel-hover: rgba(241, 245, 249, 1);
 
   /* Accent text */

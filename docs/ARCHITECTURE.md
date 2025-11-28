@@ -296,11 +296,38 @@ Auto-fill Form Fields (日時・位置情報)
 
 ### デザインシステム
 
-- **カラーパレット**: ダークテーマベース（`src/theme/colors.ts`で一元管理）
-  - Surface: Slate系（#1e293b, #334155）
-  - Text: Light系（#f1f5f9）
-  - Accent: Blue系（#60a5fa）
-  - Semantic: Success/Warning/Error/Info
+- **テーマシステム**: CSS Custom Properties（CSS変数）による動的テーマ切り替え
+  - **ダークモード**: デフォルト（`:root`で定義）
+  - **ライトモード**: `body.light-theme`クラスで定義
+  - **設定永続化**: localStorageにテーマ設定を保存
+  - **スムーズな切り替え**: 0.3秒のトランジション効果
+
+- **カラーパレット**: `src/index.css`のCSS変数で一元管理
+  ```css
+  /* 主要なCSS変数 */
+  --color-background-primary    /* 背景色 */
+  --color-surface-primary       /* カード・パネル背景 */
+  --color-text-primary          /* 主テキスト */
+  --color-text-secondary        /* 副テキスト */
+  --color-border-light          /* ボーダー */
+  --color-chart-axis            /* グラフ軸 */
+  --color-chart-grid            /* グラフグリッド */
+  ```
+
+- **カラー定義**:
+  | カテゴリ | ダーク | ライト |
+  |---------|--------|--------|
+  | 背景 | `#0f172a` | `#f8fafc` |
+  | サーフェス | `#1e293b` | `#ffffff` |
+  | テキスト | `#f1f5f9` | `#1e293b` |
+  | アクセント | `#60a5fa` | `#3b82f6` |
+
+- **テーマ適用対象**: 全42コンポーネント
+  - UIコンポーネント（Button, Card, Modal等）
+  - レイアウト（Header, Navigation, Footer）
+  - チャート（TideChart, TrendChart, SpeciesChart）
+  - マップオーバーレイ（FishingMap）
+
 - **タイポグラフィ**: システムフォント（SF Pro, Roboto）
 - **アイコン**: Lucide React アイコン
 - **レスポンシブ**: モバイルファースト設計
@@ -502,5 +529,5 @@ interface FormState {
 
 ---
 
-**最終更新**: 2025年10月30日
+**最終更新**: 2025年11月28日
 **作成者**: Bite Note Development Team
