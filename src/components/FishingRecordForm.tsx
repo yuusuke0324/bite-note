@@ -343,7 +343,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           }}>
             <h4 style={{
               margin: '0 0 0.75rem 0',
-              color: '#60a5fa',
+              color: 'var(--color-accent-text)',
               fontSize: '1rem',
               display: 'flex',
               alignItems: 'center',
@@ -351,7 +351,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             }}>
               <Icon icon={Camera} size={16} decorative /> 写真から抽出された情報
             </h4>
-            <div style={{ fontSize: '0.9rem', color: '#93c5fd' }}>
+            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
               {extractedMetadata.coordinates && (
                 <p style={{ margin: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                   <Icon icon={MapPin} size={14} decorative /> GPS座標: {extractedMetadata.coordinates.latitude.toFixed(6)}, {extractedMetadata.coordinates.longitude.toFixed(6)}

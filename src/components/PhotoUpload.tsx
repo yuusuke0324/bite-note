@@ -316,7 +316,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
               <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
                 ドラッグ&amp;ドロップまたはクリックして選択
               </p>
-              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#60a5fa', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: 'var(--color-accent-text)', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
                 <MapPin size={14} color="#10B981" aria-hidden="true" /> GPS情報付きの写真なら位置・日時・天気・海面水温を自動入力!
               </p>
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>

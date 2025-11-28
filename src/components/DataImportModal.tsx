@@ -214,7 +214,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           borderRadius: '6px',
           marginBottom: '1.5rem',
           fontSize: '0.9rem',
-          color: '#93c5fd',
+          color: 'var(--color-text-secondary)',
           border: '1px solid rgba(96, 165, 250, 0.3)'
         }}>
           <h4 style={{
@@ -224,9 +224,9 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
-            color: '#60a5fa'
+            color: 'var(--color-accent-text)'
           }}>
-            <Lightbulb size={18} color="#60a5fa" aria-hidden="true" />
+            <Lightbulb size={18} style={{ color: 'var(--color-accent-text)' }} aria-hidden="true" />
             インポート可能なファイル形式
           </h4>
           <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
