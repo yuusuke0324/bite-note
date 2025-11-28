@@ -509,11 +509,24 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
             disabled={loading}
             aria-expanded={isExpanded}
             aria-controls="tide-content-section"
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 px-4 py-2 rounded-lg transition-colors duration-200"
-            style={{ color: '#ffffff' }}
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors duration-200"
+            style={{
+              backgroundColor: loading ? '#60a5fa' : '#2563eb',
+              color: '#ffffff'
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = '#1d4ed8';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = '#2563eb';
+              }
+            }}
           >
             <Icon icon={BarChart3} size={16} decorative />
-            <span style={{ color: '#ffffff' }}>
+            <span>
               {loading ? '計算中...' : (isExpanded ? '潮汐グラフを非表示' : '潮汐グラフを表示')}
             </span>
             {loading && (
