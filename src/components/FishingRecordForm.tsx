@@ -621,7 +621,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <input
             id="fishing-spot"
             data-testid={TestIds.LOCATION_NAME}
-            type="text"
+            type="search"
             readOnly
             autoComplete="off"
             autoCorrect="off"
@@ -722,7 +722,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <input
             id="weather"
             data-testid={TestIds.WEATHER}
-            type="text"
+            type="search"
             readOnly
             autoComplete="off"
             autoCorrect="off"
