@@ -212,7 +212,8 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
       <div className="input-wrapper">
         <input
           ref={inputRef}
-          type="text"
+          type="search"
+          inputMode="text"
           autoComplete="off"
           autoCorrect="off"
           spellCheck="false"
