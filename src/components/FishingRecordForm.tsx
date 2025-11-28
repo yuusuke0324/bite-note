@@ -509,11 +509,13 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="date"
             data-testid={TestIds.FISHING_DATE}
             type="datetime-local"
+            autoComplete="off"
             {...register('date')}
             aria-describedby={errors.date ? 'date-error' : undefined}
             aria-invalid={!!errors.date}
             style={{
               width: '100%',
+              boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.date ? '#ef4444' : 'var(--color-border-medium)'}`,
               borderRadius: '8px',
@@ -605,6 +607,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="location"
             data-testid={TestIds.LOCATION_NAME}
             type="text"
+            autoComplete="off"
             placeholder={autoFilledFields.has('location')
               ? "基本住所に詳細を追加（例: ○○港、△△磯、釣り堀名など）"
               : "釣り場の名前や住所を入力してください"}
@@ -613,6 +616,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             aria-invalid={!!errors.location}
             style={{
               width: '100%',
+              boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.location ? '#ef4444' : 'var(--color-border-medium)'}`,
               borderRadius: '8px',
@@ -693,12 +697,14 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="weather"
             data-testid={TestIds.WEATHER}
             type="text"
+            autoComplete="off"
             placeholder="天気や気温を入力してください"
             {...register('weather')}
             aria-describedby={errors.weather ? 'weather-error' : 'weather-help'}
             aria-invalid={!!errors.weather}
             style={{
               width: '100%',
+              boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.weather ? '#ef4444' : 'var(--color-border-medium)'}`,
               borderRadius: '8px',
@@ -775,6 +781,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <input
             id="seaTemperature"
             type="number"
+            autoComplete="off"
             min="0"
             max="50"
             step="0.1"
@@ -790,6 +797,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             aria-invalid={!!errors.seaTemperature}
             style={{
               width: '100%',
+              boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.seaTemperature ? '#ef4444' : 'var(--color-border-medium)'}`,
               borderRadius: '8px',
@@ -891,6 +899,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="size"
             data-testid={TestIds.FISH_SIZE}
             type="number"
+            autoComplete="off"
             min="0"
             max="999"
             step="0.1"
@@ -906,6 +915,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             aria-invalid={!!errors.size}
             style={{
               width: '100%',
+              boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.size ? '#ef4444' : 'var(--color-border-medium)'}`,
               borderRadius: '8px',
@@ -969,6 +979,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <input
             id="weight"
             type="number"
+            autoComplete="off"
             min="0"
             max="99999"
             step="1"
@@ -984,6 +995,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             aria-invalid={!!errors.weight}
             style={{
               width: '100%',
+              boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.weight ? '#ef4444' : 'var(--color-border-medium)'}`,
               borderRadius: '8px',
@@ -1049,6 +1061,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <textarea
             id="notes"
             data-testid={TestIds.NOTES}
+            autoComplete="off"
             rows={4}
             placeholder="釣りの記録や感想、天候、使用した餌などを自由に記入してください"
             {...register('notes')}
@@ -1056,6 +1069,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             aria-invalid={!!errors.notes}
             style={{
               width: '100%',
+              boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.notes ? '#ef4444' : 'var(--color-border-medium)'}`,
               borderRadius: '8px',

@@ -209,6 +209,7 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
         <input
           ref={inputRef}
           type="text"
+          autoComplete="off"
           role="combobox"
           value={inputValue}
           onChange={handleInputChange}
