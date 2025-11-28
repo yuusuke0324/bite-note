@@ -166,6 +166,14 @@ input, textarea, select {
   --color-nav-active-bg: rgba(59, 130, 246, 0.2);
   --color-nav-active-text: #60a5fa;
   --color-nav-inactive-text: rgba(255, 255, 255, 0.6);
+
+  /* Panel backgrounds (for floating panels with blur) */
+  --color-panel-bg: rgba(30, 41, 59, 0.95);
+  --color-panel-bg-solid: rgba(30, 41, 59, 0.98);
+  --color-panel-hover: rgba(51, 65, 85, 1);
+
+  /* Accent text */
+  --color-accent-text: #60a5fa;
 }
 
 /* Light Theme */
@@ -213,6 +221,14 @@ body.light-theme {
   --color-nav-active-bg: rgba(59, 130, 246, 0.15);
   --color-nav-active-text: #3b82f6;
   --color-nav-inactive-text: rgba(30, 41, 59, 0.6);
+
+  /* Panel backgrounds (for floating panels with blur) */
+  --color-panel-bg: rgba(255, 255, 255, 0.95);
+  --color-panel-bg-solid: rgba(255, 255, 255, 0.98);
+  --color-panel-hover: rgba(241, 245, 249, 1);
+
+  /* Accent text */
+  --color-accent-text: #3b82f6;
 }
 
 /* 全ての要素に対する横スクロール防止の適用 */

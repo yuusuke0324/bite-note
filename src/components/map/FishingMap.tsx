@@ -644,10 +644,10 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 1000,
-            backgroundColor: 'rgba(30, 41, 59, 0.98)',
+            backgroundColor: 'var(--color-panel-bg-solid)',
             backdropFilter: 'blur(20px)',
             borderRadius: '16px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
             padding: '16px 20px',
             border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
             maxWidth: '400px',
@@ -835,7 +835,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             style={{
               width: '44px',
               height: '44px',
-              backgroundColor: 'rgba(30, 41, 59, 0.95)',
+              backgroundColor: 'var(--color-panel-bg)',
               backdropFilter: 'blur(10px)',
               color: colors.text.primary,
               border: `1px solid ${colors.border.light}`,
@@ -845,16 +845,16 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
             }}
             title="全体表示に戻す"
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(51, 65, 85, 1)';
-              e.currentTarget.style.boxShadow = '0 6px 32px rgba(0, 0, 0, 0.4)';
+              e.currentTarget.style.backgroundColor = 'var(--color-panel-hover)';
+              e.currentTarget.style.boxShadow = '0 6px 32px rgba(0, 0, 0, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
-              e.currentTarget.style.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.3)';
+              e.currentTarget.style.backgroundColor = 'var(--color-panel-bg)';
+              e.currentTarget.style.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.15)';
             }}
           >
             <Icon icon={Maximize2} size={20} decorative />
@@ -862,10 +862,10 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
           {/* 統計情報カード */}
           <div style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.95)',
+            backgroundColor: 'var(--color-panel-bg)',
             backdropFilter: 'blur(10px)',
             borderRadius: '12px',
-            boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3)',
+            boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
             padding: '12px',
             border: `1px solid ${colors.border.light}`,
             minWidth: '140px',
@@ -885,7 +885,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 <span style={{ fontSize: '0.8rem', color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Icon icon={BarChart3} size={14} color="secondary" decorative /> 記録数
                 </span>
-                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#60a5fa' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-accent-text)' }}>
                   {statistics.totalRecords}
                 </span>
               </div>
@@ -893,7 +893,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 <span style={{ fontSize: '0.8rem', color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Icon icon={MapPin} size={14} color="secondary" decorative /> 釣り場
                 </span>
-                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#60a5fa' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-accent-text)' }}>
                   {statistics.uniqueLocations}
                 </span>
               </div>
@@ -901,7 +901,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 <span style={{ fontSize: '0.8rem', color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Icon icon={Fish} size={14} color="secondary" decorative /> 魚種
                 </span>
-                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: '#60a5fa' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-accent-text)' }}>
                   {statistics.uniqueSpecies}
                 </span>
               </div>
@@ -916,19 +916,19 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           left: 0,
           right: 0,
           zIndex: 1000,
-          backgroundColor: 'rgba(30, 41, 59, 0.98)',
+          backgroundColor: 'var(--color-panel-bg-solid)',
           backdropFilter: 'blur(20px)',
           borderTop: `1px solid ${colors.border.light}`,
           maxHeight: '180px',
           overflowY: 'auto',
-          boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.15)',
         }}>
           <div style={{
             padding: '12px 16px 8px 16px',
             borderBottom: `1px solid ${colors.border.light}`,
             position: 'sticky',
             top: 0,
-            backgroundColor: 'rgba(30, 41, 59, 0.98)',
+            backgroundColor: 'var(--color-panel-bg-solid)',
             backdropFilter: 'blur(20px)',
             zIndex: 1,
           }}>
