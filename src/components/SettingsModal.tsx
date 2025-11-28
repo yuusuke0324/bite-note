@@ -5,7 +5,7 @@ import { useAppStore, selectSettings, selectActions } from '../stores/app-store'
 import type { AppSettings } from '../types';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
-import { colors, setTheme, getTheme, type ThemeMode } from '../theme/colors';
+import { setTheme, getTheme, type ThemeMode } from '../theme/colors';
 import {
   Settings,
   Palette,

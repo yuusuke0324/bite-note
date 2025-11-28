@@ -27,7 +27,6 @@ import {
   Scroll,
 } from 'lucide-react';
 import type { FishingRecord } from '../types';
-import { colors } from '../theme/colors';
 
 interface FishingRecordListProps {
   records: FishingRecord[];

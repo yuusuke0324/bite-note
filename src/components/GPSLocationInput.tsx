@@ -7,7 +7,6 @@ import { useToastStore } from '../stores/toast-store';
 import { TestIds } from '../constants/testIds';
 import type { Coordinates } from '../types';
 import { logger } from '../lib/errors/logger';
-import { colors } from '../theme/colors';
 
 interface GPSLocationInputProps {
   value?: Coordinates;

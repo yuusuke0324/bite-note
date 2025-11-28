@@ -53,7 +53,6 @@ import type {
 } from './types';
 import styles from './TideChart.module.css';
 import { logger } from '../../../lib/errors/logger';
-import { colors } from '../../../theme/colors';
 import { StackedMarkerOverlay } from './markers/StackedMarkerOverlay';
 import type { FishingMarkerData } from './markers/types';
 

@@ -11,7 +11,6 @@ import type { TideInfo } from '../types/tide';
 import { TestIds } from '../constants/testIds';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
-import { colors } from '../theme/colors';
 import {
   Anchor,
   Camera,

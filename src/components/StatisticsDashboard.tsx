@@ -12,7 +12,6 @@ import type {
   WeatherStats
 } from '../lib/statistics-service';
 import { Icon } from './ui/Icon';
-import { colors } from '../theme/colors';
 import {
   BarChart3,
   Fish,

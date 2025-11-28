@@ -1,7 +1,6 @@
 // 遅延読み込み対応画像コンポーネント
 
 import React, { useState, useRef, useEffect } from 'react';
-import { colors } from '../theme/colors';
 
 export interface LazyImageProps {
   src: string;

@@ -1,5 +1,4 @@
 import React, { type ReactNode } from 'react';
-import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
 
 type TabType = 'home' | 'form' | 'list' | 'map' | 'debug';

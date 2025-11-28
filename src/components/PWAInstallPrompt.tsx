@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Smartphone, X } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
-import { colors } from '../theme/colors';
 import { logger } from '../lib/errors/logger';
 
 interface PWAInstallPromptProps {

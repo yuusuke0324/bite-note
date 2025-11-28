@@ -7,7 +7,6 @@ import type { FishingRecord } from '../types';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { Fish, Calendar, Ruler, Map, MessageCircle, Camera, Edit, Trash2 } from 'lucide-react';
-import { colors } from '../theme/colors';
 
 interface FishingRecordCardProps {
   record: FishingRecord;

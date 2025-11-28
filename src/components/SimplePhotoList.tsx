@@ -4,7 +4,6 @@ import React from 'react';
 import { AlertTriangle, Fish, Camera, FileText } from 'lucide-react';
 import { PhotoBasedRecordCard } from './PhotoBasedRecordCard';
 import type { FishingRecord } from '../types';
-import { colors } from '../theme/colors';
 
 interface SimplePhotoListProps {
   records: FishingRecord[];

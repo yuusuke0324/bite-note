@@ -4,7 +4,6 @@
 import React, { useEffect, useRef } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { TestIds } from '../../../constants/testIds';
-import { colors } from '../../../theme/colors';
 
 interface ReAuthPromptProps {
   unsavedCount: number;

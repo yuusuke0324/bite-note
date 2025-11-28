@@ -10,7 +10,6 @@ import { TestIds } from '../constants/testIds';
 import { Skeleton } from './ui/Skeleton';
 import type { PhotoMetadata, AutoFillData } from '../types';
 import { logger } from '../lib/errors/logger';
-import { colors } from '../theme/colors';
 
 interface PhotoUploadProps {
   value?: File;

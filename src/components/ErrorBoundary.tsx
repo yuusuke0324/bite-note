@@ -5,7 +5,6 @@ import { AlertTriangle } from 'lucide-react';
 import { errorManager } from '../lib/errors/ErrorManager';
 import { AppError, ErrorSeverity, ErrorCategory } from '../lib/errors/ErrorTypes';
 import { TestIds } from '../constants/testIds';
-import { colors } from '../theme/colors';
 
 interface Props {
   children: ReactNode;

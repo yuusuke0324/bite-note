@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import type { Guidance } from '../lib/user-guidance-service';
 import { Icon } from './ui/Icon';
 import { Hand, Lightbulb, Wrench, FileText, X } from 'lucide-react';
-import { colors } from '../theme/colors';
 
 export interface UserGuidanceProps {
   guidance: Guidance | null;

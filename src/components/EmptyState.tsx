@@ -3,7 +3,6 @@
 import React, { type ReactNode } from 'react';
 import { Icon } from './ui/Icon';
 import { Anchor, Search, MapPin, Camera, Wifi, FileText, Lightbulb } from 'lucide-react';
-import { colors } from '../theme/colors';
 
 export interface EmptyStateProps {
   type: 'noRecords' | 'noSearchResults' | 'gpsError' | 'noPhotos' | 'offline';

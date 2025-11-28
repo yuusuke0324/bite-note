@@ -5,7 +5,6 @@ import type { SearchFilters } from './AdvancedSearchFilter';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { Save, X } from 'lucide-react';
-import { colors } from '../theme/colors';
 
 interface SavedSearch {
   id: string;

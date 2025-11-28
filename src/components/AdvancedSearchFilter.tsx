@@ -4,7 +4,6 @@ import React, { useCallback, useMemo } from 'react';
 import type { FishingRecord } from '../types';
 import { Icon } from './ui/Icon';
 import { Search, Type, Calendar, Ruler, MapPin, Fish, Settings, Camera, Map, BarChart3, X } from 'lucide-react';
-import { colors } from '../theme/colors';
 
 export interface SearchFilters {
   // テキスト検索

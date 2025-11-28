@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import { colors } from '../../theme/colors';
 
 interface SkeletonProps {
   /** 幅（CSSの値、例: '100%', '200px'） */

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { photoService } from '../lib/photo-service';
-import { colors } from '../theme/colors';
 import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
 import { logger } from '../lib/errors/logger';

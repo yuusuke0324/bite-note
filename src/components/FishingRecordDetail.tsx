@@ -6,7 +6,6 @@ import type { FishingRecord } from '../types';
 import { TideIntegration } from './TideIntegration';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
-import { colors } from '../theme/colors';
 import {
   Fish,
   Calendar,

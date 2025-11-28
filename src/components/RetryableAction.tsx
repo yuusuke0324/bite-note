@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { RetryService } from '../lib/retry-service';
-import { colors } from '../theme/colors';
 
 export interface RetryableActionProps<T = unknown> {
   action: () => Promise<T>;

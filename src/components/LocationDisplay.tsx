@@ -5,7 +5,6 @@ import { GeolocationService } from '../lib/geolocation-service';
 import type { Coordinates } from '../types';
 import { Icon } from './ui/Icon';
 import { MapPin, Globe, Ruler } from 'lucide-react';
-import { colors } from '../theme/colors';
 
 interface LocationDisplayProps {
   coordinates?: Coordinates;

@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import type { FishingRecord } from '../types';
-import { colors } from '../theme/colors';
 
 export interface VirtualizedRecordListProps {
   records: FishingRecord[];
