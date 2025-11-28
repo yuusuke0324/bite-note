@@ -317,6 +317,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         data-has-coordinates={hasCoordinates.toString()}
         onSubmit={handleSubmit(handleFormSubmit)}
         noValidate
+        autoComplete="off"
       >
         {/* 写真アップロード（メタデータ自動入力のため先頭に配置） */}
         <div style={{ marginBottom: '2rem' }}>
@@ -480,7 +481,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         {/* 日付 */}
         <div style={{ marginBottom: '2rem' }}>
           <label
-            htmlFor="date"
+            htmlFor="fishing-date"
             style={{
               display: 'flex',
               marginBottom: '0.5rem',
@@ -506,7 +507,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             )}
           </label>
           <input
-            id="date"
+            id="fishing-date"
             data-testid={TestIds.FISHING_DATE}
             type="datetime-local"
             autoComplete="off"
@@ -515,6 +516,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             aria-invalid={!!errors.date}
             style={{
               width: '100%',
+              maxWidth: '100%',
               boxSizing: 'border-box',
               padding: '1rem',
               border: `2px solid ${errors.date ? '#ef4444' : 'var(--color-border-medium)'}`,
@@ -524,7 +526,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               backgroundColor: 'var(--color-surface-secondary)',
               color: 'var(--color-text-primary)',
               boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-              outline: 'none'
+              outline: 'none',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none'
             }}
             onFocus={(e) => {
               e.target.style.borderColor = 'var(--color-border-focus)';
@@ -555,7 +560,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
         {/* 場所（県・市自動取得＋詳細手動入力） */}
         <div style={{ marginBottom: '2rem' }}>
           <label
-            htmlFor="location"
+            htmlFor="fishing-spot"
             style={{
               display: 'flex',
               marginBottom: '0.5rem',
@@ -581,7 +586,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             )}
           </label>
 
-          {/* 自動取得された基本住所表示 */}
+          {/* 自動取得された基本地域表示 */}
           {autoFilledFields.has('location') && (
             <div style={{
               marginBottom: '0.75rem',
@@ -595,22 +600,22 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 <span style={{ color: '#4ade80', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon icon={MapPin} size={14} decorative /> 写真から自動取得</span>
               </div>
               <div style={{ color: 'var(--color-text-primary)' }}>
-                <strong>基本住所:</strong> {watch('location')?.split(/[・、,]/, 1)[0] || watch('location')}
+                <strong>基本地域:</strong> {watch('location')?.split(/[・、,]/, 1)[0] || watch('location')}
               </div>
               <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                <Icon icon={Lightbulb} size={12} decorative /> この基本住所に詳細な場所名を追加できます
+                <Icon icon={Lightbulb} size={12} decorative /> この基本地域に詳細な場所名を追加できます
               </div>
             </div>
           )}
 
           <input
-            id="location"
+            id="fishing-spot"
             data-testid={TestIds.LOCATION_NAME}
             type="text"
             autoComplete="off"
             placeholder={autoFilledFields.has('location')
-              ? "基本住所に詳細を追加（例: ○○港、△△磯、釣り堀名など）"
-              : "釣り場の名前や住所を入力してください"}
+              ? "詳細を追加（例: ○○港、△△磯、釣り堀名など）"
+              : "釣り場の名前を入力してください"}
             {...register('location')}
             aria-describedby={errors.location ? 'location-error' : 'location-help'}
             aria-invalid={!!errors.location}
