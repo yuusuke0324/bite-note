@@ -529,7 +529,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.date ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.borderColor = errors.date ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
@@ -628,7 +628,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.location ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.borderColor = errors.location ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
@@ -714,7 +714,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.weather ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.borderColor = errors.weather ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
@@ -805,7 +805,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.seaTemperature ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.borderColor = errors.seaTemperature ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
@@ -921,7 +921,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.size ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.borderColor = errors.size ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
@@ -999,7 +999,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.weight ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.borderColor = errors.weight ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />
@@ -1074,7 +1074,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = errors.notes ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+              e.target.style.borderColor = errors.notes ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
           />

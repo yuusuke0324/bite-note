@@ -369,7 +369,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                       <p style={{
                         margin: 0,
                         fontSize: '0.75rem',
-                        color: 'rgba(255, 255, 255, 0.5)'
+                        color: 'var(--color-text-tertiary)'
                       }}>
                         作成: {formatDate(search.createdAt)}
                       </p>
