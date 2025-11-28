@@ -5,11 +5,13 @@
  * - Glassmorphism デザイン
  * - スムーズアニメーション（cubic-bezier）
  * - グラデーション & シャドウ階層
- * - レスポンシブ & ダークモード完全対応
+ * - レスポンシブ対応
+ * - CSS変数によるライト/ダークテーマ対応
  * - アクセシビリティ対応（prefers-reduced-motion）
  *
- * @version 3.0.0
+ * @version 3.1.0
  * @since 2025-10-25
+ * @updated 2025-11-28 - CSS変数ベースのテーマ対応に移行
  */
 
 .fish-species-autocomplete {
@@ -28,27 +30,24 @@
   padding: 1rem 1.25rem;
   font-size: 1.0625rem;
   font-weight: 500;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--color-border-medium);
   border-radius: 0.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #334155;
-  color: #f1f5f9;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--color-surface-secondary);
+  color: var(--color-text-primary);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
               0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
 .fish-species-autocomplete input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-tertiary);
   font-weight: 400;
-  opacity: 0.7;
 }
 
 .fish-species-autocomplete input:focus {
   outline: none;
-  border-color: #60a5fa;
-  background: #334155;
+  border-color: var(--color-border-focus);
+  background: var(--color-surface-secondary);
   box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2),
               0 10px 15px -3px rgba(0, 0, 0, 0.3),
               0 4px 6px -2px rgba(0, 0, 0, 0.15);
@@ -56,7 +55,7 @@
 }
 
 .fish-species-autocomplete input:disabled {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: var(--color-surface-tertiary);
   cursor: not-allowed;
   opacity: 0.6;
   transform: none;
@@ -87,7 +86,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
@@ -95,8 +94,8 @@
   content: '';
   width: 1rem;
   height: 1rem;
-  border: 2px solid #374151;
-  border-top-color: #60a5fa;
+  border: 2px solid var(--color-border-medium);
+  border-top-color: var(--color-border-focus);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -145,14 +144,14 @@
   right: 0;
   max-height: 20rem;
   overflow-y: auto;
-  background: rgba(30, 41, 59, 0.98);
+  background: var(--color-panel-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--color-border-medium);
   border-radius: 0.875rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
               0 10px 10px -5px rgba(0, 0, 0, 0.2),
-              0 0 0 1px rgba(0, 0, 0, 0.3);
+              0 0 0 1px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   list-style: none;
   margin: 0;
@@ -180,12 +179,12 @@
 }
 
 .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb {
-  background: #4b5563;
+  background: var(--color-scrollbar-thumb);
   border-radius: 0.25rem;
 }
 
 .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+  background: var(--color-scrollbar-thumb-hover);
 }
 
 .fish-species-autocomplete .suggestion-item {
@@ -235,21 +234,21 @@
 .fish-species-autocomplete .species-name {
   font-weight: 600;
   font-size: 1rem;
-  color: #f9fafb;
+  color: var(--color-text-primary);
   transition: color 0.2s;
 }
 
 .fish-species-autocomplete .suggestion-item:hover .species-name,
 .fish-species-autocomplete .suggestion-item.selected .species-name {
-  color: #93c5fd;
+  color: var(--color-accent-text);
 }
 
 .fish-species-autocomplete .species-category {
   font-size: 0.75rem;
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
-  background: linear-gradient(135deg, rgba(30, 58, 138, 0.5) 0%, rgba(29, 78, 216, 0.5) 100%);
-  color: #93c5fd;
+  background: var(--color-highlight-bg);
+  color: var(--color-accent-text);
   font-weight: 600;
   letter-spacing: 0.015em;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
@@ -265,7 +264,7 @@
 
 .fish-species-autocomplete .species-scientific {
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--color-text-secondary);
   font-style: italic;
   position: relative;
   z-index: 1;
@@ -274,7 +273,7 @@
 
 .fish-species-autocomplete .suggestion-item:hover .species-scientific,
 .fish-species-autocomplete .suggestion-item.selected .species-scientific {
-  color: #d1d5db;
+  color: var(--color-text-primary);
 }
 
 .fish-species-autocomplete .no-results {
@@ -283,16 +282,16 @@
   left: 0;
   right: 0;
   padding: 1.5rem;
-  background: rgba(30, 41, 59, 0.98);
+  background: var(--color-panel-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--color-border-medium);
   border-radius: 0.875rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
               0 10px 10px -5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   text-align: center;
-  color: #9ca3af;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   animation: slideDownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -344,105 +343,6 @@
 @media (min-width: 641px) and (max-width: 1024px) {
   .fish-species-autocomplete .suggestions-list {
     max-height: 18rem;
-  }
-}
-
-/* ダークモード対応 */
-@media (prefers-color-scheme: dark) {
-  .fish-species-autocomplete input {
-    background: rgba(31, 41, 55, 0.95);
-    border-color: rgba(75, 85, 99, 0.5);
-    color: #f9fafb;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
-                0 2px 4px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  .fish-species-autocomplete input::placeholder {
-    color: #9ca3af;
-  }
-
-  .fish-species-autocomplete input:focus {
-    border-color: #60a5fa;
-    background: rgba(31, 41, 55, 1);
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2),
-                0 10px 15px -3px rgba(0, 0, 0, 0.3),
-                0 4px 6px -2px rgba(0, 0, 0, 0.15);
-  }
-
-  .fish-species-autocomplete input:disabled {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  }
-
-  .fish-species-autocomplete .loading-indicator {
-    color: #9ca3af;
-  }
-
-  .fish-species-autocomplete .loading-indicator::before {
-    border-color: #374151;
-    border-top-color: #60a5fa;
-  }
-
-  .fish-species-autocomplete .suggestions-list,
-  .fish-species-autocomplete .no-results {
-    background: rgba(31, 41, 55, 0.98);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-color: rgba(75, 85, 99, 0.6);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
-                0 10px 10px -5px rgba(0, 0, 0, 0.2),
-                0 0 0 1px rgba(0, 0, 0, 0.3);
-  }
-
-  .fish-species-autocomplete .suggestion-item::before {
-    background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(147, 197, 253, 0.08) 100%);
-  }
-
-  .fish-species-autocomplete .suggestion-item:hover,
-  .fish-species-autocomplete .suggestion-item.selected {
-    background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(29, 78, 216, 0.25) 100%);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
-                0 2px 4px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  .fish-species-autocomplete .species-name {
-    color: #f9fafb;
-  }
-
-  .fish-species-autocomplete .suggestion-item:hover .species-name,
-  .fish-species-autocomplete .suggestion-item.selected .species-name {
-    color: #93c5fd;
-  }
-
-  .fish-species-autocomplete .species-category {
-    background: linear-gradient(135deg, rgba(30, 58, 138, 0.5) 0%, rgba(29, 78, 216, 0.5) 100%);
-    color: #93c5fd;
-  }
-
-  .fish-species-autocomplete .suggestion-item:hover .species-category,
-  .fish-species-autocomplete .suggestion-item.selected .species-category {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: #ffffff;
-  }
-
-  .fish-species-autocomplete .species-scientific {
-    color: #9ca3af;
-  }
-
-  .fish-species-autocomplete .suggestion-item:hover .species-scientific,
-  .fish-species-autocomplete .suggestion-item.selected .species-scientific {
-    color: #d1d5db;
-  }
-
-  .fish-species-autocomplete .no-results {
-    color: #9ca3af;
-  }
-
-  .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb {
-    background: #4b5563;
-  }
-
-  .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
   }
 }
 
