@@ -300,9 +300,12 @@ test.describe('TASK-301-010: CI/CD統合パフォーマンステスト', () => {
 async function createTestRecord(page, recordId = 'test-record') {
   await page.click('[data-testid="add-record-button"]');
 
+  // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+  await page.click('[data-testid="location-name"]');
   await page.fill('[data-testid="location-name"]', '東京湾');
   await page.fill('[data-testid="latitude"]', '35.6762');
   await page.fill('[data-testid="longitude"]', '139.6503');
+  await page.click('[data-testid="fishing-date"]');
   await page.fill('[data-testid="fishing-date"]', '2024-07-15');
 
   // 記録IDの設定

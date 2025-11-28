@@ -16,21 +16,27 @@ test.describe('釣果記録作成フロー', () => {
 
   test('基本的な釣果記録を作成できる', async ({ page }) => {
     // 日付を入力
+    // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+    await page.click('[data-testid="fishing-date"]');
     await page.fill('[data-testid="fishing-date"]', '2024-01-15T10:00');
 
     // 場所を入力
+    await page.click('[data-testid="location-name"]');
     await page.fill('[data-testid="location-name"]', '千葉県 印旛沼');
 
     // 魚種を入力（Autocompleteコンポーネントを使用）
+    await page.click('[data-testid="fish-species-input"]');
     await page.fill('[data-testid="fish-species-input"]', 'ブラックバス');
 
     // サイズを入力
     await page.fill('[data-testid="fish-size"]', '45');
 
     // 天候を入力
+    await page.click('[data-testid="weather"]');
     await page.fill('[data-testid="weather"]', '晴れ');
 
     // メモを入力
+    await page.click('[data-testid="notes"]');
     await page.fill('[data-testid="notes"]', 'スピナーベイトで釣れました');
 
     // 保存ボタンをクリック

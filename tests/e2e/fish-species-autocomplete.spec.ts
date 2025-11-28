@@ -41,6 +41,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       // 1文字入力
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
 
       // 候補リストが表示される
@@ -57,6 +59,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       // 「マアジ」を検索
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('まあじ');
 
       // 候補が表示されるまで待機
@@ -79,11 +83,13 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       // 「あ」で検索
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
       let options = page.locator('[role="option"]');
       const countA = await options.count();
 
-      // 「あじ」で検索
+      // 「あじ」で検索（既にフォーカスがあるのでclick不要）
       await input.fill('あじ');
       await page.waitForTimeout(100); // 検索結果の更新を待つ
       options = page.locator('[role="option"]');
@@ -97,6 +103,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       // 存在しない魚種を入力
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('存在しない魚種名xyz');
 
       // 結果なしメッセージが表示される
@@ -111,6 +119,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
       const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
 
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
 
       // 候補が表示されるまで待機
@@ -142,6 +152,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const selectedOptions = page.locator('[role="option"][aria-selected="true"]');
 
       // 「マ」で検索すると複数の候補（マアジ、マダイ等）が表示される
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('マ');
       await expect(suggestions).toBeVisible();
 
@@ -176,6 +188,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
     test('Enterキーで選択した候補を確定できる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('まあじ');
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
@@ -199,6 +213,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
     test('Escapeキーで候補リストを閉じられる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
@@ -212,6 +228,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
     test('Tabキーで次のフィールドに移動できる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
@@ -294,6 +312,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       await expect(input).toHaveAttribute('aria-expanded', 'false');
 
       // 入力して候補を表示
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
 
       // aria-expandedがtrueになる
@@ -315,6 +335,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       // 結果なしの場合
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('存在しない魚種xyz');
 
       const noResults = page.locator(`[data-testid="${TestIds.FISH_SPECIES_NO_RESULTS}"]`);
@@ -328,6 +350,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       // 連続で入力
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('a');
       await page.waitForTimeout(50);
       await input.fill('ab');
@@ -346,6 +370,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       // 候補を表示
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
@@ -381,6 +407,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
     test('ブラー時に候補が閉じる', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('あ');
       await expect(page.locator(`[data-testid="${TestIds.FISH_SPECIES_SUGGESTIONS}"]`)).toBeVisible();
 
@@ -395,6 +423,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
     test('特殊文字を含む入力でもエラーが発生しない', async ({ page }) => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill('!@#$%^&*()');
 
       // 魚種入力フィールドにエラーが表示されていないことを確認
@@ -407,6 +437,8 @@ test.describe('魚種オートコンプリート E2Eテスト', () => {
       const input = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
 
       const longInput = 'あ'.repeat(100);
+      // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+      await input.click();
       await input.fill(longInput);
 
       // 魚種入力フィールドにエラーが表示されていないことを確認
