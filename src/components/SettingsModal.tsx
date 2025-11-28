@@ -753,11 +753,11 @@ const PrivacyTab: React.FC<{
         borderRadius: '6px',
         border: '1px solid rgba(96, 165, 250, 0.3)'
       }}>
-        <h4 style={{ margin: '0 0 0.5rem 0', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--color-accent-text)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={FileText} size="sm" decorative />
           データの取り扱いについて
         </h4>
-        <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.85rem', color: '#93c5fd' }}>
+        <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
           <li>すべてのデータはお使いのデバイス内にのみ保存されます</li>
           <li>外部サーバーにデータが送信されることはありません</li>
           <li>位置情報は記録の精度向上のためにのみ使用されます</li>
