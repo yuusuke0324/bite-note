@@ -99,15 +99,20 @@ export async function createTestFishingRecord(
   ]);
 
   // フォーム入力（緯度・経度は省略 - UIでは直接入力フィールドがない）
+  // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
+  await page.click(`[data-testid="${TestIds.LOCATION_NAME}"]`);
   await page.fill(`[data-testid="${TestIds.LOCATION_NAME}"]`, testRecord.location);
+  await page.click(`[data-testid="${TestIds.FISHING_DATE}"]`);
   await page.fill(`[data-testid="${TestIds.FISHING_DATE}"]`, testRecord.date);
 
   if (testRecord.fishSpecies) {
     // FishSpeciesAutocompleteコンポーネントはFISH_SPECIES_INPUTを使用
+    await page.click(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
     await page.fill(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`, testRecord.fishSpecies);
   }
 
   if (testRecord.weather) {
+    await page.click(`[data-testid="${TestIds.WEATHER}"]`);
     await page.fill(`[data-testid="${TestIds.WEATHER}"]`, testRecord.weather);
   }
 
@@ -116,6 +121,7 @@ export async function createTestFishingRecord(
   }
 
   if (testRecord.notes) {
+    await page.click(`[data-testid="${TestIds.NOTES}"]`);
     await page.fill(`[data-testid="${TestIds.NOTES}"]`, testRecord.notes);
   }
 
