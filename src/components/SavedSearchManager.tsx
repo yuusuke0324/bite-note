@@ -119,9 +119,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
         onClick={() => setIsVisible(true)}
         style={{
           padding: '0.5rem 1rem',
-          backgroundColor: '#f8f9fa',
-          color: '#333',
-          border: '1px solid #dee2e6',
+          backgroundColor: 'var(--color-surface-secondary)',
+          color: 'var(--color-text-primary)',
+          border: `1px solid ${'var(--color-border-light)'}`,
           borderRadius: '6px',
           cursor: 'pointer',
           fontSize: '0.875rem',
@@ -133,7 +133,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
         <Icon icon={Save} size={16} decorative /> 保存された検索
         {savedSearches.length > 0 && (
           <span style={{
-            backgroundColor: '#007bff',
+            backgroundColor: '#60a5fa',
             color: 'white',
             borderRadius: '50%',
             width: '18px',
@@ -154,10 +154,10 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
     <div style={{
       marginBottom: '1rem',
       padding: '1.5rem',
-      backgroundColor: 'white',
+      backgroundColor: 'var(--color-surface-primary)',
       borderRadius: '12px',
-      border: '1px solid #dee2e6',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      border: `1px solid ${'var(--color-border-light)'}`,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
     }}>
       {/* ヘッダー */}
       <div style={{
@@ -170,7 +170,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           margin: 0,
           fontSize: '1.1rem',
           fontWeight: 'bold',
-          color: '#333',
+          color: 'var(--color-text-primary)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px'
@@ -184,7 +184,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
             backgroundColor: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            color: '#6c757d',
+            color: 'var(--color-text-secondary)',
             padding: '0.25rem',
             display: 'flex',
             alignItems: 'center',
@@ -199,7 +199,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
       {activeFilterCount > 0 && (
         <div style={{
           padding: '1rem',
-          backgroundColor: '#e3f2fd',
+          backgroundColor: 'rgba(96, 165, 250, 0.15)',
           borderRadius: '8px',
           marginBottom: '1rem'
         }}>
@@ -214,14 +214,14 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 margin: '0 0 0.25rem 0',
                 fontSize: '0.9rem',
                 fontWeight: 'bold',
-                color: '#1976d2'
+                color: '#60a5fa'
               }}>
                 現在の検索条件
               </h4>
               <p style={{
                 margin: 0,
                 fontSize: '0.8rem',
-                color: '#666'
+                color: 'var(--color-text-secondary)'
               }}>
                 {getFilterSummary(currentFilters)}
               </p>
@@ -231,7 +231,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 onClick={() => setIsCreating(true)}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#007bff',
+                  backgroundColor: '#60a5fa',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -259,9 +259,11 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 style={{
                   flex: 1,
                   padding: '0.5rem',
-                  border: '1px solid #ced4da',
+                  border: `1px solid ${'var(--color-border-medium)'}`,
                   borderRadius: '4px',
-                  fontSize: '0.875rem'
+                  fontSize: '0.875rem',
+                  backgroundColor: 'var(--color-surface-secondary)',
+                  color: 'var(--color-text-primary)'
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -277,7 +279,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 disabled={!newSearchName.trim()}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: newSearchName.trim() ? '#28a745' : '#6c757d',
+                  backgroundColor: newSearchName.trim() ? '#34d399' : 'var(--color-surface-secondary)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
@@ -294,9 +296,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
-                  border: 'none',
+                  backgroundColor: 'var(--color-surface-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: `1px solid ${'var(--color-border-medium)'}`,
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '0.875rem'
@@ -315,7 +317,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           <div style={{
             textAlign: 'center',
             padding: '2rem',
-            color: '#6c757d'
+            color: 'var(--color-text-secondary)'
           }}>
             <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
               <Icon icon={Save} size={32} color="secondary" decorative />
@@ -337,9 +339,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                   key={search.id}
                   style={{
                     padding: '1rem',
-                    backgroundColor: '#f8f9fa',
+                    backgroundColor: 'var(--color-surface-secondary)',
                     borderRadius: '8px',
-                    border: '1px solid #dee2e6'
+                    border: `1px solid ${'var(--color-border-light)'}`
                   }}
                 >
                   <div style={{
@@ -353,21 +355,21 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                         margin: '0 0 0.25rem 0',
                         fontSize: '1rem',
                         fontWeight: 'bold',
-                        color: '#333'
+                        color: 'var(--color-text-primary)'
                       }}>
                         {search.name}
                       </h4>
                       <p style={{
                         margin: '0 0 0.25rem 0',
                         fontSize: '0.8rem',
-                        color: '#666'
+                        color: 'var(--color-text-secondary)'
                       }}>
                         {getFilterSummary(search.filters)}
                       </p>
                       <p style={{
                         margin: 0,
                         fontSize: '0.75rem',
-                        color: '#999'
+                        color: 'rgba(255, 255, 255, 0.5)'
                       }}>
                         作成: {formatDate(search.createdAt)}
                       </p>
@@ -380,7 +382,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                         onClick={() => onLoadSearch(search.id)}
                         style={{
                           padding: '0.5rem 0.75rem',
-                          backgroundColor: '#007bff',
+                          backgroundColor: '#60a5fa',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
@@ -394,7 +396,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                         onClick={() => setSearchToDelete(search.id)}
                         style={{
                           padding: '0.5rem 0.75rem',
-                          backgroundColor: '#dc3545',
+                          backgroundColor: '#ef4444',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
@@ -420,30 +422,31 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1002
         }}>
           <div style={{
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-surface-primary)',
             borderRadius: '8px',
             padding: '1.5rem',
             maxWidth: '400px',
-            width: '90%'
+            width: '90%',
+            border: `1px solid ${'var(--color-border-light)'}`
           }}>
             <h4 style={{
               margin: '0 0 1rem 0',
               fontSize: '1.1rem',
-              color: '#333'
+              color: 'var(--color-text-primary)'
             }}>
               検索クエリの削除
             </h4>
             <p style={{
               margin: '0 0 1.5rem 0',
               fontSize: '0.9rem',
-              color: '#666'
+              color: 'var(--color-text-secondary)'
             }}>
               この検索クエリを削除してもよろしいですか？この操作は取り消せません。
             </p>
@@ -456,9 +459,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 onClick={() => setSearchToDelete(null)}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
-                  border: 'none',
+                  backgroundColor: 'var(--color-surface-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: `1px solid ${'var(--color-border-medium)'}`,
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '0.875rem'
@@ -470,7 +473,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 onClick={() => handleDeleteConfirm(searchToDelete)}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#dc3545',
+                  backgroundColor: '#ef4444',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',

@@ -73,31 +73,32 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
   });
 
   const getModalStyle = () => ({
-    backgroundColor: '#fff',
+    backgroundColor: 'var(--color-surface-primary)',
     borderRadius: '12px',
     maxWidth: '500px',
     width: '100%',
     maxHeight: '80vh',
     overflow: 'auto',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+    boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+    border: `1px solid ${'var(--color-border-light)'}`,
     transform: isAnimating ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(20px)',
     transition: 'all 0.3s ease-in-out'
   });
 
   const getTypeColor = () => {
-    if (!guidance) return '#007bff';
+    if (!guidance) return '#60a5fa';
 
     switch (guidance.type) {
       case 'first-time':
-        return '#28a745';
+        return '#34d399';
       case 'feature':
-        return '#007bff';
+        return '#60a5fa';
       case 'error-recovery':
-        return '#dc3545';
+        return '#ef4444';
       case 'empty-state':
-        return '#6c757d';
+        return 'var(--color-text-secondary)';
       default:
-        return '#007bff';
+        return '#60a5fa';
     }
   };
 
@@ -133,7 +134,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
         <div
           style={{
             padding: '1.5rem 1.5rem 1rem 1.5rem',
-            borderBottom: '1px solid #e9ecef',
+            borderBottom: `1px solid ${'var(--color-border-light)'}`,
             display: 'flex',
             alignItems: 'flex-start',
             gap: '1rem'
@@ -146,7 +147,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
                 margin: 0,
                 fontSize: '1.25rem',
                 fontWeight: 'bold',
-                color: '#333',
+                color: 'var(--color-text-primary)',
                 marginBottom: '0.5rem'
               }}
             >
@@ -156,7 +157,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
               style={{
                 margin: 0,
                 fontSize: '0.9rem',
-                color: '#666'
+                color: 'var(--color-text-secondary)'
               }}
             >
               {guidance.description}
@@ -168,7 +169,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: '#999',
+              color: 'var(--color-text-secondary)',
               padding: '0',
               width: '24px',
               height: '24px',
@@ -192,14 +193,14 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
                 marginBottom: '0.5rem'
               }}
             >
-              <span style={{ fontSize: '0.8rem', color: '#666' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
                 ステップ {activeStep + 1} / {guidance.steps.length}
               </span>
             </div>
             <div
               style={{
                 height: '4px',
-                backgroundColor: '#e9ecef',
+                backgroundColor: 'var(--color-surface-secondary)',
                 borderRadius: '2px',
                 overflow: 'hidden'
               }}
@@ -224,7 +225,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
                 style={{
                   fontSize: '1.1rem',
                   fontWeight: '600',
-                  color: '#333',
+                  color: 'var(--color-text-primary)',
                   marginBottom: '1rem'
                 }}
               >
@@ -233,7 +234,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
               <p
                 style={{
                   fontSize: '1rem',
-                  color: '#555',
+                  color: 'var(--color-text-secondary)',
                   lineHeight: 1.6,
                   marginBottom: '1.5rem'
                 }}
@@ -267,7 +268,7 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
         <div
           style={{
             padding: '1rem 1.5rem',
-            borderTop: '1px solid #e9ecef',
+            borderTop: `1px solid ${'var(--color-border-light)'}`,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
@@ -280,8 +281,8 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
                 style={{
                   padding: '0.5rem 1rem',
                   backgroundColor: 'transparent',
-                  color: '#6c757d',
-                  border: '1px solid #dee2e6',
+                  color: 'var(--color-text-secondary)',
+                  border: `1px solid ${'var(--color-border-medium)'}`,
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '0.9rem'
@@ -332,8 +333,8 @@ export const UserGuidance: React.FC<UserGuidanceProps> = ({
               style={{
                 padding: '0.5rem 1rem',
                 backgroundColor: 'transparent',
-                color: '#6c757d',
-                border: '1px solid #dee2e6',
+                color: 'var(--color-text-secondary)',
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontSize: '0.9rem'

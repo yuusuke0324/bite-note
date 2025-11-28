@@ -15,6 +15,7 @@ import type { FishingRecord } from '../types/entities';
 import type { TideInfo, TideGraphData } from '../types/tide';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
+import { colors, getTheme } from '../theme/colors';
 import {
   Waves,
   AlertTriangle,
@@ -478,20 +479,20 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
 
       {/* セクションヘッダー */}
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+        <h3 className="text-lg font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
           <Icon icon={Waves} size={20} decorative /> 潮汐情報
         </h3>
 
         {/* 座標なしエラー */}
         {!hasCoordinates && (
-          <div data-testid="coordinates-error" className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div data-testid="coordinates-error" className="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-4">
             <div className="flex items-center">
-              <div className="text-yellow-600 mr-3">
+              <div className="text-yellow-400 mr-3">
                 <Icon icon={AlertTriangle} size={24} decorative />
               </div>
               <div>
-                <div className="text-yellow-800 font-medium">GPS座標が未記録</div>
-                <div className="text-yellow-600 text-sm mt-1">
+                <div className="text-yellow-300 font-medium">GPS座標が未記録</div>
+                <div className="text-yellow-400/80 text-sm mt-1">
                   GPS座標が記録されていないため、潮汐情報を表示できません
                 </div>
               </div>
@@ -508,14 +509,35 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
             disabled={loading}
             aria-expanded={isExpanded}
             aria-controls="tide-content-section"
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+            className="flex items-center space-x-2 px-2 py-1 rounded transition-opacity duration-200"
+            style={{
+              color: 'var(--color-text-primary)',
+              opacity: loading ? 0.6 : 1,
+              cursor: loading ? 'wait' : 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.opacity = '0.7';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.opacity = '1';
+              }
+            }}
           >
             <Icon icon={BarChart3} size={16} decorative />
             <span>
               {loading ? '計算中...' : (isExpanded ? '潮汐グラフを非表示' : '潮汐グラフを表示')}
             </span>
             {loading && (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div
+                className="w-4 h-4 border-2 rounded-full animate-spin"
+                style={{
+                  borderColor: 'var(--color-text-primary)',
+                  borderTopColor: 'transparent'
+                }}
+              />
             )}
           </button>
         )}
@@ -535,23 +557,23 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
             <div data-testid="tide-loading" className="text-center py-8">
               <div className="inline-flex items-center space-x-3">
                 <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                <span className="text-gray-600">潮汐情報を計算中...</span>
+                <span style={{ color: 'var(--color-text-secondary)' }}>潮汐情報を計算中...</span>
               </div>
             </div>
           )}
 
           {/* エラー状態 */}
           {error && (
-            <div data-testid="tide-error" className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div data-testid="tide-error" className="bg-red-900/30 border border-red-600/50 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="text-red-600 mr-3">
+                  <div className="text-red-400 mr-3">
                     <Icon icon={Waves} size={24} decorative />
                   </div>
                   <div>
-                    <div className="text-red-800 font-medium">実データ潮汐計算システムエラー</div>
-                    <div className="text-red-600 text-sm mt-1">{error}</div>
-                    <div className="text-red-500 text-xs mt-2">
+                    <div className="text-red-300 font-medium">実データ潮汐計算システムエラー</div>
+                    <div className="text-red-400 text-sm mt-1">{error}</div>
+                    <div className="text-red-400/80 text-xs mt-2">
                       • GPS座標から地域データを取得できませんでした<br/>
                       • 潮汐計算エンジンの初期化に失敗しました<br/>
                       • システムを再起動するか、しばらく後に再試行してください
@@ -597,8 +619,8 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                 });
 
                 return (
-                  <div className="bg-white rounded-lg border border-gray-200 p-3 w-full max-w-full overflow-x-auto">
-                    <h4 className="text-md font-medium text-gray-800 mb-4">潮位グラフ（24時間表示）</h4>
+                  <div className="rounded-lg p-3 w-full max-w-full overflow-x-auto" style={{ backgroundColor: 'var(--color-surface-primary)', border: `1px solid ${'var(--color-border-medium)'}` }}>
+                    <h4 className="text-md font-medium mb-4" style={{ color: 'var(--color-text-primary)' }}>潮位グラフ（24時間表示）</h4>
                     <div style={{ width: chartWidth, height: chartHeight }}>
                       <TideChart
                         data={chartData}
@@ -611,6 +633,7 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                         keyboardNavigationEnabled={true}
                         focusManagementEnabled={true}
                         enablePerformanceMonitoring={false}
+                        theme={getTheme()}
                       />
                     </div>
                   </div>
@@ -619,8 +642,8 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
 
               {/* 釣果と潮汐の関係分析 */}
               {tideAnalysis && (
-                <div data-testid="tide-analysis-section" className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="text-md font-medium text-blue-800 mb-3 flex items-center gap-2">
+                <div data-testid="tide-analysis-section" className="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/30 rounded-lg p-4">
+                  <h4 className="text-md font-medium text-blue-300 mb-3 flex items-center gap-2">
                     <Icon icon={Fish} size={18} decorative /> 釣果と潮汐の関係
                   </h4>
 
@@ -631,16 +654,16 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                         <Icon icon={Clock} size={28} decorative />
                       </div>
                       <div>
-                        <div className="font-medium text-gray-800">
+                        <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
                           {fishingRecord.fishSpecies} ({fishingRecord.size}cm)
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                           {fishingRecord.date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     </div>
-                    <div className="bg-white rounded-lg p-3 border border-blue-100">
-                      <div className={`text-sm ${tideAnalysis.fishingTimeRelation.optimalTiming ? 'text-green-700' : 'text-gray-700'}`}>
+                    <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-surface-primary)', border: `1px solid ${'var(--color-border-focus)'}` }}>
+                      <div className="text-sm" style={{ color: tideAnalysis.fishingTimeRelation.optimalTiming ? '#22c55e' : 'var(--color-text-secondary)' }}>
                         {tideAnalysis.fishingTimeRelation.analysis}
                       </div>
                       {tideAnalysis.fishingTimeRelation.optimalTiming && (
@@ -654,8 +677,8 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                   {/* 次回最適時間提案 */}
                   {tideAnalysis.nextOptimalTime && (
                     <div data-testid="next-optimal-time">
-                      <h5 className="font-medium text-blue-800 mb-2">次回の最適釣行時間</h5>
-                      <div className="bg-white rounded-lg p-3 border border-blue-100">
+                      <h5 className="font-medium mb-2" style={{ color: colors.chart.primary }}>次回の最適釣行時間</h5>
+                      <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-surface-primary)', border: `1px solid ${'var(--color-border-focus)'}` }}>
                         <div className="flex items-center space-x-2">
                           <span className="text-blue-600">
                             {tideAnalysis.nextOptimalTime.tideEvent === 'high' ? (
@@ -665,11 +688,11 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
                             )}
                           </span>
                           <div>
-                            <div className="font-medium text-gray-800">
+                            <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
                               {tideAnalysis.nextOptimalTime.time.toLocaleDateString('ja-JP')} {' '}
                               {tideAnalysis.nextOptimalTime.time.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}頃
                             </div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                               {tideAnalysis.nextOptimalTime.reason}
                             </div>
                           </div>
@@ -714,12 +737,12 @@ export const TideIntegration: React.FC<TideIntegrationProps> = ({
           @apply bg-gray-900 text-white;
         }
 
-        .high-contrast .text-gray-800 {
+        .high-contrast .text-slate-100 {
           @apply text-white;
         }
 
-        .high-contrast .text-gray-600 {
-          @apply text-gray-300;
+        .high-contrast .text-slate-300 {
+          @apply text-slate-100;
         }
 
         .high-contrast .border-gray-200 {

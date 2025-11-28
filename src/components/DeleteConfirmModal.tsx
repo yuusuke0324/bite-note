@@ -67,12 +67,13 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     >
       <div
         style={{
-          backgroundColor: 'white',
+          backgroundColor: 'var(--color-surface-primary)',
           borderRadius: '12px',
           padding: '2rem',
           width: '100%',
           maxWidth: '480px',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+          border: `1px solid ${'var(--color-border-light)'}`,
           animation: 'modalSlideIn 0.2s ease-out'
         }}
         onClick={(e) => e.stopPropagation()}
@@ -93,7 +94,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333',
+            color: 'var(--color-text-primary)',
             marginBottom: '0.5rem'
           }}>
             記録を削除しますか？
@@ -101,7 +102,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           <p style={{
             margin: 0,
             fontSize: '0.875rem',
-            color: '#6c757d'
+            color: 'var(--color-text-secondary)'
           }}>
             この操作は取り消すことができません
           </p>
@@ -109,16 +110,16 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
 
         {/* 削除対象の記録情報 */}
         <div style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--color-surface-secondary)',
           borderRadius: '8px',
           padding: '1rem',
           marginBottom: '1.5rem',
-          border: '1px solid #dee2e6'
+          border: `1px solid ${'var(--color-border-light)'}`
         }}>
           <div style={{
             fontSize: '1.1rem',
             fontWeight: 'bold',
-            color: '#333',
+            color: 'var(--color-text-primary)',
             marginBottom: '0.5rem',
             display: 'flex',
             alignItems: 'center',
@@ -128,7 +129,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           </div>
           <div style={{
             fontSize: '0.875rem',
-            color: '#6c757d',
+            color: 'var(--color-text-secondary)',
             marginBottom: '0.25rem',
             display: 'flex',
             alignItems: 'center',
@@ -138,7 +139,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           </div>
           <div style={{
             fontSize: '0.875rem',
-            color: '#6c757d',
+            color: 'var(--color-text-secondary)',
             marginBottom: '0.25rem',
             display: 'flex',
             alignItems: 'center',
@@ -149,7 +150,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           {record.size && (
             <div style={{
               fontSize: '0.875rem',
-              color: '#6c757d',
+              color: 'var(--color-text-secondary)',
               display: 'flex',
               alignItems: 'center',
               gap: '6px'
@@ -245,7 +246,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         }
 
         button:focus {
-          outline: 2px solid #007bff;
+          outline: 2px solid #60a5fa;
           outline-offset: 2px;
         }
 

@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Smartphone, X } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
-import { colors } from '../theme/colors';
 import { logger } from '../lib/errors/logger';
 
 interface PWAInstallPromptProps {
@@ -244,11 +243,11 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
           bottom: '1rem',
           left: '1rem',
           right: '1rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--color-surface-primary)',
           borderRadius: '12px',
           padding: '1rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-          border: '1px solid #e1e5e9',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          border: `1px solid ${'var(--color-border-light)'}`,
           zIndex: 1000,
           animation: 'slideUp 0.3s ease-out',
           maxWidth: '400px',
@@ -280,7 +279,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                 margin: '0 0 0.5rem 0',
                 fontSize: '1.1rem',
                 fontWeight: 'bold',
-                color: colors.text.primary
+                color: 'var(--color-text-primary)'
               }}
             >
               アプリをインストールしませんか？
@@ -291,7 +290,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               style={{
                 margin: '0 0 1rem 0',
                 fontSize: '0.875rem',
-                color: colors.text.secondary,
+                color: 'var(--color-text-secondary)',
                 lineHeight: 1.4
               }}
             >
@@ -311,7 +310,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                 onClick={handleInstall}
                 disabled={isInstalling}
                 style={{
-                  backgroundColor: colors.primary[500],
+                  backgroundColor: 'var(--color-primary-500)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
@@ -355,8 +354,8 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                 onClick={handleDismiss}
                 style={{
                   backgroundColor: 'transparent',
-                  color: colors.text.secondary,
-                  border: `1px solid ${colors.border.light}`,
+                  color: 'var(--color-text-secondary)',
+                  border: `1px solid ${'var(--color-border-light)'}`,
                   borderRadius: '8px',
                   padding: '0.75rem 1rem',
                   fontSize: '0.875rem',
@@ -376,7 +375,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               backgroundColor: 'transparent',
               border: 'none',
               fontSize: '1.25rem',
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer',
               padding: '0',
               borderRadius: '4px',
@@ -418,18 +417,19 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
             aria-modal="true"
             aria-labelledby="ios-modal-title"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-surface-primary)',
               borderRadius: '12px',
               padding: '2rem',
               width: '100%',
               maxWidth: '400px',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)',
+              border: `1px solid ${'var(--color-border-light)'}`
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
               <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
-                <Smartphone size={48} color="#10B981" aria-hidden="true" />
+                <Smartphone size={48} color="#60a5fa" aria-hidden="true" />
               </div>
               <h2
                 id="ios-modal-title"
@@ -437,7 +437,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                   margin: 0,
                   fontSize: '1.5rem',
                   fontWeight: 'bold',
-                  color: colors.text.primary
+                  color: 'var(--color-text-primary)'
                 }}
               >
                 {iosInstructions.title}
@@ -454,12 +454,13 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                     gap: '1rem',
                     marginBottom: '1rem',
                     padding: '0.75rem',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '8px'
+                    backgroundColor: 'var(--color-surface-secondary)',
+                    borderRadius: '8px',
+                    border: `1px solid ${'var(--color-border-light)'}`
                   }}
                 >
                   <div style={{
-                    backgroundColor: colors.primary[500],
+                    backgroundColor: 'var(--color-primary-500)',
                     color: 'white',
                     borderRadius: '50%',
                     width: '24px',
@@ -476,7 +477,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
                   <p style={{
                     margin: 0,
                     fontSize: '0.875rem',
-                    color: colors.text.primary,
+                    color: 'var(--color-text-primary)',
                     lineHeight: 1.4
                   }}>
                     {step}
@@ -492,7 +493,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
               }}
               style={{
                 width: '100%',
-                backgroundColor: colors.primary[500],
+                backgroundColor: 'var(--color-primary-500)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -532,7 +533,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
         }
 
         button:focus {
-          outline: 2px solid ${colors.primary[500]};
+          outline: 2px solid ${'var(--color-primary-500)'};
           outline-offset: 2px;
         }
 

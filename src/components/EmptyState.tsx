@@ -55,22 +55,22 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       case 'gpsError':
         return {
           ...baseStyle,
-          backgroundColor: '#fff3cd',
-          border: '1px solid #ffeaa7',
+          backgroundColor: 'rgba(251, 191, 36, 0.15)',
+          border: '1px solid rgba(251, 191, 36, 0.3)',
           borderRadius: '8px'
         };
       case 'offline':
         return {
           ...baseStyle,
-          backgroundColor: '#f8d7da',
-          border: '1px solid #f5c6cb',
+          backgroundColor: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
           borderRadius: '8px'
         };
       default:
         return {
           ...baseStyle,
-          backgroundColor: '#f8f9fa',
-          border: '1px solid #dee2e6',
+          backgroundColor: 'var(--color-surface-secondary)',
+          border: `1px solid ${'var(--color-border-light)'}`,
           borderRadius: '8px'
         };
     }
@@ -88,7 +88,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         style={{
           fontSize: '1.25rem',
           fontWeight: 'bold',
-          color: '#333',
+          color: 'var(--color-text-primary)',
           marginBottom: '0.75rem'
         }}
       >
@@ -99,7 +99,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <p
         style={{
           fontSize: '1rem',
-          color: '#666',
+          color: 'var(--color-text-secondary)',
           marginBottom: '2rem',
           maxWidth: '400px',
           lineHeight: 1.5
@@ -114,7 +114,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           onClick={onAction}
           style={{
             padding: '0.75rem 2rem',
-            backgroundColor: '#007bff',
+            backgroundColor: '#60a5fa',
             color: 'white',
             border: 'none',
             borderRadius: '6px',
@@ -122,13 +122,13 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             fontWeight: '500',
             cursor: 'pointer',
             transition: 'background-color 0.2s ease',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#0056b3';
+            e.currentTarget.style.backgroundColor = '#3b82f6';
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = '#007bff';
+            e.currentTarget.style.backgroundColor = '#60a5fa';
           }}
         >
           {actionLabel}
@@ -141,10 +141,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           style={{
             marginTop: '2rem',
             padding: '1rem',
-            backgroundColor: '#e3f2fd',
+            backgroundColor: 'rgba(96, 165, 250, 0.15)',
             borderRadius: '6px',
             fontSize: '0.9rem',
-            color: '#1976d2'
+            color: '#60a5fa'
           }}
         >
           <Icon icon={Lightbulb} size={14} decorative /> ヒント: 日付、場所、魚種、サイズなどを記録して釣果を管理しましょう
@@ -156,15 +156,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           style={{
             marginTop: '2rem',
             padding: '1rem',
-            backgroundColor: '#fff',
-            border: '1px solid #ffeaa7',
+            backgroundColor: 'var(--color-surface-primary)',
+            border: '1px solid rgba(251, 191, 36, 0.3)',
             borderRadius: '6px',
             fontSize: '0.9rem',
-            color: '#856404'
+            color: '#fbbf24'
           }}
         >
           <strong>解決方法：</strong>
-          <ul style={{ textAlign: 'left', marginTop: '0.5rem', paddingLeft: '1.5rem' }}>
+          <ul style={{ textAlign: 'left', marginTop: '0.5rem', paddingLeft: '1.5rem', color: 'var(--color-text-secondary)' }}>
             <li>ブラウザの位置情報許可設定を確認</li>
             <li>WiFiやGPSが有効になっているか確認</li>
             <li>手動で場所を入力することも可能です</li>

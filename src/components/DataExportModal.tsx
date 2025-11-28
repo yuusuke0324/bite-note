@@ -109,13 +109,14 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
       zIndex: 1000
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '12px',
         padding: '2rem',
         maxWidth: '500px',
         width: '90%',
         maxHeight: '80vh',
-        overflow: 'auto'
+        overflow: 'auto',
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
         {/* ヘッダー */}
         <div style={{
@@ -128,12 +129,12 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333',
+            color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <Upload size={24} color="#6366F1" aria-hidden="true" />
+            <Upload size={24} color="#60a5fa" aria-hidden="true" />
             データエクスポート
           </h2>
           <button
@@ -143,7 +144,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: '#6c757d',
+              color: 'var(--color-text-secondary)',
               padding: '0.25rem',
               display: 'flex',
               alignItems: 'center',
@@ -161,7 +162,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             marginBottom: '0.5rem',
             fontWeight: 'bold',
             fontSize: '0.9rem',
-            color: '#333'
+            color: 'var(--color-text-primary)'
           }}>
             エクスポート形式
           </label>
@@ -174,7 +175,8 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: 'var(--color-text-primary)'
             }}>
               <input
                 type="radio"
@@ -183,14 +185,15 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileText size={18} color="#6366F1" aria-hidden="true" /> JSON (全データ)
+                <FileText size={18} color="#60a5fa" aria-hidden="true" /> JSON (全データ)
               </span>
             </label>
             <label style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: 'var(--color-text-primary)'
             }}>
               <input
                 type="radio"
@@ -199,7 +202,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
               />
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileSpreadsheet size={18} color="#6366F1" aria-hidden="true" /> CSV (記録のみ)
+                <FileSpreadsheet size={18} color="#60a5fa" aria-hidden="true" /> CSV (記録のみ)
               </span>
             </label>
           </div>
@@ -212,10 +215,10 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             marginBottom: '0.5rem',
             fontWeight: 'bold',
             fontSize: '0.9rem',
-            color: '#333'
+            color: 'var(--color-text-primary)'
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Calendar size={20} color="#8B5CF6" aria-hidden="true" /> 日付範囲（オプション）
+              <Calendar size={20} color="#a78bfa" aria-hidden="true" /> 日付範囲（オプション）
             </span>
           </label>
           <div style={{
@@ -230,21 +233,25 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               onChange={(e) => setDateFrom(e.target.value)}
               style={{
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
-            <span style={{ color: '#6c757d', fontSize: '0.875rem' }}>〜</span>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>〜</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
               style={{
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
@@ -258,7 +265,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               marginBottom: '0.5rem',
               fontWeight: 'bold',
               fontSize: '0.9rem',
-              color: '#333'
+              color: 'var(--color-text-primary)'
             }}>
               追加オプション
             </label>
@@ -266,7 +273,8 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: 'var(--color-text-primary)'
             }}>
               <input
                 type="checkbox"
@@ -278,7 +286,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 }}
               />
               <span style={{ fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Image size={18} color="#6B7280" aria-hidden="true" /> 写真データを含める
+                <Image size={18} color={'var(--color-text-secondary)'} aria-hidden="true" /> 写真データを含める
               </span>
             </label>
           </div>
@@ -287,17 +295,18 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
         {/* エクスポート対象の情報 */}
         <div style={{
           padding: '1rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--color-surface-secondary)',
           borderRadius: '6px',
           marginBottom: '1.5rem',
           fontSize: '0.9rem',
-          color: '#666'
+          color: 'var(--color-text-secondary)',
+          border: `1px solid ${'var(--color-border-light)'}`
         }}>
           <h4 style={{
             margin: '0 0 0.5rem 0',
             fontSize: '0.9rem',
             fontWeight: 'bold',
-            color: '#333'
+            color: 'var(--color-text-primary)'
           }}>
             エクスポート対象
           </h4>
@@ -319,14 +328,14 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             borderRadius: '6px',
             marginBottom: '1.5rem',
             fontSize: '0.9rem',
-            backgroundColor: exportStatus.type === 'success' ? '#d4edda' : '#f8d7da',
-            color: exportStatus.type === 'success' ? '#155724' : '#721c24',
-            border: `1px solid ${exportStatus.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
+            backgroundColor: exportStatus.type === 'success' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            color: exportStatus.type === 'success' ? '#34d399' : '#ef4444',
+            border: `1px solid ${exportStatus.type === 'success' ? 'rgba(52, 211, 153, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               {exportStatus.type === 'success'
-                ? <CheckCircle size={20} color="#10B981" aria-hidden="true" />
-                : <XCircle size={20} color="#EF4444" aria-hidden="true" />
+                ? <CheckCircle size={20} color="#34d399" aria-hidden="true" />
+                : <XCircle size={20} color="#ef4444" aria-hidden="true" />
               }
               {exportStatus.message}
             </span>

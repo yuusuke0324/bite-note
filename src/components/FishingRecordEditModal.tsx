@@ -88,15 +88,16 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
     >
       <div
         style={{
-          backgroundColor: 'white',
+          backgroundColor: 'var(--color-surface-primary)',
           borderRadius: '12px',
           padding: '2rem',
           width: '100%',
           maxWidth: '600px',
           maxHeight: '90vh',
           overflow: 'auto',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          position: 'relative'
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+          position: 'relative',
+          border: `1px solid ${'var(--color-border-light)'}`
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -107,13 +108,13 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
           alignItems: 'center',
           marginBottom: '1.5rem',
           paddingBottom: '1rem',
-          borderBottom: '1px solid #e5e7eb'
+          borderBottom: `1px solid ${'var(--color-border-light)'}`
         }}>
           <h2 style={{
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333'
+            color: 'var(--color-text-primary)'
           }}>
             <Icon icon={Edit} size={20} decorative /> 記録を編集
           </h2>
@@ -127,7 +128,7 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
               cursor: 'pointer',
               padding: '0.5rem',
               borderRadius: '50%',
-              color: '#6b7280',
+              color: 'var(--color-text-secondary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -152,7 +153,7 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
         <div style={{
           marginTop: '1.5rem',
           paddingTop: '1rem',
-          borderTop: '1px solid #e5e7eb',
+          borderTop: `1px solid ${'var(--color-border-light)'}`,
           display: 'flex',
           justifyContent: 'flex-end',
           gap: '1rem'

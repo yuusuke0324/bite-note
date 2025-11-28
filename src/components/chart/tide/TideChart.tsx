@@ -371,11 +371,12 @@ const highContrastThemes: Record<string, HighContrastTheme> = {
     error: '#CC0000',
   }),
   dark: calculateThemeContrastRatios({
-    background: '#000000',
-    foreground: '#FFFFFF',
-    accent: '#66CCFF',
-    focus: '#FFCC00',
-    error: '#FF6666',
+    // Designer recommendation: Use app's Slate-based dark theme instead of pure black
+    background: '#1e293b', // Surface Primary (matches app theme)
+    foreground: '#f1f5f9', // Text Primary (slate-100)
+    accent: '#60a5fa', // Accent Blue (matches app's accent color)
+    focus: '#22c55e', // Green 500 (current time indicator)
+    error: '#ef4444', // Red 500
   }),
   'high-contrast': calculateThemeContrastRatios({
     background: '#000000',
@@ -529,15 +530,16 @@ const CustomTooltip = React.memo(({ active, payload, label }: TideTooltipProps) 
         data-testid="tide-tooltip"
         className="custom-tooltip"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: 'var(--color-surface-primary)',
           padding: '10px',
-          border: '1px solid #ccc',
+          border: `1px solid ${'var(--color-border-light)'}`,
           borderRadius: '4px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+          color: 'var(--color-text-primary)',
         }}
       >
-        <p data-testid="tooltip-time">{`時刻: ${label}`}</p>
-        <p data-testid="tooltip-level">{`潮位: ${payload[0].value}cm`}</p>
+        <p data-testid="tooltip-time" style={{ color: 'var(--color-text-primary)' }}>{`時刻: ${label}`}</p>
+        <p data-testid="tooltip-level" style={{ color: 'var(--color-text-primary)' }}>{`潮位: ${payload[0].value}cm`}</p>
       </div>
     );
   }
@@ -664,14 +666,14 @@ const FallbackDataTable = React.memo(({
   return (
     <div
       data-testid="fallback-data-table"
-      style={{ padding: '20px', textAlign: 'center' }}
+      style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-primary)' }}
     >
-      <p style={{ color: 'red', marginBottom: '10px' }}>{message}</p>
+      <p style={{ color: '#ef4444', marginBottom: '10px' }}>{message}</p>
       <table style={{ margin: '0 auto', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>時刻</th>
-            <th style={{ border: '1px solid #ccc', padding: '8px' }}>
+            <th style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>時刻</th>
+            <th style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>
               潮位 (cm)
             </th>
           </tr>
@@ -679,10 +681,10 @@ const FallbackDataTable = React.memo(({
         <tbody>
           {displayData.map((point, index) => (
             <tr key={index}>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+              <td style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>
                 {point.time}
               </td>
-              <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+              <td style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>
                 {point.tide}
               </td>
             </tr>
@@ -690,7 +692,7 @@ const FallbackDataTable = React.memo(({
         </tbody>
       </table>
       {data.length > 10 && (
-        <p style={{ fontSize: '12px', color: '#666' }}>
+        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
           ...他 {data.length - 10} 件
         </p>
       )}
@@ -1711,8 +1713,8 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
               <XAxis
                 dataKey="time"
-                axisLine={true}
-                tickLine={true}
+                axisLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
+                tickLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
                 data-testid="x-axis"
                 tick={{ fill: currentTheme.foreground, fontSize: '12px' }}
               />
@@ -1720,11 +1722,13 @@ const TideChartBase: React.FC<TideChartProps> = ({
                 dataKey="tide"
                 unit="cm"
                 domain={['dataMin', 'dataMax']}
+                axisLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
+                tickLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
                 data-testid="y-axis"
                 tick={{ fill: currentTheme.foreground, fontSize: '12px' }}
               />
               {showGrid && (
-                <Line stroke="#E0E0E0" strokeWidth={1} dot={false} />
+                <Line stroke={currentTheme.foreground} strokeOpacity={0.1} strokeWidth={1} dot={false} />
               )}
               <Line
                 dataKey="tide"

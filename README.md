@@ -1,443 +1,128 @@
-# 🎣 釣果記録アプリ (Bite Note)
+# Bite Note
 
 [![Build Status](https://github.com/yuusuke0324/bite-note/workflows/CI/badge.svg)](https://github.com/yuusuke0324/bite-note/actions)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yuusuke0324/bite-note/releases)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Version 1.0.0** - 初版リリース (2024年10月30日)
+釣果記録PWAアプリケーション。釣った魚を簡単に記録・振り返ることができます。
 
-個人用釣果記録PWAアプリケーション。釣った魚を簡単に記録・振り返ることができます。
-
-## 🌐 デモサイト
-
-**Live Demo**: [https://bite-note.vercel.app](https://bite-note.vercel.app)
-
-<!-- TODO: スクリーンショット追加予定 -->
-<!-- ![ホーム画面](docs/screenshots/home.png) -->
-<!-- ![釣果記録画面](docs/screenshots/record.png) -->
-<!-- ![潮汐グラフ](docs/screenshots/tide-graph.png) -->
+**Demo**: [https://bite-note.vercel.app](https://bite-note.vercel.app)
 
 ## 特徴
 
-- 📱 PWA対応（iOS/Android/Webで動作）
-- 🔄 オフライン対応
-- 📷 写真添付機能
-- 📍 GPS位置情報取得
-- 🌟 **写真メタデータ自動入力** - GPS付き写真から位置・日時・天気を自動抽出
-- 🌤️ リアルタイム天気情報取得
-- 💾 ローカルストレージ（IndexedDB）
-- 🎯 シンプルで直感的なUI
-- ⚡ **スケルトンローディング** - 体感速度を向上させる最新UI
-- 🏆 **ベストキャッチ表示** - 今月最大の釣果を自動判定
+- **PWA対応** - iOS/Android/Webで動作、オフラインでも利用可能
+- **写真メタデータ自動入力** - GPS付き写真から位置・日時・天気を自動抽出
+- **潮汐グラフ** - 釣果時刻と潮汐の関係を24時間グラフで可視化
+- **ライト/ダークテーマ** - ワンクリックでテーマ切り替え
+- **ローカルストレージ** - データは端末内に保存（IndexedDB）
 
-## 技術スタック
+## クイックスタート
 
-- **Frontend**: React 18 + TypeScript + Vite
-- **State Management**: Zustand + Immer
-- **Database**: IndexedDB (Dexie.js)
-- **Forms**: React Hook Form + Zod
-- **Testing**: Vitest + Testing Library
-- **UI**: TailwindCSS + Radix UI（予定）
-- **Photo Metadata**: ExifReader
-- **Geocoding**: OpenStreetMap Nominatim API
-- **Weather**: OpenWeatherMap API
+### アプリを使う
 
-## ⚡ Quick Start
-
-### ユーザー向け（アプリを使う）
-
-1. **デモサイトにアクセス**
-   ```
-   https://bite-note.vercel.app
-   ```
-
-2. **PWAとしてインストール**（オプション）
-   - **iOS**: Safari → 共有ボタン → 「ホーム画面に追加」
+1. [https://bite-note.vercel.app](https://bite-note.vercel.app) にアクセス
+2. PWAとしてインストール（オプション）
+   - **iOS**: Safari → 共有 → 「ホーム画面に追加」
    - **Android**: Chrome → メニュー → 「アプリをインストール」
 
-3. **釣果を記録**
-   - 「記録登録」タブで魚種、サイズ、場所を入力
-   - 写真を追加すると位置・日時を自動抽出
-   - 「記録を保存」をクリック
-
-詳細な使い方は [ユーザーガイド](docs/user-guide.md) を参照してください。
-
-### 開発者向け（ローカルで開発）
+### 開発環境
 
 ```bash
-# 1. リポジトリをクローン
+# クローン
 git clone https://github.com/yuusuke0324/bite-note.git
 cd bite-note
 
-# 2. 依存関係をインストール
-npm install
-
-# 3. 開発サーバー起動
-npm run dev
-# → デフォルトでは http://localhost:5173
-# （ポートが使用中の場合は自動的に 5174、5175... を使用）
-
-# 4. テスト実行
-npm run test:fast
-```
-
-詳細な開発環境構築は [開発者向けガイド](docs/GETTING-STARTED.md) を参照してください。
-
-## セットアップ
-
-```bash
-# 依存関係のインストール
+# 依存関係インストール
 npm install
 
 # 開発サーバー起動
 npm run dev
 
+# テスト実行
+npm run test:fast
+
 # ビルド
 npm run build
-
-# テスト実行
-npm test
-
-# Linter実行
-npm run lint
 ```
+
+## 技術スタック
+
+| カテゴリ | 技術 |
+|---------|-----|
+| Frontend | React 18, TypeScript, Vite |
+| State | Zustand |
+| Database | IndexedDB (Dexie.js) |
+| Forms | React Hook Form, Zod |
+| Charts | Recharts |
+| Maps | Leaflet |
+| Testing | Vitest, Playwright |
+| Styling | TailwindCSS |
 
 ## プロジェクト構造
 
 ```
 src/
-├── components/          # UIコンポーネント
-│   ├── ui/             # 汎用UIコンポーネント
-│   │   ├── Skeleton.tsx           # スケルトンローディング
-│   │   ├── ModernCard.tsx         # カードコンポーネント
-│   │   └── FloatingActionButton.tsx
-│   ├── home/           # ホーム画面コンポーネント
-│   ├── layout/         # レイアウトコンポーネント
-│   └── ...
-├── hooks/              # カスタムフック
-├── lib/                # サービス・ライブラリ層
-│   ├── photo-metadata-service.ts  # 写真メタデータ処理
-│   ├── fishing-record-service.ts  # 釣果記録管理
-│   └── database.ts                # IndexedDB (Dexie)
-├── stores/             # 状態管理（Zustand）
-├── types/              # TypeScript型定義
-├── theme/              # テーマ設定（色、タイポグラフィ）
-├── utils/              # ユーティリティ関数
-└── test/               # テスト設定
+├── components/     # UIコンポーネント
+│   ├── ui/        # 汎用UI（Button, Card, Skeleton等）
+│   ├── home/      # ホーム画面
+│   ├── chart/     # グラフ（TideChart, TrendChart）
+│   ├── map/       # 地図
+│   └── layout/    # レイアウト
+├── lib/           # サービス層
+├── stores/        # 状態管理（Zustand）
+├── hooks/         # カスタムフック
+├── types/         # 型定義
+├── theme/         # テーマ設定
+└── utils/         # ユーティリティ
 ```
 
-## ✨ モダンUI/UX機能
+## 主要機能
 
-### 🎯 スケルトンローディング
-体感速度を向上させる最新ローディングUI。従来のくるくる回るスピナーから、レイアウトの形をしたプレースホルダーに変更。
+### 写真からの自動入力
 
-**特徴:**
-- 光が流れるシマーアニメーション（1.5秒周期）
-- レイアウトシフト防止
-- 何が読み込まれるかの予測が可能
-- Instagram、Facebook、LinkedInなど大手サービスと同じパターン
+GPS情報付き写真をアップロードすると、以下の情報を自動抽出：
+- 撮影場所（緯度・経度 → 住所）
+- 撮影日時
+- 天気情報
 
-**コンポーネント:**
-- `Skeleton` - 基本スケルトン（カスタマイズ可能）
-- `SkeletonRecordCard` - コンパクトカード用
-- `SkeletonPhotoCard` - 写真カード用
-- `SkeletonList` - リスト表示用
+### 潮汐グラフ
 
-### 🏆 ベストキャッチ表示
-今月の釣果から最大サイズ/重量を自動判定し、ホーム画面に大きく表示。
+釣果記録にGPS座標が含まれる場合、その場所・日時の潮汐情報を表示：
+- 24時間潮位グラフ
+- 釣果時刻マーカー
+- 満潮・干潮イベント表示
+- 次回最適釣行時間の提案
 
-**特徴:**
-- サイズ（cm）と重量（g）の両方に対応
-- 金色のグラデーションバッジ「🏆 XXXg/cm - 今月最大!」
-- ホバー時のアニメーション効果
-- 自動判定ロジック: `Math.max(size, weight)`
+### テーマ切り替え
 
-### ⚖️ 重量フィールド対応
-イカなど重量メインで記録する魚種に対応。
+- ヘッダーのトグルボタンでライト/ダーク切り替え
+- 設定はlocalStorageに保存
+- 全コンポーネントがCSS変数ベースで統一
 
-**特徴:**
-- 任意入力（0-99999g）
-- サイズと重量の両方を記録可能
-- ベストキャッチ判定に重量を含む
-- 詳細画面とカードに表示
+## ドキュメント
 
-## 📷 写真機能
+| ドキュメント | 内容 |
+|-------------|-----|
+| [ユーザーガイド](docs/user-guide.md) | 使い方、PWAインストール |
+| [アーキテクチャ](docs/ARCHITECTURE.md) | システム設計 |
+| [API仕様](docs/API.md) | サービス層API |
+| [テストガイド](docs/testing-best-practices.md) | テスト実行方法 |
 
-アプリでは以下の写真関連機能が利用できます：
-- **写真の自動保存**: 選択した写真は自動的にローカルストレージに保存
-- **写真付き記録の表示**: 「写真で確認」タブで写真付き記録を一覧表示
-- **⚡ 高速メタデータ自動入力**: GPS情報付きの写真から位置・日時・天気・海面水温を自動抽出（2025年最適化完了）
+## コントリビューション
 
-### 🚀 パフォーマンス最適化（2025年10月実装）
+1. Fork
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit (`git commit -m 'Add amazing feature'`)
+4. Push (`git push origin feature/amazing-feature`)
+5. Create Pull Request
 
-**1. 並列API呼び出し**
-- 逆ジオコーディング・天気・海面水温APIを同時実行
-- **高速化**: 3秒 → 1秒（67%短縮）
+## ライセンス
 
-**2. IndexedDB永続キャッシュ**
-- 位置情報の逆ジオコーディング結果を永続化
-- キャッシュ有効期限: 30分
-- **高速化**: キャッシュヒット時は97%短縮（3秒 → 0.1秒）
+[MIT](LICENSE)
 
-**3. EXIF読み取り最適化**
-- 必要なタグ（GPS、日時、カメラ情報）のみ抽出
-- **高速化**: 30-50%短縮
+## 謝辞
 
-**4. Debounce処理**
-- 連続写真選択時の不要な処理を防止（300ms）
-- **効果**: CPU負荷削減
-
-**5. ローディングUI**
-- 写真処理開始時に即座にローディング表示
-- データ取得中はユーザー入力を防止
-- **UX改善**: 処理状況の可視化
-
-**6. スケルトンローディング（2025年10月実装）**
-- 従来のスピナーに代わる最新ローディングUI
-- レイアウトの形をしたプレースホルダーで体感速度を向上
-- 光が流れるシマーアニメーション
-- **適用箇所**:
-  - 記録一覧の初期表示（写真カード × 6）
-  - ホーム画面の初期表示（統計カード、グラフ、ベストキャッチ）
-  - 写真プレビューの読み込み
-  - 写真メタデータ解析中
-- **効果**: レイアウトシフトの防止、待ち時間の体感短縮
-
-**7. ベストキャッチ機能（2025年10月実装）**
-- 今月の釣果から最大サイズ/重量を自動判定
-- 金色の「🏆 XXXg/cm - 今月最大!」バッジ表示
-- サイズと重量の両方に対応（イカなど重量メインの魚種も対応）
-- ホーム画面に大きく表示
-
-### 📸 写真機能のテスト方法
-
-### 🧪 テスト用ダミーデータで試す
-1. 新規記録追加画面で写真アップロード
-2. ファイル名に **"test"** を含む画像を選択（例: `test_photo.jpg`）
-3. 自動入力確認ダイアログが表示される
-4. 「自動入力する」をクリックして動作確認
-
-### 📱 実際のGPS付き写真で試す
-1. **スマートフォンで位置情報ONで撮影した写真を使用**
-2. iPhone: 設定 > プライバシーとセキュリティ > 位置情報サービス > カメラ を有効化
-3. Android: カメラアプリの位置情報タグ付けを有効化
-4. 撮影した写真をアプリにアップロード
-5. GPS、撮影日時、天気情報が自動抽出される
-
-### 🔍 デバッグ情報の確認
-- ブラウザの開発者ツール（F12）を開く
-- コンソールタブで詳細なログを確認
-- 以下のような情報が表示されます：
-  ```
-  📷 メタデータ抽出開始
-  🔍 EXIF抽出中...
-  🏷️ 抽出されたEXIFタグ
-  🌍 GPS座標あり、住所を取得中
-  🌤️ 天気情報を取得中
-  ✅ 自動入力データ準備完了
-  ```
-
-### ⚠️ 注意事項
-- Web版の場合、HTTPS環境でのみ位置情報が利用可能
-- 一部の画像編集アプリやSNSアップロード時にEXIFデータが削除される場合があります
-- 天気情報取得にはOpenWeatherMap APIキーが必要（現在はダミーデータで動作）
-
-## 🔧 トラブルシューティング
-
-### 写真が表示されない場合
-写真機能は以下の流れで動作します：
-1. 写真選択 → 自動保存 → UUID形式のphotoID生成
-2. メタデータ抽出（GPS、日時、天気）
-3. 記録作成時にphotoIDが正しく保存
-4. 「写真で確認」タブで写真が表示
-
-問題が発生した場合：
-- ブラウザの開発者ツール（F12）でコンソールを確認
-- `📸 写真保存成功! photoId: [UUID]` のログが表示されることを確認
-- 写真付き記録が「写真で確認」タブに表示されることを確認
-
-## 開発状況
-
-### 基本機能
-- [x] プロジェクト初期設定
-- [x] 型定義・インターフェース設定
-- [x] IndexedDBセットアップ
-- [x] データアクセス層実装
-- [x] UI実装
-- [x] 写真アップロード・保存機能
-- [x] 写真表示機能（写真で確認タブ）
-- [x] 写真メタデータ自動入力機能（2025年10月パフォーマンス最適化完了）
-- [x] 天気情報取得機能
-- [x] 基本的な釣果記録管理機能
-- [x] ジオコーディングキャッシュシステム（IndexedDB v3, 2025年10月実装）
-
-### UI/UX改善計画 🎨
-- [x] 現状のUI/UX問題点分析完了
-- [x] モダンデザインシステム設計完了
-- [x] 改善ロードマップ策定完了
-- [x] **スケルトンローディング実装**（2025年10月完了）
-- [x] **ベストキャッチ表示機能**（2025年10月完了）
-- [x] **重量フィールド追加**（イカなど重量メインの魚種対応、2025年10月完了）
-- [ ] **Phase 1**: カラーシステム・タイポグラフィ統一
-- [ ] **Phase 2**: ナビゲーション構造刷新（ボトムナビ + FAB）
-- [ ] **Phase 3**: 写真カード再デザイン（16:9比率 + スワイプアクション）
-- [ ] **Phase 4**: プログレッシブフォーム実装
-- [ ] **Phase 5**: アニメーション・ダークモード対応
-
-### 🌊 潮汐グラフシステム（2024年9月大幅改善完了）
-
-完全無料・リアルタイム・オフライン対応の高度な潮汐情報システムです。
-
-#### ✅ 実装完了機能
-
-##### 📊 **レスポンシブ対応（TASK-001/002）**
-- **完全横スクロール防止**: 全デバイス（320px-2560px）で快適表示
-- **動的SVG調整**: 画面サイズに応じた自動リサイズ機能
-- **モバイル最適化**: スマートフォンでの操作性向上
-- **実装**: `useResizeObserver`フック、レスポンシブユーティリティ
-
-##### 🎯 **動的スケール調整（TASK-101）**
-- **智能縦軸調整**: 潮位データに応じた最適スケール自動計算
-- **高性能キャッシュ**: LRUキャッシュによる高速描画
-- **TDD実装**: 12/12テスト成功、90%以上カバレッジ
-- **実装**: `DynamicScaleCalculator`、`ScaleRenderer`
-
-##### 🌊 **グラフパターン多様化（TASK-102）**
-- **地域差対応**: 座標・季節変動係数による個別パターン生成
-- **高精度分析**: 同一条件での結果一致、異なる条件での差異確保
-- **デバッグ機能**: 計算パラメータ表示、中央集約エラーハンドリング
-- **実装**: `GraphPatternAnalyzer`、`VariationEffectMeasurer`、`TideDebugger`
-
-##### ⚡ **パフォーマンス最適化（TASK-201/202）**
-- **スマートキャッシュ**: 座標・時間・変動係数の複合キー生成
-- **高速計算**: 平均8.3ms、最大12.7ms（目標2秒の1%未満）
-- **メモリ効率**: スマート削除戦略、実プロパティサイズ計算
-- **実装**: `EnhancedTideLRUCache`、`SmartKeyGenerator`
-
-##### 🧪 **包括的テストスイート（TASK-301）**
-- **18統合テストケース**: 異なる釣果記録、レスポンシブ、パフォーマンス、A11y
-- **TestIds定数管理**: 中央集約による保守性向上
-- **共通ヘルパー関数**: コード重複削除、DRY原則実現
-- **実装**: E2Eテスト3ファイル、Playwright + axe-playwright
-
-#### 🎯 潮汐統合機能の詳細
-
-**TideIntegration コンポーネント**: 釣果記録詳細画面に完全統合
-```typescript
-// 主要機能
-- 24時間潮位グラフ表示（滑らかなcos曲線補間）
-- 釣果時刻マーカー（🎣）表示
-- 満潮・干潮イベントマーカー
-- 釣果と潮汐の関係分析（最適タイミング判定）
-- 次回最適釣行時間提案
-```
-
-**技術仕様**:
-- **座標変動**: `coordinateVariationFactor` による地域特性反映
-- **季節補正**: `seasonalVariationFactor` による時期調整
-- **データ範囲**: 45-180cm（日本沿岸標準）
-- **表示精度**: 15分間隔でのスムーズ補間
-- **キャッシュ**: 24時間TTL、地理的近接マッチング対応
-
-詳細仕様: [`docs/design/tide-system-master-spec.md`](./docs/design/tide-system-master-spec.md)
-
-### 今後の開発
-- [ ] PWA機能実装
-- [ ] データエクスポート/インポート機能
-
-## 🎨 UI/UXデザイン改善
-
-現在のアプリは2018年頃のBootstrap風デザインから、**2024年のモダンなデザインスタンダード**への大幅なアップグレードを計画中です。
-
-### 📋 設計ドキュメント
-- **UI/UX改善計画**: [`docs/design/ui-ux-improvement-plan.md`](./docs/design/ui-ux-improvement-plan.md)
-- **潮汐システム設計**: [`docs/design/tide-system-master-spec.md`](./docs/design/tide-system-master-spec.md)
-- **アーキテクチャ設計**: [`docs/design/fishing-record/architecture.md`](./docs/design/fishing-record/architecture.md)
-- **2024年改善記録**: [`docs/design/architectural-improvements-2024.md`](./docs/design/architectural-improvements-2024.md)
-
-### 🎯 主要な改善ポイント
-1. **視覚的階層の明確化** - 情報の優先度を明確に
-2. **モバイルファーストデザイン** - スマホ中心の体験設計
-3. **モダンカラーパレット** - Google Material Design 3準拠
-4. **インタラクション改善** - マイクロアニメーション・スワイプジェスチャー
-5. **アクセシビリティ** - WCAG 2.1 AA準拠
-
-### 🚀 実装優先度
-| Phase | 内容 | 期間 | 影響度 |
-|-------|------|------|--------|
-| 1 | カラー・タイポグラフィ統一 | 1-2週 | 🔥 即効性 |
-| 2 | ナビゲーション刷新 | 2-3週 | 🔥 ユーザビリティ大幅向上 |
-| 3 | カード・フォーム再設計 | 3-4週 | ⚡ エンゲージメント向上 |
-
----
-
-## 📚 ドキュメント
-
-### ユーザー向け
-- [ユーザーガイド](docs/user-guide.md) - アプリの使い方、PWAインストール方法
-- [トラブルシューティング](docs/troubleshooting.md) - よくある問題と解決方法
-
-### 開発者向け
-- [開発者向けガイド](docs/GETTING-STARTED.md) - 5分クイックスタート
-- [デプロイガイド](docs/DEPLOYMENT.md) - Vercel/Netlifyへのデプロイ方法
-- [アーキテクチャ設計](docs/ARCHITECTURE.md) - システム設計の詳細
-- [API仕様](docs/API.md) - サービス層API仕様
-- [テストガイド](docs/testing-best-practices.md) - テスト実行方法とベストプラクティス
-
-### 設計ドキュメント
-- [UI/UX改善計画](docs/design/ui-ux-improvement-plan.md)
-- [潮汐システム設計](docs/design/tide-system-master-spec.md)
-- [技術仕様](docs/technical-specifications.md)
-
----
-
-## 🤝 コントリビューション
-
-このプロジェクトは個人開発プロジェクトですが、フィードバックやバグ報告を歓迎します。
-
-1. このリポジトリをフォーク
-2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
-4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
-
-詳細は [Issue駆動開発ガイド](ai-rules/TASK_CYCLES.md) を参照してください。
-
----
-
-## 📄 ライセンス
-
-MIT License
-
-Copyright (c) 2025 Bite Note
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
----
-
-## 🙏 謝辞
-
-このプロジェクトは以下のオープンソースプロジェクトを使用しています：
-
-- [React](https://reactjs.org/) - UIライブラリ
-- [Vite](https://vitejs.dev/) - ビルドツール
-- [Dexie.js](https://dexie.org/) - IndexedDBラッパー
-- [Zustand](https://github.com/pmndrs/zustand) - 状態管理
-- [OpenWeatherMap](https://openweathermap.org/) - 天気情報API
-- [OpenStreetMap Nominatim](https://nominatim.org/) - ジオコーディングAPI
+- [React](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [Dexie.js](https://dexie.org/)
+- [Zustand](https://github.com/pmndrs/zustand)
+- [OpenStreetMap Nominatim](https://nominatim.org/)

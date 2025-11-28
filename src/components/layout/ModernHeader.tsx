@@ -1,6 +1,7 @@
 import React, { type ReactNode } from 'react';
-import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
+
+type TabType = 'home' | 'form' | 'list' | 'map' | 'debug';
 
 interface ModernHeaderProps {
   title: string;
@@ -10,6 +11,8 @@ interface ModernHeaderProps {
   onMenuClick?: () => void;
   showMenu?: boolean;
   className?: string;
+  logo?: ReactNode;
+  activeTab?: TabType;
 }
 
 export const ModernHeader: React.FC<ModernHeaderProps> = ({
@@ -19,17 +22,20 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
   avatar,
   onMenuClick,
   showMenu = false,
-  className = ''
+  className = '',
+  logo,
+  activeTab: _activeTab
 }) => {
   const headerStyles: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 16px',
-    backgroundColor: colors.surface.primary,
-    borderBottom: `1px solid ${colors.border.light}`,
+    padding: '12px 20px',
+    background: 'var(--color-background-primary)',
+    boxShadow: '0 2px 8px var(--color-border-light)',
     minHeight: '64px',
     position: 'relative',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   };
 
   const leftSectionStyles: React.CSSProperties = {
@@ -48,13 +54,20 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
     flex: 1,
   };
 
+  const titleRowStyles: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  };
+
   const titleStyles: React.CSSProperties = {
     ...textStyles.headline.small,
-    color: colors.text.primary,
+    color: 'var(--color-text-primary)',
     margin: 0,
-    fontWeight: 700,
-    fontSize: '20px',
+    fontWeight: 800,
+    fontSize: '22px',
     lineHeight: 1.2,
+    letterSpacing: '-0.02em',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -62,10 +75,13 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 
   const subtitleStyles: React.CSSProperties = {
     ...textStyles.body.small,
-    color: colors.text.secondary,
+    color: 'var(--color-text-secondary)',
     margin: 0,
-    fontSize: '14px',
-    lineHeight: 1.2,
+    marginTop: '2px',
+    fontSize: '13px',
+    fontWeight: 500,
+    lineHeight: 1.4,
+    letterSpacing: '0.01em',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -88,7 +104,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
     backgroundColor: 'transparent',
     border: 'none',
     cursor: 'pointer',
-    color: colors.text.primary,
+    color: 'var(--color-text-primary)',
     transition: 'all 0.2s ease',
     fontSize: '20px',
   };
@@ -108,7 +124,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
             style={menuButtonStyles}
             onClick={onMenuClick}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.surface.hover;
+              e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
@@ -121,7 +137,10 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 
         {/* タイトルセクション */}
         <div style={titleSectionStyles}>
-          <h1 style={titleStyles}>{title}</h1>
+          <div style={titleRowStyles}>
+            {logo}
+            <h1 style={titleStyles}>{title}</h1>
+          </div>
           {subtitle && (
             <p style={subtitleStyles}>{subtitle}</p>
           )}

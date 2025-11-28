@@ -113,6 +113,28 @@ Zustand + Immer で実装:
 - ui/FloatingActionButton.tsx → FAB
 ```
 
+### テーマシステム
+
+```
+CSS変数ベースのライト/ダークテーマ:
+- src/index.css → 全カラー変数を一元管理
+- body.light-theme クラス → ライトモード適用
+- localStorage → テーマ設定の永続化
+
+色指定のルール:
+- ❌ colors.XXX を直接使用しない
+- ✅ var(--color-XXX) を使用する
+  例: var(--color-text-primary), var(--color-surface-secondary)
+
+主要CSS変数:
+- --color-background-primary    # 背景色
+- --color-surface-primary       # カード/パネル背景
+- --color-text-primary          # 主テキスト
+- --color-text-secondary        # 副テキスト
+- --color-border-light          # ボーダー
+- --color-chart-axis            # グラフ軸
+```
+
 ### アーキテクチャ
 
 - **IndexedDB操作**: Dexieサービス層経由で実行（直接操作禁止）
@@ -267,7 +289,7 @@ npm run memory:profile
 
 ---
 
-**現在フェーズ**: v1.5.0 データ検証機能強化完了
+**現在フェーズ**: v2.0.0 ライト/ダークテーマ切り替え実装完了
 **次期目標**: PWA対応完全化、テストカバレッジ70%達成
 
 ---

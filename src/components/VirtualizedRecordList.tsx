@@ -58,19 +58,19 @@ export const VirtualizedRecordList: React.FC<VirtualizedRecordListProps> = ({
         display: 'flex',
         alignItems: 'center',
         padding: '0.5rem 1rem',
-        borderBottom: '1px solid #eee',
+        borderBottom: `1px solid var(--color-border-light)`,
         cursor: onRecordClick ? 'pointer' : 'default',
-        backgroundColor: index % 2 === 0 ? '#fff' : '#f8f9fa'
+        backgroundColor: index % 2 === 0 ? 'var(--color-surface-primary)' : 'var(--color-surface-secondary)'
       }}
       onClick={() => onRecordClick?.(record)}
     >
       <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: 'bold' }}>{record.fishSpecies}</div>
-        <div style={{ fontSize: '0.8rem', color: '#666' }}>
+        <div style={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{record.fishSpecies}</div>
+        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
           {record.location} - {record.date.toLocaleDateString()}
         </div>
       </div>
-      <div style={{ fontSize: '0.9rem' }}>
+      <div style={{ fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
         {record.size}cm
       </div>
     </div>
@@ -81,7 +81,7 @@ export const VirtualizedRecordList: React.FC<VirtualizedRecordListProps> = ({
       style={{
         height: containerHeight,
         position: 'relative',
-        border: '1px solid #ddd',
+        border: `1px solid var(--color-border-light)`,
         borderRadius: '4px',
         overflow: 'hidden'
       }}
@@ -93,8 +93,8 @@ export const VirtualizedRecordList: React.FC<VirtualizedRecordListProps> = ({
             position: 'sticky',
             top: 0,
             zIndex: 10,
-            backgroundColor: '#f8f9fa',
-            borderBottom: '1px solid #dee2e6',
+            backgroundColor: 'var(--color-surface-secondary)',
+            borderBottom: `1px solid var(--color-border-light)`,
             padding: '0.5rem 1rem'
           }}
         >

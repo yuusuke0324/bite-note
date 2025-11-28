@@ -94,9 +94,9 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
       return (
         <div
           style={{
-            backgroundColor: colors.surface.primary,
+            backgroundColor: 'var(--color-surface-primary)',
             padding: '12px',
-            border: `1px solid ${colors.border.light}`,
+            border: `1px solid ${'var(--color-border-light)'}`,
             borderRadius: '8px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
           }}
@@ -105,14 +105,14 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
             margin: '0 0 4px 0',
             ...textStyles.body.medium,
             fontWeight: '600',
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
           }}>
             {data.name}
           </p>
           <p style={{
             margin: 0,
             ...textStyles.body.small,
-            color: colors.text.secondary,
+            color: 'var(--color-text-secondary)',
           }}>
             {data.value}件 ({data.percentage}%)
           </p>
@@ -165,7 +165,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
         style={{
           padding: '24px',
           borderRadius: '16px',
-          backgroundColor: colors.surface.secondary,
+          backgroundColor: 'var(--color-surface-secondary)',
           textAlign: 'center',
         }}
       >
@@ -178,7 +178,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
         </div>
         <p style={{
           ...textStyles.body.medium,
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
           margin: 0,
         }}>
           まだ魚種の記録がありません
@@ -193,7 +193,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
       <h2 style={{
         margin: '0 0 12px 0',
         ...textStyles.title.medium,
-        color: colors.text.primary,
+        color: 'var(--color-text-primary)',
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
@@ -204,10 +204,10 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
 
       {/* チャート */}
       <div style={{
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '16px',
         padding: '16px',
-        border: `1px solid ${colors.border.light}`,
+        border: `1px solid ${'var(--color-border-light)'}`,
       }}>
         <div style={{
           display: 'flex',
@@ -232,6 +232,8 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
                 innerRadius={54}
                 fill="#8884d8"
                 dataKey="value"
+                stroke="var(--color-surface-primary)"
+                strokeWidth={2}
                 onClick={(data) => {
                   if (onSpeciesClick && data.name !== 'その他') {
                     onSpeciesClick(data.name);
@@ -256,7 +258,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
             overflowY: 'auto',
             padding: '8px',
             borderRadius: '8px',
-            backgroundColor: colors.surface.secondary,
+            backgroundColor: 'var(--color-surface-secondary)',
           }}>
             {speciesChartData.map((item, index) => (
               <div
@@ -273,19 +275,19 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
                   padding: '10px 12px',
                   marginBottom: '6px',
                   borderRadius: '8px',
-                  backgroundColor: colors.surface.primary,
-                  border: `1px solid ${colors.border.light}`,
+                  backgroundColor: 'var(--color-surface-primary)',
+                  border: `1px solid ${'var(--color-border-light)'}`,
                   cursor: onSpeciesClick && item.name !== 'その他' ? 'pointer' : 'default',
                   transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
                   if (onSpeciesClick && item.name !== 'その他') {
-                    e.currentTarget.style.backgroundColor = colors.surface.secondary;
+                    e.currentTarget.style.backgroundColor = 'var(--color-surface-secondary)';
                     e.currentTarget.style.transform = 'translateX(4px)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.surface.primary;
+                  e.currentTarget.style.backgroundColor = 'var(--color-surface-primary)';
                   e.currentTarget.style.transform = 'translateX(0)';
                 }}
               >
@@ -302,7 +304,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
                 <div style={{
                   flex: 1,
                   ...textStyles.body.small,
-                  color: colors.text.primary,
+                  color: 'var(--color-text-primary)',
                   fontWeight: '500',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -320,13 +322,13 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
                 }}>
                   <span style={{
                     ...textStyles.body.small,
-                    color: colors.text.secondary,
+                    color: 'var(--color-text-secondary)',
                   }}>
                     {item.value}件
                   </span>
                   <span style={{
                     ...textStyles.body.small,
-                    color: colors.text.primary,
+                    color: 'var(--color-text-primary)',
                     fontWeight: '600',
                     minWidth: '40px',
                     textAlign: 'right',
@@ -343,7 +345,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
         <div style={{
           marginTop: '12px',
           paddingTop: '12px',
-          borderTop: `1px solid ${colors.border.light}`,
+          borderTop: `1px solid ${'var(--color-border-light)'}`,
           display: 'flex',
           justifyContent: 'center',
           gap: '20px',
@@ -352,14 +354,14 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
           <div style={{ textAlign: 'center' }}>
             <div style={{
               ...textStyles.body.small,
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
               marginBottom: '4px',
             }}>
               総記録数
             </div>
             <div style={{
               ...textStyles.title.small,
-              color: colors.text.primary,
+              color: 'var(--color-text-primary)',
               fontWeight: '700',
             }}>
               {records.length}件
@@ -368,14 +370,14 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
           <div style={{ textAlign: 'center' }}>
             <div style={{
               ...textStyles.body.small,
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
               marginBottom: '4px',
             }}>
               魚種数
             </div>
             <div style={{
               ...textStyles.title.small,
-              color: colors.text.primary,
+              color: 'var(--color-text-primary)',
               fontWeight: '700',
             }}>
               {speciesChartData.length}種

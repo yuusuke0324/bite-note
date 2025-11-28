@@ -161,13 +161,14 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
       zIndex: 1000
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '12px',
         padding: '2rem',
         maxWidth: '600px',
         width: '90%',
         maxHeight: '80vh',
-        overflow: 'auto'
+        overflow: 'auto',
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
         {/* ヘッダー */}
         <div style={{
@@ -180,12 +181,12 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333',
+            color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <Download size={24} color="#6366F1" aria-hidden="true" />
+            <Download size={24} color="#60a5fa" aria-hidden="true" />
             データインポート
           </h2>
           <button
@@ -195,7 +196,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: '#6c757d',
+              color: 'var(--color-text-secondary)',
               padding: '0.25rem',
               display: 'flex',
               alignItems: 'center',
@@ -209,11 +210,12 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
         {/* 説明 */}
         <div style={{
           padding: '1rem',
-          backgroundColor: '#e3f2fd',
+          backgroundColor: 'rgba(96, 165, 250, 0.15)',
           borderRadius: '6px',
           marginBottom: '1.5rem',
           fontSize: '0.9rem',
-          color: '#1976d2'
+          color: '#93c5fd',
+          border: '1px solid rgba(96, 165, 250, 0.3)'
         }}>
           <h4 style={{
             margin: '0 0 0.5rem 0',
@@ -221,9 +223,10 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             fontWeight: 'bold',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: '0.5rem',
+            color: '#60a5fa'
           }}>
-            <Lightbulb size={18} color="#1976d2" aria-hidden="true" />
+            <Lightbulb size={18} color="#60a5fa" aria-hidden="true" />
             インポート可能なファイル形式
           </h4>
           <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
@@ -239,12 +242,12 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           style={{
-            border: `2px dashed ${dragOver ? '#007bff' : selectedFile ? '#28a745' : '#ced4da'}`,
+            border: `2px dashed ${dragOver ? '#60a5fa' : selectedFile ? '#34d399' : 'var(--color-border-medium)'}`,
             borderRadius: '8px',
             padding: '2rem',
             textAlign: 'center',
             cursor: 'pointer',
-            backgroundColor: dragOver ? '#e3f2fd' : selectedFile ? '#d4edda' : '#f8f9fa',
+            backgroundColor: dragOver ? 'rgba(96, 165, 250, 0.15)' : selectedFile ? 'rgba(52, 211, 153, 0.15)' : 'var(--color-surface-secondary)',
             marginBottom: '1.5rem',
             transition: 'all 0.2s ease'
           }}
@@ -260,19 +263,19 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           {selectedFile ? (
             <div>
               <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
-                <FileText size={40} color="#28a745" aria-hidden="true" />
+                <FileText size={40} color="#34d399" aria-hidden="true" />
               </div>
               <div style={{
                 fontWeight: 'bold',
                 fontSize: '1rem',
-                color: '#333',
+                color: 'var(--color-text-primary)',
                 marginBottom: '0.25rem'
               }}>
                 {selectedFile.name}
               </div>
               <div style={{
                 fontSize: '0.875rem',
-                color: '#666'
+                color: 'var(--color-text-secondary)'
               }}>
                 {formatFileSize(selectedFile.size)}
               </div>
@@ -280,18 +283,18 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           ) : (
             <div>
               <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
-                <Paperclip size={40} color="#6c757d" aria-hidden="true" />
+                <Paperclip size={40} color={'var(--color-text-tertiary)'} aria-hidden="true" />
               </div>
               <div style={{
                 fontSize: '1rem',
-                color: '#333',
+                color: 'var(--color-text-primary)',
                 marginBottom: '0.5rem'
               }}>
                 {dragOver ? 'ファイルをドロップしてください' : 'ファイルを選択またはドロップ'}
               </div>
               <div style={{
                 fontSize: '0.875rem',
-                color: '#666'
+                color: 'var(--color-text-secondary)'
               }}>
                 JSON または CSV ファイル
               </div>
@@ -305,19 +308,19 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             padding: '1rem',
             borderRadius: '6px',
             marginBottom: '1.5rem',
-            backgroundColor: importResult.success ? '#d4edda' : '#f8d7da',
-            border: `1px solid ${importResult.success ? '#c3e6cb' : '#f5c6cb'}`
+            backgroundColor: importResult.success ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            border: `1px solid ${importResult.success ? 'rgba(52, 211, 153, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
           }}>
             <h4 style={{
               margin: '0 0 0.5rem 0',
               fontSize: '1rem',
               fontWeight: 'bold',
-              color: importResult.success ? '#155724' : '#721c24'
+              color: importResult.success ? '#34d399' : '#ef4444'
             }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 {importResult.success
-                  ? <><CheckCircle size={20} color="#10B981" aria-hidden="true" /> インポート完了</>
-                  : <><XCircle size={20} color="#EF4444" aria-hidden="true" /> インポート失敗</>
+                  ? <><CheckCircle size={20} color="#34d399" aria-hidden="true" /> インポート完了</>
+                  : <><XCircle size={20} color="#ef4444" aria-hidden="true" /> インポート失敗</>
                 }
               </span>
             </h4>
@@ -325,7 +328,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             {importResult.success && (
               <div style={{
                 fontSize: '0.9rem',
-                color: '#155724'
+                color: '#6ee7b7'
               }}>
                 <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
                   <li>インポート済み記録: {importResult.importedRecords}件</li>
@@ -339,12 +342,12 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
 
             {importResult.errors && importResult.errors.length > 0 && (
               <div style={{ marginTop: '0.5rem' }}>
-                <strong style={{ color: '#721c24', fontSize: '0.9rem' }}>エラー:</strong>
+                <strong style={{ color: '#fca5a5', fontSize: '0.9rem' }}>エラー:</strong>
                 <ul style={{
                   margin: '0.25rem 0 0 0',
                   paddingLeft: '1.5rem',
                   fontSize: '0.85rem',
-                  color: '#721c24'
+                  color: '#fca5a5'
                 }}>
                   {importResult.errors.slice(0, 5).map((error, index) => (
                     <li key={index}>{error}</li>
@@ -361,15 +364,15 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
         {/* 警告メッセージ */}
         <div style={{
           padding: '1rem',
-          backgroundColor: '#fff3cd',
+          backgroundColor: 'rgba(251, 191, 36, 0.15)',
           borderRadius: '6px',
           marginBottom: '1.5rem',
           fontSize: '0.9rem',
-          color: '#856404',
-          border: '1px solid #ffeaa7'
+          color: '#fbbf24',
+          border: '1px solid rgba(251, 191, 36, 0.3)'
         }}>
           <span style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-            <AlertTriangle size={18} color="#F59E0B" aria-hidden="true" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <AlertTriangle size={18} color="#fbbf24" aria-hidden="true" style={{ flexShrink: 0, marginTop: '2px' }} />
             <span><strong>注意:</strong> インポートにより既存のデータが上書きされる場合があります。</span>
           </span>
           重要なデータは事前にエクスポートしてバックアップを取ることをお勧めします。

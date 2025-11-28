@@ -1,5 +1,4 @@
 import React, { type ReactNode } from 'react';
-import { colors } from '../../theme/colors';
 // import { textStyles, typography } from '../../theme/typography';
 
 interface AppLayoutProps {
@@ -24,8 +23,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     display: 'flex',
     flexDirection: 'column',
     fontFamily: 'Inter, system-ui, sans-serif',
-    backgroundColor: colors.background.primary,
-    color: colors.text.primary,
+    backgroundColor: 'var(--color-background-primary)',
+    color: 'var(--color-text-primary)',
   };
 
   const mainContentStyles: React.CSSProperties = {
@@ -44,8 +43,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
   const sidebarStyles: React.CSSProperties = {
     width: '280px',
-    backgroundColor: colors.surface.secondary,
-    borderRight: `1px solid ${colors.border.light}`,
+    backgroundColor: 'var(--color-surface-primary)',
+    borderRight: '1px solid var(--color-border-light)',
     flexShrink: 0,
     position: 'sticky',
     top: 0,
@@ -63,9 +62,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          backgroundColor: colors.surface.primary,
-          borderBottom: `1px solid ${colors.border.light}`,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         }}>
           {header}
         </header>
@@ -94,8 +90,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           {/* フッター */}
           {footer && (
             <footer style={{
-              backgroundColor: colors.surface.secondary,
-              borderTop: `1px solid ${colors.border.light}`,
+              backgroundColor: 'var(--color-surface-primary)',
+              borderTop: '1px solid var(--color-border-light)',
               padding: '1rem',
             }}>
               {footer}
@@ -112,8 +108,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           left: 0,
           right: 0,
           zIndex: 100,
-          backgroundColor: colors.surface.primary,
-          borderTop: `1px solid ${colors.border.light}`,
           // モバイルでのみ表示（CSSメディアクエリは別途追加）
           display: 'block',
         }}>

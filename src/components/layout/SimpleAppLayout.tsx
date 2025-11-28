@@ -1,5 +1,4 @@
 import React, { type ReactNode } from 'react';
-import { colors } from '../../theme/colors';
 
 interface SimpleAppLayoutProps {
   children: ReactNode;
@@ -20,8 +19,8 @@ export const SimpleAppLayout: React.FC<SimpleAppLayoutProps> = ({
         display: 'flex',
         flexDirection: 'column',
         fontFamily: 'Inter, system-ui, sans-serif',
-        backgroundColor: colors.background.primary,
-        color: colors.text.primary,
+        backgroundColor: 'var(--color-background-primary)',
+        color: 'var(--color-text-primary)',
       }}
     >
       {/* ヘッダー */}
@@ -30,8 +29,8 @@ export const SimpleAppLayout: React.FC<SimpleAppLayoutProps> = ({
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          backgroundColor: colors.surface.primary,
-          borderBottom: `1px solid ${colors.border.light}`,
+          backgroundColor: 'var(--color-surface-primary)',
+          borderBottom: `1px solid var(--color-border-light)`,
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         }}>
           {header}

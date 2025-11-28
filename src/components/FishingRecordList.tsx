@@ -158,37 +158,37 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
   // スケルトンローダー
   const SkeletonCard = () => (
     <div style={{
-      border: '1px solid #dee2e6',
+      border: `1px solid ${'var(--color-border-light)'}`,
       borderRadius: '8px',
       padding: '1rem',
       marginBottom: '1rem',
-      backgroundColor: '#fff',
+      backgroundColor: 'var(--color-surface-primary)',
       animation: 'skeleton-loading 1.5s ease-in-out infinite'
     }}>
       <div style={{
         height: '1.5rem',
-        backgroundColor: '#e9ecef',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '4px',
         marginBottom: '0.5rem',
         width: '60%'
       }} />
       <div style={{
         height: '1rem',
-        backgroundColor: '#e9ecef',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '4px',
         marginBottom: '0.75rem',
         width: '40%'
       }} />
       <div style={{
         height: '1rem',
-        backgroundColor: '#e9ecef',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '4px',
         marginBottom: '0.5rem',
         width: '80%'
       }} />
       <div style={{
         height: '1rem',
-        backgroundColor: '#e9ecef',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '4px',
         width: '30%'
       }} />
@@ -210,7 +210,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
           <h2 style={{
             margin: 0,
             fontSize: 'clamp(1.5rem, 4vw, 2rem)',
-            color: '#333'
+            color: 'var(--color-text-primary)'
           }}>
             <Icon icon={Anchor} size="md" decorative />
             記録一覧
@@ -244,9 +244,9 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
         }}>
           <span style={{
             fontSize: '0.875rem',
-            color: '#6c757d',
+            color: 'var(--color-text-secondary)',
             padding: '0.375rem 0.75rem',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--color-surface-secondary)',
             borderRadius: '20px'
           }}>
             <Icon icon={BarChart3} size={14} decorative /> {filteredRecords.length}件
@@ -256,9 +256,9 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
           {!isFiltersEmpty && (
             <span style={{
               fontSize: '0.75rem',
-              color: '#007bff',
+              color: '#60a5fa',
               padding: '0.25rem 0.5rem',
-              backgroundColor: '#e3f2fd',
+              backgroundColor: 'rgba(96, 165, 250, 0.2)',
               borderRadius: '12px'
             }}>
               フィルター適用中
@@ -389,10 +389,10 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
       {showFilters && (
         <div style={{
           padding: '1rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--color-surface-primary)',
           borderRadius: '8px',
           marginBottom: '1.5rem',
-          border: '1px solid #dee2e6'
+          border: `1px solid ${'var(--color-border-light)'}`
         }}>
           {/* 検索入力 */}
           <div style={{ marginBottom: '1rem' }}>
@@ -402,7 +402,8 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
                 display: 'block',
                 marginBottom: '0.5rem',
                 fontWeight: 'bold',
-                fontSize: '0.875rem'
+                fontSize: '0.875rem',
+                color: 'var(--color-text-primary)'
               }}
             >
               <Icon icon={Search} size={14} decorative /> 検索
@@ -416,9 +417,11 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: '1px solid #ced4da',
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
@@ -429,7 +432,8 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
               display: 'block',
               marginBottom: '0.5rem',
               fontWeight: 'bold',
-              fontSize: '0.875rem'
+              fontSize: '0.875rem',
+              color: 'var(--color-text-primary)'
             }}>
               <Icon icon={FileText} size={14} decorative /> 並び順
             </label>
@@ -444,9 +448,9 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
                   onClick={() => handleSortChange(option.key)}
                   style={{
                     padding: '0.5rem 0.75rem',
-                    backgroundColor: sortBy === option.key ? '#007bff' : '#fff',
-                    color: sortBy === option.key ? 'white' : '#333',
-                    border: '1px solid #ced4da',
+                    backgroundColor: sortBy === option.key ? '#60a5fa' : 'var(--color-surface-secondary)',
+                    color: sortBy === option.key ? 'white' : 'var(--color-text-primary)',
+                    border: `1px solid ${'var(--color-border-medium)'}`,
                     borderRadius: '4px',
                     cursor: 'pointer',
                     fontSize: '0.875rem',
@@ -496,15 +500,15 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
         <div style={{
           marginBottom: '1rem',
           padding: '1rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--color-surface-primary)',
           borderRadius: '8px',
-          border: '1px solid #dee2e6'
+          border: `1px solid ${'var(--color-border-light)'}`
         }}>
           <h4 style={{
             margin: '0 0 0.75rem 0',
             fontSize: '1rem',
             fontWeight: 'bold',
-            color: '#333'
+            color: 'var(--color-text-primary)'
           }}>
             <Icon icon={BarChart3} size={14} decorative /> 検索結果の統計
           </h4>
@@ -512,7 +516,8 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: '1rem',
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            color: 'var(--color-text-secondary)'
           }}>
             <div>
               <strong>結果:</strong> {searchStats.filtered}件 ({searchStats.filterRate}%)
@@ -536,9 +541,9 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
       {error && (
         <div style={{
           padding: '1rem',
-          backgroundColor: '#f8d7da',
-          color: '#721c24',
-          border: '1px solid #f5c6cb',
+          backgroundColor: 'rgba(234, 67, 53, 0.15)',
+          color: '#f87171',
+          border: '1px solid rgba(234, 67, 53, 0.3)',
           borderRadius: '8px',
           marginBottom: '1.5rem'
         }}>
@@ -558,12 +563,12 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
           <div style={{
             textAlign: 'center',
             padding: '3rem 1rem',
-            color: '#6c757d'
+            color: 'var(--color-text-secondary)'
           }}>
             <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
               <Icon icon={Anchor} size={48} color="secondary" decorative />
             </div>
-            <h3 style={{ margin: '0 0 0.5rem 0' }}>記録がありません</h3>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--color-text-primary)' }}>記録がありません</h3>
             <p style={{ margin: 0, fontSize: '0.875rem' }}>
               {searchQuery ? '検索条件に一致する記録が見つかりませんでした' : 'まだ記録がありません'}
             </p>
@@ -591,7 +596,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
             disabled={loading}
             style={{
               padding: '0.75rem 2rem',
-              backgroundColor: loading ? '#6c757d' : '#007bff',
+              backgroundColor: loading ? 'var(--color-surface-disabled)' : '#60a5fa',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -628,7 +633,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
       <style>{`
         @keyframes skeleton-loading {
           0% { opacity: 1; }
-          50% { opacity: 0.6; }
+          50% { opacity: 0.5; }
           100% { opacity: 1; }
         }
 
@@ -643,7 +648,7 @@ export const FishingRecordList: React.FC<FishingRecordListProps> = ({
         }
 
         button:focus {
-          outline: 2px solid #007bff;
+          outline: 2px solid #60a5fa;
           outline-offset: 2px;
         }
 

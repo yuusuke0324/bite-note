@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### ✨ Added
+
+#### 🌓 ライト/ダークテーマ切り替え機能 (#307)
+
+アプリ全体でライトモード/ダークモードの動的切り替えが可能になりました。
+
+**主な変更:**
+- **CSS変数システム導入**: `src/index.css`にCSS Custom Propertiesで全カラー変数を一元管理
+- **テーマ切り替えUI**: ヘッダーにテーマトグルボタン追加（🌞/🌙アイコン）
+- **設定永続化**: 選択したテーマはlocalStorageに保存、次回起動時も維持
+- **全コンポーネント対応**: 42ファイルを`colors.`オブジェクトからCSS変数に移行
+
+**対応コンポーネント:**
+- UIコンポーネント: Button, ModernCard, Skeleton, FloatingActionButton等
+- レイアウト: ModernHeader, BottomNavigation, SimpleAppLayout
+- チャート: TideChart, TrendChart, SpeciesChartSection
+- モーダル: DataExportModal, DataImportModal, DeleteConfirmModal, ErrorModal等
+- マップ: FishingMap（オーバーレイパネル対応）
+
+**カラーパレット:**
+| 用途 | ダークモード | ライトモード |
+|------|-------------|-------------|
+| 背景 | `#0f172a` | `#f8fafc` |
+| サーフェス | `#1e293b` | `#ffffff` |
+| テキスト（主） | `#f1f5f9` | `#1e293b` |
+| アクセント | `#60a5fa` | `#3b82f6` |
+
+**技術仕様:**
+- `body.light-theme`クラスのトグルでテーマ切り替え
+- 0.3秒のスムーズなトランジション効果
+- Rechartsコンポーネントもテーマ対応（軸色、ツールチップ等）
+
 ### 🐛 Fixed
 
 #### CI: test:perf 'No test files found' error (#57)

@@ -77,21 +77,22 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
         zIndex: 1000
       }}>
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: 'var(--color-surface-primary)',
           borderRadius: '12px',
           padding: '2rem',
-          textAlign: 'center'
+          textAlign: 'center',
+          border: `1px solid ${'var(--color-border-light)'}`
         }}>
           <div style={{ marginBottom: '1rem' }}>
             <Icon icon={BarChart3} size={48} decorative color="secondary" />
           </div>
-          <h3>データがありません</h3>
-          <p>統計を表示するには記録が必要です。</p>
+          <h3 style={{ color: 'var(--color-text-primary)' }}>データがありません</h3>
+          <p style={{ color: 'var(--color-text-secondary)' }}>統計を表示するには記録が必要です。</p>
           <button
             onClick={onClose}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: '#007bff',
+              backgroundColor: '#60a5fa',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -129,14 +130,15 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
       padding: '1rem'
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '12px',
         width: '95%',
         maxWidth: '1000px',
         height: '90%',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
         {/* ヘッダー */}
         <div style={{
@@ -144,13 +146,13 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '1.5rem',
-          borderBottom: '1px solid #dee2e6'
+          borderBottom: `1px solid ${'var(--color-border-light)'}`
         }}>
           <h2 style={{
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#333',
+            color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -163,7 +165,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: '#6c757d',
+              color: 'var(--color-text-secondary)',
               padding: '0.25rem',
               display: 'flex',
               alignItems: 'center'
@@ -177,7 +179,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
         {/* タブナビゲーション */}
         <div style={{
           display: 'flex',
-          borderBottom: '1px solid #dee2e6',
+          borderBottom: `1px solid ${'var(--color-border-light)'}`,
           overflowX: 'auto'
         }}>
           {tabs.map(tab => (
@@ -186,8 +188,8 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
               onClick={() => setActiveTab(tab.id as TabType)}
               style={{
                 padding: '0.75rem 1rem',
-                backgroundColor: activeTab === tab.id ? '#007bff' : 'transparent',
-                color: activeTab === tab.id ? 'white' : '#333',
+                backgroundColor: activeTab === tab.id ? '#60a5fa' : 'transparent',
+                color: activeTab === tab.id ? 'white' : 'var(--color-text-primary)',
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '0.9rem',
@@ -195,7 +197,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                borderBottom: activeTab === tab.id ? '3px solid #007bff' : '3px solid transparent'
+                borderBottom: activeTab === tab.id ? '3px solid #60a5fa' : '3px solid transparent'
               }}
             >
               {tab.icon} {tab.label}
@@ -224,7 +226,7 @@ export const StatisticsDashboard: React.FC<StatisticsDashboardProps> = ({
 // 概要タブ
 const OverviewTab: React.FC<{ stats: OverallStats }> = ({ stats }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={BarChart3} size={20} decorative /> 全体統計
     </h3>
 
@@ -285,62 +287,62 @@ const OverviewTab: React.FC<{ stats: OverallStats }> = ({ stats }) => (
     }}>
       <div style={{
         padding: '1rem',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '8px',
-        border: '1px solid #dee2e6'
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
-        <h4 style={{ margin: '0 0 0.5rem 0', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={Camera} size={16} decorative /> 写真付き記録
         </h4>
-        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#007bff' }}>
+        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#60a5fa' }}>
           {stats.recordsWithPhoto} / {stats.totalRecords}
         </div>
-        <div style={{ fontSize: '0.875rem', color: '#666' }}>
+        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
           ({Math.round((stats.recordsWithPhoto / stats.totalRecords) * 100)}%)
         </div>
       </div>
 
       <div style={{
         padding: '1rem',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '8px',
-        border: '1px solid #dee2e6'
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
-        <h4 style={{ margin: '0 0 0.5rem 0', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={Map} size={16} decorative /> GPS記録
         </h4>
-        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>
+        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#34d399' }}>
           {stats.recordsWithGPS} / {stats.totalRecords}
         </div>
-        <div style={{ fontSize: '0.875rem', color: '#666' }}>
+        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
           ({Math.round((stats.recordsWithGPS / stats.totalRecords) * 100)}%)
         </div>
       </div>
 
       <div style={{
         padding: '1rem',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '8px',
-        border: '1px solid #dee2e6'
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
-        <h4 style={{ margin: '0 0 0.5rem 0', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={Calendar} size={16} decorative /> 記録開始
         </h4>
-        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#333' }}>
+        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
           {stats.dateRange.earliest.toLocaleDateString('ja-JP')}
         </div>
       </div>
 
       <div style={{
         padding: '1rem',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '8px',
-        border: '1px solid #dee2e6'
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
-        <h4 style={{ margin: '0 0 0.5rem 0', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={Calendar} size={16} decorative /> 最新記録
         </h4>
-        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#333' }}>
+        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
           {stats.dateRange.latest.toLocaleDateString('ja-JP')}
         </div>
       </div>
@@ -351,7 +353,7 @@ const OverviewTab: React.FC<{ stats: OverallStats }> = ({ stats }) => (
 // 魚種別タブ
 const SpeciesTab: React.FC<{ stats: SpeciesStats[] }> = ({ stats }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Fish} size={20} decorative /> 魚種別統計
     </h3>
 
@@ -364,10 +366,10 @@ const SpeciesTab: React.FC<{ stats: SpeciesStats[] }> = ({ stats }) => (
           key={species.species}
           style={{
             padding: '1rem',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-surface-secondary)',
             borderRadius: '8px',
-            border: '1px solid #dee2e6',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            border: `1px solid ${'var(--color-border-light)'}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
           }}
         >
           <div style={{
@@ -380,14 +382,14 @@ const SpeciesTab: React.FC<{ stats: SpeciesStats[] }> = ({ stats }) => (
               margin: 0,
               fontSize: '1.1rem',
               fontWeight: 'bold',
-              color: '#333'
+              color: 'var(--color-text-primary)'
             }}>
               #{index + 1} {species.species}
             </h4>
             <div style={{
               padding: '0.25rem 0.75rem',
-              backgroundColor: '#e3f2fd',
-              color: '#1976d2',
+              backgroundColor: 'rgba(96, 165, 250, 0.2)',
+              color: '#60a5fa',
               borderRadius: '20px',
               fontSize: '0.8rem',
               fontWeight: 'bold'
@@ -400,7 +402,8 @@ const SpeciesTab: React.FC<{ stats: SpeciesStats[] }> = ({ stats }) => (
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
             gap: '0.75rem',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            color: 'var(--color-text-primary)'
           }}>
             <div>
               <strong>釣果数:</strong> {species.count}匹
@@ -417,7 +420,7 @@ const SpeciesTab: React.FC<{ stats: SpeciesStats[] }> = ({ stats }) => (
           </div>
 
           {species.locations.length > 0 && (
-            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#666' }}>
+            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
               <strong>主な釣り場:</strong> {species.locations.slice(0, 3).join(', ')}
               {species.locations.length > 3 && ` 他${species.locations.length - 3}箇所`}
             </div>
@@ -431,7 +434,7 @@ const SpeciesTab: React.FC<{ stats: SpeciesStats[] }> = ({ stats }) => (
 // 場所別タブ
 const LocationsTab: React.FC<{ stats: LocationStats[] }> = ({ stats }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={MapPin} size={20} decorative /> 釣り場別統計
     </h3>
 
@@ -444,10 +447,10 @@ const LocationsTab: React.FC<{ stats: LocationStats[] }> = ({ stats }) => (
           key={location.location}
           style={{
             padding: '1rem',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-surface-secondary)',
             borderRadius: '8px',
-            border: '1px solid #dee2e6',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            border: `1px solid ${'var(--color-border-light)'}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
           }}
         >
           <div style={{
@@ -460,14 +463,14 @@ const LocationsTab: React.FC<{ stats: LocationStats[] }> = ({ stats }) => (
               margin: 0,
               fontSize: '1.1rem',
               fontWeight: 'bold',
-              color: '#333'
+              color: 'var(--color-text-primary)'
             }}>
               #{index + 1} {location.location}
             </h4>
             <div style={{
               padding: '0.25rem 0.75rem',
-              backgroundColor: '#e8f5e8',
-              color: '#2e7d32',
+              backgroundColor: 'rgba(52, 211, 153, 0.2)',
+              color: '#34d399',
               borderRadius: '20px',
               fontSize: '0.8rem',
               fontWeight: 'bold'
@@ -480,7 +483,8 @@ const LocationsTab: React.FC<{ stats: LocationStats[] }> = ({ stats }) => (
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
             gap: '0.75rem',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            color: 'var(--color-text-primary)'
           }}>
             <div>
               <strong>釣果数:</strong> {location.count}匹
@@ -497,7 +501,7 @@ const LocationsTab: React.FC<{ stats: LocationStats[] }> = ({ stats }) => (
           </div>
 
           {location.species.length > 0 && (
-            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#666' }}>
+            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
               <strong>釣れる魚種:</strong> {location.species.slice(0, 5).join(', ')}
               {location.species.length > 5 && ` 他${location.species.length - 5}種`}
             </div>
@@ -511,13 +515,13 @@ const LocationsTab: React.FC<{ stats: LocationStats[] }> = ({ stats }) => (
 // 時系列タブ
 const TrendsTab: React.FC<{ stats: TimeAnalysis }> = ({ stats }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={TrendingUp} size={20} decorative /> 時系列分析
     </h3>
 
     {/* 季節別統計 */}
     <div style={{ marginBottom: '2rem' }}>
-      <h4 style={{ color: '#333', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <h4 style={{ color: 'var(--color-text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <Icon icon={Cherry} size={16} decorative /> 季節別釣果
       </h4>
       <div style={{
@@ -526,24 +530,24 @@ const TrendsTab: React.FC<{ stats: TimeAnalysis }> = ({ stats }) => (
         gap: '1rem'
       }}>
         {[
-          { season: '春', count: stats.seasonal.spring, icon: <Icon icon={Cherry} size={32} decorative />, color: '#e91e63' },
-          { season: '夏', count: stats.seasonal.summer, icon: <Icon icon={Sun} size={32} decorative />, color: '#ff9800' },
-          { season: '秋', count: stats.seasonal.autumn, icon: <Icon icon={Leaf} size={32} decorative />, color: '#ff5722' },
-          { season: '冬', count: stats.seasonal.winter, icon: <Icon icon={Snowflake} size={32} decorative />, color: '#2196f3' }
+          { season: '春', count: stats.seasonal.spring, icon: <Icon icon={Cherry} size={32} decorative />, color: '#f472b6' },
+          { season: '夏', count: stats.seasonal.summer, icon: <Icon icon={Sun} size={32} decorative />, color: '#fbbf24' },
+          { season: '秋', count: stats.seasonal.autumn, icon: <Icon icon={Leaf} size={32} decorative />, color: '#fb923c' },
+          { season: '冬', count: stats.seasonal.winter, icon: <Icon icon={Snowflake} size={32} decorative />, color: '#60a5fa' }
         ].map(({ season, count, icon, color }) => (
           <div
             key={season}
             style={{
               padding: '1rem',
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-surface-secondary)',
               borderRadius: '8px',
-              border: '1px solid #dee2e6',
+              border: `1px solid ${'var(--color-border-light)'}`,
               textAlign: 'center'
             }}
           >
             <div style={{ marginBottom: '0.5rem' }}>{icon}</div>
             <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color }}>{count}</div>
-            <div style={{ fontSize: '0.9rem', color: '#666' }}>{season} ({count}匹)</div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>{season} ({count}匹)</div>
           </div>
         ))}
       </div>
@@ -552,7 +556,7 @@ const TrendsTab: React.FC<{ stats: TimeAnalysis }> = ({ stats }) => (
     {/* 年別トレンド */}
     {stats.yearlyTrends.length > 1 && (
       <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: '#333', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h4 style={{ color: 'var(--color-text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Icon icon={BarChart3} size={16} decorative /> 年別トレンド
         </h4>
         <div style={{
@@ -564,11 +568,12 @@ const TrendsTab: React.FC<{ stats: TimeAnalysis }> = ({ stats }) => (
               key={trend.year}
               style={{
                 padding: '0.75rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--color-surface-secondary)',
                 borderRadius: '6px',
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
+                color: 'var(--color-text-primary)'
               }}
             >
               <span style={{ fontWeight: 'bold' }}>{trend.year}年</span>
@@ -581,7 +586,7 @@ const TrendsTab: React.FC<{ stats: TimeAnalysis }> = ({ stats }) => (
 
     {/* 月別詳細 */}
     <div>
-      <h4 style={{ color: '#333', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <h4 style={{ color: 'var(--color-text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <Icon icon={Calendar} size={16} decorative /> 月別詳細（直近12ヶ月）
       </h4>
       <div style={{
@@ -595,18 +600,19 @@ const TrendsTab: React.FC<{ stats: TimeAnalysis }> = ({ stats }) => (
             key={`${month.year}-${month.month}`}
             style={{
               padding: '0.75rem',
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-surface-secondary)',
               borderRadius: '6px',
-              border: '1px solid #dee2e6',
+              border: `1px solid ${'var(--color-border-light)'}`,
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              color: 'var(--color-text-primary)'
             }}
           >
             <span style={{ fontWeight: 'bold' }}>
               {month.year}年{month.month}月
             </span>
-            <div style={{ fontSize: '0.9rem' }}>
+            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
               {month.count}匹 | 平均: {month.averageSize}cm | 魚種: {month.species.size}種
             </div>
           </div>
@@ -619,13 +625,13 @@ const TrendsTab: React.FC<{ stats: TimeAnalysis }> = ({ stats }) => (
 // サイズ分布タブ
 const SizesTab: React.FC<{ stats: SizeDistribution }> = ({ stats }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Ruler} size={20} decorative /> サイズ分布
     </h3>
 
     {/* パーセンタイル */}
     <div style={{ marginBottom: '2rem' }}>
-      <h4 style={{ color: '#333', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <h4 style={{ color: 'var(--color-text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <Icon icon={BarChart3} size={16} decorative /> パーセンタイル
       </h4>
       <div style={{
@@ -644,17 +650,17 @@ const SizesTab: React.FC<{ stats: SizeDistribution }> = ({ stats }) => (
             key={label}
             style={{
               padding: '1rem',
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-surface-secondary)',
               borderRadius: '8px',
-              border: '1px solid #dee2e6',
+              border: `1px solid ${'var(--color-border-light)'}`,
               textAlign: 'center'
             }}
           >
-            <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.25rem' }}>{desc}</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#007bff' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: '0.25rem' }}>{desc}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#60a5fa' }}>
               {value}cm
             </div>
-            <div style={{ fontSize: '0.8rem', color: '#666' }}>{label}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{label}</div>
           </div>
         ))}
       </div>
@@ -662,7 +668,7 @@ const SizesTab: React.FC<{ stats: SizeDistribution }> = ({ stats }) => (
 
     {/* 範囲別分布 */}
     <div>
-      <h4 style={{ color: '#333', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <h4 style={{ color: 'var(--color-text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <Icon icon={TrendingUp} size={16} decorative /> サイズ範囲別分布
       </h4>
       <div style={{
@@ -674,29 +680,30 @@ const SizesTab: React.FC<{ stats: SizeDistribution }> = ({ stats }) => (
             key={range.range}
             style={{
               padding: '0.75rem',
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-surface-secondary)',
               borderRadius: '6px',
-              border: '1px solid #dee2e6'
+              border: `1px solid ${'var(--color-border-light)'}`
             }}
           >
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '0.5rem'
+              marginBottom: '0.5rem',
+              color: 'var(--color-text-primary)'
             }}>
               <span style={{ fontWeight: 'bold' }}>{range.range}</span>
               <span>{range.count}匹 ({range.percentage.toFixed(1)}%)</span>
             </div>
             <div style={{
               height: '8px',
-              backgroundColor: '#e9ecef',
+              backgroundColor: 'var(--color-surface-tertiary)',
               borderRadius: '4px',
               overflow: 'hidden'
             }}>
               <div style={{
                 height: '100%',
-                backgroundColor: '#007bff',
+                backgroundColor: '#60a5fa',
                 width: `${range.percentage}%`,
                 transition: 'width 0.3s ease'
               }} />
@@ -711,7 +718,7 @@ const SizesTab: React.FC<{ stats: SizeDistribution }> = ({ stats }) => (
 // 天候別タブ
 const WeatherTab: React.FC<{ stats: WeatherStats[] }> = ({ stats }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#333', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={CloudSun} size={20} decorative /> 天候別統計
     </h3>
 
@@ -724,10 +731,10 @@ const WeatherTab: React.FC<{ stats: WeatherStats[] }> = ({ stats }) => (
           key={weather.weather}
           style={{
             padding: '1rem',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-surface-secondary)',
             borderRadius: '8px',
-            border: '1px solid #dee2e6',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            border: `1px solid ${'var(--color-border-light)'}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
           }}
         >
           <div style={{
@@ -740,14 +747,14 @@ const WeatherTab: React.FC<{ stats: WeatherStats[] }> = ({ stats }) => (
               margin: 0,
               fontSize: '1.1rem',
               fontWeight: 'bold',
-              color: '#333'
+              color: 'var(--color-text-primary)'
             }}>
               #{index + 1} {weather.weather}
             </h4>
             <div style={{
               padding: '0.25rem 0.75rem',
-              backgroundColor: '#fff3cd',
-              color: '#856404',
+              backgroundColor: 'rgba(251, 191, 36, 0.2)',
+              color: '#fbbf24',
               borderRadius: '20px',
               fontSize: '0.8rem',
               fontWeight: 'bold'
@@ -760,7 +767,8 @@ const WeatherTab: React.FC<{ stats: WeatherStats[] }> = ({ stats }) => (
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
             gap: '0.75rem',
-            fontSize: '0.9rem'
+            fontSize: '0.9rem',
+            color: 'var(--color-text-primary)'
           }}>
             <div>
               <strong>釣果数:</strong> {weather.count}匹
@@ -774,7 +782,7 @@ const WeatherTab: React.FC<{ stats: WeatherStats[] }> = ({ stats }) => (
           </div>
 
           {weather.species.length > 0 && (
-            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#666' }}>
+            <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
               <strong>釣れる魚種:</strong> {weather.species.slice(0, 5).join(', ')}
               {weather.species.length > 5 && ` 他${weather.species.length - 5}種`}
             </div>
@@ -795,17 +803,17 @@ const StatCard: React.FC<{
 }> = ({ title, value, unit, icon, color }) => (
   <div style={{
     padding: '1.5rem',
-    backgroundColor: 'white',
+    backgroundColor: 'var(--color-surface-secondary)',
     borderRadius: '8px',
-    border: '1px solid #dee2e6',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+    border: `1px solid ${'var(--color-border-light)'}`,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
     textAlign: 'center'
   }}>
     <div style={{ marginBottom: '0.5rem' }}>{icon}</div>
     <div style={{ fontSize: '2rem', fontWeight: 'bold', color, marginBottom: '0.25rem' }}>
       {value}
     </div>
-    <div style={{ fontSize: '0.9rem', color: '#666' }}>
+    <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
       {title} ({unit})
     </div>
   </div>

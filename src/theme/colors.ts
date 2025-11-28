@@ -1,8 +1,9 @@
 // Modern Color System based on Google Material Design 3
 // 2024年のモダンカラーパレット
+// CSS変数を使用してテーマ切り替えに対応
 
 export const colors = {
-  // Primary Colors (Google Blue)
+  // Primary Colors (Google Blue) - 静的カラー
   primary: {
     50: '#E8F0FE',
     100: '#D2E3FC',
@@ -16,7 +17,7 @@ export const colors = {
     900: '#06263D',
   },
 
-  // Secondary Colors (Google Green)
+  // Secondary Colors (Google Green) - 静的カラー
   secondary: {
     50: '#E8F5E8',
     100: '#CEEAD6',
@@ -30,41 +31,41 @@ export const colors = {
     900: '#174021',
   },
 
-  // Surface Colors
+  // Surface Colors - CSS変数でテーマ対応
   surface: {
-    primary: '#FFFFFF',
-    secondary: '#F8F9FA',
-    tertiary: '#F1F3F4',
-    variant: '#E8EAED',
-    disabled: '#DADCE0',
-    hover: '#F1F5F9',
+    primary: 'var(--color-surface-primary)',
+    secondary: 'var(--color-surface-secondary)',
+    tertiary: 'var(--color-surface-tertiary)',
+    variant: 'var(--color-surface-primary)',
+    disabled: '#64748b',
+    hover: 'var(--color-surface-hover)',
   },
 
-  // Background Colors
+  // Background Colors - CSS変数でテーマ対応
   background: {
-    primary: '#FAFBFC',
-    secondary: '#F8F9FA',
-    tertiary: '#F1F3F4',
+    primary: 'var(--color-background-primary)',
+    secondary: 'var(--color-background-secondary)',
+    tertiary: 'var(--color-background-tertiary)',
   },
 
-  // Text Colors
+  // Text Colors - CSS変数でテーマ対応
   text: {
-    primary: '#202124',
-    secondary: '#5F6368',
-    tertiary: '#80868B',
-    disabled: '#9AA0A6',
-    inverse: '#FFFFFF',
+    primary: 'var(--color-text-primary)',
+    secondary: 'var(--color-text-secondary)',
+    tertiary: 'var(--color-text-tertiary)',
+    disabled: 'var(--color-text-disabled)',
+    inverse: 'var(--color-text-inverse)',
   },
 
-  // Border Colors
+  // Border Colors - CSS変数でテーマ対応
   border: {
-    light: '#E8EAED',
-    medium: '#DADCE0',
-    dark: '#BDC1C6',
-    focus: '#1A73E8',
+    light: 'var(--color-border-light)',
+    medium: 'var(--color-border-medium)',
+    dark: 'var(--color-border-dark)',
+    focus: 'var(--color-border-focus)',
   },
 
-  // Status Colors
+  // Status Colors - 静的カラー（テーマに依存しない）
   status: {
     success: '#34A853',
     warning: '#FBBC04',
@@ -72,7 +73,7 @@ export const colors = {
     info: '#4285F4',
   },
 
-  // Accent Color (釣り関連)
+  // Accent Color (釣り関連) - 静的カラー
   accent: {
     50: '#FFF4F1',
     100: '#FFE8E1',
@@ -86,7 +87,7 @@ export const colors = {
     900: '#992C0D',
   },
 
-  // Semantic Colors
+  // Semantic Colors - 静的カラー
   semantic: {
     // 成功（魚が釣れた）
     success: {
@@ -117,35 +118,29 @@ export const colors = {
       contrastText: '#FFFFFF',
     },
   },
-} as const;
 
-// CSS Variables for runtime theme switching
-export const cssVariables = {
-  '--color-primary': colors.primary[500],
-  '--color-primary-light': colors.primary[100],
-  '--color-primary-dark': colors.primary[700],
+  // ハイライトカード専用 - CSS変数でテーマ対応
+  highlight: {
+    bg: 'var(--color-highlight-bg)',
+    border: 'var(--color-highlight-border)',
+    text: 'var(--color-text-primary)',
+    textSecondary: 'var(--color-text-secondary)',
+    gradient: 'var(--color-highlight-gradient)',
+  },
 
-  '--color-secondary': colors.secondary[500],
-  '--color-secondary-light': colors.secondary[100],
-  '--color-secondary-dark': colors.secondary[700],
-
-  '--color-surface': colors.surface.primary,
-  '--color-surface-variant': colors.surface.secondary,
-  '--color-background': colors.background.primary,
-
-  '--color-text-primary': colors.text.primary,
-  '--color-text-secondary': colors.text.secondary,
-  '--color-text-disabled': colors.text.disabled,
-
-  '--color-border': colors.border.light,
-  '--color-border-focus': colors.border.focus,
-
-  '--color-accent': colors.accent[500],
-
-  '--color-success': colors.semantic.success.main,
-  '--color-warning': colors.semantic.warning.main,
-  '--color-error': colors.semantic.error.main,
-  '--color-info': colors.semantic.info.main,
+  // チャート専用カラー - CSS変数でテーマ対応
+  chart: {
+    axis: 'var(--color-chart-axis)',
+    grid: 'var(--color-chart-grid)',
+    primary: 'var(--color-chart-primary)',
+    secondary: 'var(--color-chart-secondary)',
+    label: 'var(--color-chart-label)',
+    tooltip: {
+      bg: 'var(--color-chart-tooltip-bg)',
+      border: 'var(--color-border-focus)',
+      text: 'var(--color-text-primary)',
+    },
+  },
 } as const;
 
 // Helper functions
@@ -166,31 +161,28 @@ export const withOpacity = (color: string, opacity: number) => {
   return `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`;
 };
 
-// Dark mode colors (future implementation)
-export const darkColors = {
-  surface: {
-    primary: '#121212',
-    secondary: '#1E1E1E',
-    tertiary: '#232323',
-    variant: '#2D2D2D',
-    disabled: '#3C3C3C',
-  },
-  background: {
-    primary: '#000000',
-    secondary: '#121212',
-    tertiary: '#1E1E1E',
-  },
-  text: {
-    primary: '#E8EAED',
-    secondary: '#9AA0A6',
-    tertiary: '#80868B',
-    disabled: '#5F6368',
-    inverse: '#202124',
-  },
-  border: {
-    light: '#3C4043',
-    medium: '#5F6368',
-    dark: '#80868B',
-    focus: '#8AB4F8',
-  },
-} as const;
+// テーマタイプ
+export type ThemeMode = 'light' | 'dark';
+
+// テーマ切り替えユーティリティ
+export const setTheme = (theme: ThemeMode) => {
+  if (theme === 'light') {
+    document.body.classList.add('light-theme');
+  } else {
+    document.body.classList.remove('light-theme');
+  }
+  localStorage.setItem('bite-note-theme', theme);
+};
+
+// 現在のテーマを取得
+export const getTheme = (): ThemeMode => {
+  const saved = localStorage.getItem('bite-note-theme') as ThemeMode | null;
+  return saved || 'dark';
+};
+
+// 初期化時にテーマを適用
+export const initializeTheme = () => {
+  const theme = getTheme();
+  setTheme(theme);
+  return theme;
+};

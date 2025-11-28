@@ -79,8 +79,8 @@ export class ErrorBoundary extends Component<Props, State> {
           style={{
             padding: '2rem',
             textAlign: 'center',
-            backgroundColor: '#f8f9fa',
-            border: '1px solid #dee2e6',
+            backgroundColor: 'var(--color-surface-primary)',
+            border: `1px solid ${'var(--color-border-light)'}`,
             borderRadius: '8px',
             margin: '1rem'
           }}
@@ -93,16 +93,16 @@ export class ErrorBoundary extends Component<Props, State> {
               width: '64px',
               height: '64px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
               margin: '0 auto 1rem auto'
             }}
           >
             <AlertTriangle size={48} color="#EF4444" aria-hidden="true" />
           </div>
-          <h2 style={{ color: '#dc3545', marginBottom: '1rem' }}>
+          <h2 style={{ color: '#ef4444', marginBottom: '1rem' }}>
             エラーが発生しました
           </h2>
-          <p data-testid={TestIds.ERROR_BOUNDARY_MESSAGE} style={{ color: '#666', marginBottom: '1.5rem' }}>
+          <p data-testid={TestIds.ERROR_BOUNDARY_MESSAGE} style={{ color: 'var(--color-text-secondary)', marginBottom: '1.5rem' }}>
             予期しないエラーが発生しました。ページを再読み込みするか、しばらく時間をおいてから再度お試しください。
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -110,7 +110,7 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={this.handleRetry}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#007bff',
+                backgroundColor: '#60a5fa',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -125,9 +125,9 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={() => window.location.reload()}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#6c757d',
-                color: 'white',
-                border: 'none',
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)',
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontSize: '1rem'
@@ -138,17 +138,18 @@ export class ErrorBoundary extends Component<Props, State> {
           </div>
           {process.env.NODE_ENV === 'development' && this.state.error && (
             <details style={{ marginTop: '2rem', textAlign: 'left' }}>
-              <summary style={{ cursor: 'pointer', color: '#666' }}>
+              <summary style={{ cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
                 エラー詳細（開発用）
               </summary>
               <pre
                 style={{
                   marginTop: '1rem',
                   padding: '1rem',
-                  backgroundColor: '#f1f3f4',
+                  backgroundColor: 'var(--color-surface-secondary)',
                   borderRadius: '4px',
                   fontSize: '0.8rem',
-                  overflow: 'auto'
+                  overflow: 'auto',
+                  color: 'var(--color-text-primary)'
                 }}
               >
                 {this.state.error.stack}

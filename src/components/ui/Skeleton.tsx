@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import { colors } from '../../theme/colors';
 
 interface SkeletonProps {
   /** 幅（CSSの値、例: '100%', '200px'） */
@@ -40,7 +39,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
           width: circle ? height : width,
           height,
           borderRadius: circle ? '50%' : borderRadius,
-          backgroundColor: colors.surface.tertiary,
+          backgroundColor: 'var(--color-surface-tertiary)',
           position: 'relative',
           overflow: 'hidden',
           ...style,
@@ -97,8 +96,8 @@ export const SkeletonRecordCard: React.FC = () => {
         gap: '12px',
         padding: '12px',
         borderRadius: '12px',
-        backgroundColor: colors.surface.primary,
-        border: `1px solid ${colors.border.light}`,
+        backgroundColor: 'var(--color-surface-primary)',
+        border: `1px solid var(--color-border-light)`,
       }}
     >
       {/* 写真サムネイル */}
@@ -142,7 +141,7 @@ export const SkeletonPhotoCard: React.FC = () => {
       style={{
         width: '100%',
         height: '350px',
-        backgroundColor: colors.surface.secondary,
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '12px',
         overflow: 'hidden',
         position: 'relative',

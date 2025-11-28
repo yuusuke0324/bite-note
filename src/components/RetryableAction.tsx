@@ -152,21 +152,21 @@ export const RetryableAction = <T = unknown,>({
           style={{
             marginTop: '1rem',
             padding: '1rem',
-            backgroundColor: '#f8d7da',
-            border: '1px solid #f5c6cb',
+            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.5)',
             borderRadius: '4px',
-            color: '#721c24'
+            color: 'var(--color-text-primary)'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <AlertTriangle size={20} color="#F59E0B" aria-hidden="true" />
+            <AlertTriangle size={20} color="#fbbf24" aria-hidden="true" />
             <strong>エラーが発生しました</strong>
           </div>
           <p style={{ margin: 0, fontSize: '0.9rem' }}>
             {errorMessage || lastError.message}
           </p>
           {retryCount > 0 && (
-            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', color: '#856404' }}>
+            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', color: '#fbbf24' }}>
               再試行回数: {retryCount}/{maxRetries + 1}
             </p>
           )}

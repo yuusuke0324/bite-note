@@ -150,11 +150,11 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         style={{
           width,
           height,
-          backgroundColor: '#f0f0f0',
+          backgroundColor: 'var(--color-surface-secondary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#666',
+          color: 'var(--color-text-secondary)',
           fontSize: '0.9rem',
           position: 'relative',
           overflow: 'hidden',
@@ -172,13 +172,13 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       style={{
         width,
         height,
-        backgroundColor: '#f8f8f8',
+        backgroundColor: 'var(--color-surface-secondary)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#999',
+        color: 'var(--color-text-secondary)',
         fontSize: '0.9rem',
-        border: '1px solid #ddd'
+        border: `1px solid var(--color-border-light)`
       }}
     >
       画像を読み込めませんでした

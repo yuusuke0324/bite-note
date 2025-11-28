@@ -41,7 +41,7 @@ import { OfflineIndicator } from './components/common/OfflineIndicator';
 // アイコン
 import Icons from './components/icons/Icons';
 import { Icon } from './components/ui/Icon';
-import { Search, Sliders, ChevronDown, Fish, MapPin, Ruler, Trophy, TrendingUp, Calendar, Scale, X } from 'lucide-react';
+import { Search, Sliders, ChevronDown, Fish, MapPin, Ruler, Trophy, TrendingUp, Calendar, Scale, X, Sun, Moon } from 'lucide-react';
 
 // テスト用定数
 import { TestIds } from './constants/testIds';
@@ -52,7 +52,7 @@ import { fishingRecordService } from './lib/fishing-record-service';
 import { exportImportService } from './lib/export-import-service';
 
 // テーマ
-import { colors } from './theme/colors';
+import { colors, initializeTheme, setTheme, getTheme, type ThemeMode } from './theme/colors';
 import { textStyles } from './theme/typography';
 
 // 型定義
@@ -170,6 +170,11 @@ const applyFilters = (records: FishingRecord[], filters: FilterState): FishingRe
 };
 
 function ModernApp() {
+  // テーマ初期化（アプリ起動時に一度だけ実行）
+  useEffect(() => {
+    initializeTheme();
+  }, []);
+
   // 状態管理
   const [activeTab, setActiveTab] = useState<'home' | 'form' | 'list' | 'map' | 'debug'>('home');
   const [selectedRecord, setSelectedRecord] = useState<FishingRecord | null>(null);
@@ -440,7 +445,7 @@ function ModernApp() {
   const getHeaderSubtitle = () => {
     const recordsWithCoordinates = records.filter(r => r.coordinates).length;
     switch (activeTab) {
-      case 'home': return `${records.length}件の記録`;
+      case 'home': return undefined;
       case 'list': return '写真で振り返る';
       case 'map': return `${recordsWithCoordinates}箇所の釣り場`;
       case 'form': return '新しい釣果を記録';
@@ -1930,9 +1935,73 @@ function ModernApp() {
     </div>
   );
 
-  // デバッグコンテンツ
-  const DebugContent = () => (
-    <div style={{ padding: '16px' }}>
+  // 設定コンテンツ（旧デバッグコンテンツ）
+  const DebugContent = () => {
+    const [currentTheme, setCurrentTheme] = useState<ThemeMode>(getTheme());
+
+    const handleThemeToggle = () => {
+      const newTheme: ThemeMode = currentTheme === 'dark' ? 'light' : 'dark';
+      setCurrentTheme(newTheme);
+      setTheme(newTheme);
+    };
+
+    return (
+    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* テーマ設定 */}
+      <ModernCard variant="outlined" size="md">
+        <h3 style={{
+          ...textStyles.headline.small,
+          color: colors.text.primary,
+          marginBottom: '16px',
+        }}>
+          テーマ設定
+        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Sun size={24} style={{ color: currentTheme === 'light' ? '#fbbf24' : colors.text.tertiary }} />
+          <button
+            onClick={handleThemeToggle}
+            role="switch"
+            aria-checked={currentTheme === 'dark'}
+            aria-label={`テーマ切り替え: 現在${currentTheme === 'dark' ? 'ダーク' : 'ライト'}モード`}
+            style={{
+              position: 'relative',
+              width: '56px',
+              height: '28px',
+              backgroundColor: currentTheme === 'dark' ? '#3b82f6' : '#e2e8f0',
+              borderRadius: '14px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s ease',
+              padding: 0,
+            }}
+          >
+            <span
+              style={{
+                position: 'absolute',
+                top: '2px',
+                left: currentTheme === 'dark' ? '30px' : '2px',
+                width: '24px',
+                height: '24px',
+                backgroundColor: '#ffffff',
+                borderRadius: '50%',
+                transition: 'left 0.3s ease',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+              }}
+            />
+          </button>
+          <Moon size={24} style={{ color: currentTheme === 'dark' ? '#60a5fa' : colors.text.tertiary }} />
+          <span style={{
+            marginLeft: '8px',
+            fontSize: '1rem',
+            color: colors.text.primary,
+            fontWeight: 500
+          }}>
+            {currentTheme === 'dark' ? 'ダークモード' : 'ライトモード'}
+          </span>
+        </div>
+      </ModernCard>
+
+      {/* アプリ情報 */}
       <ModernCard variant="outlined" size="md">
         <h3 style={{
           ...textStyles.headline.small,
@@ -1948,7 +2017,6 @@ function ModernApp() {
         }}>
           <p>バージョン: 2.0.0</p>
           <p>記録数: {records.length}件</p>
-          <p>テーマ: {settings.theme}</p>
           <p>言語: {settings.language}</p>
           {error && (
             <p style={{ color: colors.semantic.error.main }}>
@@ -1958,7 +2026,8 @@ function ModernApp() {
         </div>
       </ModernCard>
     </div>
-  );
+    );
+  };
 
   // 地図コンテンツ
   const MapContent = () => (
@@ -1993,6 +2062,21 @@ function ModernApp() {
           <ModernHeader
             title={getHeaderTitle()}
             subtitle={getHeaderSubtitle()}
+            activeTab={activeTab}
+            logo={activeTab === 'home' ? (
+              <img
+                src="/icons/icon-96x96.png"
+                alt="Bite Note"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  objectFit: 'cover',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 8px rgba(255, 255, 255, 0.3)',
+                }}
+              />
+            ) : undefined}
             actions={
               <FloatingActionButton
                 icon={<Icons.Add />}

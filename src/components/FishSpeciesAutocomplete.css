@@ -22,40 +22,41 @@
   width: 100%;
 }
 
+/* ダークモードをデフォルトに設定（アプリ全体がダークテーマ） */
 .fish-species-autocomplete input {
   width: 100%;
   padding: 1rem 1.25rem;
   font-size: 1.0625rem;
   font-weight: 500;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 0.75rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.95);
-  color: #1a1a2e;
+  background: #334155;
+  color: #f1f5f9;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-              0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
+              0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
 .fish-species-autocomplete input::placeholder {
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 400;
   opacity: 0.7;
 }
 
 .fish-species-autocomplete input:focus {
   outline: none;
-  border-color: #3b82f6;
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15),
-              0 10px 15px -3px rgba(0, 0, 0, 0.1),
-              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: #60a5fa;
+  background: #334155;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2),
+              0 10px 15px -3px rgba(0, 0, 0, 0.3),
+              0 4px 6px -2px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
 }
 
 .fish-species-autocomplete input:disabled {
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   cursor: not-allowed;
   opacity: 0.6;
   transform: none;
@@ -86,7 +87,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #9ca3af;
   font-weight: 500;
 }
 
@@ -94,8 +95,8 @@
   content: '';
   width: 1rem;
   height: 1rem;
-  border: 2px solid #e5e7eb;
-  border-top-color: #3b82f6;
+  border: 2px solid #374151;
+  border-top-color: #60a5fa;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -144,14 +145,14 @@
   right: 0;
   max-height: 20rem;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(229, 231, 235, 0.8);
+  background: rgba(30, 41, 59, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 0.875rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-              0 10px 10px -5px rgba(0, 0, 0, 0.04),
-              0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+              0 10px 10px -5px rgba(0, 0, 0, 0.2),
+              0 0 0 1px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   list-style: none;
   margin: 0;
@@ -179,12 +180,12 @@
 }
 
 .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #4b5563;
   border-radius: 0.25rem;
 }
 
 .fish-species-autocomplete .suggestions-list::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #6b7280;
 }
 
 .fish-species-autocomplete .suggestion-item {
@@ -200,7 +201,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(147, 197, 253, 0.08) 100%);
   opacity: 0;
   transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -212,10 +213,10 @@
 
 .fish-species-autocomplete .suggestion-item:hover,
 .fish-species-autocomplete .suggestion-item.selected {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(29, 78, 216, 0.25) 100%);
   transform: translateX(0.25rem);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-              0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
+              0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
 .fish-species-autocomplete .suggestion-item:active {
@@ -234,24 +235,24 @@
 .fish-species-autocomplete .species-name {
   font-weight: 600;
   font-size: 1rem;
-  color: #111827;
+  color: #f9fafb;
   transition: color 0.2s;
 }
 
 .fish-species-autocomplete .suggestion-item:hover .species-name,
 .fish-species-autocomplete .suggestion-item.selected .species-name {
-  color: #1e40af;
+  color: #93c5fd;
 }
 
 .fish-species-autocomplete .species-category {
   font-size: 0.75rem;
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.5) 0%, rgba(29, 78, 216, 0.5) 100%);
+  color: #93c5fd;
   font-weight: 600;
   letter-spacing: 0.015em;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -264,7 +265,7 @@
 
 .fish-species-autocomplete .species-scientific {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #9ca3af;
   font-style: italic;
   position: relative;
   z-index: 1;
@@ -273,7 +274,7 @@
 
 .fish-species-autocomplete .suggestion-item:hover .species-scientific,
 .fish-species-autocomplete .suggestion-item.selected .species-scientific {
-  color: #4b5563;
+  color: #d1d5db;
 }
 
 .fish-species-autocomplete .no-results {
@@ -282,16 +283,16 @@
   left: 0;
   right: 0;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(229, 231, 235, 0.8);
+  background: rgba(30, 41, 59, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 0.875rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+              0 10px 10px -5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   text-align: center;
-  color: #6b7280;
+  color: #9ca3af;
   font-size: 0.875rem;
   font-weight: 500;
   animation: slideDownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);

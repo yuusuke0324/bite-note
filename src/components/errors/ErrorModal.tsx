@@ -72,20 +72,21 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-surface-primary)',
             borderRadius: '12px',
             maxWidth: '600px',
             width: '100%',
             maxHeight: '90vh',
             overflow: 'auto',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+            border: `1px solid ${'var(--color-border-light)'}`
           }}
         >
           {/* ヘッダー */}
           <div
             style={{
               padding: '1.5rem',
-              borderBottom: '1px solid #dee2e6',
+              borderBottom: `1px solid ${'var(--color-border-light)'}`,
               display: 'flex',
               alignItems: 'center',
               gap: '1rem'
@@ -112,7 +113,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                 <div
                   style={{
                     fontSize: '0.85rem',
-                    color: '#6c757d',
+                    color: 'var(--color-text-secondary)',
                     marginTop: '0.25rem'
                   }}
                 >
@@ -126,7 +127,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: '#6c757d',
+                color: 'var(--color-text-secondary)',
                 padding: '0',
                 width: '32px',
                 height: '32px',
@@ -146,7 +147,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
             <div
               style={{
                 fontSize: '1rem',
-                color: '#333',
+                color: 'var(--color-text-primary)',
                 lineHeight: '1.6',
                 marginBottom: '1.5rem'
               }}
@@ -159,7 +160,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
               <div
                 style={{
                   padding: '1rem',
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: 'var(--color-surface-secondary)',
                   borderRadius: '6px',
                   marginBottom: '1.5rem'
                 }}
@@ -168,13 +169,13 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     fontWeight: 'bold',
                     fontSize: '0.9rem',
-                    color: '#495057',
+                    color: 'var(--color-text-primary)',
                     marginBottom: '0.5rem'
                   }}
                 >
                   詳細情報:
                 </div>
-                <div style={{ fontSize: '0.85rem', color: '#6c757d' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                   {Object.entries(error.context).map(([key, value]) => (
                     <div key={key} style={{ marginBottom: '0.25rem' }}>
                       <strong>{key}:</strong> {String(value)}
@@ -191,7 +192,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     cursor: 'pointer',
                     fontSize: '0.9rem',
-                    color: '#6c757d',
+                    color: 'var(--color-text-secondary)',
                     marginBottom: '0.5rem'
                   }}
                 >
@@ -201,12 +202,12 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     marginTop: '0.5rem',
                     padding: '1rem',
-                    backgroundColor: '#f1f3f4',
+                    backgroundColor: 'var(--color-surface-secondary)',
                     borderRadius: '4px',
                     fontSize: '0.75rem',
                     overflow: 'auto',
                     maxHeight: '200px',
-                    color: '#333'
+                    color: 'var(--color-text-primary)'
                   }}
                 >
                   {error.stack}
@@ -221,7 +222,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     fontWeight: 'bold',
                     fontSize: '0.9rem',
-                    color: '#495057',
+                    color: 'var(--color-text-primary)',
                     marginBottom: '0.75rem'
                   }}
                 >
@@ -239,12 +240,12 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                         padding: '0.75rem 1.5rem',
                         backgroundColor:
                           action.variant === 'danger'
-                            ? '#dc3545'
+                            ? '#ef4444'
                             : action.primary
-                            ? '#007bff'
-                            : '#6c757d',
-                        color: 'white',
-                        border: 'none',
+                            ? '#60a5fa'
+                            : 'var(--color-surface-secondary)',
+                        color: action.variant === 'danger' || action.primary ? 'white' : 'var(--color-text-primary)',
+                        border: action.variant === 'danger' || action.primary ? 'none' : `1px solid ${'var(--color-border-medium)'}`,
                         borderRadius: '6px',
                         cursor: 'pointer',
                         fontSize: '0.95rem',
@@ -265,9 +266,9 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   onClick={onClose}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
-                    border: 'none',
+                    backgroundColor: 'var(--color-surface-secondary)',
+                    color: 'var(--color-text-primary)',
+                    border: `1px solid ${'var(--color-border-medium)'}`,
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontSize: '0.95rem',
