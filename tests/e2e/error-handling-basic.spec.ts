@@ -49,10 +49,13 @@ test.describe('エラーハンドリング基礎', () => {
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // 必須フィールドを明示的に空にする（clear()ではなくfill('')を使用）
+    // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
     const dateInput = page.locator(`[data-testid="${TestIds.FISHING_DATE}"]`);
+    await dateInput.click();
     await dateInput.fill(''); // fill('')はReactのonChangeをトリガーする
 
     const locationInput = page.locator(`[data-testid="${TestIds.LOCATION_NAME}"]`);
+    await locationInput.click();
     await locationInput.fill('');
 
     // 保存ボタンを取得
@@ -78,15 +81,19 @@ test.describe('エラーハンドリング基礎', () => {
     const futureDateStr = futureDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm形式
 
     // 未来の日付を入力
+    // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
     const dateInput = page.locator(`[data-testid="${TestIds.FISHING_DATE}"]`);
+    await dateInput.click();
     await dateInput.fill(futureDateStr);
 
     // 場所を入力（必須フィールド）
     const locationInput = page.locator(`[data-testid="${TestIds.LOCATION_NAME}"]`);
+    await locationInput.click();
     await locationInput.fill('テスト釣り場');
 
     // 魚種を入力（必須フィールド）
     const speciesInput = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
+    await speciesInput.click();
     await speciesInput.fill('テスト魚種');
 
     // 保存ボタンを取得
@@ -103,14 +110,18 @@ test.describe('エラーハンドリング基礎', () => {
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // 必須フィールドを入力
+    // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
     const dateInput = page.locator(`[data-testid="${TestIds.FISHING_DATE}"]`);
+    await dateInput.click();
     await dateInput.fill('2024-01-01T10:00');
 
     const locationInput = page.locator(`[data-testid="${TestIds.LOCATION_NAME}"]`);
+    await locationInput.click();
     await locationInput.fill('テスト釣り場');
 
     // 魚種を入力（必須フィールド）
     const speciesInput = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
+    await speciesInput.click();
     await speciesInput.fill('テスト魚種');
 
     // サイズフィールドに負の値を入力
@@ -131,16 +142,20 @@ test.describe('エラーハンドリング基礎', () => {
     await page.waitForSelector('form[data-testid="fishing-record-form"]', { state: 'visible' });
 
     // 必須フィールドを入力
+    // Note: iOS AutoFill防止のreadonly属性を解除するためclick()を先に実行
     const dateInput = page.locator(`[data-testid="${TestIds.FISHING_DATE}"]`);
+    await dateInput.click();
     await dateInput.fill('2024-01-01T10:00');
 
     // 特殊文字を含む場所名を入力（XSS対策確認）
     const locationInput = page.locator(`[data-testid="${TestIds.LOCATION_NAME}"]`);
     const specialCharsLocation = '<script>alert("xss")</script>';
+    await locationInput.click();
     await locationInput.fill(specialCharsLocation);
 
     // 魚種を入力（必須フィールド）
     const speciesInput = page.locator(`[data-testid="${TestIds.FISH_SPECIES_INPUT}"]`);
+    await speciesInput.click();
     await speciesInput.fill('テスト魚種');
 
     // 保存ボタンをクリック
