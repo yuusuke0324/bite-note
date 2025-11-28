@@ -512,6 +512,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             type="datetime-local"
             autoComplete="off"
             {...register('date')}
+            name="date-search-input"
             aria-describedby={errors.date ? 'date-error' : undefined}
             aria-invalid={!!errors.date}
             style={{
@@ -608,15 +609,35 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             </div>
           )}
 
+          {/* Decoy input for Safari AutoFill (hidden, captures address suggestions) */}
+          <input
+            type="text"
+            name="address"
+            autoComplete="street-address"
+            tabIndex={-1}
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              opacity: 0,
+              height: 0,
+              width: 0,
+              padding: 0,
+              margin: 0,
+              border: 'none',
+              pointerEvents: 'none'
+            }}
+          />
           <input
             id="fishing-spot"
             data-testid={TestIds.LOCATION_NAME}
             type="text"
             autoComplete="off"
+            inputMode="search"
             placeholder={autoFilledFields.has('location')
               ? "詳細を追加（例: ○○港、△△磯、釣り堀名など）"
               : "釣り場の名前を入力してください"}
             {...register('location')}
+            name="spot-search-input"
             aria-describedby={errors.location ? 'location-error' : 'location-help'}
             aria-invalid={!!errors.location}
             style={{
@@ -703,8 +724,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             data-testid={TestIds.WEATHER}
             type="text"
             autoComplete="off"
+            inputMode="search"
             placeholder="天気や気温を入力してください"
             {...register('weather')}
+            name="weather-search-input"
             aria-describedby={errors.weather ? 'weather-error' : 'weather-help'}
             aria-invalid={!!errors.weather}
             style={{
@@ -787,6 +810,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="seaTemperature"
             type="number"
             autoComplete="off"
+            inputMode="decimal"
             min="0"
             max="50"
             step="0.1"
@@ -798,6 +822,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 return isNaN(num) ? undefined : num;
               }
             })}
+            name="seaTemp-search-input"
             aria-describedby={errors.seaTemperature ? 'seaTemperature-error' : 'seaTemperature-help'}
             aria-invalid={!!errors.seaTemperature}
             style={{
@@ -905,6 +930,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             data-testid={TestIds.FISH_SIZE}
             type="number"
             autoComplete="off"
+            inputMode="decimal"
             min="0"
             max="999"
             step="0.1"
@@ -916,6 +942,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 return isNaN(num) ? undefined : num;
               }
             })}
+            name="size-search-input"
             aria-describedby={errors.size ? 'size-error' : 'size-help'}
             aria-invalid={!!errors.size}
             style={{
@@ -985,6 +1012,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="weight"
             type="number"
             autoComplete="off"
+            inputMode="numeric"
             min="0"
             max="99999"
             step="1"
@@ -996,6 +1024,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 return isNaN(num) ? undefined : num;
               }
             })}
+            name="weight-search-input"
             aria-describedby={errors.weight ? 'weight-error' : 'weight-help'}
             aria-invalid={!!errors.weight}
             style={{
@@ -1070,6 +1099,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             rows={4}
             placeholder="釣りの記録や感想、天候、使用した餌などを自由に記入してください"
             {...register('notes')}
+            name="notes-search-input"
             aria-describedby={errors.notes ? 'notes-error' : 'notes-help'}
             aria-invalid={!!errors.notes}
             style={{
