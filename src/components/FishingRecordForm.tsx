@@ -510,7 +510,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="fishing-date"
             data-testid={TestIds.FISHING_DATE}
             type="datetime-local"
+            readOnly
             autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
             data-form-type="other"
             data-lpignore="true"
             {...register('date')}
@@ -533,11 +536,16 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               MozAppearance: 'none',
               appearance: 'none'
             }}
+            onTouchStart={(e) => {
+              e.currentTarget.removeAttribute('readonly');
+            }}
             onFocus={(e) => {
+              e.currentTarget.removeAttribute('readonly');
               e.target.style.borderColor = 'var(--color-border-focus)';
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
+              e.currentTarget.setAttribute('readonly', '');
               e.target.style.borderColor = errors.date ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
@@ -614,7 +622,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="fishing-spot"
             data-testid={TestIds.LOCATION_NAME}
             type="text"
+            readOnly
             autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
             inputMode="text"
             data-form-type="other"
             data-lpignore="true"
@@ -637,11 +648,16 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
+            onTouchStart={(e) => {
+              e.currentTarget.removeAttribute('readonly');
+            }}
             onFocus={(e) => {
+              e.currentTarget.removeAttribute('readonly');
               e.target.style.borderColor = 'var(--color-border-focus)';
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
+              e.currentTarget.setAttribute('readonly', '');
               e.target.style.borderColor = errors.location ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
@@ -707,7 +723,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             id="weather"
             data-testid={TestIds.WEATHER}
             type="text"
+            readOnly
             autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
             inputMode="text"
             data-form-type="other"
             data-lpignore="true"
@@ -728,11 +747,16 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               outline: 'none'
             }}
+            onTouchStart={(e) => {
+              e.currentTarget.removeAttribute('readonly');
+            }}
             onFocus={(e) => {
+              e.currentTarget.removeAttribute('readonly');
               e.target.style.borderColor = 'var(--color-border-focus)';
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
+              e.currentTarget.setAttribute('readonly', '');
               e.target.style.borderColor = errors.weather ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}
@@ -1077,7 +1101,10 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           <textarea
             id="notes"
             data-testid={TestIds.NOTES}
+            readOnly
             autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
             data-form-type="other"
             data-lpignore="true"
             rows={4}
@@ -1101,11 +1128,16 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               outline: 'none',
               fontFamily: 'inherit'
             }}
+            onTouchStart={(e) => {
+              e.currentTarget.removeAttribute('readonly');
+            }}
             onFocus={(e) => {
+              e.currentTarget.removeAttribute('readonly');
               e.target.style.borderColor = 'var(--color-border-focus)';
               e.target.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.25)';
             }}
             onBlur={(e) => {
+              e.currentTarget.setAttribute('readonly', '');
               e.target.style.borderColor = errors.notes ? '#ef4444' : 'var(--color-border-medium)';
               e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
             }}

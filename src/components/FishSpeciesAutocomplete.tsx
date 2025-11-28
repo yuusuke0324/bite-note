@@ -166,7 +166,9 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
    * フォーカスハンドラ
    * Note: blur時のタイマーをキャンセルして状態リセットを防止
    */
-  const handleFocus = useCallback(() => {
+  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    // iOS Safari AutoFill防止: readonlyを解除
+    e.currentTarget.removeAttribute('readonly');
     if (blurTimeoutRef.current) {
       clearTimeout(blurTimeoutRef.current);
       blurTimeoutRef.current = null;
@@ -179,7 +181,9 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
    * Note: setTimeoutでキーボード操作との競合を防止
    * キーイベント処理後にドロップダウンを閉じる
    */
-  const handleBlur = useCallback(() => {
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    // iOS Safari AutoFill防止: readonlyを戻す
+    e.currentTarget.setAttribute('readonly', '');
     blurTimeoutRef.current = setTimeout(() => {
       setIsOpen(false);
       setSelectedIndex(-1);
@@ -210,6 +214,8 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
           ref={inputRef}
           type="text"
           autoComplete="off"
+          autoCorrect="off"
+          spellCheck="false"
           data-form-type="other"
           data-lpignore="true"
           role="combobox"
@@ -218,9 +224,13 @@ export const FishSpeciesAutocomplete: React.FC<FishSpeciesAutocompleteProps> = (
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          onTouchStart={(e) => {
+            e.currentTarget.removeAttribute('readonly');
+          }}
           placeholder={placeholder}
           disabled={disabled}
           required={required}
+          readOnly
           data-testid="fish-species-input"
           aria-label="魚種名"
           aria-autocomplete="list"
