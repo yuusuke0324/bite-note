@@ -156,7 +156,7 @@ export const RetryableAction = <T = unknown,>({
             backgroundColor: 'rgba(239, 68, 68, 0.2)',
             border: '1px solid rgba(239, 68, 68, 0.5)',
             borderRadius: '4px',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>

@@ -109,10 +109,10 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
         gap: '12px',
         padding: '12px',
         borderRadius: '12px',
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         cursor: 'pointer',
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-        border: `1px solid ${colors.border.light}`,
+        border: `1px solid ${'var(--color-border-light)'}`,
         boxShadow: '0 1px 2px rgba(60,64,67,.1)',
       }}
       onMouseEnter={(e) => {
@@ -123,7 +123,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = '0 1px 2px rgba(60,64,67,.1)';
-        e.currentTarget.style.borderColor = colors.border.light;
+        e.currentTarget.style.borderColor = 'var(--color-border-light)';
       }}
     >
       {/* 写真サムネイル */}
@@ -134,7 +134,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
           flexShrink: 0,
           borderRadius: '8px',
           overflow: 'hidden',
-          backgroundColor: colors.surface.tertiary,
+          backgroundColor: 'var(--color-surface-tertiary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -174,7 +174,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
           margin: '0 0 4px 0',
           ...textStyles.body.large,
           fontWeight: '600',
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -185,7 +185,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
         {/* 場所 */}
         <div style={{
           ...textStyles.body.small,
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
           display: 'flex',
           alignItems: 'center',
           gap: '4px',
@@ -204,7 +204,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
         {/* 日付 */}
         <div style={{
           ...textStyles.body.small,
-          color: colors.text.tertiary,
+          color: 'var(--color-text-tertiary)',
           display: 'flex',
           alignItems: 'center',
           gap: '4px',

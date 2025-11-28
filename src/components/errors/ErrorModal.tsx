@@ -6,7 +6,6 @@
 import React from 'react';
 import { Info, AlertTriangle, XCircle, AlertOctagon, X } from 'lucide-react';
 import { AppError, ErrorSeverity } from '../../lib/errors/ErrorTypes';
-import { colors } from '../../theme/colors';
 
 export interface ErrorModalProps {
   error: AppError | Error;
@@ -73,21 +72,21 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
-            backgroundColor: colors.surface.primary,
+            backgroundColor: 'var(--color-surface-primary)',
             borderRadius: '12px',
             maxWidth: '600px',
             width: '100%',
             maxHeight: '90vh',
             overflow: 'auto',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
-            border: `1px solid ${colors.border.light}`
+            border: `1px solid ${'var(--color-border-light)'}`
           }}
         >
           {/* ヘッダー */}
           <div
             style={{
               padding: '1.5rem',
-              borderBottom: `1px solid ${colors.border.light}`,
+              borderBottom: `1px solid ${'var(--color-border-light)'}`,
               display: 'flex',
               alignItems: 'center',
               gap: '1rem'
@@ -114,7 +113,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                 <div
                   style={{
                     fontSize: '0.85rem',
-                    color: colors.text.secondary,
+                    color: 'var(--color-text-secondary)',
                     marginTop: '0.25rem'
                   }}
                 >
@@ -128,7 +127,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: colors.text.secondary,
+                color: 'var(--color-text-secondary)',
                 padding: '0',
                 width: '32px',
                 height: '32px',
@@ -148,7 +147,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
             <div
               style={{
                 fontSize: '1rem',
-                color: colors.text.primary,
+                color: 'var(--color-text-primary)',
                 lineHeight: '1.6',
                 marginBottom: '1.5rem'
               }}
@@ -161,7 +160,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
               <div
                 style={{
                   padding: '1rem',
-                  backgroundColor: colors.surface.secondary,
+                  backgroundColor: 'var(--color-surface-secondary)',
                   borderRadius: '6px',
                   marginBottom: '1.5rem'
                 }}
@@ -170,13 +169,13 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     fontWeight: 'bold',
                     fontSize: '0.9rem',
-                    color: colors.text.primary,
+                    color: 'var(--color-text-primary)',
                     marginBottom: '0.5rem'
                   }}
                 >
                   詳細情報:
                 </div>
-                <div style={{ fontSize: '0.85rem', color: colors.text.secondary }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                   {Object.entries(error.context).map(([key, value]) => (
                     <div key={key} style={{ marginBottom: '0.25rem' }}>
                       <strong>{key}:</strong> {String(value)}
@@ -193,7 +192,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     cursor: 'pointer',
                     fontSize: '0.9rem',
-                    color: colors.text.secondary,
+                    color: 'var(--color-text-secondary)',
                     marginBottom: '0.5rem'
                   }}
                 >
@@ -203,12 +202,12 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     marginTop: '0.5rem',
                     padding: '1rem',
-                    backgroundColor: colors.surface.secondary,
+                    backgroundColor: 'var(--color-surface-secondary)',
                     borderRadius: '4px',
                     fontSize: '0.75rem',
                     overflow: 'auto',
                     maxHeight: '200px',
-                    color: colors.text.primary
+                    color: 'var(--color-text-primary)'
                   }}
                 >
                   {error.stack}
@@ -223,7 +222,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   style={{
                     fontWeight: 'bold',
                     fontSize: '0.9rem',
-                    color: colors.text.primary,
+                    color: 'var(--color-text-primary)',
                     marginBottom: '0.75rem'
                   }}
                 >
@@ -244,9 +243,9 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                             ? '#ef4444'
                             : action.primary
                             ? '#60a5fa'
-                            : colors.surface.secondary,
-                        color: action.variant === 'danger' || action.primary ? 'white' : colors.text.primary,
-                        border: action.variant === 'danger' || action.primary ? 'none' : `1px solid ${colors.border.medium}`,
+                            : 'var(--color-surface-secondary)',
+                        color: action.variant === 'danger' || action.primary ? 'white' : 'var(--color-text-primary)',
+                        border: action.variant === 'danger' || action.primary ? 'none' : `1px solid ${'var(--color-border-medium)'}`,
                         borderRadius: '6px',
                         cursor: 'pointer',
                         fontSize: '0.95rem',
@@ -267,9 +266,9 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
                   onClick={onClose}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    backgroundColor: colors.surface.secondary,
-                    color: colors.text.primary,
-                    border: `1px solid ${colors.border.medium}`,
+                    backgroundColor: 'var(--color-surface-secondary)',
+                    color: 'var(--color-text-primary)',
+                    border: `1px solid ${'var(--color-border-medium)'}`,
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontSize: '0.95rem',

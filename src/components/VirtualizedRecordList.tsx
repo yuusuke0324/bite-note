@@ -59,19 +59,19 @@ export const VirtualizedRecordList: React.FC<VirtualizedRecordListProps> = ({
         display: 'flex',
         alignItems: 'center',
         padding: '0.5rem 1rem',
-        borderBottom: `1px solid ${colors.border.light}`,
+        borderBottom: `1px solid var(--color-border-light)`,
         cursor: onRecordClick ? 'pointer' : 'default',
-        backgroundColor: index % 2 === 0 ? colors.surface.primary : colors.surface.secondary
+        backgroundColor: index % 2 === 0 ? 'var(--color-surface-primary)' : 'var(--color-surface-secondary)'
       }}
       onClick={() => onRecordClick?.(record)}
     >
       <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: 'bold', color: colors.text.primary }}>{record.fishSpecies}</div>
-        <div style={{ fontSize: '0.8rem', color: colors.text.secondary }}>
+        <div style={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{record.fishSpecies}</div>
+        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
           {record.location} - {record.date.toLocaleDateString()}
         </div>
       </div>
-      <div style={{ fontSize: '0.9rem', color: colors.text.primary }}>
+      <div style={{ fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
         {record.size}cm
       </div>
     </div>
@@ -82,7 +82,7 @@ export const VirtualizedRecordList: React.FC<VirtualizedRecordListProps> = ({
       style={{
         height: containerHeight,
         position: 'relative',
-        border: `1px solid ${colors.border.light}`,
+        border: `1px solid var(--color-border-light)`,
         borderRadius: '4px',
         overflow: 'hidden'
       }}
@@ -94,8 +94,8 @@ export const VirtualizedRecordList: React.FC<VirtualizedRecordListProps> = ({
             position: 'sticky',
             top: 0,
             zIndex: 10,
-            backgroundColor: colors.surface.secondary,
-            borderBottom: `1px solid ${colors.border.light}`,
+            backgroundColor: 'var(--color-surface-secondary)',
+            borderBottom: `1px solid var(--color-border-light)`,
             padding: '0.5rem 1rem'
           }}
         >

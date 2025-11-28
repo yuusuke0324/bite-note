@@ -177,7 +177,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       padding: '1rem'
     }}>
       <div style={{
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '12px',
         width: '95%',
         maxWidth: '800px',
@@ -185,7 +185,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        border: `1px solid ${colors.border.light}`
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
         {/* ヘッダー */}
         <div style={{
@@ -193,13 +193,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '1.5rem',
-          borderBottom: `1px solid ${colors.border.light}`
+          borderBottom: `1px solid ${'var(--color-border-light)'}`
         }}>
           <h2 style={{
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -225,7 +225,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: colors.text.secondary,
+                color: 'var(--color-text-secondary)',
                 padding: '0.25rem',
                 display: 'flex',
                 alignItems: 'center',
@@ -240,7 +240,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* タブナビゲーション */}
         <div style={{
           display: 'flex',
-          borderBottom: `1px solid ${colors.border.light}`,
+          borderBottom: `1px solid ${'var(--color-border-light)'}`,
           overflowX: 'auto'
         }}>
           {tabs.map(tab => (
@@ -250,7 +250,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               style={{
                 padding: '0.75rem 1rem',
                 backgroundColor: activeTab === tab.id ? '#60a5fa' : 'transparent',
-                color: activeTab === tab.id ? 'white' : colors.text.primary,
+                color: activeTab === tab.id ? 'white' : 'var(--color-text-primary)',
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '0.9rem',
@@ -309,7 +309,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* フッター */}
         <div style={{
           padding: '1rem 1.5rem',
-          borderTop: `1px solid ${colors.border.light}`,
+          borderTop: `1px solid ${'var(--color-border-light)'}`,
           display: 'flex',
           justifyContent: 'flex-end',
           gap: '0.75rem'
@@ -360,7 +360,7 @@ const GeneralTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Settings} size="sm" decorative />
       一般設定
     </h3>
@@ -373,11 +373,11 @@ const GeneralTab: React.FC<{
           onChange={(e) => onSettingChange('language', e.target.value as 'ja' | 'en')}
           style={{
             padding: '0.5rem',
-            border: `1px solid ${colors.border.medium}`,
+            border: `1px solid ${'var(--color-border-medium)'}`,
             borderRadius: '4px',
             fontSize: '0.9rem',
-            backgroundColor: colors.surface.secondary,
-            color: colors.text.primary
+            backgroundColor: 'var(--color-surface-secondary)',
+            color: 'var(--color-text-primary)'
           }}
         >
           <option value="ja">日本語</option>
@@ -392,11 +392,11 @@ const GeneralTab: React.FC<{
           onChange={(e) => onSettingChange('dateFormat', e.target.value as 'YYYY/MM/DD' | 'DD/MM/YYYY' | 'MM/DD/YYYY')}
           style={{
             padding: '0.5rem',
-            border: `1px solid ${colors.border.medium}`,
+            border: `1px solid ${'var(--color-border-medium)'}`,
             borderRadius: '4px',
             fontSize: '0.9rem',
-            backgroundColor: colors.surface.secondary,
-            color: colors.text.primary
+            backgroundColor: 'var(--color-surface-secondary)',
+            color: 'var(--color-text-primary)'
           }}
         >
           <option value="YYYY/MM/DD">YYYY/MM/DD</option>
@@ -410,17 +410,17 @@ const GeneralTab: React.FC<{
       <SettingGroup title="単位設定" titleIcon={<Icon icon={Ruler} size="sm" decorative />} description="測定単位を選択">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <label style={{ minWidth: '80px', fontSize: '0.9rem', color: colors.text.primary }}>気温:</label>
+            <label style={{ minWidth: '80px', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>気温:</label>
             <select
               value={settings.temperatureUnit}
               onChange={(e) => onSettingChange('temperatureUnit', e.target.value as 'celsius' | 'fahrenheit')}
               style={{
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             >
               <option value="celsius">摂氏 (°C)</option>
@@ -428,17 +428,17 @@ const GeneralTab: React.FC<{
             </select>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <label style={{ minWidth: '80px', fontSize: '0.9rem', color: colors.text.primary }}>サイズ:</label>
+            <label style={{ minWidth: '80px', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>サイズ:</label>
             <select
               value={settings.sizeUnit}
               onChange={(e) => onSettingChange('sizeUnit', e.target.value as 'cm' | 'inch')}
               style={{
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             >
               <option value="cm">センチメートル (cm)</option>
@@ -452,7 +452,7 @@ const GeneralTab: React.FC<{
       <SettingGroup title="デフォルト値" titleIcon={<Icon icon={Target} size="sm" decorative />} description="新規記録作成時のデフォルト値">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
               デフォルト釣り場:
             </label>
             <input
@@ -463,16 +463,16 @@ const GeneralTab: React.FC<{
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
               デフォルト魚種:
             </label>
             <input
@@ -483,11 +483,11 @@ const GeneralTab: React.FC<{
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
@@ -514,7 +514,7 @@ const DisplayTab: React.FC<{
 
   return (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Palette} size="sm" decorative />
       表示設定
     </h3>
@@ -523,7 +523,7 @@ const DisplayTab: React.FC<{
       {/* テーマ設定 */}
       <SettingGroup title="テーマ" titleIcon={<Icon icon={Moon} size="sm" decorative />} description="アプリの外観テーマを切り替え">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Icon icon={Sun} size={20} style={{ color: currentTheme === 'light' ? '#fbbf24' : colors.text.tertiary }} />
+          <Icon icon={Sun} size={20} style={{ color: currentTheme === 'light' ? '#fbbf24' : 'var(--color-text-tertiary)' }} />
           <button
             onClick={handleThemeToggle}
             role="switch"
@@ -555,11 +555,11 @@ const DisplayTab: React.FC<{
               }}
             />
           </button>
-          <Icon icon={Moon} size={20} style={{ color: currentTheme === 'dark' ? '#60a5fa' : colors.text.tertiary }} />
+          <Icon icon={Moon} size={20} style={{ color: currentTheme === 'dark' ? '#60a5fa' : 'var(--color-text-tertiary)' }} />
           <span style={{
             marginLeft: '0.5rem',
             fontSize: '0.9rem',
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
             fontWeight: 500
           }}>
             {currentTheme === 'dark' ? 'ダークモード' : 'ライトモード'}
@@ -601,7 +601,7 @@ const DataTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Save} size="sm" decorative />
       データ設定
     </h3>
@@ -624,11 +624,11 @@ const DataTab: React.FC<{
           onChange={(e) => onSettingChange('exportFormat', e.target.value as 'json' | 'csv')}
           style={{
             padding: '0.5rem',
-            border: `1px solid ${colors.border.medium}`,
+            border: `1px solid ${'var(--color-border-medium)'}`,
             borderRadius: '4px',
             fontSize: '0.9rem',
-            backgroundColor: colors.surface.secondary,
-            color: colors.text.primary
+            backgroundColor: 'var(--color-surface-secondary)',
+            color: 'var(--color-text-primary)'
           }}
         >
           <option value="json">JSON (完全データ)</option>
@@ -648,16 +648,16 @@ const DataTab: React.FC<{
             style={{
               width: '100px',
               padding: '0.5rem',
-              border: `1px solid ${colors.border.medium}`,
+              border: `1px solid ${'var(--color-border-medium)'}`,
               borderRadius: '4px',
               fontSize: '0.9rem',
-              backgroundColor: colors.surface.secondary,
-              color: colors.text.primary
+              backgroundColor: 'var(--color-surface-secondary)',
+              color: 'var(--color-text-primary)'
             }}
           />
-          <span style={{ fontSize: '0.9rem', color: colors.text.secondary }}>日間</span>
+          <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>日間</span>
         </div>
-        <div style={{ fontSize: '0.8rem', color: colors.text.secondary, marginTop: '0.25rem' }}>
+        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
           0を設定すると無期限で保持されます
         </div>
       </SettingGroup>
@@ -666,7 +666,7 @@ const DataTab: React.FC<{
       <SettingGroup title="写真設定" titleIcon={<Icon icon={Camera} size="sm" decorative />} description="写真の保存に関する設定">
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
               最大ファイルサイズ (MB):
             </label>
             <input
@@ -678,16 +678,16 @@ const DataTab: React.FC<{
               style={{
                 width: '100px',
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: colors.text.primary }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
               画質 (0.1 - 1.0):
             </label>
             <input
@@ -700,11 +700,11 @@ const DataTab: React.FC<{
               style={{
                 width: '100px',
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
@@ -720,7 +720,7 @@ const PrivacyTab: React.FC<{
   onSettingChange: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }> = ({ settings, onSettingChange }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Lock} size="sm" decorative />
       プライバシー設定
     </h3>
@@ -776,7 +776,7 @@ const AdvancedTab: React.FC<{
   onReset: () => void;
 }> = ({ onClearData, onReset }) => (
   <div>
-    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Icon icon={Wrench} size="sm" decorative />
       詳細設定
     </h3>
@@ -786,10 +786,10 @@ const AdvancedTab: React.FC<{
       <SettingGroup title="アプリ情報" titleIcon={<Icon icon={Info} size="sm" decorative />} description="アプリケーションの詳細情報">
         <div style={{
           padding: '1rem',
-          backgroundColor: colors.surface.tertiary,
+          backgroundColor: 'var(--color-surface-tertiary)',
           borderRadius: '6px',
           fontSize: '0.9rem',
-          color: colors.text.primary
+          color: 'var(--color-text-primary)'
         }}>
           <div style={{ marginBottom: '0.5rem' }}>
             <strong>バージョン:</strong> 1.0.0
@@ -872,15 +872,15 @@ const SettingGroup: React.FC<{
 }> = ({ title, titleIcon, description, children }) => (
   <div style={{
     padding: '1rem',
-    backgroundColor: colors.surface.secondary,
+    backgroundColor: 'var(--color-surface-secondary)',
     borderRadius: '8px',
-    border: `1px solid ${colors.border.light}`
+    border: `1px solid ${'var(--color-border-light)'}`
   }}>
-    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       {titleIcon}
       {title}
     </h4>
-    <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: colors.text.secondary }}>
+    <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
       {description}
     </p>
     {children}
@@ -913,10 +913,10 @@ const ToggleSetting: React.FC<{
       }}
     />
     <div style={{ flex: 1 }}>
-      <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: colors.text.primary }}>
+      <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
         {label}
       </div>
-      <div style={{ fontSize: '0.8rem', color: colors.text.secondary }}>
+      <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
         {description}
       </div>
     </div>

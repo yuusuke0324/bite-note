@@ -38,7 +38,7 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
         style={{
           padding: '24px',
           borderRadius: '16px',
-          backgroundColor: colors.surface.secondary,
+          backgroundColor: 'var(--color-surface-secondary)',
           textAlign: 'center',
         }}
       >
@@ -51,7 +51,7 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
         </div>
         <p style={{
           ...textStyles.body.medium,
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
           margin: 0,
         }}>
           まだ記録がありません
@@ -72,7 +72,7 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
         <h2 style={{
           margin: 0,
           ...textStyles.title.medium,
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',

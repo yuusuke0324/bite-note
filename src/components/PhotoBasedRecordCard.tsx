@@ -143,12 +143,12 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
       style={{
         borderRadius: '16px',
         overflow: 'hidden',
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         cursor: 'pointer',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         position: 'relative',
         boxShadow: '0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)',
-        border: `1px solid ${colors.border.light}`,
+        border: `1px solid var(--color-border-light)`,
         fontFamily: typography.fontFamily.primary,
       }}
       onMouseEnter={(e) => {
@@ -164,7 +164,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
       <div style={{
         width: '100%',
         position: 'relative',
-        backgroundColor: colors.surface.tertiary,
+        backgroundColor: 'var(--color-surface-tertiary)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -176,13 +176,13 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.surface.tertiary
+            backgroundColor: 'var(--color-surface-tertiary)'
           }}>
             <div style={{
               width: '40px',
               height: '40px',
-              border: `3px solid ${colors.border.light}`,
-              borderTop: `3px solid ${colors.primary[500]}`,
+              border: `3px solid var(--color-border-light)`,
+              borderTop: '3px solid var(--color-primary-500)',
               borderRadius: '50%',
               animation: 'spin 1s linear infinite'
             }}></div>
@@ -212,7 +212,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.surface.tertiary,
+            backgroundColor: 'var(--color-surface-tertiary)',
             color: '#6c757d'
           }}>
             <Icon icon={Fish} size={48} color="secondary" decorative />
@@ -270,7 +270,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
                 height: '32px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: colors.primary[500],
+                backgroundColor: 'var(--color-primary-500)',
                 color: 'white',
                 cursor: 'pointer',
                 display: 'flex',
@@ -289,7 +289,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
                 height: '32px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: colors.status.error,
+                backgroundColor: 'var(--color-status-error)',
                 color: 'white',
                 cursor: 'pointer',
                 display: 'flex',
@@ -310,7 +310,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
         <h3 style={{
           margin: '0 0 12px 0',
           ...textStyles.title.large,
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px'
@@ -325,7 +325,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
           gap: '6px',
           marginBottom: '12px',
           ...textStyles.body.medium,
-          color: colors.text.secondary
+          color: 'var(--color-text-secondary)'
         }}>
           <Icon icon={MapPin} size={16} color="secondary" decorative />
           <span>{formatLocation(record.location)}</span>

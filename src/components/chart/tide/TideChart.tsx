@@ -531,16 +531,16 @@ const CustomTooltip = React.memo(({ active, payload, label }: TideTooltipProps) 
         data-testid="tide-tooltip"
         className="custom-tooltip"
         style={{
-          backgroundColor: colors.surface.primary,
+          backgroundColor: 'var(--color-surface-primary)',
           padding: '10px',
-          border: `1px solid ${colors.border.light}`,
+          border: `1px solid ${'var(--color-border-light)'}`,
           borderRadius: '4px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
         }}
       >
-        <p data-testid="tooltip-time" style={{ color: colors.text.primary }}>{`時刻: ${label}`}</p>
-        <p data-testid="tooltip-level" style={{ color: colors.text.primary }}>{`潮位: ${payload[0].value}cm`}</p>
+        <p data-testid="tooltip-time" style={{ color: 'var(--color-text-primary)' }}>{`時刻: ${label}`}</p>
+        <p data-testid="tooltip-level" style={{ color: 'var(--color-text-primary)' }}>{`潮位: ${payload[0].value}cm`}</p>
       </div>
     );
   }
@@ -667,14 +667,14 @@ const FallbackDataTable = React.memo(({
   return (
     <div
       data-testid="fallback-data-table"
-      style={{ padding: '20px', textAlign: 'center', color: colors.text.primary }}
+      style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-primary)' }}
     >
       <p style={{ color: '#ef4444', marginBottom: '10px' }}>{message}</p>
       <table style={{ margin: '0 auto', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th style={{ border: `1px solid ${colors.border.light}`, padding: '8px', color: colors.text.primary }}>時刻</th>
-            <th style={{ border: `1px solid ${colors.border.light}`, padding: '8px', color: colors.text.primary }}>
+            <th style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>時刻</th>
+            <th style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>
               潮位 (cm)
             </th>
           </tr>
@@ -682,10 +682,10 @@ const FallbackDataTable = React.memo(({
         <tbody>
           {displayData.map((point, index) => (
             <tr key={index}>
-              <td style={{ border: `1px solid ${colors.border.light}`, padding: '8px', color: colors.text.primary }}>
+              <td style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>
                 {point.time}
               </td>
-              <td style={{ border: `1px solid ${colors.border.light}`, padding: '8px', color: colors.text.primary }}>
+              <td style={{ border: `1px solid ${'var(--color-border-light)'}`, padding: '8px', color: 'var(--color-text-primary)' }}>
                 {point.tide}
               </td>
             </tr>
@@ -693,7 +693,7 @@ const FallbackDataTable = React.memo(({
         </tbody>
       </table>
       {data.length > 10 && (
-        <p style={{ fontSize: '12px', color: colors.text.secondary }}>
+        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
           ...他 {data.length - 10} 件
         </p>
       )}
@@ -1714,22 +1714,22 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
               <XAxis
                 dataKey="time"
-                axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
-                tickLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+                axisLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
+                tickLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
                 data-testid="x-axis"
-                tick={{ fill: '#94a3b8', fontSize: '12px' }}
+                tick={{ fill: currentTheme.foreground, fontSize: '12px' }}
               />
               <YAxis
                 dataKey="tide"
                 unit="cm"
                 domain={['dataMin', 'dataMax']}
-                axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
-                tickLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+                axisLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
+                tickLine={{ stroke: currentTheme.foreground, strokeOpacity: 0.3 }}
                 data-testid="y-axis"
-                tick={{ fill: '#94a3b8', fontSize: '12px' }}
+                tick={{ fill: currentTheme.foreground, fontSize: '12px' }}
               />
               {showGrid && (
-                <Line stroke="rgba(255, 255, 255, 0.05)" strokeWidth={1} dot={false} />
+                <Line stroke={currentTheme.foreground} strokeOpacity={0.1} strokeWidth={1} dot={false} />
               )}
               <Line
                 dataKey="tide"

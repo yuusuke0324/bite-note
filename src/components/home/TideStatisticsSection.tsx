@@ -276,7 +276,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
       <ModernCard variant="outlined" size="md">
         <h2 style={{
           ...textStyles.title.medium,
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           marginBottom: '24px',
           display: 'flex',
           alignItems: 'center',
@@ -357,7 +357,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               ...textStyles.body.large,
               fontWeight: '700',
               marginBottom: '16px',
-              color: colors.text.primary,
+              color: 'var(--color-text-primary)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -368,10 +368,10 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
             </h3>
             <div style={{
               width: '100%',
-              background: `linear-gradient(135deg, ${colors.surface.secondary} 0%, ${colors.surface.primary} 100%)`,
+              background: `linear-gradient(135deg, ${'var(--color-surface-secondary)'} 0%, ${'var(--color-surface-primary)'} 100%)`,
               borderRadius: '16px',
               padding: '24px',
-              border: `1px solid ${colors.border.light}`,
+              border: `1px solid ${'var(--color-border-light)'}`,
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               overflowX: 'auto',
             }}>
@@ -392,7 +392,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   type="number"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: colors.text.secondary, fontSize: 12 }}
+                  tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
                 />
                 <YAxis
                   type="category"
@@ -400,7 +400,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   width={90}
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: colors.text.primary, fontSize: 13, fontWeight: 500 }}
+                  tick={{ fill: 'var(--color-text-primary)', fontSize: 13, fontWeight: 500 }}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(26, 115, 232, 0.05)' }} />
                 <Bar dataKey="value" fill="url(#phaseGradient)" radius={[0, 12, 12, 0]}>
@@ -423,7 +423,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
               ...textStyles.body.large,
               fontWeight: '700',
               marginBottom: '16px',
-              color: colors.text.primary,
+              color: 'var(--color-text-primary)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -434,10 +434,10 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
             </h3>
             <div style={{
               width: '100%',
-              background: `linear-gradient(135deg, ${colors.surface.secondary} 0%, ${colors.surface.primary} 100%)`,
+              background: `linear-gradient(135deg, ${'var(--color-surface-secondary)'} 0%, ${'var(--color-surface-primary)'} 100%)`,
               borderRadius: '16px',
               padding: '24px',
-              border: `1px solid ${colors.border.light}`,
+              border: `1px solid ${'var(--color-border-light)'}`,
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               overflowX: 'auto',
             }}>
@@ -458,7 +458,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   type="number"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: colors.text.secondary, fontSize: 12 }}
+                  tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
                 />
                 <YAxis
                   type="category"
@@ -466,7 +466,7 @@ export const TideStatisticsSection: React.FC<TideStatisticsSectionProps> = ({
                   width={70}
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: colors.text.primary, fontSize: 13, fontWeight: 500 }}
+                  tick={{ fill: 'var(--color-text-primary)', fontSize: 13, fontWeight: 500 }}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(52, 168, 83, 0.05)' }} />
                 <Bar dataKey="value" fill="url(#typeGradient)" radius={[0, 12, 12, 0]}>

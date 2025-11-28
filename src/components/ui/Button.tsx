@@ -71,27 +71,27 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   // Variant styles
   const variantStyles: Record<string, React.CSSProperties> = {
     primary: {
-      backgroundColor: disabled ? colors.surface.disabled : colors.primary[500],
-      color: colors.text.inverse,
+      backgroundColor: disabled ? 'var(--color-surface-disabled)' : colors.primary[500],
+      color: 'var(--color-text-inverse)',
       boxShadow: disabled ? 'none' : '0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)',
     },
     secondary: {
-      backgroundColor: disabled ? colors.surface.disabled : colors.secondary[500],
-      color: colors.text.inverse,
+      backgroundColor: disabled ? 'var(--color-surface-disabled)' : colors.secondary[500],
+      color: 'var(--color-text-inverse)',
       boxShadow: disabled ? 'none' : '0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)',
     },
     outlined: {
       backgroundColor: 'transparent',
-      color: disabled ? colors.text.disabled : colors.primary[500],
-      border: `1px solid ${disabled ? colors.border.light : colors.primary[500]}`,
+      color: disabled ? 'var(--color-text-disabled)' : colors.primary[500],
+      border: `1px solid ${disabled ? 'var(--color-border-light)' : colors.primary[500]}`,
     },
     text: {
       backgroundColor: 'transparent',
-      color: disabled ? colors.text.disabled : colors.primary[500],
+      color: disabled ? 'var(--color-text-disabled)' : colors.primary[500],
     },
     danger: {
-      backgroundColor: disabled ? colors.surface.disabled : colors.status.error,
-      color: colors.text.inverse,
+      backgroundColor: disabled ? 'var(--color-surface-disabled)' : colors.status.error,
+      color: 'var(--color-text-inverse)',
       boxShadow: disabled ? 'none' : '0 1px 2px 0 rgba(234,67,53,.3), 0 1px 3px 1px rgba(234,67,53,.15)',
     },
   };

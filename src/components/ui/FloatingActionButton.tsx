@@ -63,22 +63,22 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
   // Variant styles
   const variantStyles: Record<string, React.CSSProperties> = {
     primary: {
-      backgroundColor: disabled ? colors.surface.disabled : colors.primary[500],
-      color: colors.text.inverse,
+      backgroundColor: disabled ? 'var(--color-surface-disabled)' : colors.primary[500],
+      color: 'var(--color-text-inverse)',
       boxShadow: disabled ?
         'none' :
         '0 6px 10px 4px rgba(60,64,67,.15), 0 2px 3px rgba(60,64,67,.3)',
     },
     secondary: {
-      backgroundColor: disabled ? colors.surface.disabled : colors.secondary[500],
-      color: colors.text.inverse,
+      backgroundColor: disabled ? 'var(--color-surface-disabled)' : colors.secondary[500],
+      color: 'var(--color-text-inverse)',
       boxShadow: disabled ?
         'none' :
         '0 6px 10px 4px rgba(60,64,67,.15), 0 2px 3px rgba(60,64,67,.3)',
     },
     accent: {
-      backgroundColor: disabled ? colors.surface.disabled : colors.accent[500],
-      color: colors.text.inverse,
+      backgroundColor: disabled ? 'var(--color-surface-disabled)' : colors.accent[500],
+      color: 'var(--color-text-inverse)',
       boxShadow: disabled ?
         'none' :
         '0 6px 10px 4px rgba(255,107,53,.15), 0 2px 3px rgba(255,107,53,.3)',

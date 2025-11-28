@@ -67,13 +67,13 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
     <div>
       {/* ヘッダー */}
       <div style={{
-        backgroundColor: colors.surface.secondary,
+        backgroundColor: 'var(--color-surface-secondary)',
         padding: '1rem',
         borderRadius: '8px',
         marginBottom: '1.5rem',
-        border: `1px solid ${colors.border.light}`
+        border: `1px solid var(--color-border-light)`
       }}>
-        <h2 style={{ margin: 0, color: colors.text.primary, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h2 style={{ margin: 0, color: 'var(--color-text-primary)', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Camera size={24} color="#60a5fa" aria-hidden="true" /> 写真で確認 ({records.length}件)
         </h2>
         <div style={{
@@ -81,13 +81,13 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
           gap: '1rem',
           marginTop: '0.5rem',
           fontSize: '0.875rem',
-          color: colors.text.secondary
+          color: 'var(--color-text-secondary)'
         }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <Camera size={14} color={colors.text.secondary} aria-hidden="true" /> 写真付き: {recordsWithPhotos.length}件
+            <Camera size={14} color="var(--color-text-secondary)" aria-hidden="true" /> 写真付き: {recordsWithPhotos.length}件
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <FileText size={14} color={colors.text.secondary} aria-hidden="true" /> 写真なし: {recordsWithoutPhotos.length}件
+            <FileText size={14} color="var(--color-text-secondary)" aria-hidden="true" /> 写真なし: {recordsWithoutPhotos.length}件
           </span>
         </div>
       </div>
@@ -97,12 +97,12 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
         <div style={{
           padding: '3rem',
           textAlign: 'center',
-          color: colors.text.secondary
+          color: 'var(--color-text-secondary)'
         }}>
           <div style={{
             width: '50px',
             height: '50px',
-            border: `4px solid ${colors.border.light}`,
+            border: `4px solid var(--color-border-light)`,
             borderTop: '4px solid #60a5fa',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
@@ -114,15 +114,15 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
         <div style={{
           padding: '3rem',
           textAlign: 'center',
-          color: colors.text.secondary,
-          backgroundColor: colors.surface.secondary,
+          color: 'var(--color-text-secondary)',
+          backgroundColor: 'var(--color-surface-secondary)',
           borderRadius: '8px',
-          border: `1px solid ${colors.border.light}`
+          border: `1px solid var(--color-border-light)`
         }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
             <Fish size={48} color="#9CA3AF" aria-hidden="true" />
           </div>
-          <h3 style={{ color: colors.text.primary }}>記録がありません</h3>
+          <h3 style={{ color: 'var(--color-text-primary)' }}>記録がありません</h3>
           <p>デバッグタブでテスト記録を作成してみましょう！</p>
         </div>
       ) : (
@@ -132,7 +132,7 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
             <div>
               <h3 style={{
                 marginBottom: '1rem',
-                color: colors.text.primary,
+                color: 'var(--color-text-primary)',
                 fontSize: '1.125rem',
                 display: 'flex',
                 alignItems: 'center',
@@ -164,13 +164,13 @@ export const SimplePhotoList: React.FC<SimplePhotoListProps> = ({
             <div>
               <h3 style={{
                 marginBottom: '1rem',
-                color: colors.text.primary,
+                color: 'var(--color-text-primary)',
                 fontSize: '1.125rem',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                <FileText size={20} color={colors.text.secondary} aria-hidden="true" /> 写真なし記録 ({recordsWithoutPhotos.length}件)
+                <FileText size={20} color="var(--color-text-secondary)" aria-hidden="true" /> 写真なし記録 ({recordsWithoutPhotos.length}件)
               </h3>
               <div style={{
                 display: 'grid',

@@ -103,11 +103,11 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
       }}
       aria-label={`記録: ${record.fishSpecies}, ${formatDate(record.date)}, ${record.location}`}
       style={{
-        border: `1px solid ${colors.border.light}`,
+        border: `1px solid ${'var(--color-border-light)'}`,
         borderRadius: '8px',
         padding: '1rem',
         marginBottom: '1rem',
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         position: 'relative',
@@ -130,13 +130,13 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             flexShrink: 0,
             borderRadius: '8px',
             overflow: 'hidden',
-            backgroundColor: colors.surface.secondary,
+            backgroundColor: 'var(--color-surface-secondary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
             {photoLoading ? (
-              <div style={{ color: colors.text.tertiary, fontSize: '0.75rem' }}>読込中...</div>
+              <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>読込中...</div>
             ) : photoUrl ? (
               <img
                 src={photoUrl}
@@ -158,7 +158,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
             margin: '0 0 0.25rem 0',
             fontSize: '1.25rem',
             fontWeight: 'bold',
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -168,7 +168,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
           <p style={{
             margin: '0',
             fontSize: '0.875rem',
-            color: colors.text.secondary
+            color: 'var(--color-text-secondary)'
           }}>
             <Icon icon={Calendar} size={14} decorative /> {formatDate(record.date)}
           </p>
@@ -176,8 +176,8 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
 
         {/* サイズ表示 */}
         <div style={{
-          backgroundColor: record.size ? 'rgba(96, 165, 250, 0.2)' : colors.surface.secondary,
-          color: record.size ? '#60a5fa' : colors.text.secondary,
+          backgroundColor: record.size ? 'rgba(96, 165, 250, 0.2)' : 'var(--color-surface-secondary)',
+          color: record.size ? '#60a5fa' : 'var(--color-text-secondary)',
           padding: '0.25rem 0.75rem',
           borderRadius: '20px',
           fontSize: '0.875rem',
@@ -195,7 +195,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
       }}>
         <div style={{
           fontSize: '0.875rem',
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           marginBottom: '0.25rem'
         }}>
           <Icon icon={Map} size={14} decorative /> {formatLocation(record.location)}
@@ -235,14 +235,14 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
         <div style={{
           marginBottom: '0.75rem',
           padding: '0.5rem',
-          backgroundColor: colors.surface.secondary,
+          backgroundColor: 'var(--color-surface-secondary)',
           borderRadius: '4px',
-          borderLeft: `3px solid ${colors.border.medium}`
+          borderLeft: `3px solid ${'var(--color-border-medium)'}`
         }}>
           <p style={{
             margin: '0',
             fontSize: '0.875rem',
-            color: colors.text.secondary,
+            color: 'var(--color-text-secondary)',
             fontStyle: 'italic',
             lineHeight: '1.4',
             maxHeight: '3em',
@@ -264,11 +264,11 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
         alignItems: 'center',
         marginTop: '0.75rem',
         paddingTop: '0.75rem',
-        borderTop: `1px solid ${colors.border.light}`
+        borderTop: `1px solid ${'var(--color-border-light)'}`
       }}>
         <div style={{
           fontSize: '0.75rem',
-          color: colors.text.tertiary
+          color: 'var(--color-text-tertiary)'
         }}>
           {record.updatedAt.toLocaleDateString('ja-JP')} {record.updatedAt.toLocaleTimeString('ja-JP', {
             hour: '2-digit',

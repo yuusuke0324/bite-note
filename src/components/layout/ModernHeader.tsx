@@ -125,7 +125,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
             style={menuButtonStyles}
             onClick={onMenuClick}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.surface.hover;
+              e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';

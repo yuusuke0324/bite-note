@@ -100,7 +100,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
         aria-describedby="modal-description"
         aria-modal="true"
         style={{
-          backgroundColor: colors.surface.primary,
+          backgroundColor: 'var(--color-surface-primary)',
           borderRadius: '12px',
           padding: '2rem',
           width: '100%',
@@ -109,7 +109,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
           overflowY: 'auto',
           boxShadow:
             '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
-          border: `1px solid ${colors.border.light}`,
+          border: `1px solid ${'var(--color-border-light)'}`,
           animation: 'modalFadeInScale 0.25s ease-out',
           position: 'relative',
         }}
@@ -139,7 +139,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               margin: 0,
               fontSize: '1.5rem',
               fontWeight: 'bold',
-              color: colors.text.primary,
+              color: 'var(--color-text-primary)',
               marginBottom: '0.5rem',
             }}
           >
@@ -153,7 +153,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
           style={{
             marginBottom: '1.5rem',
             fontSize: '0.9rem',
-            color: colors.text.secondary,
+            color: 'var(--color-text-secondary)',
             lineHeight: '1.6',
           }}
         >
@@ -240,9 +240,9 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               width: '100%',
               minHeight: '48px',
               padding: '0.75rem 1.5rem',
-              backgroundColor: isReconnecting ? colors.surface.secondary : colors.surface.primary,
-              color: isReconnecting ? colors.text.secondary : '#60a5fa',
-              border: `2px solid ${isReconnecting ? colors.border.medium : '#60a5fa'}`,
+              backgroundColor: isReconnecting ? 'var(--color-surface-secondary)' : 'var(--color-surface-primary)',
+              color: isReconnecting ? 'var(--color-text-secondary)' : '#60a5fa',
+              border: `2px solid ${isReconnecting ? 'var(--color-border-medium)' : '#60a5fa'}`,
               borderRadius: '6px',
               cursor: isReconnecting ? 'not-allowed' : 'pointer',
               fontSize: '1rem',
@@ -279,7 +279,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.5rem',
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
               opacity: isReconnecting ? 0.5 : 1,
               transition: 'all 0.15s ease',
             }}
@@ -323,7 +323,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
 
         /* 閉じるボタンのホバーエフェクト */
         button[aria-label="閉じる"]:not(:disabled):hover {
-          background-color: ${colors.surface.secondary};
+          background-color: ${'var(--color-surface-secondary)'};
         }
 
         /* デスクトップでボタンを横並びに */

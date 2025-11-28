@@ -120,9 +120,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
         onClick={() => setIsVisible(true)}
         style={{
           padding: '0.5rem 1rem',
-          backgroundColor: colors.surface.secondary,
-          color: colors.text.primary,
-          border: `1px solid ${colors.border.light}`,
+          backgroundColor: 'var(--color-surface-secondary)',
+          color: 'var(--color-text-primary)',
+          border: `1px solid ${'var(--color-border-light)'}`,
           borderRadius: '6px',
           cursor: 'pointer',
           fontSize: '0.875rem',
@@ -155,9 +155,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
     <div style={{
       marginBottom: '1rem',
       padding: '1.5rem',
-      backgroundColor: colors.surface.primary,
+      backgroundColor: 'var(--color-surface-primary)',
       borderRadius: '12px',
-      border: `1px solid ${colors.border.light}`,
+      border: `1px solid ${'var(--color-border-light)'}`,
       boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
     }}>
       {/* ヘッダー */}
@@ -171,7 +171,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           margin: 0,
           fontSize: '1.1rem',
           fontWeight: 'bold',
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px'
@@ -185,7 +185,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
             backgroundColor: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            color: colors.text.secondary,
+            color: 'var(--color-text-secondary)',
             padding: '0.25rem',
             display: 'flex',
             alignItems: 'center',
@@ -222,7 +222,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
               <p style={{
                 margin: 0,
                 fontSize: '0.8rem',
-                color: colors.text.secondary
+                color: 'var(--color-text-secondary)'
               }}>
                 {getFilterSummary(currentFilters)}
               </p>
@@ -260,11 +260,11 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 style={{
                   flex: 1,
                   padding: '0.5rem',
-                  border: `1px solid ${colors.border.medium}`,
+                  border: `1px solid ${'var(--color-border-medium)'}`,
                   borderRadius: '4px',
                   fontSize: '0.875rem',
-                  backgroundColor: colors.surface.secondary,
-                  color: colors.text.primary
+                  backgroundColor: 'var(--color-surface-secondary)',
+                  color: 'var(--color-text-primary)'
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -280,7 +280,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 disabled={!newSearchName.trim()}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: newSearchName.trim() ? '#34d399' : colors.surface.secondary,
+                  backgroundColor: newSearchName.trim() ? '#34d399' : 'var(--color-surface-secondary)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
@@ -297,9 +297,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: colors.surface.secondary,
-                  color: colors.text.primary,
-                  border: `1px solid ${colors.border.medium}`,
+                  backgroundColor: 'var(--color-surface-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: `1px solid ${'var(--color-border-medium)'}`,
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '0.875rem'
@@ -318,7 +318,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           <div style={{
             textAlign: 'center',
             padding: '2rem',
-            color: colors.text.secondary
+            color: 'var(--color-text-secondary)'
           }}>
             <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
               <Icon icon={Save} size={32} color="secondary" decorative />
@@ -340,9 +340,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                   key={search.id}
                   style={{
                     padding: '1rem',
-                    backgroundColor: colors.surface.secondary,
+                    backgroundColor: 'var(--color-surface-secondary)',
                     borderRadius: '8px',
-                    border: `1px solid ${colors.border.light}`
+                    border: `1px solid ${'var(--color-border-light)'}`
                   }}
                 >
                   <div style={{
@@ -356,14 +356,14 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                         margin: '0 0 0.25rem 0',
                         fontSize: '1rem',
                         fontWeight: 'bold',
-                        color: colors.text.primary
+                        color: 'var(--color-text-primary)'
                       }}>
                         {search.name}
                       </h4>
                       <p style={{
                         margin: '0 0 0.25rem 0',
                         fontSize: '0.8rem',
-                        color: colors.text.secondary
+                        color: 'var(--color-text-secondary)'
                       }}>
                         {getFilterSummary(search.filters)}
                       </p>
@@ -430,24 +430,24 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           zIndex: 1002
         }}>
           <div style={{
-            backgroundColor: colors.surface.primary,
+            backgroundColor: 'var(--color-surface-primary)',
             borderRadius: '8px',
             padding: '1.5rem',
             maxWidth: '400px',
             width: '90%',
-            border: `1px solid ${colors.border.light}`
+            border: `1px solid ${'var(--color-border-light)'}`
           }}>
             <h4 style={{
               margin: '0 0 1rem 0',
               fontSize: '1.1rem',
-              color: colors.text.primary
+              color: 'var(--color-text-primary)'
             }}>
               検索クエリの削除
             </h4>
             <p style={{
               margin: '0 0 1.5rem 0',
               fontSize: '0.9rem',
-              color: colors.text.secondary
+              color: 'var(--color-text-secondary)'
             }}>
               この検索クエリを削除してもよろしいですか？この操作は取り消せません。
             </p>
@@ -460,9 +460,9 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
                 onClick={() => setSearchToDelete(null)}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: colors.surface.secondary,
-                  color: colors.text.primary,
-                  border: `1px solid ${colors.border.medium}`,
+                  backgroundColor: 'var(--color-surface-secondary)',
+                  color: 'var(--color-text-primary)',
+                  border: `1px solid ${'var(--color-border-medium)'}`,
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '0.875rem'

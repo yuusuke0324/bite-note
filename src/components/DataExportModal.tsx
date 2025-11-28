@@ -3,7 +3,6 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, X, FileText, FileSpreadsheet, Calendar, Image, CheckCircle, XCircle, Loader } from 'lucide-react';
 import { exportImportService } from '../lib/export-import-service';
-import { colors } from '../theme/colors';
 import type { FishingRecord } from '../types';
 
 interface DataExportModalProps {
@@ -110,14 +109,14 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
       zIndex: 1000
     }}>
       <div style={{
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '12px',
         padding: '2rem',
         maxWidth: '500px',
         width: '90%',
         maxHeight: '80vh',
         overflow: 'auto',
-        border: `1px solid ${colors.border.light}`
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
         {/* ヘッダー */}
         <div style={{
@@ -130,7 +129,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -145,7 +144,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
               padding: '0.25rem',
               display: 'flex',
               alignItems: 'center',
@@ -163,7 +162,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             marginBottom: '0.5rem',
             fontWeight: 'bold',
             fontSize: '0.9rem',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}>
             エクスポート形式
           </label>
@@ -177,7 +176,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               alignItems: 'center',
               gap: '0.5rem',
               cursor: 'pointer',
-              color: colors.text.primary
+              color: 'var(--color-text-primary)'
             }}>
               <input
                 type="radio"
@@ -194,7 +193,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               alignItems: 'center',
               gap: '0.5rem',
               cursor: 'pointer',
-              color: colors.text.primary
+              color: 'var(--color-text-primary)'
             }}>
               <input
                 type="radio"
@@ -216,7 +215,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
             marginBottom: '0.5rem',
             fontWeight: 'bold',
             fontSize: '0.9rem',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Calendar size={20} color="#a78bfa" aria-hidden="true" /> 日付範囲（オプション）
@@ -234,25 +233,25 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               onChange={(e) => setDateFrom(e.target.value)}
               style={{
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
-            <span style={{ color: colors.text.secondary, fontSize: '0.875rem' }}>〜</span>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>〜</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
               style={{
                 padding: '0.5rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
@@ -266,7 +265,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               marginBottom: '0.5rem',
               fontWeight: 'bold',
               fontSize: '0.9rem',
-              color: colors.text.primary
+              color: 'var(--color-text-primary)'
             }}>
               追加オプション
             </label>
@@ -275,7 +274,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
               alignItems: 'center',
               gap: '0.5rem',
               cursor: 'pointer',
-              color: colors.text.primary
+              color: 'var(--color-text-primary)'
             }}>
               <input
                 type="checkbox"
@@ -287,7 +286,7 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
                 }}
               />
               <span style={{ fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Image size={18} color={colors.text.secondary} aria-hidden="true" /> 写真データを含める
+                <Image size={18} color={'var(--color-text-secondary)'} aria-hidden="true" /> 写真データを含める
               </span>
             </label>
           </div>
@@ -296,18 +295,18 @@ export const DataExportModal: React.FC<DataExportModalProps> = ({
         {/* エクスポート対象の情報 */}
         <div style={{
           padding: '1rem',
-          backgroundColor: colors.surface.secondary,
+          backgroundColor: 'var(--color-surface-secondary)',
           borderRadius: '6px',
           marginBottom: '1.5rem',
           fontSize: '0.9rem',
-          color: colors.text.secondary,
-          border: `1px solid ${colors.border.light}`
+          color: 'var(--color-text-secondary)',
+          border: `1px solid ${'var(--color-border-light)'}`
         }}>
           <h4 style={{
             margin: '0 0 0.5rem 0',
             fontSize: '0.9rem',
             fontWeight: 'bold',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}>
             エクスポート対象
           </h4>

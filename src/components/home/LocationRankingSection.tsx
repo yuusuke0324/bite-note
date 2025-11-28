@@ -57,7 +57,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
       case 1: return '#FFD700'; // Gold
       case 2: return '#C0C0C0'; // Silver
       case 3: return '#CD7F32'; // Bronze
-      default: return colors.text.tertiary;
+      default: return 'var(--color-text-tertiary)';
     }
   };
 
@@ -68,7 +68,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
         style={{
           padding: '24px',
           borderRadius: '16px',
-          backgroundColor: colors.surface.secondary,
+          backgroundColor: 'var(--color-surface-secondary)',
           textAlign: 'center',
         }}
       >
@@ -81,7 +81,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
         </div>
         <p style={{
           ...textStyles.body.medium,
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
           margin: 0,
         }}>
           まだ釣り場の記録がありません
@@ -96,7 +96,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
       <h2 style={{
         margin: '0 0 12px 0',
         ...textStyles.title.medium,
-        color: colors.text.primary,
+        color: 'var(--color-text-primary)',
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
@@ -130,8 +130,8 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
               gap: '10px',
               padding: '12px',
               borderRadius: '12px',
-              backgroundColor: colors.surface.primary,
-              border: `1px solid ${colors.border.light}`,
+              backgroundColor: 'var(--color-surface-primary)',
+              border: `1px solid ${'var(--color-border-light)'}`,
               cursor: onLocationClick ? 'pointer' : 'default',
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               boxShadow: '0 1px 2px rgba(60,64,67,.1)',
@@ -147,7 +147,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
               if (onLocationClick) {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = '0 1px 2px rgba(60,64,67,.1)';
-                e.currentTarget.style.borderColor = colors.border.light;
+                e.currentTarget.style.borderColor = 'var(--color-border-light)';
               }
             }}
           >
@@ -171,7 +171,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
               <div style={{
                 ...textStyles.body.large,
                 fontWeight: '600',
-                color: colors.text.primary,
+                color: 'var(--color-text-primary)',
                 marginBottom: '4px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -181,7 +181,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
               </div>
               <div style={{
                 ...textStyles.body.small,
-                color: colors.text.secondary,
+                color: 'var(--color-text-secondary)',
               }}>
                 {item.count}件の記録
               </div>
@@ -191,7 +191,7 @@ export const LocationRankingSection: React.FC<LocationRankingSectionProps> = ({
             <div style={{
               ...textStyles.body.large,
               fontWeight: '700',
-              color: item.rank === 1 ? colors.primary[600] : colors.text.tertiary,
+              color: item.rank === 1 ? colors.primary[600] : 'var(--color-text-tertiary)',
               flexShrink: 0,
             }}>
               #{item.rank}

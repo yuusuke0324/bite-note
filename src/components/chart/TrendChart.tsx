@@ -43,9 +43,9 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
     return (
       <div
         style={{
-          backgroundColor: colors.surface.primary,
+          backgroundColor: 'var(--color-surface-primary)',
           padding: '12px',
-          border: `1px solid ${colors.border.light}`,
+          border: '1px solid var(--color-border-light)',
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         }}
@@ -54,14 +54,14 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
           margin: '0 0 4px 0',
           fontSize: '0.875rem',
           fontWeight: '600',
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
         }}>
           {payload[0].payload.month}
         </p>
         <p style={{
           margin: 0,
           fontSize: '0.875rem',
-          color: colors.primary[600],
+          color: 'var(--color-accent-text)',
           fontWeight: '500',
           display: 'flex',
           alignItems: 'center',
@@ -115,9 +115,9 @@ export const TrendChart: React.FC<TrendChartProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: colors.surface.secondary,
+          backgroundColor: 'var(--color-surface-secondary)',
           borderRadius: '12px',
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
         }}
       >
         データがありません
@@ -132,7 +132,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({
           margin: '0 0 16px 0',
           fontSize: '1rem',
           fontWeight: '600',
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -161,24 +161,24 @@ export const TrendChart: React.FC<TrendChartProps> = ({
             {showGrid && (
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke={colors.border.light}
+                stroke="var(--color-border-light)"
                 vertical={false}
               />
             )}
             <XAxis
               dataKey="month"
-              tick={{ fill: colors.text.secondary, fontSize: 12 }}
-              axisLine={{ stroke: colors.border.light }}
+              tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--color-border-light)' }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: colors.text.secondary, fontSize: 12 }}
-              axisLine={{ stroke: colors.border.light }}
+              tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--color-border-light)' }}
               tickLine={false}
               allowDecimals={false}
               domain={[0, 'auto']}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: colors.primary[50] }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--color-surface-hover)' }} />
             <Bar
               dataKey="count"
               fill={color}
@@ -196,19 +196,19 @@ export const TrendChart: React.FC<TrendChartProps> = ({
             {showGrid && (
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke={colors.border.light}
+                stroke="var(--color-border-light)"
                 vertical={false}
               />
             )}
             <XAxis
               dataKey="month"
-              tick={{ fill: colors.text.secondary, fontSize: 12 }}
-              axisLine={{ stroke: colors.border.light }}
+              tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--color-border-light)' }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: colors.text.secondary, fontSize: 12 }}
-              axisLine={{ stroke: colors.border.light }}
+              tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--color-border-light)' }}
               tickLine={false}
               allowDecimals={false}
               domain={[0, 'auto']}

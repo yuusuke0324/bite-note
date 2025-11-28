@@ -120,9 +120,9 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
         alignItems: 'center',
         marginBottom: '1rem',
         padding: '0.75rem',
-        backgroundColor: colors.surface.secondary,
+        backgroundColor: 'var(--color-surface-secondary)',
         borderRadius: '8px',
-        border: `1px solid ${colors.border.light}`
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
         <button
           onClick={onToggle}
@@ -162,9 +162,9 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
     <div style={{
       marginBottom: '1.5rem',
       padding: '1.5rem',
-      backgroundColor: colors.surface.primary,
+      backgroundColor: 'var(--color-surface-primary)',
       borderRadius: '12px',
-      border: `1px solid ${colors.border.light}`,
+      border: `1px solid ${'var(--color-border-light)'}`,
       boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
     }}>
       {/* ヘッダー */}
@@ -178,7 +178,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
           margin: 0,
           fontSize: '1.25rem',
           fontWeight: 'bold',
-          color: colors.text.primary
+          color: 'var(--color-text-primary)'
         }}>
           <Icon icon={Search} size={20} decorative /> 高度な検索・フィルター
         </h3>
@@ -188,9 +188,9 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               onClick={resetFilters}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary,
-                border: `1px solid ${colors.border.medium}`,
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)',
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontSize: '0.875rem'
@@ -206,7 +206,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               border: 'none',
               cursor: 'pointer',
               fontSize: '1.25rem',
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
               padding: '0.25rem'
             }}
           >
@@ -227,7 +227,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             marginBottom: '0.5rem',
             fontWeight: 'bold',
             fontSize: '0.875rem',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}>
             <Icon icon={Type} size={14} decorative /> キーワード検索
           </label>
@@ -239,11 +239,11 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: `1px solid ${colors.border.medium}`,
+              border: `1px solid ${'var(--color-border-medium)'}`,
               borderRadius: '6px',
               fontSize: '1rem',
-              backgroundColor: colors.surface.secondary,
-              color: colors.text.primary
+              backgroundColor: 'var(--color-surface-secondary)',
+              color: 'var(--color-text-primary)'
             }}
           />
         </div>
@@ -255,7 +255,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             marginBottom: '0.5rem',
             fontWeight: 'bold',
             fontSize: '0.875rem',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}>
             <Icon icon={Calendar} size={14} decorative /> 日付範囲
           </label>
@@ -271,25 +271,25 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               onChange={(e) => updateFilter('dateFrom', e.target.value || undefined)}
               style={{
                 padding: '0.75rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '6px',
                 fontSize: '1rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
-            <span style={{ color: colors.text.secondary, fontSize: '0.875rem' }}>〜</span>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>〜</span>
             <input
               type="date"
               value={filters.dateTo || ''}
               onChange={(e) => updateFilter('dateTo', e.target.value || undefined)}
               style={{
                 padding: '0.75rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '6px',
                 fontSize: '1rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
@@ -302,7 +302,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             marginBottom: '0.5rem',
             fontWeight: 'bold',
             fontSize: '0.875rem',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}>
             <Icon icon={Ruler} size={14} decorative /> サイズ範囲 (cm)
           </label>
@@ -321,14 +321,14 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               max="999"
               style={{
                 padding: '0.75rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '6px',
                 fontSize: '1rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
-            <span style={{ color: colors.text.secondary, fontSize: '0.875rem' }}>〜</span>
+            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>〜</span>
             <input
               type="number"
               value={filters.sizeTo ?? ''}
@@ -338,11 +338,11 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               max="999"
               style={{
                 padding: '0.75rem',
-                border: `1px solid ${colors.border.medium}`,
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '6px',
                 fontSize: '1rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)'
               }}
             />
           </div>
@@ -356,7 +356,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               marginBottom: '0.5rem',
               fontWeight: 'bold',
               fontSize: '0.875rem',
-              color: colors.text.primary
+              color: 'var(--color-text-primary)'
             }}>
               <Icon icon={MapPin} size={14} decorative /> 場所 ({filters.locations.length}件選択中)
             </label>
@@ -371,9 +371,9 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
                   onClick={() => toggleArrayFilter('locations', location)}
                   style={{
                     padding: '0.5rem 0.75rem',
-                    backgroundColor: filters.locations.includes(location) ? '#60a5fa' : colors.surface.secondary,
-                    color: filters.locations.includes(location) ? 'white' : colors.text.primary,
-                    border: `1px solid ${colors.border.medium}`,
+                    backgroundColor: filters.locations.includes(location) ? '#60a5fa' : 'var(--color-surface-secondary)',
+                    color: filters.locations.includes(location) ? 'white' : 'var(--color-text-primary)',
+                    border: `1px solid ${'var(--color-border-medium)'}`,
                     borderRadius: '20px',
                     cursor: 'pointer',
                     fontSize: '0.875rem',
@@ -395,7 +395,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
               marginBottom: '0.5rem',
               fontWeight: 'bold',
               fontSize: '0.875rem',
-              color: colors.text.primary
+              color: 'var(--color-text-primary)'
             }}>
               <Icon icon={Fish} size={14} decorative /> 魚種 ({filters.fishSpecies.length}件選択中)
             </label>
@@ -410,9 +410,9 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
                   onClick={() => toggleArrayFilter('fishSpecies', species)}
                   style={{
                     padding: '0.5rem 0.75rem',
-                    backgroundColor: filters.fishSpecies.includes(species) ? '#60a5fa' : colors.surface.secondary,
-                    color: filters.fishSpecies.includes(species) ? 'white' : colors.text.primary,
-                    border: `1px solid ${colors.border.medium}`,
+                    backgroundColor: filters.fishSpecies.includes(species) ? '#60a5fa' : 'var(--color-surface-secondary)',
+                    color: filters.fishSpecies.includes(species) ? 'white' : 'var(--color-text-primary)',
+                    border: `1px solid ${'var(--color-border-medium)'}`,
                     borderRadius: '20px',
                     cursor: 'pointer',
                     fontSize: '0.875rem',
@@ -433,7 +433,7 @@ export const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({
             marginBottom: '0.75rem',
             fontWeight: 'bold',
             fontSize: '0.875rem',
-            color: colors.text.primary
+            color: 'var(--color-text-primary)'
           }}>
             <Icon icon={Settings} size={14} decorative /> 追加オプション
           </label>

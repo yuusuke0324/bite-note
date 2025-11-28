@@ -80,8 +80,8 @@ export class ErrorBoundary extends Component<Props, State> {
           style={{
             padding: '2rem',
             textAlign: 'center',
-            backgroundColor: colors.surface.primary,
-            border: `1px solid ${colors.border.light}`,
+            backgroundColor: 'var(--color-surface-primary)',
+            border: `1px solid ${'var(--color-border-light)'}`,
             borderRadius: '8px',
             margin: '1rem'
           }}
@@ -103,7 +103,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <h2 style={{ color: '#ef4444', marginBottom: '1rem' }}>
             エラーが発生しました
           </h2>
-          <p data-testid={TestIds.ERROR_BOUNDARY_MESSAGE} style={{ color: colors.text.secondary, marginBottom: '1.5rem' }}>
+          <p data-testid={TestIds.ERROR_BOUNDARY_MESSAGE} style={{ color: 'var(--color-text-secondary)', marginBottom: '1.5rem' }}>
             予期しないエラーが発生しました。ページを再読み込みするか、しばらく時間をおいてから再度お試しください。
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -126,9 +126,9 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={() => window.location.reload()}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: colors.surface.secondary,
-                color: colors.text.primary,
-                border: `1px solid ${colors.border.medium}`,
+                backgroundColor: 'var(--color-surface-secondary)',
+                color: 'var(--color-text-primary)',
+                border: `1px solid ${'var(--color-border-medium)'}`,
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontSize: '1rem'
@@ -139,18 +139,18 @@ export class ErrorBoundary extends Component<Props, State> {
           </div>
           {process.env.NODE_ENV === 'development' && this.state.error && (
             <details style={{ marginTop: '2rem', textAlign: 'left' }}>
-              <summary style={{ cursor: 'pointer', color: colors.text.secondary }}>
+              <summary style={{ cursor: 'pointer', color: 'var(--color-text-secondary)' }}>
                 エラー詳細（開発用）
               </summary>
               <pre
                 style={{
                   marginTop: '1rem',
                   padding: '1rem',
-                  backgroundColor: colors.surface.secondary,
+                  backgroundColor: 'var(--color-surface-secondary)',
                   borderRadius: '4px',
                   fontSize: '0.8rem',
                   overflow: 'auto',
-                  color: colors.text.primary
+                  color: 'var(--color-text-primary)'
                 }}
               >
                 {this.state.error.stack}

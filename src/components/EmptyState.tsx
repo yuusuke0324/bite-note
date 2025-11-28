@@ -70,8 +70,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       default:
         return {
           ...baseStyle,
-          backgroundColor: colors.surface.secondary,
-          border: `1px solid ${colors.border.light}`,
+          backgroundColor: 'var(--color-surface-secondary)',
+          border: `1px solid ${'var(--color-border-light)'}`,
           borderRadius: '8px'
         };
     }
@@ -89,7 +89,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         style={{
           fontSize: '1.25rem',
           fontWeight: 'bold',
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           marginBottom: '0.75rem'
         }}
       >
@@ -100,7 +100,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <p
         style={{
           fontSize: '1rem',
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
           marginBottom: '2rem',
           maxWidth: '400px',
           lineHeight: 1.5
@@ -157,7 +157,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           style={{
             marginTop: '2rem',
             padding: '1rem',
-            backgroundColor: colors.surface.primary,
+            backgroundColor: 'var(--color-surface-primary)',
             border: '1px solid rgba(251, 191, 36, 0.3)',
             borderRadius: '6px',
             fontSize: '0.9rem',
@@ -165,7 +165,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           }}
         >
           <strong>解決方法：</strong>
-          <ul style={{ textAlign: 'left', marginTop: '0.5rem', paddingLeft: '1.5rem', color: colors.text.secondary }}>
+          <ul style={{ textAlign: 'left', marginTop: '0.5rem', paddingLeft: '1.5rem', color: 'var(--color-text-secondary)' }}>
             <li>ブラウザの位置情報許可設定を確認</li>
             <li>WiFiやGPSが有効になっているか確認</li>
             <li>手動で場所を入力することも可能です</li>

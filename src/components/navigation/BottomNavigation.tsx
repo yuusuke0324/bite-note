@@ -59,7 +59,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
     right: '50%',
     transform: 'translateX(12px)',
     backgroundColor: colors.semantic.error.main,
-    color: colors.text.inverse,
+    color: 'var(--color-text-inverse)',
     borderRadius: '10px',
     minWidth: '18px',
     height: '18px',

@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore, selectRecords, selectActions } from '../../stores/app-store';
 import { ModernCard } from '../ui/ModernCard';
 import Button from '../ui/Button';
-import { colors } from '../../theme/colors';
+import { colors } from '../../theme/colors'; // Note: Most colors use CSS variables, but keep import for semantic/status colors
 import { textStyles, typography } from '../../theme/typography';
 import { logger } from '../../lib/errors/logger';
 import type { FishingRecord } from '../../types';
@@ -129,14 +129,14 @@ export const DataManagementPanel = () => {
         </Button>
         <h1 style={{
           ...textStyles.headline.large,
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           margin: 0,
         }}>
           データ管理
         </h1>
         <p style={{
           ...textStyles.body.medium,
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
           marginTop: '0.5rem',
         }}>
           ストレージ使用状況を確認し、不要なデータを削除できます
@@ -152,7 +152,7 @@ export const DataManagementPanel = () => {
         <div>
           <h2 style={{
             ...textStyles.headline.small,
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
             marginBottom: '1rem',
           }}>
             ストレージ使用状況
@@ -166,7 +166,7 @@ export const DataManagementPanel = () => {
             }}>
               <span style={{
                 ...textStyles.body.small,
-                color: colors.text.secondary,
+                color: 'var(--color-text-secondary)',
               }}>
                 {formatBytes(storageInfo.usage)} / {formatBytes(storageInfo.quota)}
               </span>
@@ -183,7 +183,7 @@ export const DataManagementPanel = () => {
             <div style={{
               width: '100%',
               height: '8px',
-              backgroundColor: colors.surface.secondary,
+              backgroundColor: 'var(--color-surface-secondary)',
               borderRadius: '4px',
               overflow: 'hidden',
             }}>
@@ -238,14 +238,14 @@ export const DataManagementPanel = () => {
           }}>
             <h2 style={{
               ...textStyles.headline.small,
-              color: colors.text.primary,
+              color: 'var(--color-text-primary)',
               margin: 0,
             }}>
               記録一覧
             </h2>
             <span style={{
               ...textStyles.body.medium,
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
             }}>
               {records.length}件
             </span>
@@ -255,7 +255,7 @@ export const DataManagementPanel = () => {
             <div style={{
               textAlign: 'center',
               padding: '3rem 1rem',
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
             }}>
               <p style={{
                 ...textStyles.body.large,
@@ -310,14 +310,14 @@ const RecordListItem = ({ record, onDelete }: RecordListItemProps) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '1rem',
-      backgroundColor: colors.surface.secondary,
+      backgroundColor: 'var(--color-surface-secondary)',
       borderRadius: '8px',
-      border: `1px solid ${colors.border.light}`,
+      border: `1px solid ${'var(--color-border-light)'}`,
     }}>
       <div style={{ flex: 1 }}>
         <div style={{
           ...textStyles.body.medium,
-          color: colors.text.primary,
+          color: 'var(--color-text-primary)',
           fontWeight: 600,
           marginBottom: '0.25rem',
         }}>
@@ -327,7 +327,7 @@ const RecordListItem = ({ record, onDelete }: RecordListItemProps) => {
           display: 'flex',
           gap: '1rem',
           ...textStyles.body.small,
-          color: colors.text.secondary,
+          color: 'var(--color-text-secondary)',
         }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Icon icon={MapPin} size={14} color="secondary" decorative /> {record.location || '場所未設定'}
@@ -391,7 +391,7 @@ const DeleteConfirmDialog = ({
       padding: '1rem',
     }}>
       <div style={{
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '16px',
         padding: '1.5rem',
         maxWidth: '400px',
@@ -406,7 +406,7 @@ const DeleteConfirmDialog = ({
           id="delete-dialog-title"
           style={{
             ...textStyles.headline.small,
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
             marginBottom: '1rem',
           }}
         >
@@ -417,7 +417,7 @@ const DeleteConfirmDialog = ({
           id="delete-dialog-description"
           style={{
             ...textStyles.body.medium,
-            color: colors.text.secondary,
+            color: 'var(--color-text-secondary)',
             marginBottom: '1.5rem',
           }}
         >

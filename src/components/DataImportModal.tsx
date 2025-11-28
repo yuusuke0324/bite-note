@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Download, X, Lightbulb, FileText, Paperclip, CheckCircle, XCircle, AlertTriangle, Loader } from 'lucide-react';
 import { exportImportService } from '../lib/export-import-service';
-import { colors } from '../theme/colors';
 import type { ImportResult } from '../types';
 
 interface DataImportModalProps {
@@ -162,14 +161,14 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
       zIndex: 1000
     }}>
       <div style={{
-        backgroundColor: colors.surface.primary,
+        backgroundColor: 'var(--color-surface-primary)',
         borderRadius: '12px',
         padding: '2rem',
         maxWidth: '600px',
         width: '90%',
         maxHeight: '80vh',
         overflow: 'auto',
-        border: `1px solid ${colors.border.light}`
+        border: `1px solid ${'var(--color-border-light)'}`
       }}>
         {/* ヘッダー */}
         <div style={{
@@ -182,7 +181,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: colors.text.primary,
+            color: 'var(--color-text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -197,7 +196,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: colors.text.secondary,
+              color: 'var(--color-text-secondary)',
               padding: '0.25rem',
               display: 'flex',
               alignItems: 'center',
@@ -243,12 +242,12 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           style={{
-            border: `2px dashed ${dragOver ? '#60a5fa' : selectedFile ? '#34d399' : colors.border.medium}`,
+            border: `2px dashed ${dragOver ? '#60a5fa' : selectedFile ? '#34d399' : 'var(--color-border-medium)'}`,
             borderRadius: '8px',
             padding: '2rem',
             textAlign: 'center',
             cursor: 'pointer',
-            backgroundColor: dragOver ? 'rgba(96, 165, 250, 0.15)' : selectedFile ? 'rgba(52, 211, 153, 0.15)' : colors.surface.secondary,
+            backgroundColor: dragOver ? 'rgba(96, 165, 250, 0.15)' : selectedFile ? 'rgba(52, 211, 153, 0.15)' : 'var(--color-surface-secondary)',
             marginBottom: '1.5rem',
             transition: 'all 0.2s ease'
           }}
@@ -269,14 +268,14 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               <div style={{
                 fontWeight: 'bold',
                 fontSize: '1rem',
-                color: colors.text.primary,
+                color: 'var(--color-text-primary)',
                 marginBottom: '0.25rem'
               }}>
                 {selectedFile.name}
               </div>
               <div style={{
                 fontSize: '0.875rem',
-                color: colors.text.secondary
+                color: 'var(--color-text-secondary)'
               }}>
                 {formatFileSize(selectedFile.size)}
               </div>
@@ -284,18 +283,18 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           ) : (
             <div>
               <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}>
-                <Paperclip size={40} color={colors.text.tertiary} aria-hidden="true" />
+                <Paperclip size={40} color={'var(--color-text-tertiary)'} aria-hidden="true" />
               </div>
               <div style={{
                 fontSize: '1rem',
-                color: colors.text.primary,
+                color: 'var(--color-text-primary)',
                 marginBottom: '0.5rem'
               }}>
                 {dragOver ? 'ファイルをドロップしてください' : 'ファイルを選択またはドロップ'}
               </div>
               <div style={{
                 fontSize: '0.875rem',
-                color: colors.text.secondary
+                color: 'var(--color-text-secondary)'
               }}>
                 JSON または CSV ファイル
               </div>
