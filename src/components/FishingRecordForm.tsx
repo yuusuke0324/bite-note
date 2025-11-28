@@ -609,24 +609,6 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
             </div>
           )}
 
-          {/* Decoy input for Safari AutoFill (hidden, captures address suggestions) */}
-          <input
-            type="text"
-            name="address"
-            autoComplete="street-address"
-            tabIndex={-1}
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              opacity: 0,
-              height: 0,
-              width: 0,
-              padding: 0,
-              margin: 0,
-              border: 'none',
-              pointerEvents: 'none'
-            }}
-          />
           <input
             id="fishing-spot"
             data-testid={TestIds.LOCATION_NAME}
