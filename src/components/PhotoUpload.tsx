@@ -322,12 +322,12 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
                 対応形式: JPEG, PNG, WebP (最大{maxSizeMB}MB)
               </p>
-              <div style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+              <div style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
                 <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
                   <CheckCircle size={12} color="#10B981" aria-hidden="true" /> GPS付き写真: 位置・日時・天気・海面水温を自動抽出
                 </p>
                 <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                  <Smartphone size={12} color="#6B7280" aria-hidden="true" /> 位置情報ONで撮影した写真がおすすめ
+                  <Smartphone size={12} style={{ color: 'var(--color-text-secondary)' }} aria-hidden="true" /> 位置情報ONで撮影した写真がおすすめ
                 </p>
               </div>
             </div>
