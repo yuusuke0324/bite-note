@@ -47,9 +47,7 @@ import type {
   TideChartData,
   ChartComponents,
   TideTooltipProps,
-  DataPointProps,
   HighContrastTheme,
-  LineDotProps,
 } from './types';
 import styles from './TideChart.module.css';
 import { logger } from '../../../lib/errors/logger';
@@ -547,109 +545,8 @@ const CustomTooltip = React.memo(({ active, payload, label }: TideTooltipProps) 
   return null;
 });
 
-/**
- * Enhanced Data Point Component with Accessibility（最適化版）
- */
-const DataPoint = React.memo(React.forwardRef<SVGCircleElement, DataPointProps>(({
-  cx,
-  cy,
-  payload,
-  index,
-  onClick,
-  focused = false,
-  selected = false,
-  theme = highContrastThemes.light,
-}, ref) => {
-  const isFocused = focused;
-  const isSelected = selected;
-
-  const handleClick = React.useCallback(() => {
-    if (payload && index !== undefined) {
-      onClick?.(payload, index);
-    }
-  }, [onClick, payload, index]);
-
-  // Color-blind friendly patterns (WCAG 2.1 1.4.1 Use of Color)
-  const isHighContrast = theme === highContrastThemes['high-contrast'];
-  const patternSuffix = isHighContrast ? '-hc' : '';
-
-  const getFillValue = (): string => {
-    if (isSelected) return theme.accent;
-
-    // Use patterns for high/low tide points
-    if (payload?.type === 'high') {
-      return `url(#high-tide-pattern${patternSuffix})`;
-    }
-    if (payload?.type === 'low') {
-      return `url(#low-tide-pattern${patternSuffix})`;
-    }
-
-    // Default color for regular points
-    return theme.accent || '#0088FE';
-  };
-
-  return (
-    <g>
-      <circle
-        ref={ref}
-        id={`data-point-${index}`}
-        cx={cx}
-        cy={cy}
-        r={isFocused ? 6 : 4}
-        fill={getFillValue()}
-        stroke={isFocused ? theme.focus : '#fff'}
-        strokeWidth={isFocused ? 3 : 2}
-        style={{ cursor: 'pointer', outline: 'none' }}
-        data-testid={`data-point-${index}`}
-        data-index={index}
-        data-value={payload?.tide}
-        data-tide-type={payload?.type || 'normal'}
-        data-type={payload?.type}
-        data-pattern={payload?.type === 'high' ? 'high-tide-pattern' : payload?.type === 'low' ? 'low-tide-pattern' : undefined}
-        data-focused={isFocused}
-        data-selected={isSelected}
-        className={isFocused ? 'highlighted' : ''}
-        onClick={handleClick}
-        tabIndex={-1}
-      />
-      {/* Focus indicator - Enhanced with double ring and pulse animation */}
-      {isFocused && (
-        <>
-          {/* Primary focus indicator - solid ring */}
-          <circle
-            cx={cx}
-            cy={cy}
-            r={9}
-            fill="none"
-            stroke={theme.focus}
-            strokeWidth={3}
-            className="focus-indicator-primary"
-            data-contrast-ratio={theme.contrastRatios?.focusBg.toFixed(2) || '3.0'}
-          />
-          {/* Secondary focus indicator - pulsing dashed ring */}
-          <circle
-            cx={cx}
-            cy={cy}
-            r={12}
-            fill="none"
-            stroke={theme.focus}
-            strokeWidth={2}
-            strokeDasharray="2,2"
-            className="focus-indicator-secondary"
-            style={{ animation: 'pulse 2s ease-in-out infinite' }}
-          />
-        </>
-      )}
-    </g>
-  );
-}), (prevProps, nextProps) => {
-  // カスタム比較関数でパフォーマンス最適化
-  return prevProps.cx === nextProps.cx &&
-    prevProps.cy === nextProps.cy &&
-    prevProps.focused === nextProps.focused &&
-    prevProps.selected === nextProps.selected &&
-    prevProps.index === nextProps.index;
-});
+// NOTE: DataPoint component was removed as part of smooth line implementation
+// (dot={false}, activeDot={false} are now used instead of custom dot rendering)
 
 
 /**
@@ -818,7 +715,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
   }, [chartComponents, components]);
 
   // React Hooks must be called before any early returns (Rules of Hooks)
-  const [focusedPointIndex, setFocusedPointIndex] = useState(-1);
   const [navigationState, setNavigationState] =
     useState<KeyboardNavigationState>({
       focusedIndex: 0,
@@ -832,7 +728,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
   const renderStartTime = useRef<number>(0);
   const liveRegionRef = useRef<HTMLDivElement>(null);
   const focusManagerRef = useRef<FocusManager | null>(null);
-  const dataPointRefsRef = useRef<(SVGCircleElement | null)[]>([]);
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   // 使用するコンポーネント: propsが優先、なければstate
@@ -840,7 +735,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
   // 注入されたコンポーネントを取得（activeComponentsがundefinedでもエラーにならないように）
   // Type assertion is safe here because we check for activeComponents existence before rendering
-  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine, ReferenceDot } = (activeComponents || {}) as ChartComponents;
+  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceDot } = (activeComponents || {}) as ChartComponents;
 
   // Determine if we should use stacked markers (Issue #273)
   // Use stacked markers when: fishingData is provided OR useStackedMarkers is explicitly true
@@ -1111,7 +1006,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             mode: 'data-point',
             isActive: true,
           }));
-          setFocusedPointIndex(nextIndex);
 
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
@@ -1142,7 +1036,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             mode: 'data-point',
             isActive: true,
           }));
-          setFocusedPointIndex(prevIndex);
 
           // Announce to screen reader
           if (liveRegionRef.current && screenReaderContent) {
@@ -1175,7 +1068,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
               mode: 'data-point',
               isActive: true,
             }));
-            setFocusedPointIndex(higherValueIndex);
           }
           break;
         }
@@ -1195,7 +1087,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
               mode: 'data-point',
               isActive: true,
             }));
-            setFocusedPointIndex(lowerValueIndex);
           }
           break;
         }
@@ -1208,7 +1099,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             mode: 'data-point',
             isActive: true,
           }));
-          setFocusedPointIndex(0);
           break;
 
         case 'End': {
@@ -1220,7 +1110,6 @@ const TideChartBase: React.FC<TideChartProps> = ({
             mode: 'data-point',
             isActive: true,
           }));
-          setFocusedPointIndex(lastIndex);
           break;
         }
 
