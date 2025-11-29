@@ -78,6 +78,7 @@ const getDefaultChartComponents = (() => {
       Line: Recharts.Line,
       Tooltip: Recharts.Tooltip,
       ReferenceLine: Recharts.ReferenceLine,
+      ReferenceDot: Recharts.ReferenceDot,
     };
     return cache;
   };
@@ -839,7 +840,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
 
   // 注入されたコンポーネントを取得（activeComponentsがundefinedでもエラーにならないように）
   // Type assertion is safe here because we check for activeComponents existence before rendering
-  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine } = (activeComponents || {}) as ChartComponents;
+  const { LineChart, XAxis, YAxis, Line, Tooltip, ReferenceLine, ReferenceDot } = (activeComponents || {}) as ChartComponents;
 
   // Determine if we should use stacked markers (Issue #273)
   // Use stacked markers when: fishingData is provided OR useStackedMarkers is explicitly true
@@ -1733,41 +1734,32 @@ const TideChartBase: React.FC<TideChartProps> = ({
               <Line
                 dataKey="tide"
                 stroke={currentTheme.accent}
-                strokeWidth={2}
-                dot={(props: LineDotProps) => (
-                  <DataPoint
-                    ref={(el: SVGCircleElement | null) => {
-                      if (el && props.index !== undefined) {
-                        dataPointRefsRef.current[props.index] = el;
-                      }
-                    }}
-                    {...props}
-                    onClick={onDataPointClick}
-                    focused={props.index === focusedPointIndex}
-                    selected={props.index === selectedDataPoint}
-                    theme={currentTheme}
-                  />
-                )}
+                strokeWidth={3}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                dot={false}
+                activeDot={false}
+                type="basis"
                 data-testid="line"
               />
-              {/* Legacy fishing markers (when useStackedMarkers is false) */}
-              {!shouldUseStackedMarkers && ReferenceLine && fishingTimes.map((time, index) => (
-                <ReferenceLine
-                  key={`fishing-${index}`}
-                  x={time}
-                  stroke="#00CC66"
-                  strokeWidth={3}
-                  strokeDasharray="5 5"
-                  label={{
-                    value: '',
-                    position: 'top',
-                    fill: '#00CC66',
-                    fontSize: 20,
-                    offset: 5,
-                  }}
-                  data-testid={`fishing-marker-${index}`}
-                />
-              ))}
+              {/* Fishing catch markers - orange dots on the tide curve */}
+              {!shouldUseStackedMarkers && ReferenceDot && fishingTimes.map((time, index) => {
+                // Find the tide level for this time from chart data
+                const dataPoint = validatedData.valid.find(d => d.time === time);
+                if (!dataPoint) return null;
+                return (
+                  <ReferenceDot
+                    key={`fishing-dot-${index}`}
+                    x={time}
+                    y={dataPoint.tide}
+                    r={8}
+                    fill="#FF8C00"
+                    stroke="#FFFFFF"
+                    strokeWidth={2}
+                    data-testid={`fishing-marker-${index}`}
+                  />
+                );
+              })}
               {showTooltip && Tooltip && <Tooltip content={<CustomTooltip />} />}
             </LineChart>
 
