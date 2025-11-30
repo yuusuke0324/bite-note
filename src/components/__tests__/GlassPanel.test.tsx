@@ -1,8 +1,44 @@
+/**
+ * GlassPanelコンポーネントの単体テスト
+ *
+ * @description
+ * Glass Morphism UIパネルコンポーネントのテストスイート
+ * CI環境での並列実行時のDOM参照問題を回避するため、
+ * `container.querySelector` パターンを採用
+ *
+ * @version 1.0.0
+ * @since 2025-11-30 Issue #318
+ */
+
 import React from 'react';
-import { render } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { render, waitFor } from '@testing-library/react';
 import { GlassPanel } from '../ui/GlassPanel';
 
 describe('GlassPanel', () => {
+  beforeEach(async () => {
+    // CI環境でのJSDOM初期化待機
+    if (process.env.CI) {
+      await waitFor(
+        () => {
+          if (!document.body || document.body.children.length === 0) {
+            throw new Error('JSDOM not ready');
+          }
+        },
+        { timeout: 5000, interval: 100 }
+      );
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  });
+
+  afterEach(() => {
+    // CI環境ではroot containerを保持
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
+  });
+
   describe('Rendering', () => {
     it('renders children correctly', () => {
       const { container } = render(<GlassPanel>Panel Content</GlassPanel>);

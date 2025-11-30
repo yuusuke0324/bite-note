@@ -1,15 +1,52 @@
+/**
+ * GlassBadgeコンポーネントの単体テスト
+ *
+ * @description
+ * Glass Morphism UIバッジコンポーネントのテストスイート
+ * CI環境での並列実行時のDOM参照問題を回避するため、
+ * `screen` → `container.querySelector` パターンを採用
+ *
+ * @version 1.0.0
+ * @since 2025-11-30 Issue #318
+ */
+
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GlassBadge } from '../ui/GlassBadge';
 
 describe('GlassBadge', () => {
+  beforeEach(async () => {
+    // CI環境でのJSDOM初期化待機
+    if (process.env.CI) {
+      await waitFor(
+        () => {
+          if (!document.body || document.body.children.length === 0) {
+            throw new Error('JSDOM not ready');
+          }
+        },
+        { timeout: 5000, interval: 100 }
+      );
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  });
+
+  afterEach(() => {
+    // CI環境ではroot containerを保持
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
+  });
+
   describe('Rendering', () => {
     it('renders children correctly', () => {
-      render(<GlassBadge>Test Badge</GlassBadge>);
+      const { container } = render(<GlassBadge>Test Badge</GlassBadge>);
       // 2-layer structure means text appears twice (shadow + glass)
-      const elements = screen.getAllByText('Test Badge');
-      expect(elements.length).toBeGreaterThanOrEqual(1);
+      const textElements = container.querySelectorAll('.glass-badge-text');
+      expect(textElements.length).toBeGreaterThanOrEqual(1);
+      expect(textElements[0]).toHaveTextContent('Test Badge');
     });
 
     it('renders with 2-layer structure', () => {
