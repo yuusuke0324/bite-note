@@ -878,6 +878,18 @@ const TideChartBase: React.FC<TideChartProps> = ({
     return ariaConfiguration?.label || '潮汐グラフ: データなし';
   }, [ariaConfiguration]);
 
+  // Calculate rendered fishing marker count (for e2e testing)
+  const renderedFishingMarkerCount = useMemo(() => {
+    if (shouldUseStackedMarkers) {
+      // When using stacked markers, count the normalized fishing data
+      return normalizedFishingData.length;
+    }
+    // Count fishing times that match a data point in the chart
+    return fishingTimes.filter(time =>
+      processedData.valid.some(d => d.time === time)
+    ).length;
+  }, [shouldUseStackedMarkers, normalizedFishingData.length, fishingTimes, processedData.valid]);
+
   // Initialize Focus Manager with focus trap (WCAG 2.1.2, 2.4.3)
   useEffect(() => {
     if (focusManagementEnabled && liveRegionRef.current) {
@@ -1292,6 +1304,7 @@ const TideChartBase: React.FC<TideChartProps> = ({
           }}
           data-testid="tide-chart"
           data-device={chartConfiguration.deviceType}
+          data-fishing-marker-count={renderedFishingMarkerCount}
           data-navigation-mode={navigationState.mode}
           data-navigation-active={navigationState.isActive}
           data-focus-manager={focusManagementEnabled ? 'enabled' : 'disabled'}
