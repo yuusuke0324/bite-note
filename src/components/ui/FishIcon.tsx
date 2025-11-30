@@ -26,6 +26,8 @@ export interface FishIconProps {
   className?: string;
   /** data-testid属性 */
   'data-testid'?: string;
+  /** 装飾的要素として扱う場合はtrue（親要素にaria-labelがある場合） */
+  'aria-hidden'?: boolean;
 }
 
 /**
@@ -51,7 +53,7 @@ export interface FishIconProps {
  * ```
  */
 export const FishIcon = forwardRef<HTMLDivElement, FishIconProps>(
-  ({ species, size = 64, className = '', 'data-testid': testId }, ref) => {
+  ({ species, size = 64, className = '', 'data-testid': testId, 'aria-hidden': ariaHidden }, ref) => {
     const { isDark } = useTheme();
     const backgroundColor = getFishColor(species, isDark);
     const iconType = getFishIconType(species);
@@ -63,8 +65,9 @@ export const FishIcon = forwardRef<HTMLDivElement, FishIconProps>(
         style={{
           backgroundColor,
         }}
-        role="img"
-        aria-label={`${species}のアイコン`}
+        role={ariaHidden ? undefined : 'img'}
+        aria-label={ariaHidden ? undefined : `${species}のアイコン`}
+        aria-hidden={ariaHidden}
         data-testid={testId}
       >
         {iconType === 'squid' ? (

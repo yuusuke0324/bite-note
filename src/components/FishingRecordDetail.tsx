@@ -1,16 +1,16 @@
 // 釣果記録詳細コンポーネント
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 // import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
-import { TideIntegration } from './TideIntegration';
+import type { TideChartData } from './chart/tide/types';
+// TideIntegration UI は PhotoHeroCard のオーバーレイに置き換えられました
+// コンポーネント自体は将来の拡張性のため保持しています
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
+import { PhotoHeroCard } from './record/PhotoHeroCard';
 import {
   Fish,
-  Calendar,
-  Ruler,
-  Scale,
   MapPin,
   MessageCircle,
   Map,
@@ -36,6 +36,60 @@ interface FishingRecordDetailProps {
   onNavigateToMap?: (record: FishingRecord) => void;
 }
 
+/**
+ * Calculate direct tide level using harmonic analysis
+ * (Copied from TideIntegration for overlay calculation)
+ */
+const calculateDirectTideLevel = (time: Date, coordinates: { latitude: number; longitude: number }): number => {
+  const coordinateVariation = {
+    latitudeFactor: 1 + (coordinates.latitude - 35) * 0.1,
+    longitudeFactor: 1 + (coordinates.longitude - 135) * 0.05
+  };
+
+  const dayOfYear = Math.floor((time.getTime() - new Date(time.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+  const seasonalAngle = ((dayOfYear - 80) / 365) * 360;
+  const latitudeEffect = Math.abs(coordinates.latitude) / 90;
+  const baseSeasonalFactor = Math.cos(seasonalAngle * Math.PI / 180);
+
+  const seasonalVariation = {
+    m2Factor: 1.0 + (baseSeasonalFactor * 0.4 * latitudeEffect),
+    s2Factor: 1.0 + (Math.cos((seasonalAngle + 45) * Math.PI / 180) * 0.5 * latitudeEffect),
+    k1Factor: 1.0 + (Math.sin(seasonalAngle * Math.PI / 180) * 0.6 * latitudeEffect),
+    o1Factor: 1.0 + (Math.sin((seasonalAngle + 90) * Math.PI / 180) * 0.45 * latitudeEffect)
+  };
+
+  const J2000_EPOCH_MS = new Date('2000-01-01T12:00:00Z').getTime();
+  const hoursFromJ2000 = (time.getTime() - J2000_EPOCH_MS) / (1000 * 60 * 60);
+
+  let tideLevel = 0;
+
+  // M2 (12.42h period)
+  const m2Frequency = 28.984104;
+  const m2Amplitude = 1.0 * coordinateVariation.latitudeFactor * seasonalVariation.m2Factor;
+  const m2Phase = 0 + coordinateVariation.longitudeFactor * 15;
+  tideLevel += m2Amplitude * Math.cos((m2Frequency * hoursFromJ2000 + m2Phase) * Math.PI / 180);
+
+  // S2 (12h period)
+  const s2Frequency = 30.0;
+  const s2Amplitude = 0.5 * coordinateVariation.longitudeFactor * seasonalVariation.s2Factor;
+  const s2Phase = 0 + coordinateVariation.latitudeFactor * 20;
+  tideLevel += s2Amplitude * Math.cos((s2Frequency * hoursFromJ2000 + s2Phase) * Math.PI / 180);
+
+  // K1 (23.93h period)
+  const k1Frequency = 15.041069;
+  const k1Amplitude = 0.3 * coordinateVariation.latitudeFactor * seasonalVariation.k1Factor;
+  const k1Phase = coordinateVariation.latitudeFactor * 80 + coordinateVariation.longitudeFactor * 25;
+  tideLevel += k1Amplitude * Math.cos((k1Frequency * hoursFromJ2000 + k1Phase) * Math.PI / 180);
+
+  // O1 (25.82h period)
+  const o1Frequency = 13.943035;
+  const o1Amplitude = 0.25 * coordinateVariation.longitudeFactor * seasonalVariation.o1Factor;
+  const o1Phase = coordinateVariation.longitudeFactor * 120 + coordinateVariation.latitudeFactor * 35;
+  tideLevel += o1Amplitude * Math.cos((o1Frequency * hoursFromJ2000 + o1Phase) * Math.PI / 180);
+
+  return 100 + tideLevel * 30;
+};
+
 export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   record,
   onClose,
@@ -51,28 +105,68 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 }) => {
   const [photoExpanded, setPhotoExpanded] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [tideChartData, setTideChartData] = useState<TideChartData[] | null>(null);
+  const [tideLoading, setTideLoading] = useState(false);
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('ja-JP', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
-  };
+  // Calculate tide data for overlay when coordinates exist
+  useEffect(() => {
+    if (!record.coordinates) {
+      setTideChartData(null);
+      return;
+    }
 
-  const formatSize = (size?: number) => {
-    if (size === undefined || size === null) return '記録なし';
-    return `${size}cm`;
-  };
+    const calculateTideForOverlay = async () => {
+      setTideLoading(true);
+      try {
+        const fishingDate = new Date(record.date);
+        const startTime = new Date(
+          fishingDate.getFullYear(),
+          fishingDate.getMonth(),
+          fishingDate.getDate(),
+          0, 0, 0, 0
+        );
+        const endTime = new Date(
+          fishingDate.getFullYear(),
+          fishingDate.getMonth(),
+          fishingDate.getDate() + 1,
+          0, 0, 0, 0
+        );
 
-  const formatWeight = (weight?: number) => {
-    if (weight === undefined || weight === null) return '記録なし';
-    return `${weight}g`;
-  };
+        // Generate 24-hour data points (15-minute intervals)
+        const points: TideChartData[] = [];
+        for (let time = startTime.getTime(); time < endTime.getTime(); time += 15 * 60 * 1000) {
+          const currentTime = new Date(time);
+          const level = calculateDirectTideLevel(currentTime, record.coordinates!);
+          const hours = String(currentTime.getHours()).padStart(2, '0');
+          const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+          points.push({
+            time: `${hours}:${minutes}`,
+            tide: Math.round(level)
+          });
+        }
 
+        setTideChartData(points);
+      } catch (error) {
+        logger.error('Tide overlay calculation error', { error });
+        setTideChartData(null);
+      } finally {
+        setTideLoading(false);
+      }
+    };
+
+    calculateTideForOverlay();
+  }, [record.date, record.coordinates]);
+
+  // Format fishing time for chart marker
+  const fishingTimeForChart = useMemo(() => {
+    const hours = record.date.getHours();
+    const minutes = record.date.getMinutes();
+    // Snap to nearest 15-minute interval
+    const snappedMinutes = Math.round(minutes / 15) * 15;
+    const finalMinutes = snappedMinutes === 60 ? 0 : snappedMinutes;
+    const finalHours = snappedMinutes === 60 ? (hours + 1) % 24 : hours;
+    return `${String(finalHours).padStart(2, '0')}:${String(finalMinutes).padStart(2, '0')}`;
+  }, [record.date]);
 
   const handleEdit = () => {
     onEdit?.(record);
@@ -286,136 +380,24 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
           {/* コンテンツ */}
           <div id="record-content" style={{ padding: '1.5rem' }}>
-            {/* 写真表示 */}
-            {photoUrl && !loading && (
-              <div style={{
-                marginBottom: '1.5rem',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                border: `1px solid ${'var(--color-border-light)'}`,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-              }}>
-                <img
-                  src={photoUrl}
-                  alt={`${record.fishSpecies}の写真`}
-                  onClick={() => setPhotoExpanded(true)}
-                  style={{
-                    width: '100%',
-                    maxHeight: '200px',
-                    objectFit: 'cover',
-                    display: 'block',
-                    cursor: 'pointer',
-                  }}
-                />
-              </div>
-            )}
-
-            {/* 基本情報 */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1rem',
-              marginBottom: '2rem'
-            }}>
-              <div style={{
-                padding: '1rem',
-                backgroundColor: 'var(--color-surface-secondary)',
-                borderRadius: '8px',
-                border: `1px solid ${'var(--color-border-light)'}`
-              }}>
-                <h4 style={{
-                  margin: '0 0 0.5rem 0',
-                  fontSize: '0.875rem',
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  <Icon icon={Calendar} size={14} decorative /> 釣行日
-                </h4>
-                <p style={{
-                  margin: 0,
-                  fontSize: '1.125rem',
-                  fontWeight: 'bold',
-                  color: 'var(--color-text-primary)'
-                }}>
-                  {formatDate(record.date)}
-                </p>
-              </div>
-
-              <div style={{
-                padding: '1rem',
-                backgroundColor: 'var(--color-surface-secondary)',
-                borderRadius: '8px',
-                border: `1px solid ${'var(--color-border-light)'}`
-              }}>
-                <h4 style={{
-                  margin: '0 0 0.5rem 0',
-                  fontSize: '0.875rem',
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  <Icon icon={Fish} size={14} decorative /> 魚種
-                </h4>
-                <p style={{
-                  margin: 0,
-                  fontSize: '1.125rem',
-                  fontWeight: 'bold',
-                  color: 'var(--color-text-primary)'
-                }}>
-                  {record.fishSpecies}
-                </p>
-              </div>
-
-              <div style={{
-                padding: '1rem',
-                backgroundColor: 'var(--color-surface-secondary)',
-                borderRadius: '8px',
-                border: `1px solid ${'var(--color-border-light)'}`
-              }}>
-                <h4 style={{
-                  margin: '0 0 0.5rem 0',
-                  fontSize: '0.875rem',
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  <Icon icon={Ruler} size={14} decorative /> サイズ
-                </h4>
-                <p style={{
-                  margin: 0,
-                  fontSize: '1.25rem',
-                  fontWeight: 'bold',
-                  color: record.size ? '#34d399' : 'var(--color-text-tertiary)'
-                }}>
-                  {formatSize(record.size)}
-                </p>
-              </div>
-
-              <div style={{
-                padding: '1rem',
-                backgroundColor: 'var(--color-surface-secondary)',
-                borderRadius: '8px',
-                border: `1px solid ${'var(--color-border-light)'}`
-              }}>
-                <h4 style={{
-                  margin: '0 0 0.5rem 0',
-                  fontSize: '0.875rem',
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  <Icon icon={Scale} size={14} decorative /> 重量
-                </h4>
-                <p style={{
-                  margin: 0,
-                  fontSize: '1.25rem',
-                  fontWeight: 'bold',
-                  color: record.weight ? '#34d399' : 'var(--color-text-tertiary)'
-                }}>
-                  {formatWeight(record.weight)}
-                </p>
-              </div>
+            {/* 写真表示 - PhotoHeroCardを使用 */}
+            {/* タップアクション: 座標があれば地図へ、なければ写真があれば拡大表示 */}
+            {/* 詳細画面では実際の潮汐グラフをオーバーレイ表示 */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <PhotoHeroCard
+                record={record}
+                onClick={() => {
+                  if (record.coordinates && onNavigateToMap) {
+                    onNavigateToMap(record);
+                    onClose?.();
+                  } else if (photoUrl) {
+                    setPhotoExpanded(true);
+                  }
+                }}
+                tideChartData={tideChartData ?? undefined}
+                fishingTime={fishingTimeForChart}
+                tideLoading={tideLoading}
+              />
             </div>
 
             {/* 場所情報 */}
@@ -526,41 +508,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
               </div>
             )}
 
-            {/* 潮汐情報統合セクション */}
-            <TideIntegration
-              fishingRecord={record}
-              onCalculateTide={async (coordinates, date) => {
-                try {
-                  const { TideCalculationService } = await import('../services/tide/TideCalculationService');
-                  const tideService = new TideCalculationService();
-
-                  // サービス初期化
-                  await tideService.initialize();
-
-                  // ヘルスチェックで正常性確認
-                  const health = await tideService.healthCheck();
-                  if (health.status !== 'healthy') {
-                    throw new Error(`潮汐サービス異常: ${health.message}`);
-                  }
-
-                  // 実際の潮汐計算実行
-                  const result = await tideService.calculateTideInfo(coordinates, date);
-
-                  return result;
-
-                } catch (error) {
-                  logger.error('実データ潮汐計算失敗', {
-                    recordId: record.id.slice(0, 8),
-                    error: error,
-                    coordinates,
-                    date: date.toISOString()
-                  });
-
-                  // 実データ処理失敗時はエラーを投げる（モックには頼らない）
-                  throw new Error(`潮汐計算システムエラー: ${error instanceof Error ? error.message : '不明なエラー'}`);
-                }
-              }}
-            />
+            {/* 潮汐情報は PhotoHeroCard のオーバーレイグラフで表示 */}
+            {/* TideIntegration UI は Issue #322 で削除されました */}
 
             {/* メタデータ */}
             <div style={{

@@ -1,5 +1,5 @@
 /**
- * InstagramGrid - Instagram-style grid layout for fishing records
+ * RecordGrid - Grid layout for fishing records
  *
  * Features:
  * - Responsive grid layout (2/3/4 columns)
@@ -15,9 +15,9 @@ import { PhotoHeroCard } from './PhotoHeroCard';
 import { SkeletonPhotoHeroCard } from '../ui/SkeletonPhotoHeroCard';
 import { useGridNavigation } from '../../hooks/useGridNavigation';
 import type { FishingRecord } from '../../types';
-import './InstagramGrid.css';
+import './RecordGrid.css';
 
-export interface InstagramGridProps {
+export interface RecordGridProps {
   /** Array of fishing records to display */
   records: FishingRecord[];
   /** Callback when a record card is clicked */
@@ -37,30 +37,32 @@ export interface InstagramGridProps {
  */
 const EmptyStateCard: React.FC<{ onCreateRecord?: () => void }> = ({ onCreateRecord }) => {
   return (
-    <div className="instagram-grid__empty-state" role="status">
-      <div className="instagram-grid__empty-content">
-        <Fish size={80} className="instagram-grid__empty-icon" aria-hidden="true" />
-        <h2 className="instagram-grid__empty-title">
-          No fishing records yet
+    <div className="record-grid__empty-state" role="status">
+      <div className="record-grid__empty-content">
+        <Fish size={80} className="record-grid__empty-icon" aria-hidden="true" />
+        <h2 className="record-grid__empty-title">
+          まだ記録がありません
         </h2>
-        <p className="instagram-grid__empty-description">
-          Record your first catch and start building your fishing journal
+        <p className="record-grid__empty-description">
+          最初の釣果を記録して、釣り日記を始めましょう
         </p>
         {onCreateRecord && (
           <button
             type="button"
-            className="instagram-grid__empty-cta"
+            className="record-grid__empty-cta"
             onClick={onCreateRecord}
-            aria-label="Create your first fishing record"
+            aria-label="最初の釣果記録を作成"
           >
             <Plus size={20} aria-hidden="true" />
-            <span>Create First Record</span>
+            <span>最初の記録を作成</span>
           </button>
         )}
       </div>
     </div>
   );
 };
+
+EmptyStateCard.displayName = 'RecordGrid.EmptyStateCard';
 
 /**
  * Loading skeleton grid component
@@ -73,9 +75,9 @@ const SkeletonGrid: React.FC<{ count: number; className?: string }> = ({ count, 
 
   return (
     <div
-      className={`instagram-grid instagram-grid--skeleton ${className}`}
+      className={`record-grid record-grid--skeleton ${className}`}
       aria-busy="true"
-      aria-label="Loading fishing records"
+      aria-label="釣果記録を読み込み中"
     >
       {skeletons.map((index) => (
         <SkeletonPhotoHeroCard key={`skeleton-${index}`} variant="grid" />
@@ -84,7 +86,9 @@ const SkeletonGrid: React.FC<{ count: number; className?: string }> = ({ count, 
   );
 };
 
-export const InstagramGrid: React.FC<InstagramGridProps> = ({
+SkeletonGrid.displayName = 'RecordGrid.SkeletonGrid';
+
+export const RecordGrid: React.FC<RecordGridProps> = ({
   records,
   onRecordClick,
   loading = false,
@@ -125,9 +129,9 @@ export const InstagramGrid: React.FC<InstagramGridProps> = ({
   return (
     <div
       ref={gridRef}
-      className={`instagram-grid ${className}`}
+      className={`record-grid ${className}`}
       role="grid"
-      aria-label="Fishing records gallery"
+      aria-label="釣果記録ギャラリー"
       aria-rowcount={rowCount}
       aria-colcount={columnCount}
       onKeyDown={handleKeyDown}
@@ -144,6 +148,6 @@ export const InstagramGrid: React.FC<InstagramGridProps> = ({
   );
 };
 
-InstagramGrid.displayName = 'InstagramGrid';
+RecordGrid.displayName = 'RecordGrid';
 
-export default InstagramGrid;
+export default RecordGrid;

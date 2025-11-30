@@ -84,6 +84,14 @@ describe('FishIcon', () => {
       expect(container.querySelector('[data-testid="fish-icon"]')).toBeInTheDocument();
     });
 
+    it('hides from screen readers when aria-hidden is true', () => {
+      const { container } = render(<FishIcon species="シーバス" aria-hidden={true} />);
+      const icon = container.querySelector('.fish-icon-container');
+      expect(icon).toHaveAttribute('aria-hidden', 'true');
+      expect(icon).not.toHaveAttribute('role');
+      expect(icon).not.toHaveAttribute('aria-label');
+    });
+
     it('renders SVG icon', () => {
       const { container } = render(<FishIcon species="シーバス" />);
       expect(container.querySelector('svg')).toBeInTheDocument();
