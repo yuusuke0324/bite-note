@@ -140,13 +140,13 @@ export async function createTestFishingRecord(
 }
 
 /**
- * 座標付き釣果記録をIndexedDBに直接作成（潮汐統合テスト用）
+ * 座標付き釣果記録をIndexedDBに直接作成
  *
  * 通常のcreateTestFishingRecordはフォーム経由で記録を作成するため、
  * 座標情報を保存できません（フォームにGPS座標の直接入力フィールドがないため）。
  *
- * この関数は、TideIntegrationコンポーネントのテストなど、
- * 座標情報が必須のテストケースで使用してください。
+ * この関数は、座標情報が必須のテストケース（例: PhotoHeroCardの
+ * 潮汐グラフオーバーレイ表示テスト）で使用してください。
  *
  * @param page Playwrightのページオブジェクト
  * @param record 作成する記録データ（coordinatesは必須）
@@ -247,35 +247,8 @@ export async function navigateToRecordsList(page: Page): Promise<void> {
   await page.waitForSelector('[data-testid="list-tab"][aria-selected="true"]', { timeout: 2000 });
 }
 
-/**
- * 潮汐グラフセクションを開く
- */
-export async function openTideGraphTab(page: Page): Promise<void> {
-  // 潮汐グラフトグルボタンをクリック
-  await page.click(`[data-testid="${TestIds.TIDE_GRAPH_TOGGLE_BUTTON}"]`);
-  // グラフが表示されるまで待機
-  await page.waitForSelector(`[data-testid="${TestIds.TIDE_GRAPH_CANVAS}"]`, { timeout: 10000 });
-}
-
-/**
- * 潮汐グラフが表示されることを確認
- *
- * Note: TideIntegrationはTideChart（Rechartsベース）を使用しているため、
- * tide-graph-area, tide-graph-time-labels, tide-graph-y-axis などの
- * TideGraph（独自SVG実装）固有のtestIdは検証しない。
- *
- * TideChartはRechartsライブラリが内部でSVG要素を生成するため、
- * tide-chart（メインコンテナ）とtide-graph-canvas（チャートラッパー）で検証。
- */
-export async function assertTideGraphVisible(page: Page): Promise<void> {
-  // TideChartのメインコンテナを確認
-  const tideChart = page.locator(`[data-testid="${TestIds.TIDE_CHART}"]`);
-  await expect(tideChart).toBeVisible();
-
-  // TideChartの内部チャートキャンバスを確認
-  const tideGraphCanvas = page.locator(`[data-testid="${TestIds.TIDE_GRAPH_CANVAS}"]`);
-  await expect(tideGraphCanvas).toBeVisible();
-}
+// openTideGraphTab と assertTideGraphVisible は Issue #322 で削除
+// TideIntegration UI は PhotoHeroCard のオーバーレイグラフに置換されました
 
 /**
  * パフォーマンス指標を取得
