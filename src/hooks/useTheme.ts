@@ -11,7 +11,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { getTheme, setTheme, ThemeMode } from '../theme/colors';
+import { getTheme, setTheme } from '../theme/colors';
+import type { ThemeMode } from '../theme/colors';
 
 export interface UseThemeReturn {
   /** 現在ダークモードかどうか */

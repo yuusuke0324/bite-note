@@ -9,7 +9,7 @@
  * @since 2025-11-30 Issue #321
  */
 
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 export interface SquidIconProps {
   /** アイコンのサイズ（px） */
