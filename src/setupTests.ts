@@ -9,63 +9,6 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 // This resolves TypeScript errors for matchers like toBeInTheDocument, toHaveAttribute, etc.
 expect.extend(matchers);
 
-// ============================================================================
-// Global Mock: usePWA Hook (CI Stability Fix)
-// ============================================================================
-
-/**
- * usePWAフックのグローバルモック
- *
- * 【背景】
- * ReAuthPrompt.test.tsx実行時にPWAInstallPromptが間接的に読み込まれ、
- * usePWA()がundefinedを返すことでCI環境で「unhandled error」が発生。
- *
- * 【根本原因】
- * - テスト並列実行時のモジュール読み込みタイミング問題
- * - usePWAフックがブラウザAPI（navigator.serviceWorker等）に依存
- * - JSDOM環境では一部のPWA APIが未実装
- *
- * 【対応】
- * - setupTests.tsでグローバルモックを提供
- * - 個別テストで上書き可能（vi.mocked(usePWA).mockReturnValue()）
- *
- * @see src/hooks/usePWA.ts
- * @see src/components/__tests__/PWAInstallPrompt.test.tsx
- * @see src/components/__tests__/ReAuthPrompt.test.tsx
- */
-// Note: Path must match how modules import usePWA (e.g., '../hooks/usePWA' or '../../hooks/usePWA')
-// Using absolute path from src/ directory
-vi.mock('./hooks/usePWA.ts', () => ({
-  usePWA: vi.fn(() => ({
-    installState: {
-      isInstallable: false,
-      isInstalled: false,
-      isStandalone: false,
-      platform: 'unknown' as const,
-    },
-    updateState: {
-      updateAvailable: false,
-      installing: false,
-      registration: null,
-    },
-    installApp: vi.fn().mockResolvedValue(false),
-    updateApp: vi.fn().mockResolvedValue(undefined),
-    getIOSInstallInstructions: vi.fn().mockReturnValue(null),
-    isOnline: true,
-    isSyncing: false,
-    capabilities: {
-      serviceWorker: false,
-      notification: false,
-      geolocation: false,
-      camera: false,
-      share: false,
-      clipboard: false,
-      storage: false,
-    },
-    registration: null,
-  })),
-}));
-
 // Global test utilities and mocks can be added here
 
 // ============================================================================

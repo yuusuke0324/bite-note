@@ -4,8 +4,21 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
 
+// デフォルト値（usePWAがundefinedを返す場合のフォールバック - テスト環境対応）
+const defaultUpdateState = {
+  updateAvailable: false,
+  installing: false,
+  registration: null,
+};
+
 export const PWAUpdateNotification: React.FC = () => {
-  const { updateState, updateApp, isOnline } = usePWA();
+  const pwaResult = usePWA();
+  // 防御的なdestructuring: usePWAがundefinedを返す場合（テスト環境等）のフォールバック
+  const {
+    updateState = defaultUpdateState,
+    updateApp = async () => {},
+    isOnline = true,
+  } = pwaResult ?? {};
   const [dismissed, setDismissed] = useState(false);
 
   if (!updateState.updateAvailable || dismissed) {
