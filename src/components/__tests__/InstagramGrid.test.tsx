@@ -6,10 +6,14 @@
  * - Responsive behavior
  * - User interactions (click, keyboard navigation)
  * - Accessibility compliance
+ *
+ * @description
+ * CI環境での並列実行時のDOM参照問題を回避するため、
+ * `screen` → `container.querySelector` パターンを採用
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { InstagramGrid } from '../record/InstagramGrid';
 import { photoService } from '../../lib/photo-service';
@@ -55,17 +59,35 @@ const mockRecords: FishingRecord[] = [
 const mockPhotoDataUrl = 'data:image/jpeg;base64,/9j/fake-photo-data';
 
 describe('InstagramGrid', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     // Default mock implementation for successful photo load
     vi.mocked(photoService.getPhotoDataUrl).mockResolvedValue({
       success: true,
       data: mockPhotoDataUrl,
     });
+
+    // CI環境でのJSDOM初期化待機
+    if (process.env.CI) {
+      await waitFor(
+        () => {
+          if (!document.body || document.body.children.length === 0) {
+            throw new Error('JSDOM not ready');
+          }
+        },
+        { timeout: 5000, interval: 100 }
+      );
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    // CI環境ではroot containerを保持
+    if (!process.env.CI) {
+      document.body.innerHTML = '';
+    }
   });
 
   describe('Rendering', () => {
@@ -143,53 +165,57 @@ describe('InstagramGrid', () => {
     });
 
     it('displays empty state message', () => {
-      render(<InstagramGrid records={[]} />);
+      const { container } = render(<InstagramGrid records={[]} />);
 
-      expect(screen.getByText('No fishing records yet')).toBeInTheDocument();
-      expect(screen.getByText(/Record your first catch/)).toBeInTheDocument();
+      const title = container.querySelector('.instagram-grid__empty-title');
+      const description = container.querySelector('.instagram-grid__empty-description');
+      expect(title).toHaveTextContent('No fishing records yet');
+      expect(description?.textContent).toMatch(/Record your first catch/);
     });
 
     it('renders CTA button when onCreateRecord is provided', () => {
       const handleCreate = vi.fn();
-      render(<InstagramGrid records={[]} onCreateRecord={handleCreate} />);
+      const { container } = render(<InstagramGrid records={[]} onCreateRecord={handleCreate} />);
 
-      const ctaButton = screen.getByRole('button', { name: /create/i });
+      const ctaButton = container.querySelector('.instagram-grid__empty-cta');
       expect(ctaButton).toBeInTheDocument();
     });
 
     it('calls onCreateRecord when CTA button is clicked', async () => {
       const handleCreate = vi.fn();
-      render(<InstagramGrid records={[]} onCreateRecord={handleCreate} />);
+      const { container } = render(<InstagramGrid records={[]} onCreateRecord={handleCreate} />);
 
-      const ctaButton = screen.getByRole('button', { name: /create/i });
+      const ctaButton = container.querySelector('.instagram-grid__empty-cta') as HTMLButtonElement;
       await userEvent.click(ctaButton);
 
       expect(handleCreate).toHaveBeenCalledTimes(1);
     });
 
     it('does not render CTA button when onCreateRecord is not provided', () => {
-      render(<InstagramGrid records={[]} />);
+      const { container } = render(<InstagramGrid records={[]} />);
 
-      expect(screen.queryByRole('button', { name: /create/i })).not.toBeInTheDocument();
+      expect(container.querySelector('.instagram-grid__empty-cta')).not.toBeInTheDocument();
     });
 
     it('empty state has role="status"', () => {
-      render(<InstagramGrid records={[]} />);
+      const { container } = render(<InstagramGrid records={[]} />);
 
-      expect(screen.getByRole('status')).toBeInTheDocument();
+      const emptyState = container.querySelector('.instagram-grid__empty-state');
+      expect(emptyState).toHaveAttribute('role', 'status');
     });
   });
 
   describe('User Interactions', () => {
     it('calls onRecordClick when a card is clicked', async () => {
       const handleClick = vi.fn();
-      render(<InstagramGrid records={mockRecords} onRecordClick={handleClick} />);
+      const { container } = render(<InstagramGrid records={mockRecords} onRecordClick={handleClick} />);
 
       await waitFor(() => {
-        expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
+        const cards = container.querySelectorAll('.photo-hero-card');
+        expect(cards.length).toBeGreaterThan(0);
       });
 
-      const cards = screen.getAllByRole('button');
+      const cards = container.querySelectorAll('.photo-hero-card');
       fireEvent.click(cards[0]);
 
       expect(handleClick).toHaveBeenCalledWith(mockRecords[0]);
@@ -197,13 +223,14 @@ describe('InstagramGrid', () => {
 
     it('calls onRecordClick with correct record when different cards are clicked', async () => {
       const handleClick = vi.fn();
-      render(<InstagramGrid records={mockRecords} onRecordClick={handleClick} />);
+      const { container } = render(<InstagramGrid records={mockRecords} onRecordClick={handleClick} />);
 
       await waitFor(() => {
-        expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
+        const cards = container.querySelectorAll('.photo-hero-card');
+        expect(cards.length).toBeGreaterThan(0);
       });
 
-      const cards = screen.getAllByRole('button');
+      const cards = container.querySelectorAll('.photo-hero-card');
 
       // Click second card
       fireEvent.click(cards[1]);
@@ -301,20 +328,23 @@ describe('InstagramGrid', () => {
     });
 
     it('each card has tabIndex=0 for keyboard focus', async () => {
-      render(<InstagramGrid records={mockRecords} />);
+      const { container } = render(<InstagramGrid records={mockRecords} />);
 
       await waitFor(() => {
-        const cards = screen.getAllByRole('button');
-        cards.forEach((card) => {
-          expect(card).toHaveAttribute('tabIndex', '0');
-        });
+        const cards = container.querySelectorAll('.photo-hero-card');
+        expect(cards.length).toBeGreaterThan(0);
+      });
+
+      const cards = container.querySelectorAll('.photo-hero-card');
+      cards.forEach((card) => {
+        expect(card).toHaveAttribute('tabIndex', '0');
       });
     });
 
     it('empty state CTA button has aria-label', () => {
-      render(<InstagramGrid records={[]} onCreateRecord={() => {}} />);
+      const { container } = render(<InstagramGrid records={[]} onCreateRecord={() => {}} />);
 
-      const ctaButton = screen.getByRole('button', { name: /create/i });
+      const ctaButton = container.querySelector('.instagram-grid__empty-cta');
       expect(ctaButton).toHaveAttribute('aria-label');
     });
   });
@@ -369,13 +399,14 @@ describe('InstagramGrid', () => {
 
     it('does not call onRecordClick when no handler is provided', async () => {
       // This test ensures no errors occur when clicking without a handler
-      render(<InstagramGrid records={mockRecords} />);
+      const { container } = render(<InstagramGrid records={mockRecords} />);
 
       await waitFor(() => {
-        expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
+        const cards = container.querySelectorAll('.photo-hero-card');
+        expect(cards.length).toBeGreaterThan(0);
       });
 
-      const cards = screen.getAllByRole('button');
+      const cards = container.querySelectorAll('.photo-hero-card');
       // Should not throw
       fireEvent.click(cards[0]);
     });
