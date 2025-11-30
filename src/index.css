@@ -174,6 +174,39 @@ input, textarea, select {
 
   /* Accent text */
   --color-accent-text: #60a5fa;
+
+  /* === Glass Morphism System === */
+  /* Base variables (theme-independent) */
+  --glass-blur: blur(10px) saturate(150%);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  --touch-target-min: 44px;
+
+  /* Animation */
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-material: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  /* Z-Index Scale */
+  --z-base: 0;
+  --z-glass-badge: 5;
+  --z-glass-panel: 10;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+
+  /* Glass Morphism - Dark Theme (default) */
+  --glass-bg: rgba(30, 41, 59, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow-bg: rgba(0, 0, 0, 0.9);
+  --glass-text-color: #f1f5f9;
+
+  /* Badge variant colors */
+  --badge-size-bg: rgba(37, 99, 235, 0.95);
 }
 
 /* Light Theme */
@@ -229,6 +262,15 @@ body.light-theme {
 
   /* Accent text */
   --color-accent-text: #3b82f6;
+
+  /* Glass Morphism - Light Theme */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow-bg: rgba(0, 0, 0, 0.85);
+  --glass-text-color: #1e293b;
+
+  /* Badge variant colors - Light Theme */
+  --badge-size-bg: rgba(37, 99, 235, 0.95);
 }
 
 /* 全ての要素に対する横スクロール防止の適用 */
@@ -324,5 +366,250 @@ input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration {
   -webkit-appearance: none;
   appearance: none;
+  display: none;
+}
+
+/* === Glass Morphism Component Styles === */
+
+/* GlassBadge Wrapper */
+.glass-badge-wrapper {
+  position: relative;
+  display: inline-flex;
+  z-index: var(--z-glass-badge);
+}
+
+/* GlassBadge Shadow Layer (for accessibility contrast) */
+.glass-badge-shadow {
+  position: absolute;
+  inset: 0;
+  background: var(--glass-shadow-bg);
+  color: transparent;
+  padding: 6px 10px;
+  border-radius: 16px;
+  filter: blur(4px);
+  z-index: 1;
+}
+
+/* GlassBadge Glass Layer */
+.glass-badge-glass {
+  position: relative;
+  background: var(--glass-bg);
+  color: var(--glass-text-color);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 6px 10px;
+  border-radius: 16px;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 500;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all var(--transition-material);
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+/* Responsive GlassBadge */
+@media (min-width: 640px) {
+  .glass-badge-shadow,
+  .glass-badge-glass {
+    padding: 6px 12px;
+  }
+  .glass-badge-glass {
+    max-width: 200px;
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .glass-badge-shadow,
+  .glass-badge-glass {
+    padding: 8px 14px;
+  }
+  .glass-badge-glass {
+    max-width: 240px;
+    font-size: 14px;
+  }
+}
+
+/* GlassBadge variant: size */
+.glass-badge--size .glass-badge-glass {
+  background: var(--badge-size-bg);
+  color: white;
+}
+
+/* GlassBadge variant: species - icon layout */
+.glass-badge--species .glass-badge-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.glass-badge-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.glass-badge-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Interactive GlassBadge */
+.glass-badge-wrapper--interactive {
+  cursor: pointer;
+}
+
+.glass-badge-wrapper--interactive .glass-badge-glass {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-badge-wrapper--interactive:hover .glass-badge-glass {
+  will-change: transform; /* Apply only on hover for performance */
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+}
+
+.glass-badge-wrapper--interactive:active .glass-badge-glass {
+  transform: translateY(0) translateZ(0);
+}
+
+/* Focus indicator for interactive badges */
+.glass-badge-wrapper--interactive:focus-visible {
+  outline: none;
+}
+
+.glass-badge-wrapper--interactive:focus-visible .glass-badge-glass {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* GlassPanel Wrapper */
+.glass-panel-wrapper {
+  position: absolute;
+  display: inline-flex;
+  z-index: var(--z-glass-panel);
+}
+
+/* GlassPanel Shadow Layer */
+.glass-panel-shadow {
+  position: absolute;
+  inset: 0;
+  background: var(--glass-shadow-bg);
+  color: transparent;
+  padding: 12px;
+  border-radius: 12px;
+  filter: blur(4px);
+  z-index: 1;
+}
+
+/* GlassPanel Glass Layer */
+.glass-panel-glass {
+  position: relative;
+  background: var(--glass-bg);
+  color: var(--glass-text-color);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 12px;
+  border-radius: 12px;
+  z-index: 2;
+  transition: all var(--transition-material);
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+/* Focus indicator for panel */
+.glass-panel-wrapper:focus-within .glass-panel-glass {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* === Glass Morphism Fallbacks === */
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(10px)) {
+  .glass-badge-glass {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  body:not(.light-theme) .glass-badge-glass {
+    background: rgba(30, 41, 59, 0.98);
+  }
+
+  .glass-badge-shadow,
+  .glass-panel-shadow {
+    display: none;
+  }
+
+  .glass-panel-glass {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  body:not(.light-theme) .glass-panel-glass {
+    background: rgba(30, 41, 59, 0.98);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .glass-badge-glass,
+  .glass-panel-glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: none;
+  }
+
+  .glass-badge-glass {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  body:not(.light-theme) .glass-badge-glass {
+    background: rgba(30, 41, 59, 0.98);
+  }
+
+  .glass-panel-glass {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  body:not(.light-theme) .glass-panel-glass {
+    background: rgba(30, 41, 59, 0.98);
+  }
+
+  .glass-badge-shadow,
+  .glass-panel-shadow {
+    filter: none;
+    opacity: 0.3;
+  }
+
+  .glass-badge-wrapper--interactive:hover .glass-badge-glass {
+    transform: none;
+  }
+}
+
+/* Low performance mode (applied via JavaScript) */
+body.low-performance .glass-badge-glass,
+body.low-performance .glass-panel-glass {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+body.low-performance:not(.light-theme) .glass-badge-glass,
+body.low-performance:not(.light-theme) .glass-panel-glass {
+  background: rgba(30, 41, 59, 0.98);
+}
+
+body.low-performance .glass-badge-shadow,
+body.low-performance .glass-panel-shadow {
   display: none;
 }
