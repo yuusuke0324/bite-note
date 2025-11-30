@@ -1,0 +1,208 @@
+/**
+ * SkeletonPhotoHeroCard Styles
+ *
+ * Loading skeleton styles matching PhotoHeroCard layout.
+ * Uses pulse animation for loading indication.
+ */
+
+/* === Base Skeleton Animation === */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-secondary) 25%,
+    var(--color-surface-tertiary) 50%,
+    var(--color-surface-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* === Skeleton Card Container === */
+
+.skeleton-photo-hero-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-surface-primary);
+}
+
+/* === Photo Skeleton === */
+
+.skeleton-photo-hero-card__photo {
+  width: 100%;
+  border-radius: 0;
+}
+
+/* Default variant heights */
+.skeleton-photo-hero-card--default .skeleton-photo-hero-card__photo {
+  height: 280px;
+}
+
+@media (min-width: 769px) {
+  .skeleton-photo-hero-card--default .skeleton-photo-hero-card__photo {
+    height: 400px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .skeleton-photo-hero-card--default .skeleton-photo-hero-card__photo {
+    height: 500px;
+  }
+}
+
+/* Grid variant */
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__photo {
+  aspect-ratio: 1 / 1;
+  height: auto;
+  min-height: 120px;
+}
+
+/* === Badge Skeletons === */
+
+.skeleton-photo-hero-card__badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.skeleton-photo-hero-card__badges-left,
+.skeleton-photo-hero-card__badges-right {
+  display: flex;
+  gap: 8px;
+}
+
+.skeleton-photo-hero-card__badge {
+  height: 28px;
+  border-radius: 16px;
+}
+
+.skeleton-photo-hero-card__badge--species {
+  width: 80px;
+}
+
+.skeleton-photo-hero-card__badge--size {
+  width: 50px;
+}
+
+@media (min-width: 769px) {
+  .skeleton-photo-hero-card__badges {
+    top: 16px;
+    left: 16px;
+    right: 16px;
+  }
+
+  .skeleton-photo-hero-card__badge {
+    height: 32px;
+  }
+
+  .skeleton-photo-hero-card__badge--species {
+    width: 100px;
+  }
+
+  .skeleton-photo-hero-card__badge--size {
+    width: 60px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .skeleton-photo-hero-card__badges {
+    top: 20px;
+    left: 20px;
+    right: 20px;
+  }
+
+  .skeleton-photo-hero-card__badge {
+    height: 36px;
+  }
+
+  .skeleton-photo-hero-card__badge--species {
+    width: 120px;
+  }
+
+  .skeleton-photo-hero-card__badge--size {
+    width: 70px;
+  }
+}
+
+/* === Panel Skeleton === */
+
+.skeleton-photo-hero-card__panel {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 180px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+@media (min-width: 769px) {
+  .skeleton-photo-hero-card__panel {
+    bottom: 16px;
+    left: 16px;
+    width: 220px;
+    height: 44px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .skeleton-photo-hero-card__panel {
+    bottom: 20px;
+    left: 20px;
+    width: 260px;
+    height: 48px;
+  }
+}
+
+/* === Grid Variant Specific === */
+
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__badges {
+  top: 8px;
+  left: 8px;
+  right: 8px;
+}
+
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__badges-left,
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__badges-right {
+  gap: 4px;
+}
+
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__badge {
+  height: 24px;
+}
+
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__badge--species {
+  width: 60px;
+}
+
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__badge--size {
+  width: 40px;
+}
+
+.skeleton-photo-hero-card--grid .skeleton-photo-hero-card__panel {
+  bottom: 8px;
+  left: 8px;
+  width: 120px;
+  height: 32px;
+}
+
+/* === Reduced Motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--color-surface-tertiary);
+  }
+}
