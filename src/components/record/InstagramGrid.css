@@ -1,0 +1,133 @@
+/**
+ * InstagramGrid Styles
+ *
+ * Instagram-style responsive grid layout for fishing records.
+ * Uses CSS Grid with responsive breakpoints.
+ */
+
+/* === Grid Layout === */
+
+.instagram-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+/* Tablet: 3 columns */
+@media (min-width: 768px) {
+  .instagram-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+/* Desktop: 4 columns */
+@media (min-width: 1024px) {
+  .instagram-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Extra small screen fallback: 1 column */
+@media (max-width: 360px) {
+  .instagram-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Ensure minimum card height for touch targets */
+.instagram-grid > * {
+  min-height: 120px;
+}
+
+/* === Empty State === */
+
+.instagram-grid__empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 32px 16px;
+  width: 100%;
+}
+
+.instagram-grid__empty-content {
+  max-width: 400px;
+  text-align: center;
+}
+
+.instagram-grid__empty-icon {
+  color: var(--color-text-tertiary);
+  margin-bottom: 24px;
+  opacity: 0.6;
+}
+
+.instagram-grid__empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 12px 0;
+}
+
+.instagram-grid__empty-description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+
+.instagram-grid__empty-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  /* WCAG 2.1 Touch Target (44x44px minimum) */
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.instagram-grid__empty-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+.instagram-grid__empty-cta:active {
+  transform: translateY(0);
+}
+
+.instagram-grid__empty-cta:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* === Reduced Motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .instagram-grid__empty-cta {
+    transition: none;
+  }
+
+  .instagram-grid__empty-cta:hover {
+    transform: none;
+  }
+}
+
+/* === Skeleton Grid === */
+
+.instagram-grid--skeleton {
+  /* Same layout as regular grid */
+}
