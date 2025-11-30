@@ -126,7 +126,7 @@ export default defineWorkspace([
       name: 'components-complex',
       include: [
         'src/components/__tests__/TideGraph.axis-labels.test.tsx',
-        'src/components/__tests__/TideIntegration.test.tsx',
+        // TideIntegration.test.tsx は Issue #322 で削除（PhotoHeroCardオーバーレイに置換）
       ],
       setupFiles: ['./src/setupTests.ts'],
       testTimeout: 20000,

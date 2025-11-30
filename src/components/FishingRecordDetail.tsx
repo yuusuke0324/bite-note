@@ -4,8 +4,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 // import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
 import type { TideChartData } from './chart/tide/types';
-// TideIntegration UI は PhotoHeroCard のオーバーレイに置き換えられました
-// コンポーネント自体は将来の拡張性のため保持しています
+// TideIntegration は Issue #322 で完全削除されました
+// 潮汐情報は PhotoHeroCard のオーバーレイグラフで表示
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { PhotoHeroCard } from './record/PhotoHeroCard';
