@@ -420,3 +420,40 @@
   font-size: 11px;
   min-height: 36px;
 }
+
+/* === Grid Variant: Hover-based Info Panel Display === */
+
+/*
+ * For hover-capable devices (desktop), show info panel on hover.
+ * For touch devices (mobile/tablet), hide info panel completely.
+ */
+
+/* Hover-capable devices: Show panel on hover with fade transition */
+@media (hover: hover) {
+  .photo-hero-card--grid .photo-hero-card__info-panel {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .photo-hero-card--grid:hover .photo-hero-card__info-panel {
+    opacity: 1;
+  }
+
+  .photo-hero-card--grid:focus-visible .photo-hero-card__info-panel {
+    opacity: 1;
+  }
+}
+
+/* Hover-capable devices with reduced motion: No animation */
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .photo-hero-card--grid .photo-hero-card__info-panel {
+    transition: none;
+  }
+}
+
+/* Touch devices: Hide info panel completely */
+@media (hover: none) {
+  .photo-hero-card--grid .photo-hero-card__info-panel {
+    display: none;
+  }
+}

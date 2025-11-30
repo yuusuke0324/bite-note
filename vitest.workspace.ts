@@ -36,6 +36,7 @@ export default defineWorkspace([
         'src/components/__tests__/GlassBadge.test.tsx', // Issue #318: Glass Morphism UIコンポーネント
         'src/components/__tests__/GlassPanel.test.tsx', // Issue #318: Glass Morphism UIコンポーネント
         'src/components/__tests__/PhotoHeroCard.test.tsx', // Issue #319: PhotoHeroCard
+        'src/components/__tests__/InstagramGrid.test.tsx', // Issue #320: InstagramGrid
       ],
       setupFiles: ['./src/setupTests.ts'],
       environment: 'jsdom',
