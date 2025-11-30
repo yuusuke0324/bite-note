@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, CSSProperties } from 'react';
+import { forwardRef, type ReactNode, type CSSProperties } from 'react';
 
 export type GlassPanelPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 

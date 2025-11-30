@@ -1,4 +1,5 @@
-import React, { forwardRef, ReactNode, KeyboardEvent } from 'react';
+import { forwardRef, type ReactNode, type KeyboardEvent } from 'react';
+import type React from 'react';
 
 export interface GlassBadgeProps {
   /** The variant determines the visual style of the badge */
