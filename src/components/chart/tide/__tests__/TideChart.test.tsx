@@ -52,13 +52,15 @@ const createMockChartComponents = (): ChartComponents => ({
   YAxis: ({ dataKey, unit }: any) => (
     <div data-testid="mock-y-axis" data-key={dataKey} data-unit={unit} />
   ),
-  Line: ({ dataKey, stroke, strokeWidth, dot }: any) => (
+  Line: ({ dataKey, stroke, strokeWidth, type, strokeLinecap, strokeLinejoin }: any) => (
     <div
       data-testid="mock-line"
       data-key={dataKey}
       data-stroke={stroke}
       data-stroke-width={strokeWidth}
-      data-has-dot={!!dot}
+      data-type={type}
+      data-stroke-linecap={strokeLinecap}
+      data-stroke-linejoin={strokeLinejoin}
     />
   ),
   Tooltip: ({ content }: any) => (
@@ -70,6 +72,16 @@ const createMockChartComponents = (): ChartComponents => ({
       data-x={x}
       data-stroke={stroke}
       data-label={label?.value}
+    />
+  ),
+  ReferenceDot: ({ x, y, r, fill, stroke }: any) => (
+    <div
+      data-testid="mock-reference-dot"
+      data-x={x}
+      data-y={y}
+      data-r={r}
+      data-fill={fill}
+      data-stroke={stroke}
     />
   ),
 });

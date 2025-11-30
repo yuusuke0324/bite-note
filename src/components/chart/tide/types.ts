@@ -11,6 +11,7 @@ import type {
   Line,
   Tooltip,
   ReferenceLine,
+  ReferenceDot,
 } from 'recharts';
 import type { FishingMarkerData, MarkerGroupingConfig } from './markers/types';
 
@@ -34,6 +35,7 @@ export interface ChartComponents {
   Line: typeof Line;
   Tooltip: typeof Tooltip;
   ReferenceLine: typeof ReferenceLine;
+  ReferenceDot: typeof ReferenceDot;
 }
 
 /**

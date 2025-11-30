@@ -18,6 +18,7 @@ export const mockChartComponents = {
   Line: Recharts.Line,
   Tooltip: Recharts.Tooltip,
   ReferenceLine: Recharts.ReferenceLine,
+  ReferenceDot: Recharts.ReferenceDot,
 };
 
 /**
