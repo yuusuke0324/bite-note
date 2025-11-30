@@ -5,7 +5,7 @@
  * Automatically adapts to responsive column count.
  */
 
-import { useCallback, RefObject } from 'react';
+import { useCallback, type RefObject } from 'react';
 
 interface UseGridNavigationOptions {
   /** Reference to the grid container element */
