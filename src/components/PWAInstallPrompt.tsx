@@ -9,8 +9,22 @@ interface PWAInstallPromptProps {
   onDismiss?: () => void;
 }
 
+// デフォルト値（usePWAがundefinedを返す場合のフォールバック - テスト環境対応）
+const defaultInstallState = {
+  isInstallable: false,
+  isInstalled: false,
+  isStandalone: false,
+  platform: 'unknown' as const,
+};
+
 export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss }) => {
-  const { installState, installApp, getIOSInstallInstructions } = usePWA();
+  const pwaResult = usePWA();
+  // 防御的なdestructuring: usePWAがundefinedを返す場合（テスト環境等）のフォールバック
+  const {
+    installState = defaultInstallState,
+    installApp = async () => false,
+    getIOSInstallInstructions = () => null,
+  } = pwaResult ?? {};
   const [isVisible, setIsVisible] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);

@@ -1,0 +1,422 @@
+/**
+ * PhotoHeroCard Styles
+ *
+ * Photo-first card component with Glass Morphism overlay.
+ * Uses CSS custom properties from src/index.css for theming.
+ */
+
+/* === Base Card Styles === */
+
+.photo-hero-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--color-surface-primary);
+  transition:
+    transform var(--transition-smooth),
+    box-shadow var(--transition-smooth);
+  /* Touch target minimum size */
+  min-height: var(--touch-target-min);
+}
+
+/* Best catch variant with gold border */
+.photo-hero-card--best-catch {
+  border: 2px solid rgba(250, 204, 21, 0.5);
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.15);
+}
+
+/* === Hover Effects === */
+
+.photo-hero-card:hover {
+  will-change: transform;
+  transform: translateY(-4px) translateZ(0);
+  box-shadow: 0 12px 48px rgba(31, 38, 135, 0.2);
+}
+
+/* Hover effect on badges */
+.photo-hero-card:hover .glass-badge-glass {
+  transform: scale(1.05) translateZ(0);
+}
+
+/* Active state for touch devices */
+.photo-hero-card:active {
+  transform: translateY(-2px) translateZ(0);
+}
+
+/* Focus state for accessibility */
+.photo-hero-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* === Photo Container === */
+
+.photo-hero-card__photo-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-surface-secondary);
+}
+
+/* Default variant: Fixed heights per breakpoint */
+.photo-hero-card--default .photo-hero-card__photo-container {
+  height: 280px;
+}
+
+@media (min-width: 769px) {
+  .photo-hero-card--default .photo-hero-card__photo-container {
+    height: 400px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .photo-hero-card--default .photo-hero-card__photo-container {
+    height: 500px;
+  }
+}
+
+/* Grid variant: Square aspect ratio */
+.photo-hero-card--grid .photo-hero-card__photo-container {
+  aspect-ratio: 1 / 1;
+  height: auto;
+  min-height: 120px;
+}
+
+/* === Photo Layers === */
+
+/* Background layer: Blurred photo */
+.photo-hero-card__photo-background {
+  position: absolute;
+  inset: -10%;
+  z-index: 1;
+}
+
+.photo-hero-card__photo-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(20px);
+  transform: scale(1.1);
+}
+
+/* Foreground layer: Original photo */
+.photo-hero-card__photo-foreground {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.photo-hero-card__photo-foreground img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.photo-hero-card__photo-foreground img.loaded {
+  opacity: 1;
+}
+
+/* === Placeholder State === */
+
+.photo-hero-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary-500, #3b82f6) 0%, var(--color-primary-600, #2563eb) 100%);
+}
+
+.photo-hero-card__placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.photo-hero-card__placeholder-text {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* === Error State === */
+
+.photo-hero-card__error-state {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+}
+
+.photo-hero-card__error-state > svg {
+  color: #ef4444;
+  opacity: 0.8;
+}
+
+.photo-hero-card__error-state > p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.photo-hero-card__retry-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-smooth);
+  /* Touch target minimum size (WCAG 2.1 SC 2.5.5) */
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+.photo-hero-card__retry-button:hover {
+  background: var(--color-surface-hover);
+}
+
+.photo-hero-card__retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.photo-hero-card__retry-button .spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === Badge Positioning === */
+
+.photo-hero-card__badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.photo-hero-card__badges-left,
+.photo-hero-card__badges-right {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 769px) {
+  .photo-hero-card__badges {
+    top: 16px;
+    left: 16px;
+    right: 16px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .photo-hero-card__badges {
+    top: 20px;
+    left: 20px;
+    right: 20px;
+  }
+}
+
+/* Species badge max width for truncation */
+.photo-hero-card__species-badge {
+  max-width: 150px;
+}
+
+@media (min-width: 769px) {
+  .photo-hero-card__species-badge {
+    max-width: 180px;
+  }
+}
+
+/* Best catch badge styling */
+.photo-hero-card__best-catch-badge .glass-badge-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.photo-hero-card__best-catch-badge svg {
+  color: #facc15;
+}
+
+/* === Info Panel Positioning === */
+
+.photo-hero-card__info-panel {
+  z-index: 10;
+}
+
+/* Override default GlassPanel position for responsive padding */
+@media (min-width: 769px) {
+  .photo-hero-card__info-panel.glass-panel-wrapper {
+    bottom: 16px;
+    left: 16px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .photo-hero-card__info-panel.glass-panel-wrapper {
+    bottom: 20px;
+    left: 20px;
+  }
+}
+
+/* Info content layout */
+.photo-hero-card__info {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.photo-hero-card__location,
+.photo-hero-card__date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.photo-hero-card__location svg,
+.photo-hero-card__date svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+/* Location text truncation */
+.photo-hero-card__location-text {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 769px) {
+  .photo-hero-card__location-text {
+    max-width: 200px;
+  }
+
+  .photo-hero-card__info {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .photo-hero-card__location-text {
+    max-width: 250px;
+  }
+
+  .photo-hero-card__info {
+    font-size: 16px;
+  }
+}
+
+/* === Reduced Motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-hero-card {
+    transition: box-shadow var(--transition-smooth);
+  }
+
+  .photo-hero-card:hover {
+    transform: none;
+  }
+
+  .photo-hero-card:active {
+    transform: none;
+  }
+
+  .photo-hero-card:hover .glass-badge-glass {
+    transform: none;
+  }
+
+  .photo-hero-card__photo-foreground img {
+    opacity: 1;
+    transition: none;
+  }
+
+  .photo-hero-card__retry-button .spinning {
+    animation: none;
+  }
+}
+
+/* === Grid Variant Specific Styles === */
+
+.photo-hero-card--grid .photo-hero-card__badges {
+  top: 8px;
+  left: 8px;
+  right: 8px;
+}
+
+.photo-hero-card--grid .photo-hero-card__badges-left,
+.photo-hero-card--grid .photo-hero-card__badges-right {
+  gap: 4px;
+}
+
+.photo-hero-card--grid .photo-hero-card__species-badge {
+  max-width: 100px;
+}
+
+.photo-hero-card--grid .photo-hero-card__info-panel.glass-panel-wrapper {
+  bottom: 8px;
+  left: 8px;
+}
+
+.photo-hero-card--grid .photo-hero-card__info {
+  font-size: 12px;
+  gap: 8px;
+}
+
+.photo-hero-card--grid .photo-hero-card__location-text {
+  max-width: 80px;
+}
+
+.photo-hero-card--grid .photo-hero-card__placeholder-content svg {
+  width: 40px;
+  height: 40px;
+}
+
+.photo-hero-card--grid .photo-hero-card__placeholder-text {
+  font-size: 12px;
+}
+
+.photo-hero-card--grid .photo-hero-card__error-state > svg {
+  width: 32px;
+  height: 32px;
+}
+
+.photo-hero-card--grid .photo-hero-card__error-state > p {
+  font-size: 12px;
+}
+
+.photo-hero-card--grid .photo-hero-card__retry-button {
+  padding: 6px 12px;
+  font-size: 11px;
+  min-height: 36px;
+}
