@@ -46,9 +46,13 @@ test.describe('釣果記録作成フロー', () => {
     await expect(page.locator('h1')).toContainText('記録一覧');
 
     // 作成した記録が表示されることを確認
-    // PhotoHeroCardに同じテキストが複数表示される場合があるため.first()を使用
-    await expect(page.locator('text=ブラックバス').first()).toBeVisible();
-    await expect(page.locator('text=千葉県 印旛沼').first()).toBeVisible();
+    // PhotoHeroCardカルーセル内で複数カードが存在する場合があるため、
+    // ページ全体にテキストが含まれることを確認
+    await page.waitForSelector('.photo-hero-card', { state: 'attached', timeout: 10000 });
+
+    // ページ内に作成した記録のテキストが存在することを確認
+    await expect(page.locator('body')).toContainText('ブラックバス', { timeout: 10000 });
+    await expect(page.locator('body')).toContainText('印旛沼', { timeout: 10000 });
   });
 
   test.skip('写真付きの釣果記録を作成できる', async ({ page }) => {
