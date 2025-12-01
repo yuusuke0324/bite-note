@@ -24,6 +24,9 @@ describe('FishSpeciesAutocomplete', () => {
   let mockOnChange: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
+    // Fake timersを使用してタイマーを制御（CI環境でのUnhandled Error防止）
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+
     // CI環境ではJSDOM初期化を確実に待つ（Tech-lead recommendation for Issue #37）
     if (process.env.CI) {
       // より長い待機時間とポーリングでbody確認
@@ -34,7 +37,7 @@ describe('FishSpeciesAutocomplete', () => {
       }, { timeout: 5000, interval: 100 });
     } else {
       // ローカル環境は高速化のため最小限
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await vi.advanceTimersByTimeAsync(0);
     }
 
     mockOnChange = vi.fn();
@@ -43,8 +46,16 @@ describe('FishSpeciesAutocomplete', () => {
     Element.prototype.scrollIntoView = vi.fn();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    // すべての保留中タイマーを実行してクリーンアップ
+    // これにより、テスト環境破棄後のタイマー実行によるUnhandled Errorを防止
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    vi.useRealTimers();
     vi.clearAllMocks();
+
     // CI環境ではsetupTests.tsが作成したroot containerを保持するため、body.innerHTML = ''を実行しない
     // 非CI環境のみクリーンアップを実施（Issue #37 fix）
     if (!process.env.CI) {

@@ -41,6 +41,8 @@ export interface PhotoHeroCardProps {
   fishingTime?: string;
   /** Whether tide data is loading */
   tideLoading?: boolean;
+  /** Whether to show "tap to view map" hint (detail view only) */
+  showMapHint?: boolean;
 }
 
 /**
@@ -183,6 +185,7 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
   tideChartData,
   fishingTime,
   tideLoading = false,
+  showMapHint = false,
 }) => {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
@@ -432,7 +435,7 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
       )}
 
       {/* Map Affordance Bar - detail view only */}
-      {variant === 'default' && (
+      {showMapHint && (
         <div className="photo-hero-card__map-bar" aria-hidden="true">
           <Map size={18} />
           <span>タップして地図を表示</span>
