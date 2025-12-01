@@ -122,10 +122,24 @@ describe('FishIcon', () => {
   });
 
   describe('Fish Species Background Colors (Light Mode)', () => {
+    // Light Mode用にモックを明示的に設定
+    beforeEach(() => {
+      mockedUseTheme.mockReturnValue({
+        isDark: false,
+        theme: 'light',
+        toggleTheme: vi.fn(),
+        setThemeMode: vi.fn(),
+      });
+    });
+
     // ヘルパー関数: HEX/RGB両形式に対応して色を比較
     const expectBackgroundColor = (element: HTMLElement | null, expectedHex: string) => {
       expect(element).not.toBeNull();
       const style = element!.style.backgroundColor;
+      // CI環境でのデバッグ用ログ
+      if (process.env.CI && !colorsMatch(style, expectedHex)) {
+        console.log('Light Mode test debug:', { style, expectedHex, colorsMatch: colorsMatch(style, expectedHex) });
+      }
       expect(colorsMatch(style, expectedHex)).toBe(true);
     };
 
