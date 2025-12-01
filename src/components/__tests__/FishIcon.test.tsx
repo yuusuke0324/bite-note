@@ -56,46 +56,44 @@ function expectBackgroundColor(element: HTMLElement | null, expectedHex: string)
       expectedHex,
       expectedRgb: hexToRgb(expectedHex),
       elementOuterHTML: element!.outerHTML.substring(0, 200),
-      mockState: mockedUseTheme.mock?.results?.[mockedUseTheme.mock.results.length - 1]?.value,
+      mockIsDark,
     });
   }
 
   expect(colorsMatch(style, expectedHex)).toBe(true);
 }
 
-// useThemeをモック（初期値はライトモード）
-vi.mock('../../hooks/useTheme', () => ({
-  useTheme: vi.fn(() => ({ isDark: false, theme: 'light', toggleTheme: vi.fn(), setThemeMode: vi.fn() })),
-}));
+/**
+ * モック状態を制御する外部変数
+ *
+ * @note Vitestのforks modeでは、vi.fn().mockReturnValue()が
+ * 正しく動作しないため、外部変数を参照する方式を採用。
+ * この変数の値を変更することで、useThemeの戻り値を制御する。
+ */
+let mockIsDark = false;
 
-// モックをインポート
-import { useTheme } from '../../hooks/useTheme';
-const mockedUseTheme = vi.mocked(useTheme);
+// useThemeをモック（外部変数を参照）
+vi.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({
+    isDark: mockIsDark,
+    theme: mockIsDark ? 'dark' : 'light',
+    toggleTheme: vi.fn(),
+    setThemeMode: vi.fn(),
+  }),
+}));
 
 /**
  * ライトモードのモック設定
  */
 function setupLightModeMock(): void {
-  mockedUseTheme.mockReset();
-  mockedUseTheme.mockReturnValue({
-    isDark: false,
-    theme: 'light',
-    toggleTheme: vi.fn(),
-    setThemeMode: vi.fn(),
-  });
+  mockIsDark = false;
 }
 
 /**
  * ダークモードのモック設定
  */
 function setupDarkModeMock(): void {
-  mockedUseTheme.mockReset();
-  mockedUseTheme.mockReturnValue({
-    isDark: true,
-    theme: 'dark',
-    toggleTheme: vi.fn(),
-    setThemeMode: vi.fn(),
-  });
+  mockIsDark = true;
 }
 
 describe('FishIcon', () => {
@@ -116,7 +114,8 @@ describe('FishIcon', () => {
   });
 
   afterEach(() => {
-    mockedUseTheme.mockReset();
+    // デフォルトはライトモードにリセット
+    mockIsDark = false;
     if (!process.env.CI) {
       document.body.innerHTML = '';
     }
