@@ -49,6 +49,9 @@ const mockedUseTheme = vi.mocked(useTheme);
 
 describe('FishIcon', () => {
   beforeEach(async () => {
+    // モックを完全にリセット
+    vi.resetAllMocks();
+
     // CI環境でのJSDOM初期化待機
     if (process.env.CI) {
       await waitFor(
@@ -72,7 +75,7 @@ describe('FishIcon', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     if (!process.env.CI) {
       document.body.innerHTML = '';
     }
@@ -122,83 +125,93 @@ describe('FishIcon', () => {
   });
 
   describe('Fish Species Background Colors (Light Mode)', () => {
-    // Light Mode用にモックを明示的に設定
-    beforeEach(() => {
+    // ヘルパー関数: ライトモードでレンダリング
+    const renderLightMode = (species: string) => {
+      // テスト直前にモックを設定
       mockedUseTheme.mockReturnValue({
         isDark: false,
         theme: 'light',
         toggleTheme: vi.fn(),
         setThemeMode: vi.fn(),
       });
-    });
+      return render(<FishIcon species={species} />);
+    };
 
     // ヘルパー関数: HEX/RGB両形式に対応して色を比較
     const expectBackgroundColor = (element: HTMLElement | null, expectedHex: string) => {
       expect(element).not.toBeNull();
       const style = element!.style.backgroundColor;
-      // CI環境でのデバッグ用ログ
-      if (process.env.CI && !colorsMatch(style, expectedHex)) {
-        console.log('Light Mode test debug:', { style, expectedHex, colorsMatch: colorsMatch(style, expectedHex) });
-      }
       expect(colorsMatch(style, expectedHex)).toBe(true);
     };
 
     it('applies teal color for Seabass (シーバス)', () => {
-      const { container } = render(<FishIcon species="シーバス" />);
+      const { container } = renderLightMode('シーバス');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['シーバス'].light);
     });
 
     it('applies red color for Red Sea Bream (マダイ)', () => {
-      const { container } = render(<FishIcon species="マダイ" />);
+      const { container } = renderLightMode('マダイ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['マダイ'].light);
     });
 
     it('applies red color for Black Sea Bream (チヌ)', () => {
-      const { container } = render(<FishIcon species="チヌ" />);
+      const { container } = renderLightMode('チヌ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['チヌ'].light);
     });
 
     it('applies blue color for Horse Mackerel (アジ)', () => {
-      const { container } = render(<FishIcon species="アジ" />);
+      const { container } = renderLightMode('アジ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['アジ'].light);
     });
 
     it('applies blue color for Mackerel (サバ)', () => {
-      const { container } = render(<FishIcon species="サバ" />);
+      const { container } = renderLightMode('サバ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['サバ'].light);
     });
 
     it('applies purple color for Rockfish (メバル)', () => {
-      const { container } = render(<FishIcon species="メバル" />);
+      const { container } = renderLightMode('メバル');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['メバル'].light);
     });
 
     it('applies purple-pink color for Bigfin Reef Squid (アオリイカ)', () => {
-      const { container } = render(<FishIcon species="アオリイカ" />);
+      const { container } = renderLightMode('アオリイカ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['アオリイカ'].light);
     });
 
     it('applies cyan color for Yellowtail (ブリ)', () => {
-      const { container } = render(<FishIcon species="ブリ" />);
+      const { container } = renderLightMode('ブリ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['ブリ'].light);
     });
 
     it('applies default primary color for unknown species', () => {
-      const { container } = render(<FishIcon species="未知の魚" />);
+      const { container } = renderLightMode('未知の魚');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, DEFAULT_FISH_COLOR.light);
     });
   });
 
   describe('Dark Mode Colors', () => {
+    // ヘルパー関数: ダークモードでレンダリング
+    const renderDarkMode = (species: string) => {
+      // テスト直前にモックを設定
+      mockedUseTheme.mockReturnValue({
+        isDark: true,
+        theme: 'dark',
+        toggleTheme: vi.fn(),
+        setThemeMode: vi.fn(),
+      });
+      return render(<FishIcon species={species} />);
+    };
+
     // ヘルパー関数: HEX/RGB両形式に対応して色を比較
     const expectBackgroundColor = (element: HTMLElement | null, expectedHex: string) => {
       expect(element).not.toBeNull();
@@ -206,35 +219,26 @@ describe('FishIcon', () => {
       expect(colorsMatch(style, expectedHex)).toBe(true);
     };
 
-    beforeEach(() => {
-      mockedUseTheme.mockReturnValue({
-        isDark: true,
-        theme: 'dark',
-        toggleTheme: vi.fn(),
-        setThemeMode: vi.fn(),
-      });
-    });
-
     it('applies brighter teal color for Seabass in dark mode', () => {
-      const { container } = render(<FishIcon species="シーバス" />);
+      const { container } = renderDarkMode('シーバス');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['シーバス'].dark);
     });
 
     it('applies brighter red color for Red Sea Bream in dark mode', () => {
-      const { container } = render(<FishIcon species="マダイ" />);
+      const { container } = renderDarkMode('マダイ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['マダイ'].dark);
     });
 
     it('applies brighter blue color for Horse Mackerel in dark mode', () => {
-      const { container } = render(<FishIcon species="アジ" />);
+      const { container } = renderDarkMode('アジ');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['アジ'].dark);
     });
 
     it('applies default primary color for unknown species in dark mode', () => {
-      const { container } = render(<FishIcon species="未知の魚" />);
+      const { container } = renderDarkMode('未知の魚');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, DEFAULT_FISH_COLOR.dark);
     });
@@ -275,6 +279,17 @@ describe('FishIcon', () => {
   });
 
   describe('Partial Matching', () => {
+    // ヘルパー関数: ライトモードでレンダリング
+    const renderLightMode = (species: string) => {
+      mockedUseTheme.mockReturnValue({
+        isDark: false,
+        theme: 'light',
+        toggleTheme: vi.fn(),
+        setThemeMode: vi.fn(),
+      });
+      return render(<FishIcon species={species} />);
+    };
+
     // ヘルパー関数: HEX/RGB両形式に対応して色を比較
     const expectBackgroundColor = (element: HTMLElement | null, expectedHex: string) => {
       expect(element).not.toBeNull();
@@ -283,13 +298,13 @@ describe('FishIcon', () => {
     };
 
     it('matches partial species name: シーバス（セイゴ）-> シーバス', () => {
-      const { container } = render(<FishIcon species="シーバス（セイゴ）" />);
+      const { container } = renderLightMode('シーバス（セイゴ）');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['シーバス'].light);
     });
 
     it('matches partial species name: マダイ 40cm -> マダイ', () => {
-      const { container } = render(<FishIcon species="マダイ 40cm" />);
+      const { container } = renderLightMode('マダイ 40cm');
       const icon = container.querySelector('.fish-icon-container') as HTMLElement;
       expectBackgroundColor(icon, FISH_COLORS['マダイ'].light);
     });
