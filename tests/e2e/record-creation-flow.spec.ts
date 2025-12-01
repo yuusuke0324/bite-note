@@ -46,8 +46,9 @@ test.describe('釣果記録作成フロー', () => {
     await expect(page.locator('h1')).toContainText('記録一覧');
 
     // 作成した記録が表示されることを確認
-    await expect(page.locator('text=ブラックバス')).toBeVisible();
-    await expect(page.locator('text=千葉県 印旛沼')).toBeVisible();
+    // PhotoHeroCardに同じテキストが複数表示される場合があるため.first()を使用
+    await expect(page.locator('text=ブラックバス').first()).toBeVisible();
+    await expect(page.locator('text=千葉県 印旛沼').first()).toBeVisible();
   });
 
   test.skip('写真付きの釣果記録を作成できる', async ({ page }) => {

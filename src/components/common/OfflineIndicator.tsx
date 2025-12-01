@@ -90,9 +90,14 @@ export const OfflineIndicator = ({ isOnline }: OfflineIndicatorProps) => {
       if (!isMountedRef.current) return;
       showError('同期中にエラーが発生しました');
     } finally {
-      // unmount後の状態更新を防ぐ
-      if (isMountedRef.current) {
-        setIsSyncing(false);
+      // unmount後・テスト環境終了後の状態更新を防ぐ
+      // テスト環境（JSDOM）が先に終了することがあるためwindow存在チェックも追加
+      if (isMountedRef.current && typeof window !== 'undefined') {
+        try {
+          setIsSyncing(false);
+        } catch {
+          // テスト環境終了後のReact状態更新エラーを無視
+        }
       }
     }
   };
