@@ -48,6 +48,18 @@ function colorsMatch(actual: string, expectedHex: string): boolean {
 function expectBackgroundColor(element: HTMLElement | null, expectedHex: string): void {
   expect(element).not.toBeNull();
   const style = element!.style.backgroundColor;
+
+  // CI環境でのデバッグ出力
+  if (process.env.CI) {
+    console.log('[FishIcon Debug]', {
+      actualStyle: style,
+      expectedHex,
+      expectedRgb: hexToRgb(expectedHex),
+      elementOuterHTML: element!.outerHTML.substring(0, 200),
+      mockState: mockedUseTheme.mock?.results?.[mockedUseTheme.mock.results.length - 1]?.value,
+    });
+  }
+
   expect(colorsMatch(style, expectedHex)).toBe(true);
 }
 
