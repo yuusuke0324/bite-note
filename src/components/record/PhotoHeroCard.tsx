@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MapPin, Calendar, Trophy, AlertCircle, RefreshCw, Fish, Ruler, Scale } from 'lucide-react';
+import { MapPin, Calendar, Trophy, AlertCircle, RefreshCw, Fish, Ruler, Scale, Cloud, Thermometer, Waves, Map } from 'lucide-react';
 import { LineChart, Line, ReferenceDot, XAxis, YAxis } from 'recharts';
 import { GlassBadge } from '../ui/GlassBadge';
 import { GlassPanel } from '../ui/GlassPanel';
@@ -84,52 +84,92 @@ const formatWeight = (weight?: number): string | null => {
 };
 
 /**
+ * Calculate tide name (潮名) from lunar age
+ * Based on traditional Japanese tide naming convention
+ */
+type TideName = '大潮' | '中潮' | '小潮' | '長潮' | '若潮';
+
+const calculateTideName = (date: Date): TideName => {
+  // Calculate lunar age (月齢) using a simplified formula
+  // Reference: New moon on January 6, 2000 (known synodic month = 29.53059 days)
+  const knownNewMoon = new Date('2000-01-06T18:14:00Z').getTime();
+  const synodicMonth = 29.53059; // days
+  const daysSinceNewMoon = (date.getTime() - knownNewMoon) / (1000 * 60 * 60 * 24);
+  const lunarAge = ((daysSinceNewMoon % synodicMonth) + synodicMonth) % synodicMonth;
+
+  // Tide name based on lunar age (rounded to integer)
+  const age = Math.round(lunarAge);
+
+  // 大潮: 新月・満月付近 (0-1, 14-16, 28-29)
+  if (age <= 1 || (age >= 14 && age <= 16) || age >= 28) return '大潮';
+  // 中潮: 大潮と小潮の間 (2-4, 12-13, 17-19, 26-27)
+  if ((age >= 2 && age <= 4) || (age >= 12 && age <= 13) ||
+      (age >= 17 && age <= 19) || (age >= 26 && age <= 27)) return '中潮';
+  // 長潮: 上弦・下弦の翌日 (7, 22)
+  if (age === 7 || age === 22) return '長潮';
+  // 若潮: 長潮の翌日 (8, 23)
+  if (age === 8 || age === 23) return '若潮';
+  // 小潮: その他 (5-6, 9-11, 20-21, 24-25)
+  return '小潮';
+};
+
+/**
  * CompactTideChart - Compact tide chart for PhotoHeroCard overlay
  * Uses Recharts directly with minimal margin for 180x100px display
  */
 interface CompactTideChartProps {
   data: TideChartData[];
   fishingTime?: string;
+  fishingDate?: Date;
 }
 
-const CompactTideChart: React.FC<CompactTideChartProps> = ({ data, fishingTime }) => {
+const CompactTideChart: React.FC<CompactTideChartProps> = ({ data, fishingTime, fishingDate }) => {
   // Find fishing time marker position
   const fishingMarker = fishingTime
     ? data.find((point) => point.time === fishingTime)
     : undefined;
 
+  // Calculate tide name from fishing date
+  const tideName = fishingDate ? calculateTideName(fishingDate) : null;
+
   return (
-    <LineChart
-      data={data}
-      width={180}
-      height={100}
-      margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
-    >
-      {/* Hidden axes required for ReferenceDot positioning */}
-      <XAxis dataKey="time" hide />
-      <YAxis dataKey="tide" hide domain={['dataMin', 'dataMax']} />
-      {/* Tide curve - blue smooth line */}
-      <Line
-        type="basis"
-        dataKey="tide"
-        stroke="#60a5fa"
-        strokeWidth={2}
-        dot={false}
-        activeDot={false}
-        isAnimationActive={false}
-      />
-      {/* Fishing time marker - orange dot */}
-      {fishingMarker && (
-        <ReferenceDot
-          x={fishingMarker.time}
-          y={fishingMarker.tide}
-          r={4}
-          fill="#fb923c"
-          stroke="#fff"
-          strokeWidth={1}
-        />
+    <div className="photo-hero-card__tide-chart-inner">
+      {/* Tide name label */}
+      {tideName && (
+        <div className="photo-hero-card__tide-name">{tideName}</div>
       )}
-    </LineChart>
+      <LineChart
+        data={data}
+        width={180}
+        height={80}
+        margin={{ top: 4, right: 8, bottom: 4, left: 8 }}
+      >
+        {/* Hidden axes required for ReferenceDot positioning */}
+        <XAxis dataKey="time" hide />
+        <YAxis dataKey="tide" hide domain={['dataMin', 'dataMax']} />
+        {/* Tide curve - blue smooth line */}
+        <Line
+          type="basis"
+          dataKey="tide"
+          stroke="#60a5fa"
+          strokeWidth={2}
+          dot={false}
+          activeDot={false}
+          isAnimationActive={false}
+        />
+        {/* Fishing time marker - orange dot */}
+        {fishingMarker && (
+          <ReferenceDot
+            x={fishingMarker.time}
+            y={fishingMarker.tide}
+            r={4}
+            fill="#fb923c"
+            stroke="#fff"
+            strokeWidth={1}
+          />
+        )}
+      </LineChart>
+    </div>
   );
 };
 
@@ -300,14 +340,45 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
       {/* Overlay: Unified Info Panel (top-left) */}
       <GlassPanel position="top-left" className="photo-hero-card__info-panel">
         <div className="photo-hero-card__info-unified">
+          {/* 1. 日時 */}
           <div className="photo-hero-card__info-row">
             <Calendar size={14} aria-hidden="true" />
             <span>{dateText}</span>
           </div>
+          {/* 2. 場所 */}
+          <div className="photo-hero-card__info-row">
+            <MapPin size={14} aria-hidden="true" />
+            <span className="photo-hero-card__location-text" title={record.location}>{record.location}</span>
+          </div>
+          {/* 3. 天気・水温 */}
+          {(record.weather || record.weatherData || record.temperature !== undefined || record.seaTemperature !== undefined) && (
+            <div className="photo-hero-card__info-row photo-hero-card__weather-row">
+              {(record.weather || record.weatherData?.condition) && (
+                <span className="photo-hero-card__weather-item">
+                  <Cloud size={14} aria-hidden="true" />
+                  <span>{record.weather || record.weatherData?.condition}</span>
+                </span>
+              )}
+              {(record.temperature !== undefined || record.weatherData?.temperature !== undefined) && (
+                <span className="photo-hero-card__weather-item">
+                  <Thermometer size={14} aria-hidden="true" />
+                  <span>{record.temperature ?? record.weatherData?.temperature}°C</span>
+                </span>
+              )}
+              {record.seaTemperature !== undefined && (
+                <span className="photo-hero-card__weather-item">
+                  <Waves size={14} aria-hidden="true" />
+                  <span>{record.seaTemperature}°C</span>
+                </span>
+              )}
+            </div>
+          )}
+          {/* 4. 魚種 */}
           <div className="photo-hero-card__info-row">
             <Fish size={14} aria-hidden="true" />
             <span className="photo-hero-card__species-text">{record.fishSpecies}</span>
           </div>
+          {/* 5. サイズ・重量 */}
           {(sizeText || weightText) && (
             <div className="photo-hero-card__info-row photo-hero-card__measurements">
               {sizeText && (
@@ -324,10 +395,6 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
               )}
             </div>
           )}
-          <div className="photo-hero-card__info-row">
-            <MapPin size={14} aria-hidden="true" />
-            <span className="photo-hero-card__location-text" title={record.location}>{record.location}</span>
-          </div>
         </div>
       </GlassPanel>
 
@@ -341,7 +408,7 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
               aria-label="潮汐グラフ"
               data-testid="photo-hero-card-tide-chart"
             >
-              <CompactTideChart data={tideChartData} fishingTime={fishingTime} />
+              <CompactTideChart data={tideChartData} fishingTime={fishingTime} fishingDate={record.date} />
             </div>
           )}
           {/* Tide Loading Indicator */}
@@ -361,6 +428,14 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
               <span>Best</span>
             </GlassBadge>
           )}
+        </div>
+      )}
+
+      {/* Map Affordance Bar - detail view only */}
+      {variant === 'default' && (
+        <div className="photo-hero-card__map-bar" aria-hidden="true">
+          <Map size={18} />
+          <span>タップして地図を表示</span>
         </div>
       )}
     </div>

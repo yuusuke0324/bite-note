@@ -10,16 +10,13 @@ import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { PhotoHeroCard } from './record/PhotoHeroCard';
 import {
-  Fish,
-  MapPin,
   MessageCircle,
-  Map,
-  Globe,
   Edit,
   Trash2,
   X,
   ChevronLeft,
   ChevronRight,
+  MoreVertical,
 } from 'lucide-react';
 
 interface FishingRecordDetailProps {
@@ -105,6 +102,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 }) => {
   const [photoExpanded, setPhotoExpanded] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showContextMenu, setShowContextMenu] = useState(false);
   const [tideChartData, setTideChartData] = useState<TideChartData[] | null>(null);
   const [tideLoading, setTideLoading] = useState(false);
 
@@ -167,10 +165,6 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     const finalHours = snappedMinutes === 60 ? (hours + 1) % 24 : hours;
     return `${String(finalHours).padStart(2, '0')}:${String(finalMinutes).padStart(2, '0')}`;
   }, [record.date]);
-
-  const handleEdit = () => {
-    onEdit?.(record);
-  };
 
   const handleDelete = () => {
     if (showDeleteConfirm) {
@@ -266,6 +260,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       >
         <div
           style={{
+            position: 'relative',
             backgroundColor: 'var(--color-surface-primary)',
             borderRadius: '12px',
             maxWidth: '600px',
@@ -276,216 +271,254 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             border: `1px solid ${'var(--color-border-light)'}`
           }}
           role="dialog"
-          aria-labelledby="record-title"
-          aria-describedby="record-content"
+          aria-label={`${record.fishSpecies}の詳細`}
         >
-          {/* ヘッダー */}
+          {/* 右上のアクションボタン群 */}
           <div style={{
-            padding: '1.5rem',
-            borderBottom: `1px solid ${'var(--color-border-light)'}`,
-            position: 'sticky',
-            top: 0,
-            backgroundColor: 'var(--color-surface-primary)',
-            borderRadius: '12px 12px 0 0'
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            display: 'flex',
+            gap: '8px',
+            zIndex: 10
           }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              marginBottom: '1rem'
-            }}>
-              <h2
-                id="record-title"
-                style={{
-                  margin: 0,
-                  fontSize: '1.75rem',
-                  fontWeight: 'bold',
-                  color: 'var(--color-text-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <Icon icon={Fish} size={24} decorative /> {record.fishSpecies}
-              </h2>
-
-              <button
-                onClick={onClose}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '1.5rem',
-                  cursor: 'pointer',
-                  color: 'var(--color-text-secondary)',
-                  padding: '0.5rem',
-                  borderRadius: '4px'
-                }}
-                aria-label="詳細を閉じる"
-                title="閉じる"
-              >
-                <Icon icon={X} size={20} decorative />
-              </button>
-            </div>
-
-            {/* ナビゲーション */}
-            {(hasPrevious || hasNext) && (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
+            {/* コンテキストメニューボタン */}
+            {(onEdit || onDelete) && (
+              <div style={{ position: 'relative' }}>
                 <button
-                  onClick={onPrevious}
-                  disabled={!hasPrevious}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    backgroundColor: hasPrevious ? '#60a5fa' : 'var(--color-surface-secondary)',
-                    color: hasPrevious ? 'white' : 'var(--color-text-tertiary)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: hasPrevious ? 'pointer' : 'not-allowed',
-                    fontSize: '0.875rem'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowContextMenu(!showContextMenu);
                   }}
-                  aria-label="前の記録"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    background: 'rgba(0, 0, 0, 0.5)',
+                    backdropFilter: 'blur(8px)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'background 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.5)';
+                  }}
+                  aria-label="アクションメニュー"
+                  title="メニュー"
                 >
-                  <Icon icon={ChevronLeft} size={16} decorative /> 前へ
+                  <Icon icon={MoreVertical} size={18} decorative />
                 </button>
 
-                <span style={{
-                  fontSize: '0.875rem',
-                  color: 'var(--color-text-secondary)'
-                }}>
-                  記録詳細
-                </span>
-
-                <button
-                  onClick={onNext}
-                  disabled={!hasNext}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    backgroundColor: hasNext ? '#60a5fa' : 'var(--color-surface-secondary)',
-                    color: hasNext ? 'white' : 'var(--color-text-tertiary)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: hasNext ? 'pointer' : 'not-allowed',
-                    fontSize: '0.875rem'
-                  }}
-                  aria-label="次の記録"
-                >
-                  次へ <Icon icon={ChevronRight} size={16} decorative />
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* コンテンツ */}
-          <div id="record-content" style={{ padding: '1.5rem' }}>
-            {/* 写真表示 - PhotoHeroCardを使用 */}
-            {/* タップアクション: 座標があれば地図へ、なければ写真があれば拡大表示 */}
-            {/* 詳細画面では実際の潮汐グラフをオーバーレイ表示 */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <PhotoHeroCard
-                record={record}
-                onClick={() => {
-                  if (record.coordinates && onNavigateToMap) {
-                    onNavigateToMap(record);
-                    onClose?.();
-                  } else if (photoUrl) {
-                    setPhotoExpanded(true);
-                  }
-                }}
-                tideChartData={tideChartData ?? undefined}
-                fishingTime={fishingTimeForChart}
-                tideLoading={tideLoading}
-              />
-            </div>
-
-            {/* 場所情報 */}
-            <div style={{
-              padding: '1rem',
-              backgroundColor: 'var(--color-surface-secondary)',
-              borderRadius: '8px',
-              border: `1px solid ${'var(--color-border-light)'}`,
-              marginBottom: '1.5rem'
-            }}>
-              <h4 style={{
-                margin: '0 0 0.75rem 0',
-                fontSize: '0.875rem',
-                color: 'var(--color-text-secondary)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                <Icon icon={MapPin} size={14} decorative /> 釣り場
-              </h4>
-              <p style={{
-                margin: '0 0 1rem 0',
-                fontSize: '1.125rem',
-                fontWeight: 'bold',
-                color: 'var(--color-text-primary)'
-              }}>
-                {record.location}
-              </p>
-
-              {record.coordinates && (
-                <div style={{ marginTop: '0.75rem' }}>
-                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
-                    <Icon icon={MapPin} size={14} decorative /> 緯度: {record.coordinates.latitude.toFixed(6)}, 経度: {record.coordinates.longitude.toFixed(6)}
-                    {record.coordinates.accuracy && <span> (精度: ±{Math.round(record.coordinates.accuracy)}m)</span>}
-                  </div>
-                  <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {onNavigateToMap && (
+                {/* ドロップダウンメニュー */}
+                {showContextMenu && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '40px',
+                      right: '0',
+                      background: 'rgba(30, 30, 30, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      borderRadius: '12px',
+                      padding: '8px',
+                      minWidth: '140px',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}
+                  >
+                    {onEdit && (
                       <button
                         onClick={() => {
-                          onNavigateToMap(record);
-                          onClose?.();
+                          setShowContextMenu(false);
+                          onEdit(record);
                         }}
                         style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          padding: '0.5rem 1rem',
-                          backgroundColor: '#60a5fa',
-                          color: 'white',
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'transparent',
                           border: 'none',
-                          borderRadius: '4px',
-                          fontSize: '0.875rem',
-                          cursor: 'pointer'
+                          borderRadius: '8px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          transition: 'background 0.2s ease',
+                          minHeight: '44px'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
                         }}
                       >
-                        <Icon icon={Map} size={16} decorative /> 地図で表示
+                        <Icon icon={Edit} size={16} decorative />
+                        <span>編集</span>
                       </button>
                     )}
-                    <a
-                      href={`https://maps.google.com/?q=${record.coordinates.latitude},${record.coordinates.longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#34A853',
-                        color: 'white',
-                        textDecoration: 'none',
-                        borderRadius: '4px',
-                        fontSize: '0.875rem'
-                      }}
-                    >
-                      <Icon icon={Globe} size={16} decorative /> Googleマップで表示
-                    </a>
+                    {onDelete && (
+                      <button
+                        onClick={() => {
+                          setShowContextMenu(false);
+                          setShowDeleteConfirm(true);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'transparent',
+                          border: 'none',
+                          borderRadius: '8px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          color: '#ef4444',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          transition: 'background 0.2s ease',
+                          minHeight: '44px'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        <Icon icon={Trash2} size={16} decorative />
+                        <span>削除</span>
+                      </button>
+                    )}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            )}
+
+            {/* 閉じるボタン */}
+            <button
+              onClick={onClose}
+              style={{
+                width: '32px',
+                height: '32px',
+                background: 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'blur(8px)',
+                border: 'none',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.5)';
+              }}
+              aria-label="詳細を閉じる"
+              title="閉じる"
+            >
+              <Icon icon={X} size={18} decorative />
+            </button>
+          </div>
+
+          {/* ナビゲーション（前後ボタン） */}
+          {(hasPrevious || hasNext) && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: 0,
+              right: 0,
+              transform: 'translateY(-50%)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '0 8px',
+              pointerEvents: 'none',
+              zIndex: 10
+            }}>
+              <button
+                onClick={onPrevious}
+                disabled={!hasPrevious}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  background: hasPrevious ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)',
+                  backdropFilter: 'blur(8px)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: hasPrevious ? 'pointer' : 'not-allowed',
+                  color: hasPrevious ? 'white' : 'rgba(255,255,255,0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'auto'
+                }}
+                aria-label="前の記録"
+              >
+                <Icon icon={ChevronLeft} size={20} decorative />
+              </button>
+
+              <button
+                onClick={onNext}
+                disabled={!hasNext}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  background: hasNext ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)',
+                  backdropFilter: 'blur(8px)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: hasNext ? 'pointer' : 'not-allowed',
+                  color: hasNext ? 'white' : 'rgba(255,255,255,0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'auto'
+                }}
+                aria-label="次の記録"
+              >
+                <Icon icon={ChevronRight} size={20} decorative />
+              </button>
             </div>
+          )}
+
+          {/* コンテンツ */}
+          <div id="record-content">
+            {/* 写真表示 - PhotoHeroCardを使用 */}
+            <PhotoHeroCard
+              record={record}
+              onClick={() => {
+                if (record.coordinates && onNavigateToMap) {
+                  onNavigateToMap(record);
+                  onClose?.();
+                } else if (photoUrl) {
+                  setPhotoExpanded(true);
+                }
+              }}
+              tideChartData={tideChartData ?? undefined}
+              fishingTime={fishingTimeForChart}
+              tideLoading={tideLoading}
+            />
 
             {/* メモ */}
             {record.notes && (
               <div style={{
+                margin: '1rem',
                 padding: '1rem',
                 backgroundColor: 'rgba(251, 191, 36, 0.15)',
                 borderRadius: '8px',
-                border: '1px solid rgba(251, 191, 36, 0.3)',
-                marginBottom: '1.5rem'
+                border: '1px solid rgba(251, 191, 36, 0.3)'
               }}>
                 <h4 style={{
                   margin: '0 0 0.75rem 0',
@@ -508,128 +541,128 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
               </div>
             )}
 
-            {/* 潮汐情報は PhotoHeroCard のオーバーレイグラフで表示 */}
-            {/* TideIntegration UI は Issue #322 で削除されました */}
-
-            {/* メタデータ */}
-            <div style={{
-              padding: '1rem',
-              backgroundColor: 'var(--color-surface-secondary)',
-              borderRadius: '8px',
-              border: `1px solid ${'var(--color-border-light)'}`,
-              fontSize: '0.875rem',
-              color: 'var(--color-text-secondary)',
-              marginTop: '1.5rem'
-            }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                gap: '0.5rem'
-              }}>
-                <div>
-                  <strong>作成:</strong> {record.createdAt.toLocaleString('ja-JP')}
-                </div>
-                <div>
-                  <strong>更新:</strong> {record.updatedAt.toLocaleString('ja-JP')}
-                </div>
-                <div>
-                  <strong>ID:</strong> {record.id.slice(0, 8)}...
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* フッター */}
-          <div style={{
-            padding: '1.5rem',
-            borderTop: `1px solid ${'var(--color-border-light)'}`,
-            display: 'flex',
-            gap: '1rem',
-            justifyContent: 'flex-end',
-            position: 'sticky',
-            bottom: 0,
-            backgroundColor: 'var(--color-surface-primary)',
-            borderRadius: '0 0 12px 12px'
-          }}>
-            {showDeleteConfirm ? (
-              <>
-                <span style={{
-                  flex: 1,
-                  color: '#ef4444',
-                  fontSize: '0.875rem',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  本当に削除しますか？
-                </span>
-                <button
-                  onClick={handleCancelDelete}
-                  style={{
-                    padding: '0.75rem 1rem',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  キャンセル
-                </button>
-                <button
-                  onClick={handleDelete}
-                  style={{
-                    padding: '0.75rem 1rem',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  削除する
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleEdit}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    backgroundColor: '#ffc107',
-                    color: '#212529',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                >
-                  <Icon icon={Edit} size={16} decorative /> 編集
-                </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                >
-                  <Icon icon={Trash2} size={16} decorative /> 削除
-                </button>
-              </>
-            )}
           </div>
         </div>
       </div>
+
+      {/* 削除確認モーダル */}
+      {showDeleteConfirm && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1200,
+            padding: '1rem'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCancelDelete();
+            }
+          }}
+        >
+          <div
+            style={{
+              background: 'rgba(30, 30, 30, 0.98)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '320px',
+              width: '100%',
+              boxShadow: '0 16px 48px rgba(0, 0, 0, 0.5)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}
+            role="alertdialog"
+            aria-labelledby="delete-confirm-title"
+            aria-describedby="delete-confirm-description"
+          >
+            <h3
+              id="delete-confirm-title"
+              style={{
+                margin: '0 0 12px 0',
+                fontSize: '18px',
+                fontWeight: 600,
+                color: 'white',
+                textAlign: 'center'
+              }}
+            >
+              記録を削除
+            </h3>
+            <p
+              id="delete-confirm-description"
+              style={{
+                margin: '0 0 24px 0',
+                fontSize: '14px',
+                color: 'rgba(255, 255, 255, 0.7)',
+                textAlign: 'center',
+                lineHeight: 1.5
+              }}
+            >
+              この釣果記録を削除しますか？<br />
+              この操作は取り消せません。
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '12px'
+            }}>
+              <button
+                onClick={handleCancelDelete}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '15px',
+                  fontWeight: 500,
+                  color: 'white',
+                  minHeight: '48px',
+                  transition: 'background 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                }}
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleDelete}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  background: '#ef4444',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '15px',
+                  fontWeight: 500,
+                  color: 'white',
+                  minHeight: '48px',
+                  transition: 'background 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#dc2626';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#ef4444';
+                }}
+              >
+                削除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 写真拡大表示 */}
       {photoExpanded && photoUrl && (

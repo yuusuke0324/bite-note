@@ -107,6 +107,9 @@
   width: 100%;
   height: 100%;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .photo-hero-card__photo-foreground img {
@@ -115,6 +118,11 @@
   object-fit: cover;
   opacity: 0;
   transition: opacity 0.3s ease;
+}
+
+/* Default variant: Show full photo without cropping */
+.photo-hero-card--default .photo-hero-card__photo-foreground img {
+  object-fit: contain;
 }
 
 .photo-hero-card__photo-foreground img.loaded {
@@ -233,6 +241,7 @@
   flex-direction: column;
   gap: 6px;
   font-size: 13px;
+  font-weight: 600;
 }
 
 .photo-hero-card__info-row {
@@ -248,7 +257,6 @@
 
 /* Species text */
 .photo-hero-card__species-text {
-  font-weight: 600;
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -273,6 +281,18 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Weather row */
+.photo-hero-card__weather-row {
+  gap: 12px;
+}
+
+.photo-hero-card__weather-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 
 @media (min-width: 769px) {
   .photo-hero-card__info-unified {
@@ -337,13 +357,32 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  /* Container size - exact fit for CompactTideChart */
+  /* Container size - fit for CompactTideChart with tide name */
   width: 180px;
   height: 100px;
   /* Ensure clean rendering */
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Inner container for tide chart content */
+.photo-hero-card__tide-chart-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tide name label (大潮、中潮、小潮、長潮、若潮) */
+.photo-hero-card__tide-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  padding: 4px 0 0 0;
+  letter-spacing: 0.05em;
 }
 
 /* Tide Loading Indicator */
@@ -378,6 +417,50 @@
   color: #facc15;
 }
 
+/* === Map Affordance Bar === */
+
+.photo-hero-card__map-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 10;
+
+  /* Glass Morphism */
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Text */
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  font-weight: 500;
+
+  /* Interaction */
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.photo-hero-card:hover .photo-hero-card__map-bar,
+.photo-hero-card:focus-visible .photo-hero-card__map-bar {
+  opacity: 1;
+}
+
+.photo-hero-card__map-bar svg {
+  transition: transform 0.2s ease;
+}
+
+.photo-hero-card:hover .photo-hero-card__map-bar svg,
+.photo-hero-card:focus-visible .photo-hero-card__map-bar svg {
+  transform: scale(1.15);
+}
+
 /* === Reduced Motion === */
 
 @media (prefers-reduced-motion: reduce) {
@@ -405,6 +488,20 @@
 
   .photo-hero-card__retry-button .spinning {
     animation: none;
+  }
+
+  .photo-hero-card__map-bar {
+    opacity: 1;
+    transition: none;
+  }
+
+  .photo-hero-card__map-bar svg {
+    transition: none;
+  }
+
+  .photo-hero-card:hover .photo-hero-card__map-bar svg,
+  .photo-hero-card:focus-visible .photo-hero-card__map-bar svg {
+    transform: none;
   }
 }
 

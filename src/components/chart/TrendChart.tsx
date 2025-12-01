@@ -129,13 +129,13 @@ export const TrendChart: React.FC<TrendChartProps> = ({
     <div style={{ width: '100%' }}>
       {title && (
         <h3 style={{
-          margin: '0 0 16px 0',
-          fontSize: '1rem',
+          margin: '0 0 8px 0',
+          fontSize: '0.9rem',
           fontWeight: '600',
           color: 'var(--color-text-primary)',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
+          gap: '6px',
         }}>
           {titleIcon}
           {title}
@@ -146,9 +146,9 @@ export const TrendChart: React.FC<TrendChartProps> = ({
         id="trend-chart-container"
         style={{
           width: '100%',
-          height: `${height}px`,
+          height: `${height - 10}px`,
           position: 'relative',
-          overflow: 'auto',
+          overflow: 'hidden',
         }}
       >
         {type === 'bar' ? (

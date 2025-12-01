@@ -44,15 +44,15 @@ export const ModernCard: React.FC<ModernCardProps> = ({
       sm: {
         padding: '4px 8px',
         minHeight: 'auto',
-        height: 'auto' // コンテンツに合わせた高さ
+        height: 'auto'
       },
       md: {
         padding: '16px',
-        minHeight: '160px' // カードサイズの統一
+        minHeight: 'auto' // コンテンツに合わせた高さ
       },
       lg: {
         padding: '24px',
-        minHeight: '200px' // 大きなカード用
+        minHeight: 'auto' // コンテンツに合わせた高さ
       },
     };
     return sizes[size];

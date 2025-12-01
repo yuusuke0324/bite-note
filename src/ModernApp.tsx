@@ -1053,7 +1053,7 @@ function ModernApp() {
           <ResponsiveGrid
             columns={{ mobile: 4, tablet: 4, desktop: 4 }}
             gap="8px"
-            style={{ marginBottom: '16px' }}
+            style={{ marginBottom: '16px', gridAutoRows: 'auto' }}
           >
             {[...Array(4)].map((_, i) => (
               <div key={i} style={{
@@ -1097,7 +1097,7 @@ function ModernApp() {
         <ResponsiveGrid
           columns={{ mobile: 4, tablet: 4, desktop: 4 }}
           gap="8px"
-          style={{ marginBottom: '16px' }}
+          style={{ marginBottom: '16px', gridAutoRows: 'auto' }}
         >
           <ModernCard variant="outlined" size="sm">
             <div style={{ textAlign: 'center' }}>
@@ -1182,11 +1182,11 @@ function ModernApp() {
 
         {/* 釣果トレンドグラフ */}
         {records.length > 0 && (
-          <ModernCard variant="outlined" size="md" style={{ marginBottom: '16px' }}>
+          <ModernCard variant="outlined" size="sm" style={{ marginBottom: '16px', padding: '12px' }}>
             <TrendChart
               data={trendData}
               type="bar"
-              height={200}
+              height={180}
               title="釣果トレンド（最近6ヶ月）"
               titleIcon={<Icon icon={TrendingUp} size="sm" decorative />}
               color={colors.primary[500]}

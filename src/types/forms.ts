@@ -14,6 +14,8 @@ export interface CreateFishingRecordForm {
   size?: number;
   /** 魚の重量（g、任意） */
   weight?: number;
+  /** 天気（任意） */
+  weather?: string;
   /** 写真ファイル（任意） */
   photo?: File;
   /** 写真ID（任意） */
