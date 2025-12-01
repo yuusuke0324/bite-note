@@ -103,14 +103,20 @@ describe('PhotoHeroCard', () => {
       expect(foreground).toBeInTheDocument();
     });
 
-    it('renders GlassBadges with fish species and size', async () => {
+    it('renders unified info panel with fish species, size, and weight', async () => {
       const { container } = render(<PhotoHeroCard record={mockRecord} />);
 
       await waitFor(() => {
-        // Use helper to find text in glass layer (not shadow layer)
-        expect(findGlassLayerText(container, 'Seabass')).toBeInTheDocument();
-        expect(findGlassLayerText(container, '60cm')).toBeInTheDocument();
-        expect(findGlassLayerText(container, '3.5kg')).toBeInTheDocument();
+        // Check unified info panel contains all information (query within glass layer only)
+        const glassLayer = container.querySelector('.glass-panel-glass');
+        const speciesText = glassLayer?.querySelector('.photo-hero-card__species-text');
+        expect(speciesText).toHaveTextContent('Seabass');
+
+        // Check measurements
+        const measurements = glassLayer?.querySelectorAll('.photo-hero-card__measurement');
+        expect(measurements?.length).toBe(2);
+        expect(measurements?.[0]).toHaveTextContent('60cm');
+        expect(measurements?.[1]).toHaveTextContent('3.5kg');
       });
     });
 
@@ -132,34 +138,47 @@ describe('PhotoHeroCard', () => {
       const { container } = render(<PhotoHeroCard record={mockRecord} isBestCatch />);
 
       await waitFor(() => {
-        expect(findGlassLayerText(container, 'Best')).toBeInTheDocument();
+        // Best catch badge is now inside top-right area
+        const bestCatchBadge = container.querySelector('.photo-hero-card__best-catch-badge');
+        expect(bestCatchBadge).toBeInTheDocument();
+        // Query within glass layer to avoid duplicate text from shadow layer
+        const glassLayer = bestCatchBadge?.querySelector('.glass-badge-glass');
+        expect(glassLayer).toHaveTextContent('Best');
       });
 
       expect(container.querySelector('.photo-hero-card--best-catch')).toBeInTheDocument();
     });
 
-    it('does not render size badge when size is undefined', async () => {
+    it('does not render size measurement when size is undefined', async () => {
       const recordNoSize = { ...mockRecord, size: undefined };
       const { container } = render(<PhotoHeroCard record={recordNoSize} />);
 
       await waitFor(() => {
-        expect(findGlassLayerText(container, 'Seabass')).toBeInTheDocument();
-      });
+        const speciesText = container.querySelector('.photo-hero-card__species-text');
+        expect(speciesText).toHaveTextContent('Seabass');
 
-      // No size badge should exist
-      expect(container.querySelector('.photo-hero-card__size-badge')).not.toBeInTheDocument();
+        // Only weight measurement should exist (query within glass layer only, not shadow)
+        const glassLayer = container.querySelector('.glass-panel-glass');
+        const measurements = glassLayer?.querySelectorAll('.photo-hero-card__measurement');
+        expect(measurements?.length).toBe(1);
+        expect(measurements?.[0]).toHaveTextContent('3.5kg');
+      });
     });
 
-    it('does not render weight badge when weight is undefined', async () => {
+    it('does not render weight measurement when weight is undefined', async () => {
       const recordNoWeight = { ...mockRecord, weight: undefined };
       const { container } = render(<PhotoHeroCard record={recordNoWeight} />);
 
       await waitFor(() => {
-        expect(findGlassLayerText(container, 'Seabass')).toBeInTheDocument();
-      });
+        const speciesText = container.querySelector('.photo-hero-card__species-text');
+        expect(speciesText).toHaveTextContent('Seabass');
 
-      // No weight badge should exist
-      expect(container.querySelector('.photo-hero-card__weight-badge')).not.toBeInTheDocument();
+        // Only size measurement should exist (query within glass layer only, not shadow)
+        const glassLayer = container.querySelector('.glass-panel-glass');
+        const measurements = glassLayer?.querySelectorAll('.photo-hero-card__measurement');
+        expect(measurements?.length).toBe(1);
+        expect(measurements?.[0]).toHaveTextContent('60cm');
+      });
     });
 
     it('renders "0cm" when size is 0', async () => {
@@ -167,7 +186,9 @@ describe('PhotoHeroCard', () => {
       const { container } = render(<PhotoHeroCard record={recordZeroSize} />);
 
       await waitFor(() => {
-        expect(findGlassLayerText(container, '0cm')).toBeInTheDocument();
+        const glassLayer = container.querySelector('.glass-panel-glass');
+        const measurements = glassLayer?.querySelectorAll('.photo-hero-card__measurement');
+        expect(measurements?.[0]).toHaveTextContent('0cm');
       });
     });
 
@@ -176,7 +197,9 @@ describe('PhotoHeroCard', () => {
       const { container } = render(<PhotoHeroCard record={recordZeroWeight} />);
 
       await waitFor(() => {
-        expect(findGlassLayerText(container, '0kg')).toBeInTheDocument();
+        const glassLayer = container.querySelector('.glass-panel-glass');
+        const measurements = glassLayer?.querySelectorAll('.photo-hero-card__measurement');
+        expect(measurements?.[1]).toHaveTextContent('0kg');
       });
     });
   });
@@ -190,25 +213,28 @@ describe('PhotoHeroCard', () => {
     });
   });
 
-  describe('Placeholder State', () => {
-    it('renders placeholder when photoId is undefined', async () => {
+  describe('Placeholder State (FishIcon)', () => {
+    it('renders FishIcon when photoId is undefined', async () => {
       const { container } = render(<PhotoHeroCard record={mockRecordWithoutPhoto} />);
 
       await waitFor(() => {
-        expect(container.querySelector('.photo-hero-card__placeholder')).toBeInTheDocument();
+        // FishIcon should be rendered with the fish-icon class
+        expect(container.querySelector('.photo-hero-card__fish-icon')).toBeInTheDocument();
       });
 
-      // Check for accessible label
-      const placeholder = container.querySelector('.photo-hero-card__placeholder');
-      expect(placeholder).toHaveAttribute('aria-label', expect.stringContaining('No photo'));
+      // Check FishIcon has data-testid
+      const fishIcon = container.querySelector('[data-testid="photo-hero-card-fish-icon"]');
+      expect(fishIcon).toBeInTheDocument();
     });
 
-    it('displays "No Photo" text in placeholder', async () => {
+    it('FishIcon is aria-hidden since card itself has aria-label', async () => {
       const { container } = render(<PhotoHeroCard record={mockRecordWithoutPhoto} />);
 
       await waitFor(() => {
-        const placeholderText = container.querySelector('.photo-hero-card__placeholder-text');
-        expect(placeholderText).toHaveTextContent('No Photo');
+        const fishIcon = container.querySelector('.fish-icon-container');
+        // FishIcon is decorative within PhotoHeroCard (card has its own aria-label)
+        expect(fishIcon).toHaveAttribute('aria-hidden', 'true');
+        expect(fishIcon).not.toHaveAttribute('role');
       });
     });
   });
@@ -226,8 +252,8 @@ describe('PhotoHeroCard', () => {
         expect(container.querySelector('.photo-hero-card__error-state')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('Photo failed to load')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+      expect(screen.getByText('写真の読み込みに失敗しました')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /再試行/i })).toBeInTheDocument();
     });
 
     it('calls loadPhoto again when retry button is clicked', async () => {
@@ -244,10 +270,10 @@ describe('PhotoHeroCard', () => {
       render(<PhotoHeroCard record={mockRecord} />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /再試行/i })).toBeInTheDocument();
       });
 
-      const retryButton = screen.getByRole('button', { name: /retry/i });
+      const retryButton = screen.getByRole('button', { name: /再試行/i });
       await userEvent.click(retryButton);
 
       await waitFor(() => {
@@ -414,9 +440,8 @@ describe('PhotoHeroCard', () => {
       const { container } = render(<PhotoHeroCard record={mockRecordWithLongText} />);
 
       await waitFor(() => {
-        expect(
-          findGlassLayerText(container, 'Very Long Fish Species Name That Should Be Truncated')
-        ).toBeInTheDocument();
+        const speciesText = container.querySelector('.photo-hero-card__species-text');
+        expect(speciesText).toHaveTextContent('Very Long Fish Species Name That Should Be Truncated');
       });
     });
 
@@ -424,7 +449,7 @@ describe('PhotoHeroCard', () => {
       const { container } = render(<PhotoHeroCard record={mockRecordWithLongText} />);
 
       await waitFor(() => {
-        const locationElement = container.querySelector('.photo-hero-card__location');
+        const locationElement = container.querySelector('.photo-hero-card__location-text');
         expect(locationElement).toHaveAttribute('title', mockRecordWithLongText.location);
       });
     });

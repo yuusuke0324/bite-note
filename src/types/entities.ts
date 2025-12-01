@@ -21,6 +21,8 @@ export interface FishingRecord {
   weather?: string;
   /** 気温（℃、任意） */
   temperature?: number;
+  /** 海面水温（℃、任意） */
+  seaTemperature?: number;
   /** 詳細天気情報（自動取得時） */
   weatherData?: WeatherData;
   /** 自動入力されたデータのフラグ */

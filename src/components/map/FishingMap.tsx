@@ -14,7 +14,7 @@ import { photoService } from '../../lib/photo-service';
 import type { FishingRecord } from '../../types';
 import { logger } from '../../lib/errors/logger';
 import { Icon } from '../ui/Icon';
-import { Map as MapIcon, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2 } from 'lucide-react';
+import { Map as MapIcon, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2, Globe } from 'lucide-react';
 
 // Leafletのデフォルトアイコン修正
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -782,34 +782,81 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             </div>
 
             {/* アクションボタン */}
-            <button
-              onClick={() => onRecordClick?.(selectedRecord)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                backgroundColor: colors.primary[500],
-                color: 'white',
-                border: 'none',
-                borderRadius: '10px',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: '0 2px 8px rgba(26, 115, 232, 0.25)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.primary[600];
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 115, 232, 0.35)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = colors.primary[500];
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(26, 115, 232, 0.25)';
-              }}
-            >
-              詳細を見る
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                onClick={() => onRecordClick?.(selectedRecord)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: colors.primary[500],
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 2px 8px rgba(26, 115, 232, 0.25)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary[600];
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 115, 232, 0.35)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary[500];
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(26, 115, 232, 0.25)';
+                }}
+              >
+                詳細を見る
+              </button>
+
+              {/* Googleマップで表示ボタン */}
+              {selectedRecord.coordinates && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const { latitude, longitude } = selectedRecord.coordinates!;
+                    window.open(
+                      `https://www.google.com/maps?q=${latitude},${longitude}`,
+                      '_blank',
+                      'noopener,noreferrer'
+                    );
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#22c55e',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 2px 8px rgba(34, 197, 94, 0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#16a34a';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.35)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#22c55e';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(34, 197, 94, 0.25)';
+                  }}
+                >
+                  <Globe size={18} />
+                  Googleマップで表示
+                </button>
+              )}
+            </div>
           </div>
         )}
 

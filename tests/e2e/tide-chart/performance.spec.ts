@@ -1,4 +1,10 @@
-// TC-E004: パフォーマンステスト群 (4個)
+/**
+ * TC-E004: パフォーマンステスト群 (4個)
+ *
+ * NOTE: These tests target the CompactTideChart displayed in PhotoHeroCard.
+ * Test IDs:
+ * - Compact chart: data-testid="photo-hero-card-tide-chart"
+ */
 import { test, expect } from '@playwright/test';
 import {
   TideChartPage,
@@ -7,6 +13,9 @@ import {
   largeTideDataset,
   setupCleanPage
 } from './helpers';
+
+// Selectors for CompactTideChart
+const TIDE_CHART_SELECTOR = '[data-testid="photo-hero-card-tide-chart"]';
 
 test.describe('TC-E004: パフォーマンステスト群', () => {
   let chartPage: TideChartPage;
@@ -54,10 +63,11 @@ test.describe('TC-E004: パフォーマンステスト群', () => {
 
     // 縦向きから横向きへ
     await page.setViewportSize({ width: 667, height: 375 });
-    await page.waitForFunction(() => {
-      const chart = document.querySelector('[data-testid="tide-chart"]');
-      return chart && chart.clientWidth > chart.clientHeight;
-    });
+    await page.waitForFunction((selector) => {
+      const chart = document.querySelector(selector);
+      // CompactTideChartは固定サイズなので、単に存在確認
+      return chart && chart.clientWidth > 0;
+    }, TIDE_CHART_SELECTOR);
 
     const orientationTime = Date.now() - startTime;
     expect(orientationTime).toBeLessThan(thresholds.orientationChange);

@@ -13,6 +13,8 @@
   overflow: hidden;
   cursor: pointer;
   background: var(--color-surface-primary);
+  /* will-change を事前に宣言してアニメーション初回フレームのスタッタリングを防止 */
+  will-change: transform;
   transition:
     transform var(--transition-smooth),
     box-shadow var(--transition-smooth);
@@ -29,7 +31,6 @@
 /* === Hover Effects === */
 
 .photo-hero-card:hover {
-  will-change: transform;
   transform: translateY(-4px) translateZ(0);
   box-shadow: 0 12px 48px rgba(31, 38, 135, 0.2);
 }
@@ -106,6 +107,9 @@
   width: 100%;
   height: 100%;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .photo-hero-card__photo-foreground img {
@@ -116,33 +120,27 @@
   transition: opacity 0.3s ease;
 }
 
+/* Default variant: Show full photo without cropping */
+.photo-hero-card--default .photo-hero-card__photo-foreground img {
+  object-fit: contain;
+}
+
 .photo-hero-card__photo-foreground img.loaded {
   opacity: 1;
 }
 
-/* === Placeholder State === */
+/* === FishIcon Integration (No Photo Placeholder) === */
 
-.photo-hero-card__placeholder {
+.photo-hero-card__fish-icon {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--color-primary-500, #3b82f6) 0%, var(--color-primary-600, #2563eb) 100%);
+  border-radius: 0; /* Override FishIcon's default border-radius */
 }
 
-.photo-hero-card__placeholder-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: white;
-}
-
-.photo-hero-card__placeholder-text {
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.9;
+/* Grid variant: Smaller icon size adjustment already handled via size prop */
+.photo-hero-card--grid .photo-hero-card__fish-icon svg {
+  width: 48px;
+  height: 48px;
 }
 
 /* === Error State === */
@@ -209,104 +207,71 @@
   }
 }
 
-/* === Badge Positioning === */
-
-.photo-hero-card__badges {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.photo-hero-card__badges-left,
-.photo-hero-card__badges-right {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-@media (min-width: 769px) {
-  .photo-hero-card__badges {
-    top: 16px;
-    left: 16px;
-    right: 16px;
-  }
-}
-
-@media (min-width: 1025px) {
-  .photo-hero-card__badges {
-    top: 20px;
-    left: 20px;
-    right: 20px;
-  }
-}
-
-/* Species badge max width for truncation */
-.photo-hero-card__species-badge {
-  max-width: 150px;
-}
-
-@media (min-width: 769px) {
-  .photo-hero-card__species-badge {
-    max-width: 180px;
-  }
-}
-
-/* Best catch badge styling */
-.photo-hero-card__best-catch-badge .glass-badge-glass {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.photo-hero-card__best-catch-badge svg {
-  color: #facc15;
-}
-
-/* === Info Panel Positioning === */
+/* === Unified Info Panel (top-left) === */
 
 .photo-hero-card__info-panel {
   z-index: 10;
 }
 
-/* Override default GlassPanel position for responsive padding */
+/* Position override for top-left */
+.photo-hero-card__info-panel.glass-panel-wrapper {
+  top: 12px;
+  left: 12px;
+  bottom: auto;
+  right: auto;
+}
+
 @media (min-width: 769px) {
   .photo-hero-card__info-panel.glass-panel-wrapper {
-    bottom: 16px;
+    top: 16px;
     left: 16px;
   }
 }
 
 @media (min-width: 1025px) {
   .photo-hero-card__info-panel.glass-panel-wrapper {
-    bottom: 20px;
+    top: 20px;
     left: 20px;
   }
 }
 
-/* Info content layout */
-.photo-hero-card__info {
+/* Unified info layout */
+.photo-hero-card__info-unified {
   display: flex;
-  gap: 16px;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.photo-hero-card__location,
-.photo-hero-card__date {
+.photo-hero-card__info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.photo-hero-card__info-row svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+/* Species text */
+.photo-hero-card__species-text {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Measurements row */
+.photo-hero-card__measurements {
+  gap: 12px;
+}
+
+.photo-hero-card__measurement {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-}
-
-.photo-hero-card__location svg,
-.photo-hero-card__date svg {
-  flex-shrink: 0;
-  opacity: 0.8;
 }
 
 /* Location text truncation */
@@ -317,30 +282,190 @@
   white-space: nowrap;
 }
 
+/* Weather row */
+.photo-hero-card__weather-row {
+  gap: 12px;
+}
+
+.photo-hero-card__weather-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+
 @media (min-width: 769px) {
-  .photo-hero-card__location-text {
-    max-width: 200px;
+  .photo-hero-card__info-unified {
+    font-size: 14px;
+    gap: 8px;
   }
 
-  .photo-hero-card__info {
-    font-size: 15px;
+  .photo-hero-card__species-text {
+    max-width: 220px;
+  }
+
+  .photo-hero-card__location-text {
+    max-width: 200px;
   }
 }
 
 @media (min-width: 1025px) {
+  .photo-hero-card__info-unified {
+    font-size: 15px;
+  }
+
+  .photo-hero-card__species-text {
+    max-width: 280px;
+  }
+
   .photo-hero-card__location-text {
     max-width: 250px;
   }
+}
 
-  .photo-hero-card__info {
-    font-size: 16px;
+/* === Top-right Area (Tide Chart + Best Badge) === */
+
+.photo-hero-card__top-right {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+@media (min-width: 769px) {
+  .photo-hero-card__top-right {
+    top: 16px;
+    right: 16px;
   }
+}
+
+@media (min-width: 1025px) {
+  .photo-hero-card__top-right {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+/* Compact Tide Chart Overlay */
+.photo-hero-card__tide-chart-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  /* Container size - fit for CompactTideChart with tide name */
+  width: 180px;
+  height: 100px;
+  /* Ensure clean rendering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inner container for tide chart content */
+.photo-hero-card__tide-chart-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tide name label (大潮、中潮、小潮、長潮、若潮) */
+.photo-hero-card__tide-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  padding: 4px 0 0 0;
+  letter-spacing: 0.05em;
+}
+
+/* Tide Loading Indicator */
+.photo-hero-card__tide-loading {
+  width: 160px;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-hero-card__tide-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Best Catch Badge */
+.photo-hero-card__best-catch-badge .glass-badge-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.photo-hero-card__best-catch-badge svg {
+  color: #facc15;
+}
+
+/* === Map Affordance Bar === */
+
+.photo-hero-card__map-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 10;
+
+  /* Glass Morphism */
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Text */
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  font-weight: 500;
+
+  /* Interaction */
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.photo-hero-card:hover .photo-hero-card__map-bar,
+.photo-hero-card:focus-visible .photo-hero-card__map-bar {
+  opacity: 1;
+}
+
+.photo-hero-card__map-bar svg {
+  transition: transform 0.2s ease;
+}
+
+.photo-hero-card:hover .photo-hero-card__map-bar svg,
+.photo-hero-card:focus-visible .photo-hero-card__map-bar svg {
+  transform: scale(1.15);
 }
 
 /* === Reduced Motion === */
 
 @media (prefers-reduced-motion: reduce) {
   .photo-hero-card {
+    will-change: auto; /* GPU負荷を軽減 */
     transition: box-shadow var(--transition-smooth);
   }
 
@@ -364,46 +489,59 @@
   .photo-hero-card__retry-button .spinning {
     animation: none;
   }
+
+  .photo-hero-card__map-bar {
+    opacity: 1;
+    transition: none;
+  }
+
+  .photo-hero-card__map-bar svg {
+    transition: none;
+  }
+
+  .photo-hero-card:hover .photo-hero-card__map-bar svg,
+  .photo-hero-card:focus-visible .photo-hero-card__map-bar svg {
+    transform: none;
+  }
 }
 
 /* === Grid Variant Specific Styles === */
 
-.photo-hero-card--grid .photo-hero-card__badges {
+.photo-hero-card--grid .photo-hero-card__info-panel.glass-panel-wrapper {
   top: 8px;
   left: 8px;
-  right: 8px;
 }
 
-.photo-hero-card--grid .photo-hero-card__badges-left,
-.photo-hero-card--grid .photo-hero-card__badges-right {
+.photo-hero-card--grid .photo-hero-card__info-unified {
+  font-size: 11px;
   gap: 4px;
 }
 
-.photo-hero-card--grid .photo-hero-card__species-badge {
+.photo-hero-card--grid .photo-hero-card__info-row {
+  gap: 4px;
+}
+
+.photo-hero-card--grid .photo-hero-card__info-row svg {
+  width: 12px;
+  height: 12px;
+}
+
+.photo-hero-card--grid .photo-hero-card__species-text {
   max-width: 100px;
 }
 
-.photo-hero-card--grid .photo-hero-card__info-panel.glass-panel-wrapper {
-  bottom: 8px;
-  left: 8px;
+.photo-hero-card--grid .photo-hero-card__location-text {
+  max-width: 100px;
 }
 
-.photo-hero-card--grid .photo-hero-card__info {
-  font-size: 12px;
+.photo-hero-card--grid .photo-hero-card__measurements {
   gap: 8px;
 }
 
-.photo-hero-card--grid .photo-hero-card__location-text {
-  max-width: 80px;
-}
-
-.photo-hero-card--grid .photo-hero-card__placeholder-content svg {
-  width: 40px;
-  height: 40px;
-}
-
-.photo-hero-card--grid .photo-hero-card__placeholder-text {
-  font-size: 12px;
+.photo-hero-card--grid .photo-hero-card__top-right {
+  top: 8px;
+  right: 8px;
+  gap: 4px;
 }
 
 .photo-hero-card--grid .photo-hero-card__error-state > svg {
@@ -418,42 +556,12 @@
 .photo-hero-card--grid .photo-hero-card__retry-button {
   padding: 6px 12px;
   font-size: 11px;
-  min-height: 36px;
+  min-height: 44px; /* WCAG 2.1 SC 2.5.5 Touch Target */
 }
 
-/* === Grid Variant: Hover-based Info Panel Display === */
+/* === Grid Variant: Info Panel Always Visible === */
 
 /*
- * For hover-capable devices (desktop), show info panel on hover.
- * For touch devices (mobile/tablet), hide info panel completely.
+ * Info panel is always visible on all devices.
+ * Location and date are important information that should be immediately accessible.
  */
-
-/* Hover-capable devices: Show panel on hover with fade transition */
-@media (hover: hover) {
-  .photo-hero-card--grid .photo-hero-card__info-panel {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .photo-hero-card--grid:hover .photo-hero-card__info-panel {
-    opacity: 1;
-  }
-
-  .photo-hero-card--grid:focus-visible .photo-hero-card__info-panel {
-    opacity: 1;
-  }
-}
-
-/* Hover-capable devices with reduced motion: No animation */
-@media (hover: hover) and (prefers-reduced-motion: reduce) {
-  .photo-hero-card--grid .photo-hero-card__info-panel {
-    transition: none;
-  }
-}
-
-/* Touch devices: Hide info panel completely */
-@media (hover: none) {
-  .photo-hero-card--grid .photo-hero-card__info-panel {
-    display: none;
-  }
-}

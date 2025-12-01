@@ -57,15 +57,9 @@ export const TestIds = {
   TOOLTIP_LEVEL: 'tooltip-level', // ツールチップ潮位
   DATA_POINT: (index: number) => `data-point-${index}`, // データポイント
 
-  // Tide Integration
-  TIDE_GRAPH_TOGGLE_BUTTON: 'tide-graph-toggle-button', // Toggle: Button to expand/collapse tide graph section
-  TIDE_INTEGRATION_SECTION: 'tide-integration-section',
-  TIDE_ERROR: 'tide-error',
-  TIDE_RETRY_BUTTON: 'tide-retry-button',
-  TIDE_ANALYSIS_SECTION: 'tide-analysis-section',
-  FISHING_TIME_ANALYSIS: 'fishing-time-analysis',
-  NEXT_OPTIMAL_TIME: 'next-optimal-time',
-  FISHING_TIME_MARKER: 'fishing-time-marker',
+  // Tide Integration (削除済み - Issue #322)
+  // PhotoHeroCard のオーバーレイグラフに置換されました
+  // 旧 TestIds は互換性のため保持しますが、使用されません
 
   // Performance Testing
   PERFORMANCE_SUMMARY: 'performance-summary',

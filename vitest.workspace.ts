@@ -36,7 +36,7 @@ export default defineWorkspace([
         'src/components/__tests__/GlassBadge.test.tsx', // Issue #318: Glass Morphism UIコンポーネント
         'src/components/__tests__/GlassPanel.test.tsx', // Issue #318: Glass Morphism UIコンポーネント
         'src/components/__tests__/PhotoHeroCard.test.tsx', // Issue #319: PhotoHeroCard
-        'src/components/__tests__/InstagramGrid.test.tsx', // Issue #320: InstagramGrid
+        'src/components/__tests__/RecordGrid.test.tsx', // Issue #320: RecordGrid
         'src/components/__tests__/FishIcon.test.tsx', // Issue #321: FishIcon
       ],
       setupFiles: ['./src/setupTests.ts'],
@@ -126,7 +126,7 @@ export default defineWorkspace([
       name: 'components-complex',
       include: [
         'src/components/__tests__/TideGraph.axis-labels.test.tsx',
-        'src/components/__tests__/TideIntegration.test.tsx',
+        // TideIntegration.test.tsx は Issue #322 で削除（PhotoHeroCardオーバーレイに置換）
       ],
       setupFiles: ['./src/setupTests.ts'],
       testTimeout: 20000,

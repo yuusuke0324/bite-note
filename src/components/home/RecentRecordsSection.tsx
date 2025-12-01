@@ -1,12 +1,14 @@
 /**
  * RecentRecordsSection.tsx - 最近の記録セクション
- * ホーム画面に最新5件の記録をコンパクト表示
+ * ホーム画面に最新6件の記録をRecordGridで表示
+ *
+ * @updated Phase 1-5 (Issue #322): CompactRecordCard → RecordGrid
  */
 
 import React, { useMemo } from 'react';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
-import { CompactRecordCard } from './CompactRecordCard';
+import { RecordGrid } from '../record/RecordGrid';
 import type { FishingRecord } from '../../types';
 import { Icon } from '../ui/Icon';
 import { Fish, FileText, ArrowRight } from 'lucide-react';
@@ -24,11 +26,11 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
   onViewAll,
   className = ''
 }) => {
-  // 最新5件の記録を取得
+  // 最新6件の記録を取得（RecordGridの2行分）
   const recentRecords = useMemo(() => {
     return [...records]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5);
+      .slice(0, 6);
   }, [records]);
 
   if (records.length === 0) {
@@ -111,47 +113,11 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
         )}
       </div>
 
-      {/* レコードリスト */}
-      <div
-        className="recent-records-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '10px',
-        }}
-      >
-        {recentRecords.map((record) => (
-          <CompactRecordCard
-            key={`${record.id}-${record.photoId || 'no-photo'}`}
-            record={record}
-            onClick={onRecordClick}
-          />
-        ))}
-      </div>
-
-      {/* スタイル調整用のメディアクエリ */}
-      <style>
-        {`
-          @media (max-width: 640px) {
-            .recent-records-grid {
-              grid-template-columns: 1fr !important;
-              gap: 10px !important;
-            }
-          }
-          @media (min-width: 641px) and (max-width: 1024px) {
-            .recent-records-grid {
-              grid-template-columns: repeat(2, 1fr) !important;
-              gap: 10px !important;
-            }
-          }
-          @media (min-width: 1025px) {
-            .recent-records-grid {
-              grid-template-columns: repeat(3, 1fr) !important;
-              gap: 10px !important;
-            }
-          }
-        `}
-      </style>
+      {/* レコードリスト - RecordGridを使用 */}
+      <RecordGrid
+        records={recentRecords}
+        onRecordClick={onRecordClick}
+      />
     </div>
   );
 };

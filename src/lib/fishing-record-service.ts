@@ -33,8 +33,10 @@ export class FishingRecordService {
         fishSpecies: form.fishSpecies,
         size: form.size,
         weight: form.weight,
+        weather: form.weather,
         photoId: form.photoId,
         coordinates: form.coordinates,
+        seaTemperature: form.seaTemperature,
         notes: form.notes,
         createdAt: now,
         updatedAt: now

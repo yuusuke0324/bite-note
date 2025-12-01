@@ -25,6 +25,10 @@ export const ResponsiveGrid: React.FC<ResponsiveGridProps> = ({
     width: '100%',
     // モバイルファースト
     gridTemplateColumns: `repeat(${columns.mobile || 1}, 1fr)`,
+    // コンテンツに合わせた自動高さ
+    gridAutoRows: 'auto',
+    // アイテムを上揃えにして余白をなくす
+    alignItems: 'start',
     ...style,
   };
 
@@ -35,8 +39,8 @@ export const ResponsiveGrid: React.FC<ResponsiveGridProps> = ({
       gap: ${gap};
       width: 100%;
       grid-template-columns: repeat(${columns.mobile || 1}, 1fr);
-      /* カードの最小・最大幅を制約して一貫性を保つ */
-      grid-auto-rows: minmax(160px, auto);
+      /* コンテンツに合わせた自動高さ */
+      grid-auto-rows: auto;
     }
 
     @media (min-width: 768px) {

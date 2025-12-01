@@ -1,13 +1,13 @@
 /**
- * InstagramGrid Styles
+ * RecordGrid Styles
  *
- * Instagram-style responsive grid layout for fishing records.
+ * Responsive grid layout for fishing records.
  * Uses CSS Grid with responsive breakpoints.
  */
 
 /* === Grid Layout === */
 
-.instagram-grid {
+.record-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
@@ -16,7 +16,7 @@
 
 /* Tablet: 3 columns */
 @media (min-width: 768px) {
-  .instagram-grid {
+  .record-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
@@ -24,7 +24,7 @@
 
 /* Desktop: 4 columns */
 @media (min-width: 1024px) {
-  .instagram-grid {
+  .record-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
   }
@@ -32,20 +32,20 @@
 
 /* Extra small screen fallback: 1 column */
 @media (max-width: 360px) {
-  .instagram-grid {
+  .record-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 }
 
 /* Ensure minimum card height for touch targets */
-.instagram-grid > * {
+.record-grid > * {
   min-height: 120px;
 }
 
 /* === Empty State === */
 
-.instagram-grid__empty-state {
+.record-grid__empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,38 +54,38 @@
   width: 100%;
 }
 
-.instagram-grid__empty-content {
+.record-grid__empty-content {
   max-width: 400px;
   text-align: center;
 }
 
-.instagram-grid__empty-icon {
+.record-grid__empty-icon {
   color: var(--color-text-tertiary);
   margin-bottom: 24px;
   opacity: 0.6;
 }
 
-.instagram-grid__empty-title {
+.record-grid__empty-title {
   font-size: 20px;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 12px 0;
 }
 
-.instagram-grid__empty-description {
+.record-grid__empty-description {
   font-size: 14px;
   color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0 0 24px 0;
 }
 
-.instagram-grid__empty-cta {
+.record-grid__empty-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   border-radius: 24px;
@@ -100,16 +100,16 @@
   min-width: 44px;
 }
 
-.instagram-grid__empty-cta:hover {
+.record-grid__empty-cta:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
 }
 
-.instagram-grid__empty-cta:active {
+.record-grid__empty-cta:active {
   transform: translateY(0);
 }
 
-.instagram-grid__empty-cta:focus-visible {
+.record-grid__empty-cta:focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
@@ -117,17 +117,17 @@
 /* === Reduced Motion === */
 
 @media (prefers-reduced-motion: reduce) {
-  .instagram-grid__empty-cta {
+  .record-grid__empty-cta {
     transition: none;
   }
 
-  .instagram-grid__empty-cta:hover {
+  .record-grid__empty-cta:hover {
     transform: none;
   }
 }
 
 /* === Skeleton Grid === */
 
-.instagram-grid--skeleton {
+.record-grid--skeleton {
   /* Same layout as regular grid */
 }

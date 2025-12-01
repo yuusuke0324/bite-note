@@ -8,8 +8,8 @@ import { useOnlineStatus } from './hooks/useOnlineStatus';
 import AppLayout from './components/layout/AppLayout';
 import ModernHeader from './components/layout/ModernHeader';
 import BottomNavigation from './components/navigation/BottomNavigation';
-import ResponsiveGrid, { PhotoGrid } from './components/layout/ResponsiveGrid';
-import ModernCard, { PhotoCard } from './components/ui/ModernCard';
+import ResponsiveGrid from './components/layout/ResponsiveGrid';
+import ModernCard from './components/ui/ModernCard';
 import FloatingActionButton from './components/ui/FloatingActionButton';
 
 // 既存コンポーネント
@@ -22,6 +22,10 @@ import { PWAInstallBanner } from './components/PWAInstallBanner';
 import { PWAUpdateNotification } from './components/PWAUpdateNotification';
 import { TrendChart, type TrendChartData } from './components/chart/TrendChart';
 import { ReAuthPrompt } from './components/features/SessionManagement/ReAuthPrompt';
+
+// Phase 1-5: 新規UI/UXコンポーネント
+import { PhotoHeroCard } from './components/record/PhotoHeroCard';
+import { RecordGrid } from './components/record/RecordGrid';
 
 // Phase 3 ホーム画面コンポーネント
 import { RecentRecordsSection } from './components/home/RecentRecordsSection';
@@ -41,7 +45,7 @@ import { OfflineIndicator } from './components/common/OfflineIndicator';
 // アイコン
 import Icons from './components/icons/Icons';
 import { Icon } from './components/ui/Icon';
-import { Search, Sliders, ChevronDown, Fish, MapPin, Ruler, Trophy, TrendingUp, Calendar, Scale, X, Sun, Moon } from 'lucide-react';
+import { Search, Sliders, ChevronDown, Fish, MapPin, Ruler, Trophy, TrendingUp, Calendar, X, Sun, Moon } from 'lucide-react';
 
 // テスト用定数
 import { TestIds } from './constants/testIds';
@@ -983,339 +987,6 @@ function ModernApp() {
     );
   };
 
-  // モダンな記録カードコンポーネント（Instagram風オーバーレイデザイン）
-  const ModernRecordCard: React.FC<{ record: FishingRecord; isBestCatch?: boolean }> = React.memo(({ record, isBestCatch = false }) => {
-    const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-    const [photoLoading, setPhotoLoading] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
-    const photoUrlRef = useRef<string | null>(null);
-
-    useEffect(() => {
-      let isMounted = true;
-
-      const loadPhoto = async () => {
-        if (!record.photoId) {
-          return;
-        }
-
-        if (isMounted) {
-          setPhotoLoading(true);
-        }
-
-        try {
-          const result = await photoService.getPhotoById(record.photoId);
-
-          if (isMounted && result.success && result.data) {
-            const url = URL.createObjectURL(result.data.blob);
-            photoUrlRef.current = url;
-            setPhotoUrl(url);
-          } else if (result.error) {
-            console.error('ModernRecordCard: 写真取得失敗', result.error);
-          }
-        } catch (error) {
-          console.error('ModernRecordCard: 写真の読み込みエラー:', error);
-        } finally {
-          if (isMounted) {
-            setPhotoLoading(false);
-          }
-        }
-      };
-
-      loadPhoto();
-
-      return () => {
-        isMounted = false;
-        if (photoUrlRef.current) {
-          URL.revokeObjectURL(photoUrlRef.current);
-          photoUrlRef.current = null;
-        }
-      };
-    }, [record.photoId]);
-
-    // 日付フォーマット用のヘルパー関数
-    const formatDate = (date: Date | string | number): string => {
-      try {
-        const dateObj = date instanceof Date ? date : new Date(date);
-        if (isNaN(dateObj.getTime())) {
-          console.error('Invalid date:', date);
-          return '日付不明';
-        }
-        return dateObj.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
-      } catch (error) {
-        console.error('Date formatting error:', error, date);
-        return '日付不明';
-      }
-    };
-
-    return (
-      <PhotoCard
-        onClick={() => handleRecordClick(record)}
-        loading={photoLoading}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        data-testid={TestIds.RECORD_ITEM(record.id)}
-      >
-        {/* 写真表示 + オーバーレイ */}
-        <div
-          className="modern-record-card-container"
-          style={{
-            width: '100%',
-            height: '350px',
-            backgroundColor: colors.surface.secondary,
-            borderRadius: '12px',
-            overflow: 'hidden',
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-        >
-          {/* 画像: 2層構造（背景ぼかし + 前景オリジナル） */}
-          {photoUrl ? (
-            <>
-              {/* 背景レイヤー: ぼかし画像 */}
-              <img
-                src={photoUrl}
-                alt=""
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  zIndex: 0,
-                  filter: 'blur(20px)',
-                  transform: isHovered ? 'scale(1.15)' : 'scale(1.1)',
-                  opacity: 0.6,
-                  objectFit: 'cover',
-                  transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-              />
-              {/* 前景レイヤー: オリジナル画像 */}
-              <img
-                src={photoUrl}
-                alt={`${record.fishSpecies}の記録`}
-                style={{
-                  position: 'relative',
-                  zIndex: 1,
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  width: 'auto',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                  transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-              />
-            </>
-          ) : (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.text.secondary,
-              transition: 'all 0.3s ease',
-            }}>
-              <Icons.Fish size={64} />
-            </div>
-          )}
-
-          {/* 日付バッジ（右上） */}
-          <div style={{
-            position: 'absolute',
-            top: '12px',
-            right: '12px',
-            zIndex: 2,
-            backgroundColor: isHovered ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.7)',
-            backdropFilter: 'blur(8px)',
-            color: 'white',
-            padding: '6px 12px',
-            borderRadius: '16px',
-            fontSize: '0.75rem',
-            fontWeight: '500',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            transform: isHovered ? 'translateY(-2px) scale(1.05)' : 'translateY(0) scale(1)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            boxShadow: isHovered ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.2)',
-          }}>
-            <Icons.Date size={14} />
-            {formatDate(record.date)}
-          </div>
-
-          {/* ベストキャッチバッジ（左上上部） */}
-          {isBestCatch && (
-            <div style={{
-              position: 'absolute',
-              top: '12px',
-              left: '12px',
-              zIndex: 3,
-              background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-              backdropFilter: 'blur(8px)',
-              color: '#000',
-              padding: '8px 14px',
-              borderRadius: '20px',
-              fontSize: '0.8rem',
-              fontWeight: 'bold',
-              transform: isHovered ? 'translateY(-2px) scale(1.05)' : 'translateY(0) scale(1)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: isHovered ? '0 6px 16px rgba(255, 215, 0, 0.5)' : '0 3px 8px rgba(255, 215, 0, 0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}>
-              <Icon icon={Trophy} size={16} decorative />
-              {(() => {
-                const bestSize = typeof record.size === 'number' ? record.size : 0;
-                const bestWeight = typeof record.weight === 'number' ? record.weight : 0;
-                const bestMax = Math.max(bestSize, bestWeight);
-                if (bestWeight > bestSize) {
-                  return `${bestMax}g - 今月最大!`;
-                } else {
-                  return `${bestMax}cm - 今月最大!`;
-                }
-              })()}
-            </div>
-          )}
-
-          {/* サイズバッジ（左上下部） */}
-          {(typeof record.size === 'number' && !isNaN(record.size)) ? (
-            <div style={{
-              position: 'absolute',
-              top: isBestCatch ? '58px' : '12px',
-              left: '12px',
-              zIndex: 2,
-              backgroundColor: isHovered ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(8px)',
-              color: colors.primary[700],
-              padding: '6px 12px',
-              borderRadius: '16px',
-              fontSize: '0.75rem',
-              fontWeight: 'bold',
-              transform: isHovered ? 'translateY(-2px) scale(1.05)' : 'translateY(0) scale(1)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: isHovered ? '0 4px 12px rgba(0, 0, 0, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}>
-              <Icon icon={Ruler} size={14} decorative />
-              {record.size}cm
-            </div>
-          ) : null}
-
-          {/* 重量バッジ（サイズバッジの下） - ベストキャッチの場合は非表示 */}
-          {!isBestCatch && (typeof record.weight === 'number' && !isNaN(record.weight)) ? (
-            <div style={{
-              position: 'absolute',
-              top: (typeof record.size === 'number' && !isNaN(record.size)) ? '56px' : '12px',
-              left: '12px',
-              zIndex: 2,
-              backgroundColor: isHovered ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(8px)',
-              color: colors.secondary[700],
-              padding: '6px 12px',
-              borderRadius: '16px',
-              fontSize: '0.75rem',
-              fontWeight: 'bold',
-              transform: isHovered ? 'translateY(-2px) scale(1.05)' : 'translateY(0) scale(1)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: isHovered ? '0 4px 12px rgba(0, 0, 0, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
-            }}>
-              <Scale size={14} aria-hidden="true" style={{ marginRight: '4px' }} />
-              {record.weight}g
-            </div>
-          ) : null}
-
-          {/* 情報オーバーレイ（下部） */}
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 2,
-            background: isHovered
-              ? 'linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.75) 70%, transparent 100%)'
-              : 'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%)',
-            backdropFilter: 'blur(8px)',
-            padding: isHovered ? '28px 16px 20px' : '24px 16px 16px',
-            color: 'white',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}>
-            {/* 魚種 */}
-            <h3 style={{
-              margin: '0 0 8px 0',
-              fontSize: isHovered ? '1.3rem' : '1.25rem',
-              fontWeight: '600',
-              color: 'white',
-              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}>
-              <Icon icon={Fish} size={20} decorative />
-              {record.fishSpecies}
-            </h3>
-
-            {/* 場所 */}
-            <div style={{
-              fontSize: '0.875rem',
-              color: 'rgba(255, 255, 255, 0.9)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-              transform: isHovered ? 'translateX(2px)' : 'translateX(0)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}>
-              <Icons.Location size={14} />
-              <span style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>
-                {record.location}
-              </span>
-            </div>
-          </div>
-        </div>
-        {/* レスポンシブスタイル */}
-        <style>{`
-          /* モバイル対応 */
-          @media (max-width: 767px) {
-            .modern-record-card-container {
-              height: 280px !important;
-            }
-          }
-
-          /* タブレット・デスクトップ */
-          @media (min-width: 768px) {
-            .modern-record-card-container {
-              height: 350px !important;
-            }
-          }
-
-          /* 大画面 */
-          @media (min-width: 1440px) {
-            .modern-record-card-container {
-              height: 400px !important;
-            }
-          }
-        `}</style>
-      </PhotoCard>
-    );
-  }, (prevProps, nextProps) => {
-    // record.idとphotoIdが同じなら再レンダリングしない
-    return prevProps.record.id === nextProps.record.id &&
-           prevProps.record.photoId === nextProps.record.photoId;
-  });
-
   // ホームコンテンツ
   const HomeContent = () => {
     // 今月のベストキャッチを取得（サイズが最大の記録）
@@ -1382,7 +1053,7 @@ function ModernApp() {
           <ResponsiveGrid
             columns={{ mobile: 4, tablet: 4, desktop: 4 }}
             gap="8px"
-            style={{ marginBottom: '16px' }}
+            style={{ marginBottom: '16px', gridAutoRows: 'auto' }}
           >
             {[...Array(4)].map((_, i) => (
               <div key={i} style={{
@@ -1426,7 +1097,7 @@ function ModernApp() {
         <ResponsiveGrid
           columns={{ mobile: 4, tablet: 4, desktop: 4 }}
           gap="8px"
-          style={{ marginBottom: '16px' }}
+          style={{ marginBottom: '16px', gridAutoRows: 'auto' }}
         >
           <ModernCard variant="outlined" size="sm">
             <div style={{ textAlign: 'center' }}>
@@ -1511,11 +1182,11 @@ function ModernApp() {
 
         {/* 釣果トレンドグラフ */}
         {records.length > 0 && (
-          <ModernCard variant="outlined" size="md" style={{ marginBottom: '16px' }}>
+          <ModernCard variant="outlined" size="sm" style={{ marginBottom: '16px', padding: '12px' }}>
             <TrendChart
               data={trendData}
               type="bar"
-              height={200}
+              height={180}
               title="釣果トレンド（最近6ヶ月）"
               titleIcon={<Icon icon={TrendingUp} size="sm" decorative />}
               color={colors.primary[500]}
@@ -1538,7 +1209,11 @@ function ModernApp() {
               今月のベストキャッチ
             </h2>
             <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-              <ModernRecordCard record={bestCatch} isBestCatch={true} />
+              <PhotoHeroCard
+                record={bestCatch}
+                isBestCatch={true}
+                onClick={handleRecordClick}
+              />
             </div>
           </div>
         ) : records.length > 0 ? (
@@ -1882,15 +1557,12 @@ function ModernApp() {
                     </div>
                   )}
 
-                  {/* 記録カード */}
-                  <PhotoGrid gap="16px">
-                    {group.records.map((record) => (
-                      <ModernRecordCard
-                        key={`${record.id}-${record.photoId || 'no-photo'}`}
-                        record={record}
-                      />
-                    ))}
-                  </PhotoGrid>
+                  {/* 記録カード - RecordGridを使用 */}
+                  <RecordGrid
+                    records={group.records}
+                    onRecordClick={handleRecordClick}
+                    onCreateRecord={() => setActiveTab('form')}
+                  />
                 </div>
               ))
             ) : (

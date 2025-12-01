@@ -199,14 +199,12 @@ input, textarea, select {
   --z-tooltip: 1070;
   --z-toast: 1080;
 
-  /* Glass Morphism - Dark Theme (default) */
-  --glass-bg: rgba(30, 41, 59, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow-bg: rgba(0, 0, 0, 0.9);
-  --glass-text-color: #f1f5f9;
+  /* Glass Morphism - Dark Theme (default) - Fully transparent */
+  --glass-bg: transparent;
+  --glass-border: transparent;
+  --glass-shadow-bg: rgba(0, 0, 0, 0.6);
+  --glass-text-color: #ffffff;
 
-  /* Badge variant colors */
-  --badge-size-bg: rgba(37, 99, 235, 0.95);
 }
 
 /* Light Theme */
@@ -263,14 +261,12 @@ body.light-theme {
   /* Accent text */
   --color-accent-text: #3b82f6;
 
-  /* Glass Morphism - Light Theme */
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-shadow-bg: rgba(0, 0, 0, 0.85);
-  --glass-text-color: #1e293b;
+  /* Glass Morphism - Light Theme - Fully transparent */
+  --glass-bg: transparent;
+  --glass-border: transparent;
+  --glass-shadow-bg: rgba(0, 0, 0, 0.6);
+  --glass-text-color: #ffffff;
 
-  /* Badge variant colors - Light Theme */
-  --badge-size-bg: rgba(37, 99, 235, 0.95);
 }
 
 /* 全ての要素に対する横スクロール防止の適用 */
@@ -435,11 +431,7 @@ input[type="search"]::-webkit-search-results-decoration {
   }
 }
 
-/* GlassBadge variant: size */
-.glass-badge--size .glass-badge-glass {
-  background: var(--badge-size-bg);
-  color: white;
-}
+/* GlassBadge variant: size - uses default glass styling for consistency */
 
 /* GlassBadge variant: species - icon layout */
 .glass-badge--species .glass-badge-glass {
@@ -500,32 +492,27 @@ input[type="search"]::-webkit-search-results-decoration {
   z-index: var(--z-glass-panel);
 }
 
-/* GlassPanel Shadow Layer */
+/* GlassPanel Shadow Layer - Hidden for transparent mode */
 .glass-panel-shadow {
-  position: absolute;
-  inset: 0;
-  background: var(--glass-shadow-bg);
-  color: transparent;
-  padding: 12px;
-  border-radius: 12px;
-  filter: blur(4px);
-  z-index: 1;
+  display: none;
 }
 
-/* GlassPanel Glass Layer */
+/* GlassPanel Glass Layer - Text with drop shadow for readability */
 .glass-panel-glass {
   position: relative;
   background: var(--glass-bg);
   color: var(--glass-text-color);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  box-shadow: none;
   padding: 12px;
   border-radius: 12px;
   z-index: 2;
   transition: all var(--transition-material);
   transform: translateZ(0); /* GPU acceleration */
+  /* Text shadow for readability on any background */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 /* Focus indicator for panel */
