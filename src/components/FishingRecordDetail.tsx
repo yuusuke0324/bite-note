@@ -176,35 +176,46 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       }
     };
 
-    // iOS Safari用のシェアヘルパー（エラー処理付き）
-    const shareOnMobile = async (dataUrl: string) => {
+    // iOS Safari用のシェアヘルパー（Blob直接使用版）
+    const shareOnMobile = async (blob: Blob) => {
       try {
-        const response = await fetch(dataUrl);
-        const blob = await response.blob();
-        const file = new File([blob], filename, { type: 'image/jpeg' });
-
         // iOSでは canShare を呼び出さずに直接 share を試みる
-        // （一部のiOSバージョンで canShare が正しく動作しないため）
-        if ('share' in navigator) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: `${record.fishSpecies}の写真`,
-            });
-            return true;
-          } catch (shareError) {
-            // ユーザーがキャンセルした場合は成功扱い
-            if (shareError instanceof Error && shareError.name === 'AbortError') {
-              return true;
-            }
-            logger.error('Share API failed, falling back to download', { shareError });
+        if (!('share' in navigator)) {
+          logger.info('navigator.share not available');
+          return false;
+        }
+
+        const file = new File([blob], filename, { type: blob.type });
+        const shareData = { files: [file] };
+
+        // canShareが利用可能な場合はチェック（オプショナル）
+        if ('canShare' in navigator && typeof navigator.canShare === 'function') {
+          if (!navigator.canShare(shareData)) {
+            logger.info('canShare returned false, trying share anyway');
           }
         }
-        return false;
+
+        try {
+          await navigator.share(shareData);
+          return true;
+        } catch (shareError) {
+          // ユーザーがキャンセルした場合は成功扱い
+          if (shareError instanceof Error && shareError.name === 'AbortError') {
+            return true;
+          }
+          logger.error('Share API failed', { shareError, name: (shareError as Error).name });
+          return false;
+        }
       } catch (error) {
         logger.error('Mobile share failed', { error });
         return false;
       }
+    };
+
+    // dataURLからBlobを作成
+    const dataUrlToBlob = async (dataUrl: string): Promise<Blob> => {
+      const response = await fetch(dataUrl);
+      return response.blob();
     };
 
     // ダウンロードフォールバック
@@ -320,19 +331,23 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
         },
       });
 
-      // Convert canvas to JPEG data URL
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-
       // Restore styles immediately after capture
       restoreStyles();
 
       // タッチデバイス（モバイル/タブレット）: Web Share APIでネイティブ共有
       if (isTouchDevice()) {
-        const shared = await shareOnMobile(dataUrl);
-        if (shared) return;
+        // canvas.toBlob()を使用して直接Blobを取得
+        const blob = await new Promise<Blob | null>((resolve) => {
+          canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.95);
+        });
+        if (blob) {
+          const shared = await shareOnMobile(blob);
+          if (shared) return;
+        }
       }
 
       // デスクトップまたはシェア失敗時: 直接ダウンロード
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       downloadImage(dataUrl);
     } catch (error) {
       restoreStyles();
@@ -341,7 +356,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       // html2canvasが失敗した場合、元の写真をそのまま保存を試みる
       if (localPhotoUrl && isTouchDevice()) {
         try {
-          const shared = await shareOnMobile(localPhotoUrl);
+          const blob = await dataUrlToBlob(localPhotoUrl);
+          const shared = await shareOnMobile(blob);
           if (shared) return;
         } catch {
           // フォールバックも失敗
