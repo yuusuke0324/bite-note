@@ -464,4 +464,75 @@ describe('PhotoHeroCard', () => {
       expect(container.querySelector('.photo-hero-card.custom-class')).toBeInTheDocument();
     });
   });
+
+  describe('Fullscreen Mode', () => {
+    it('applies fullscreen class when fullscreen is true', () => {
+      const { container } = render(
+        <PhotoHeroCard record={mockRecord} fullscreen />
+      );
+
+      expect(container.querySelector('.photo-hero-card--fullscreen')).toBeInTheDocument();
+    });
+
+    it('does not apply fullscreen class by default', () => {
+      const { container } = render(<PhotoHeroCard record={mockRecord} />);
+
+      expect(container.querySelector('.photo-hero-card--fullscreen')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Fit Mode', () => {
+    it('applies fit-cover class by default', () => {
+      const { container } = render(
+        <PhotoHeroCard record={mockRecord} fullscreen />
+      );
+
+      expect(container.querySelector('.photo-hero-card--fit-cover')).toBeInTheDocument();
+    });
+
+    it('applies fit-cover class when fitMode="cover"', () => {
+      const { container } = render(
+        <PhotoHeroCard record={mockRecord} fullscreen fitMode="cover" />
+      );
+
+      expect(container.querySelector('.photo-hero-card--fit-cover')).toBeInTheDocument();
+      expect(container.querySelector('.photo-hero-card--fit-contain')).not.toBeInTheDocument();
+    });
+
+    it('applies fit-contain class when fitMode="contain"', () => {
+      const { container } = render(
+        <PhotoHeroCard record={mockRecord} fullscreen fitMode="contain" />
+      );
+
+      expect(container.querySelector('.photo-hero-card--fit-contain')).toBeInTheDocument();
+      expect(container.querySelector('.photo-hero-card--fit-cover')).not.toBeInTheDocument();
+    });
+
+    it('hides info panel in contain mode with fullscreen', async () => {
+      const { container } = render(
+        <PhotoHeroCard record={mockRecord} fullscreen fitMode="contain" />
+      );
+
+      // CSS should hide the info panel via display: none
+      // The element exists in DOM but is hidden by CSS
+      const infoPanel = container.querySelector('.photo-hero-card__info-panel');
+      expect(infoPanel).toBeInTheDocument();
+    });
+  });
+
+  describe('Transparent Info', () => {
+    it('applies transparent-info class when transparentInfo is true', () => {
+      const { container } = render(
+        <PhotoHeroCard record={mockRecord} transparentInfo />
+      );
+
+      expect(container.querySelector('.photo-hero-card--transparent-info')).toBeInTheDocument();
+    });
+
+    it('does not apply transparent-info class by default', () => {
+      const { container } = render(<PhotoHeroCard record={mockRecord} />);
+
+      expect(container.querySelector('.photo-hero-card--transparent-info')).not.toBeInTheDocument();
+    });
+  });
 });

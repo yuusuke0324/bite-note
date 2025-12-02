@@ -52,6 +52,8 @@
     "dexie": "^3.2.4",
     "dexie-react-hooks": "^1.1.6",
     "exifreader": "^4.31.2",
+    "html-to-image": "^1.11.13",
+    "html2canvas": "^1.4.1",
     "immer": "^10.0.3",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
