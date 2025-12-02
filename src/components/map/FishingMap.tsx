@@ -679,7 +679,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               top: 'auto',
               transform: 'none',
               borderRadius: '20px 20px 0 0',
-              maxHeight: '70vh',
+              maxHeight: '45vh', // 70vh → 45vh: ピン位置を見やすく
               overflowY: 'auto',
             } : {
               top: '16px',
@@ -695,7 +695,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             boxShadow: isMobile
               ? '0 -8px 32px rgba(0, 0, 0, 0.3)'
               : '0 8px 32px rgba(0, 0, 0, 0.2)',
-            padding: isMobile ? '20px 16px 24px' : '16px 20px',
+            padding: isMobile ? '20px 16px 72px' : '16px 20px', // モバイル: 下72pxでフッター対策
             border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
             borderBottom: isMobile ? 'none' : undefined,
           }}>
@@ -754,7 +754,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   alt={`${selectedRecord.fishSpecies}の写真`}
                   style={{
                     width: '100%',
-                    maxHeight: isMobile ? '150px' : '200px',
+                    maxHeight: isMobile ? '100px' : '200px', // 150px → 100px: コンパクト化
                     objectFit: 'cover',
                     display: 'block',
                   }}
@@ -801,36 +801,39 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               )}
             </div>
 
-            {/* 情報グリッド */}
+            {/* 情報グリッド - コンパクト化 */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'auto 1fr',
-              gap: '8px 12px',
-              marginBottom: '16px',
+              gap: '6px 10px', // 8px 12px → 6px 10px: コンパクト化
+              marginBottom: '12px', // 16px → 12px
             }}>
-              <Icon icon={Calendar} size={18} color="secondary" decorative />
+              <Icon icon={Calendar} size={16} color="secondary" decorative />
               <span style={{
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 color: 'var(--color-text-secondary)',
                 fontWeight: '500',
               }}>
                 {formatDate(selectedRecord.date)}
               </span>
 
-              <Icon icon={MapPin} size={18} color="secondary" decorative />
+              <Icon icon={MapPin} size={16} color="secondary" decorative />
               <span style={{
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 color: 'var(--color-text-secondary)',
                 fontWeight: '500',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}>
                 {selectedRecord.location}
               </span>
 
               {selectedRecord.size && selectedRecord.weight && (
                 <>
-                  <Icon icon={Ruler} size={18} color="secondary" decorative />
+                  <Icon icon={Ruler} size={16} color="secondary" decorative />
                   <span style={{
-                    fontSize: '0.9rem',
+                    fontSize: '0.85rem',
                     color: 'var(--color-text-secondary)',
                     fontWeight: '500',
                   }}>
@@ -871,7 +874,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 詳細を見る
               </button>
 
-              {/* Googleマップで表示ボタン */}
+              {/* Googleマップで表示ボタン - セカンダリ（アウトライン） */}
               {selectedRecord.coordinates && (
                 <button
                   onClick={(e) => {
@@ -885,33 +888,30 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   }}
                   style={{
                     width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#22c55e',
-                    color: 'white',
-                    border: 'none',
+                    padding: '10px', // 12px → 10px: セカンダリはコンパクトに
+                    backgroundColor: 'transparent',
+                    color: '#22c55e',
+                    border: '2px solid #22c55e',
                     borderRadius: '10px',
-                    fontSize: '0.9rem',
+                    fontSize: '0.85rem', // 0.9rem → 0.85rem
                     fontWeight: '600',
                     cursor: 'pointer',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 2px 8px rgba(34, 197, 94, 0.25)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#16a34a';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.35)';
+                    e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#22c55e';
+                    e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(34, 197, 94, 0.25)';
                   }}
                 >
-                  <Globe size={18} />
+                  <Globe size={16} />
                   Googleマップで表示
                 </button>
               )}
