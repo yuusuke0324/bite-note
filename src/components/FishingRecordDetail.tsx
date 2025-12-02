@@ -1095,7 +1095,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 tideChartData={tideChartData ?? undefined}
                 fishingTime={fishingTimeForChart}
                 tideLoading={tideLoading}
-                showMapHint={!!record.coordinates}
+                showMapHint={!!record.coordinates && photoFitMode === 'cover'}
                 fullscreen={true}
                 transparentInfo={true}
                 fitMode={photoFitMode}
@@ -1127,7 +1127,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   tideChartData={tideChartData ?? undefined}
                   fishingTime={fishingTimeForChart}
                   tideLoading={tideLoading}
-                  showMapHint={!!record.coordinates}
+                  showMapHint={!!record.coordinates && photoFitMode === 'cover'}
                   fitMode={photoFitMode}
                 />
               </div>
