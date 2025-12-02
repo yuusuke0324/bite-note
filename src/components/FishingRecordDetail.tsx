@@ -356,22 +356,27 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             photoCard.style.height = `${captureHeight}px`;
           }
 
-          // 保存用: 潮汐チャートを上部に移動＆サイズ拡大
-          // アプリ表示時はボタン回避で top: 72px だが、保存時はボタン非表示なので上へ
-          const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
-          if (tideChart) {
-            tideChart.style.top = '12px';
-            tideChart.style.transform = 'scale(1.3)';
-            tideChart.style.transformOrigin = 'top right';
-          }
+          // モバイル（フルスクリーン）モードの場合のみ位置・サイズ調整
+          // デスクトップでは元のバランスを維持
+          const isFullscreen = clonedElement.querySelector('.photo-hero-card--fullscreen') !== null;
+          if (isFullscreen) {
+            // 保存用: 潮汐チャートを上部に移動＆サイズ拡大
+            // アプリ表示時はボタン回避で top: 72px だが、保存時はボタン非表示なので上へ
+            const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
+            if (tideChart) {
+              tideChart.style.top = '12px';
+              tideChart.style.transform = 'scale(1.3)';
+              tideChart.style.transformOrigin = 'top right';
+            }
 
-          // 保存用: 情報パネル（日時・場所等）を上部に移動＆サイズ拡大
-          // CSSで !important が使われているため setProperty で上書き
-          const infoPanel = clonedElement.querySelector('.photo-hero-card__info-panel') as HTMLElement;
-          if (infoPanel) {
-            infoPanel.style.setProperty('top', '12px', 'important');
-            infoPanel.style.setProperty('transform', 'scale(1.2)', 'important');
-            infoPanel.style.setProperty('transform-origin', 'top left', 'important');
+            // 保存用: 情報パネル（日時・場所等）を上部に移動＆サイズ拡大
+            // CSSで !important が使われているため setProperty で上書き
+            const infoPanel = clonedElement.querySelector('.photo-hero-card__info-panel') as HTMLElement;
+            if (infoPanel) {
+              infoPanel.style.setProperty('top', '12px', 'important');
+              infoPanel.style.setProperty('transform', 'scale(1.2)', 'important');
+              infoPanel.style.setProperty('transform-origin', 'top left', 'important');
+            }
           }
         },
         // Ignore elements that cause issues
