@@ -38,6 +38,7 @@ export default defineWorkspace([
         'src/components/__tests__/PhotoHeroCard.test.tsx', // Issue #319: PhotoHeroCard
         'src/components/__tests__/RecordGrid.test.tsx', // Issue #320: RecordGrid
         'src/components/__tests__/FishIcon.test.tsx', // Issue #321: FishIcon
+        'src/components/__tests__/Skeleton.test.tsx', // Issue #327: Skeleton統一
       ],
       setupFiles: ['./src/setupTests.ts'],
       environment: 'jsdom',
