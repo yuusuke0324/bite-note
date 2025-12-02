@@ -10,9 +10,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
-import { photoService } from '../../lib/photo-service';
 import type { FishingRecord } from '../../types';
-import { logger } from '../../lib/errors/logger';
 import { Icon } from '../ui/Icon';
 import { Map as MapIcon, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2, Globe } from 'lucide-react';
 
@@ -290,9 +288,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
   const [selectedRecord, setSelectedRecord] = useState<FishingRecord | null>(null);
   const [flyToCoords, setFlyToCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [photoLoading, setPhotoLoading] = useState(false);
-  const photoUrlRef = React.useRef<string | null>(null);
 
   // Issue #296: ダークモード検出
   const isDarkMode = useDarkMode();
@@ -392,10 +387,9 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('ja-JP', {
+      year: 'numeric',
       month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     }).format(date);
   };
 
@@ -457,51 +451,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
       });
     }
   }, [focusedMarkerIndex, recordsWithAdjustedCoordinates]);
-
-  // 選択されたレコードの写真を読み込む
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadPhoto = async () => {
-      if (!selectedRecord?.photoId) {
-        setPhotoUrl(null);
-        setPhotoLoading(false);
-        return;
-      }
-
-      try {
-        setPhotoLoading(true);
-        const photoResult = await photoService.getPhotoById(selectedRecord.photoId);
-
-        if (isMounted && photoResult.success && photoResult.data) {
-          // 古いURLをクリーンアップ
-          if (photoUrlRef.current) {
-            URL.revokeObjectURL(photoUrlRef.current);
-          }
-
-          const url = URL.createObjectURL(photoResult.data.blob);
-          photoUrlRef.current = url;
-          setPhotoUrl(url);
-        }
-      } catch (error) {
-        logger.error('写真の読み込みエラー', { error });
-      } finally {
-        if (isMounted) {
-          setPhotoLoading(false);
-        }
-      }
-    };
-
-    loadPhoto();
-
-    return () => {
-      isMounted = false;
-      if (photoUrlRef.current) {
-        URL.revokeObjectURL(photoUrlRef.current);
-        photoUrlRef.current = null;
-      }
-    };
-  }, [selectedRecord?.photoId]);
 
   if (recordsWithCoordinates.length === 0) {
     return (
@@ -670,53 +619,28 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
         {/* 選択された釣果のサマリパネル（モバイル: Bottom Sheet、デスクトップ: 上部中央） */}
         {selectedRecord && (
           <div style={{
-            position: isMobile ? 'fixed' : 'absolute',
-            // モバイル: 下部からスライドアップ
-            ...(isMobile ? {
-              bottom: 0,
-              left: 0,
-              right: 0,
-              top: 'auto',
-              transform: 'none',
-              borderRadius: '20px 20px 0 0',
-              maxHeight: '70vh',
-              overflowY: 'auto',
-            } : {
-              top: '16px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              borderRadius: '16px',
-              maxWidth: '400px',
-              minWidth: '320px',
-            }),
-            zIndex: 1001, // 統計パネルより上
+            position: 'absolute',
+            top: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            borderRadius: '16px',
+            maxWidth: isMobile ? '90%' : '400px',
+            minWidth: isMobile ? '280px' : '320px',
+            zIndex: 1001,
             backgroundColor: 'var(--color-panel-bg-solid)',
             backdropFilter: 'blur(20px)',
-            boxShadow: isMobile
-              ? '0 -8px 32px rgba(0, 0, 0, 0.3)'
-              : '0 8px 32px rgba(0, 0, 0, 0.2)',
-            padding: isMobile ? '20px 16px 24px' : '16px 20px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+            padding: '16px 20px',
             border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
-            borderBottom: isMobile ? 'none' : undefined,
           }}>
-            {/* モバイル用ドラッグハンドル */}
-            {isMobile && (
-              <div style={{
-                width: '40px',
-                height: '4px',
-                backgroundColor: 'var(--color-border-medium)',
-                borderRadius: '2px',
-                margin: '0 auto 16px',
-              }} />
-            )}
             {/* 閉じるボタン - iOS HIG準拠 44x44px */}
             <button
               onClick={() => setSelectedRecord(null)}
               aria-label="サマリパネルを閉じる"
               style={{
                 position: 'absolute',
-                top: isMobile ? '12px' : '8px',
-                right: isMobile ? '12px' : '8px',
+                top: '8px',
+                right: '8px',
                 width: '44px',
                 height: '44px',
                 minWidth: '44px',
@@ -740,27 +664,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             >
               <Icon icon={X} size={20} decorative />
             </button>
-
-            {/* 写真（あれば表示） */}
-            {photoUrl && !photoLoading && (
-              <div style={{
-                marginBottom: '12px',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                border: `1px solid ${'var(--color-border-light)'}`,
-              }}>
-                <img
-                  src={photoUrl}
-                  alt={`${selectedRecord.fishSpecies}の写真`}
-                  style={{
-                    width: '100%',
-                    maxHeight: isMobile ? '150px' : '200px',
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                />
-              </div>
-            )}
 
             {/* ヘッダー */}
             <div style={{
@@ -786,55 +689,50 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               }}>
                 {selectedRecord.fishSpecies}
               </h4>
-              {(selectedRecord.size || selectedRecord.weight) && (
-                <div style={{
-                  backgroundColor: 'rgba(96, 165, 250, 0.2)',
-                  color: '#60a5fa',
-                  padding: '4px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.875rem',
-                  fontWeight: '700',
-                  marginLeft: 'auto',
-                }}>
-                  {selectedRecord.size ? `${selectedRecord.size}cm` : `${selectedRecord.weight}g`}
-                </div>
-              )}
             </div>
 
-            {/* 情報グリッド */}
+            {/* 情報グリッド - コンパクト化 */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'auto 1fr',
-              gap: '8px 12px',
-              marginBottom: '16px',
+              gap: '6px 10px', // 8px 12px → 6px 10px: コンパクト化
+              marginBottom: '12px', // 16px → 12px
             }}>
-              <Icon icon={Calendar} size={18} color="secondary" decorative />
+              <Icon icon={Calendar} size={16} color="secondary" decorative />
               <span style={{
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 color: 'var(--color-text-secondary)',
                 fontWeight: '500',
               }}>
                 {formatDate(selectedRecord.date)}
               </span>
 
-              <Icon icon={MapPin} size={18} color="secondary" decorative />
+              <Icon icon={MapPin} size={16} color="secondary" decorative />
               <span style={{
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 color: 'var(--color-text-secondary)',
                 fontWeight: '500',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}>
                 {selectedRecord.location}
               </span>
 
-              {selectedRecord.size && selectedRecord.weight && (
+              {(selectedRecord.size || selectedRecord.weight) && (
                 <>
-                  <Icon icon={Ruler} size={18} color="secondary" decorative />
+                  <Icon icon={Ruler} size={16} color="secondary" decorative />
                   <span style={{
-                    fontSize: '0.9rem',
-                    color: 'var(--color-text-secondary)',
-                    fontWeight: '500',
+                    fontSize: '0.85rem',
+                    color: 'var(--color-text-primary)',
+                    fontWeight: '600',
                   }}>
-                    {selectedRecord.size}cm / {selectedRecord.weight}g
+                    {selectedRecord.size && selectedRecord.weight
+                      ? `${selectedRecord.size}cm / ${selectedRecord.weight}g`
+                      : selectedRecord.size
+                        ? `${selectedRecord.size}cm`
+                        : `${selectedRecord.weight}g`
+                    }
                   </span>
                 </>
               )}
@@ -885,33 +783,30 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   }}
                   style={{
                     width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#22c55e',
-                    color: 'white',
-                    border: 'none',
+                    padding: '10px',
+                    backgroundColor: 'transparent',
+                    color: '#22c55e',
+                    border: '2px solid #22c55e',
                     borderRadius: '10px',
-                    fontSize: '0.9rem',
+                    fontSize: '0.85rem',
                     fontWeight: '600',
                     cursor: 'pointer',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 2px 8px rgba(34, 197, 94, 0.25)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#16a34a';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.35)';
+                    e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#22c55e';
+                    e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(34, 197, 94, 0.25)';
                   }}
                 >
-                  <Globe size={18} />
+                  <Globe size={16} />
                   Googleマップで表示
                 </button>
               )}
