@@ -534,7 +534,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
         top: 0,
         left: 0,
         right: 0,
-        bottom: isMobile ? '56px' : 0, // モバイルはフッター分を確保
+        bottom: 0,
         backgroundColor: 'rgba(0,0,0,0.5)',
         display: 'flex',
         alignItems: 'center',
@@ -574,7 +574,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           top: 0,
           left: 0,
           right: 0,
-          bottom: isMobile ? '56px' : 0, // モバイルはフッター分を確保
+          bottom: 0,
           backgroundColor: isMobile ? 'var(--color-surface-primary)' : 'rgba(0,0,0,0.5)',
           display: 'flex',
           alignItems: isMobile ? 'stretch' : 'center',
