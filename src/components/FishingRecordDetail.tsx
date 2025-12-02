@@ -359,7 +359,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           // PC/モバイル共通: グラフを縮小・右寄せ
           const tideChartArea = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
           if (tideChartArea) {
-            tideChartArea.style.transform = 'scale(0.8)';
+            tideChartArea.style.transform = 'scale(0.85, 0.95)'; // 縦方向を大きめに
             tideChartArea.style.transformOrigin = 'top right';
             tideChartArea.style.right = '4px'; // より右寄せ
           }
