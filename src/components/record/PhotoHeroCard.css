@@ -29,16 +29,7 @@
 }
 
 /* === Hover Effects === */
-
-.photo-hero-card:hover {
-  transform: translateY(-4px) translateZ(0);
-  box-shadow: 0 12px 48px rgba(31, 38, 135, 0.2);
-}
-
-/* Hover effect on badges */
-.photo-hero-card:hover .glass-badge-glass {
-  transform: scale(1.05) translateZ(0);
-}
+/* Note: Hover styles are provided by .card-hover-effect class from index.css */
 
 /* Active state for touch devices */
 .photo-hero-card:active {
@@ -611,18 +602,10 @@ body.light-theme .photo-hero-card--fit-contain .photo-hero-card__photo-backgroun
 @media (prefers-reduced-motion: reduce) {
   .photo-hero-card {
     will-change: auto; /* GPU負荷を軽減 */
-    transition: box-shadow var(--transition-smooth);
   }
-
-  .photo-hero-card:hover {
-    transform: none;
-  }
+  /* Note: Hover/badge transform:none is handled by .card-hover-effect in index.css */
 
   .photo-hero-card:active {
-    transform: none;
-  }
-
-  .photo-hero-card:hover .glass-badge-glass {
     transform: none;
   }
 

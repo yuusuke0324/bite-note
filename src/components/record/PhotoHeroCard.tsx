@@ -305,7 +305,7 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
 
   return (
     <div
-      className={`photo-hero-card ${fullscreen ? `photo-hero-card--fullscreen photo-hero-card--fit-${fitMode}` : `photo-hero-card--${variant}`} ${isBestCatch ? 'photo-hero-card--best-catch' : ''} ${transparentInfo ? 'photo-hero-card--transparent-info' : ''} ${className}`}
+      className={`photo-hero-card card-hover-effect ${fullscreen ? `photo-hero-card--fullscreen photo-hero-card--fit-${fitMode}` : `photo-hero-card--${variant}`} ${isBestCatch ? 'photo-hero-card--best-catch' : ''} ${transparentInfo ? 'photo-hero-card--transparent-info' : ''} ${className}`}
       onClick={handleClick}
       role="button"
       tabIndex={0}
