@@ -1,6 +1,7 @@
 // 釣果記録詳細コンポーネント
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 // import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
 import type { TideChartData } from './chart/tide/types';
@@ -565,7 +566,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     );
   }
 
-  return (
+  // createPortalでbody直下にレンダリングし、スタッキングコンテキストの問題を回避
+  return createPortal(
     <>
       {/* メインダイアログ */}
       <div
@@ -581,7 +583,6 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           justifyContent: 'center',
           zIndex: 1000,
           padding: isMobile ? 0 : '1rem',
-          pointerEvents: 'none', // クリックを透過してフッターに届ける
         }}
         onClick={(e) => {
           if (!isMobile && e.target === e.currentTarget) {
@@ -609,7 +610,6 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             border: isMobile ? 'none' : `1px solid ${'var(--color-border-light)'}`,
             display: 'flex',
             flexDirection: 'column',
-            pointerEvents: 'auto', // コンテンツはクリック可能に
           }}
           role="dialog"
           aria-label={`${record.fishSpecies}の詳細`}
@@ -1508,6 +1508,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           }
         }
       `}</style>
-    </>
+    </>,
+    document.body
   );
 };
