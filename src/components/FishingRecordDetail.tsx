@@ -127,7 +127,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   // Web Share API使用の判定（タッチデバイスかつAPI対応の場合のみ）
   const shouldUseWebShare = () => {
     if (!isTouchDevice()) return false;
-    return !!(navigator.share && navigator.canShare);
+    return !!(navigator.share && typeof navigator.canShare === 'function');
   };
 
   // Load photo URL for save functionality
@@ -158,7 +158,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     // Elements to restore after capture
     const mapBar = container.querySelector('.photo-hero-card__map-bar') as HTMLElement | null;
     const glassElements = container.querySelectorAll('.glass-panel, .photo-hero-card__tide-chart-overlay, .photo-hero-card__tide-name');
-    const originalStyles: { element: HTMLElement; backdrop: string; webkitBackdrop: string; bg: string }[] = [];
+    type StyleRecord = { element: HTMLElement; backdrop: string; webkitBackdrop: string; bg: string };
+    const originalStyles: StyleRecord[] = [];
 
     // Save current fitMode and temporarily set to 'cover' to ensure overlay is visible
     const originalFitMode = photoFitMode;
@@ -169,7 +170,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       if (mapBar) mapBar.style.display = '';
       originalStyles.forEach(({ element, backdrop, webkitBackdrop, bg }) => {
         element.style.backdropFilter = backdrop;
-        element.style.webkitBackdropFilter = webkitBackdrop;
+        (element.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter = webkitBackdrop;
         element.style.background = bg;
       });
       // Restore original fitMode if changed
@@ -193,15 +194,16 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       glassElements.forEach((el) => {
         const htmlEl = el as HTMLElement;
         const computed = window.getComputedStyle(htmlEl);
+        const styleWithWebkit = htmlEl.style as CSSStyleDeclaration & { webkitBackdropFilter?: string };
         originalStyles.push({
           element: htmlEl,
           backdrop: htmlEl.style.backdropFilter,
-          webkitBackdrop: htmlEl.style.webkitBackdropFilter || '',
+          webkitBackdrop: styleWithWebkit.webkitBackdropFilter || '',
           bg: htmlEl.style.background,
         });
         // Replace backdrop-filter with solid semi-transparent background
         htmlEl.style.backdropFilter = 'none';
-        htmlEl.style.webkitBackdropFilter = 'none';
+        styleWithWebkit.webkitBackdropFilter = 'none';
         // If background is transparent or very light, add solid background
         if (!computed.background || computed.background.includes('rgba(0, 0, 0, 0)')) {
           htmlEl.style.background = 'rgba(0, 0, 0, 0.7)';
