@@ -27,6 +27,7 @@ import { ReAuthPrompt } from './components/features/SessionManagement/ReAuthProm
 import { PhotoHeroCard } from './components/record/PhotoHeroCard';
 import { RecordGrid } from './components/record/RecordGrid';
 
+
 // Phase 3 ホーム画面コンポーネント
 import { RecentRecordsSection } from './components/home/RecentRecordsSection';
 import { LocationRankingSection } from './components/home/LocationRankingSection';
