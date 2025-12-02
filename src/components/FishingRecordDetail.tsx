@@ -574,7 +574,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           top: 0,
           left: 0,
           right: 0,
-          bottom: 0,
+          bottom: isMobile ? 56 : 0, // モバイル: フッターの高さ分空けてタップ可能に
           backgroundColor: isMobile ? 'var(--color-surface-primary)' : 'rgba(0,0,0,0.5)',
           display: 'flex',
           alignItems: isMobile ? 'stretch' : 'center',
@@ -596,7 +596,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             top: isMobile ? 0 : undefined,
             left: isMobile ? 0 : undefined,
             right: isMobile ? 0 : undefined,
-            bottom: isMobile ? 56 : undefined, // フッターの高さ分空ける
+            bottom: isMobile ? 0 : undefined, // 外側オーバーレイがフッター分を空けている
             backgroundColor: 'var(--color-surface-primary)',
             borderRadius: isMobile ? 0 : '12px',
             maxWidth: isMobile ? '100%' : '600px',
