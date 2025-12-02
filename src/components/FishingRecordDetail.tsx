@@ -113,6 +113,11 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [photoFitMode, setPhotoFitMode] = useState<'cover' | 'contain'>('cover');
   const [localPhotoUrl, setLocalPhotoUrl] = useState<string | null>(null);
+  // 2ステップ共有用の状態
+  const [generatedImageBlob, setGeneratedImageBlob] = useState<Blob | null>(null);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const photoContainerRef = useRef<HTMLDivElement>(null);
 
   // タッチデバイス判定（macOSデスクトップでのWeb Share API誤発火防止）
@@ -140,16 +145,102 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     loadPhoto();
   }, [record.photoId]);
 
-  // Save photo with overlay info (screen capture)
+  // 2ステップ共有用のクリーンアップ
+  useEffect(() => {
+    return () => {
+      // コンポーネントアンマウント時にObject URLを解放
+      if (generatedImageUrl) {
+        URL.revokeObjectURL(generatedImageUrl);
+      }
+    };
+  }, [generatedImageUrl]);
+
+  // ファイル名生成
+  const getFilename = () => `BiteNote_${record.fishSpecies}_${record.date.toISOString().split('T')[0]}.jpg`;
+
+  // ダウンロードフォールバック
+  const downloadImage = (dataUrl: string) => {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = getFilename();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // 2ステップ目: 共有シートを表示（新しいユーザージェスチャーコンテキスト）
+  const handleShare = async () => {
+    if (!generatedImageBlob) {
+      logger.error('No generated image blob');
+      return;
+    }
+
+    try {
+      if (!('share' in navigator)) {
+        logger.info('navigator.share not available, falling back to download');
+        if (generatedImageUrl) {
+          downloadImage(generatedImageUrl);
+        }
+        setShowShareModal(false);
+        return;
+      }
+
+      const file = new File([generatedImageBlob], getFilename(), { type: 'image/jpeg' });
+      const shareData = { files: [file] };
+
+      try {
+        await navigator.share(shareData);
+        // 共有成功（またはキャンセル）
+        setShowShareModal(false);
+        setGeneratedImageBlob(null);
+        if (generatedImageUrl) {
+          URL.revokeObjectURL(generatedImageUrl);
+          setGeneratedImageUrl(null);
+        }
+      } catch (shareError) {
+        if (shareError instanceof Error && shareError.name === 'AbortError') {
+          // ユーザーがキャンセル - モーダルは閉じない（再試行可能）
+          return;
+        }
+        logger.error('Share API failed', { shareError });
+        // 共有失敗時はダウンロードにフォールバック
+        if (generatedImageUrl) {
+          downloadImage(generatedImageUrl);
+        }
+        setShowShareModal(false);
+      }
+    } catch (error) {
+      logger.error('Share failed', { error });
+      if (generatedImageUrl) {
+        downloadImage(generatedImageUrl);
+      }
+      setShowShareModal(false);
+    }
+  };
+
+  // 共有モーダルを閉じる（ダウンロードにフォールバック）
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
+    // Blob/URLはクリーンアップ
+    if (generatedImageUrl) {
+      URL.revokeObjectURL(generatedImageUrl);
+      setGeneratedImageUrl(null);
+    }
+    setGeneratedImageBlob(null);
+  };
+
+  // 1ステップ目: 画像生成（情報オーバーレイ付きスクリーンキャプチャ）
   const handleSavePhotoWithInfo = async () => {
     if (!photoContainerRef.current) {
       logger.error('Photo container ref not found');
       return;
     }
 
+    // 重複実行防止
+    if (isSaving) return;
+    setIsSaving(true);
     setShowContextMenu(false);
 
-    const filename = `BiteNote_${record.fishSpecies}_${record.date.toISOString().split('T')[0]}.jpg`;
     const container = photoContainerRef.current;
 
     // Elements to restore after capture
@@ -174,58 +265,6 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       if (needsFitModeChange) {
         setPhotoFitMode(originalFitMode);
       }
-    };
-
-    // iOS Safari用のシェアヘルパー（Blob直接使用版）
-    const shareOnMobile = async (blob: Blob) => {
-      try {
-        // iOSでは canShare を呼び出さずに直接 share を試みる
-        if (!('share' in navigator)) {
-          logger.info('navigator.share not available');
-          return false;
-        }
-
-        const file = new File([blob], filename, { type: blob.type });
-        const shareData = { files: [file] };
-
-        // canShareが利用可能な場合はチェック（オプショナル）
-        if ('canShare' in navigator && typeof navigator.canShare === 'function') {
-          if (!navigator.canShare(shareData)) {
-            logger.info('canShare returned false, trying share anyway');
-          }
-        }
-
-        try {
-          await navigator.share(shareData);
-          return true;
-        } catch (shareError) {
-          // ユーザーがキャンセルした場合は成功扱い
-          if (shareError instanceof Error && shareError.name === 'AbortError') {
-            return true;
-          }
-          logger.error('Share API failed', { shareError, name: (shareError as Error).name });
-          return false;
-        }
-      } catch (error) {
-        logger.error('Mobile share failed', { error });
-        return false;
-      }
-    };
-
-    // dataURLからBlobを作成
-    const dataUrlToBlob = async (dataUrl: string): Promise<Blob> => {
-      const response = await fetch(dataUrl);
-      return response.blob();
-    };
-
-    // ダウンロードフォールバック
-    const downloadImage = (dataUrl: string) => {
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     };
 
     try {
@@ -334,37 +373,39 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       // Restore styles immediately after capture
       restoreStyles();
 
-      // タッチデバイス（モバイル/タブレット）: Web Share APIでネイティブ共有
-      if (isTouchDevice()) {
-        // canvas.toBlob()を使用して直接Blobを取得
-        const blob = await new Promise<Blob | null>((resolve) => {
-          canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.95);
-        });
-        if (blob) {
-          const shared = await shareOnMobile(blob);
-          if (shared) return;
-        }
+      // Blobを生成
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.95);
+      });
+
+      if (!blob) {
+        throw new Error('Failed to create blob from canvas');
       }
 
-      // デスクトップまたはシェア失敗時: 直接ダウンロード
+      // タッチデバイス: 2ステップ共有モーダルを表示
+      if (isTouchDevice()) {
+        // 古いURLを解放
+        if (generatedImageUrl) {
+          URL.revokeObjectURL(generatedImageUrl);
+        }
+        const imageUrl = URL.createObjectURL(blob);
+        setGeneratedImageBlob(blob);
+        setGeneratedImageUrl(imageUrl);
+        setShowShareModal(true);
+        setIsSaving(false);
+        return;
+      }
+
+      // デスクトップ: 直接ダウンロード
       const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       downloadImage(dataUrl);
+      setIsSaving(false);
     } catch (error) {
       restoreStyles();
+      setIsSaving(false);
       logger.error('Photo capture failed', { error });
 
-      // html2canvasが失敗した場合、元の写真をそのまま保存を試みる
-      if (localPhotoUrl && isTouchDevice()) {
-        try {
-          const blob = await dataUrlToBlob(localPhotoUrl);
-          const shared = await shareOnMobile(blob);
-          if (shared) return;
-        } catch {
-          // フォールバックも失敗
-        }
-      }
-
-      // 最終フォールバック: 元の写真をダウンロード
+      // html2canvasが失敗した場合、元の写真をダウンロード
       if (localPhotoUrl) {
         downloadImage(localPhotoUrl);
       }
@@ -1235,6 +1276,117 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 }}
               >
                 削除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2ステップ共有モーダル */}
+      {showShareModal && generatedImageUrl && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1300,
+            padding: '1rem'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseShareModal();
+            }
+          }}
+        >
+          <div
+            style={{
+              background: 'rgba(30, 30, 30, 0.98)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '16px',
+              padding: '20px',
+              maxWidth: '340px',
+              width: '100%',
+              boxShadow: '0 16px 48px rgba(0, 0, 0, 0.5)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}
+          >
+            {/* プレビュー画像 */}
+            <div style={{
+              marginBottom: '16px',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+            }}>
+              <img
+                src={generatedImageUrl}
+                alt="保存する画像"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block'
+                }}
+              />
+            </div>
+
+            {/* 説明テキスト */}
+            <p style={{
+              margin: '0 0 20px 0',
+              fontSize: '14px',
+              color: 'rgba(255, 255, 255, 0.8)',
+              textAlign: 'center',
+              lineHeight: 1.5
+            }}>
+              「共有」をタップして、共有シートから<br />
+              「"写真"に保存」を選択してください
+            </p>
+
+            {/* ボタン */}
+            <div style={{
+              display: 'flex',
+              gap: '12px'
+            }}>
+              <button
+                onClick={handleCloseShareModal}
+                style={{
+                  flex: 1,
+                  padding: '14px 16px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '15px',
+                  fontWeight: 500,
+                  color: 'white',
+                  minHeight: '48px',
+                  transition: 'background 0.2s ease'
+                }}
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleShare}
+                style={{
+                  flex: 1,
+                  padding: '14px 16px',
+                  background: '#007AFF',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  color: 'white',
+                  minHeight: '48px',
+                  transition: 'background 0.2s ease'
+                }}
+              >
+                共有
               </button>
             </div>
           </div>
