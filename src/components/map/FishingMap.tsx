@@ -126,6 +126,31 @@ const useDarkMode = (): boolean => {
   return isDark;
 };
 
+// Issue #346: モバイル検出フック（768px未満をモバイルとする）
+// デバウンス処理でパフォーマンス最適化
+const useIsMobile = (): boolean => {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.innerWidth < 768
+  );
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsMobile(window.innerWidth < 768);
+      }, 150); // 150ms デバウンス
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return isMobile;
+};
+
 // Issue #298: ズームレベル追跡コンポーネント
 const ZoomTracker: React.FC<{ onZoomChange: (zoom: number) => void }> = ({ onZoomChange }) => {
   const map = useMapEvents({
@@ -271,6 +296,12 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
   // Issue #296: ダークモード検出
   const isDarkMode = useDarkMode();
+
+  // Issue #346: モバイル検出
+  const isMobile = useIsMobile();
+
+  // Issue #346: モバイルでサマリ表示時は他のパネルを非表示
+  const shouldHideOnMobileSummary = isMobile && selectedRecord;
 
   // Issue #298: ズームレベル追跡
   const [zoomLevel, setZoomLevel] = useState(14);
@@ -636,32 +667,60 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
           </MarkerClusterGroup>
         </MapContainer>
 
-        {/* 選択された釣果のサマリパネル（上部中央） */}
+        {/* 選択された釣果のサマリパネル（モバイル: Bottom Sheet、デスクトップ: 上部中央） */}
         {selectedRecord && (
           <div style={{
-            position: 'absolute',
-            top: '16px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 1000,
+            position: isMobile ? 'fixed' : 'absolute',
+            // モバイル: 下部からスライドアップ
+            ...(isMobile ? {
+              bottom: 0,
+              left: 0,
+              right: 0,
+              top: 'auto',
+              transform: 'none',
+              borderRadius: '20px 20px 0 0',
+              maxHeight: '70vh',
+              overflowY: 'auto',
+            } : {
+              top: '16px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              borderRadius: '16px',
+              maxWidth: '400px',
+              minWidth: '320px',
+            }),
+            zIndex: 1001, // 統計パネルより上
             backgroundColor: 'var(--color-panel-bg-solid)',
             backdropFilter: 'blur(20px)',
-            borderRadius: '16px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-            padding: '16px 20px',
+            boxShadow: isMobile
+              ? '0 -8px 32px rgba(0, 0, 0, 0.3)'
+              : '0 8px 32px rgba(0, 0, 0, 0.2)',
+            padding: isMobile ? '20px 16px 24px' : '16px 20px',
             border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
-            maxWidth: '400px',
-            minWidth: '320px',
+            borderBottom: isMobile ? 'none' : undefined,
           }}>
-            {/* 閉じるボタン */}
+            {/* モバイル用ドラッグハンドル */}
+            {isMobile && (
+              <div style={{
+                width: '40px',
+                height: '4px',
+                backgroundColor: 'var(--color-border-medium)',
+                borderRadius: '2px',
+                margin: '0 auto 16px',
+              }} />
+            )}
+            {/* 閉じるボタン - iOS HIG準拠 44x44px */}
             <button
               onClick={() => setSelectedRecord(null)}
+              aria-label="サマリパネルを閉じる"
               style={{
                 position: 'absolute',
-                top: '8px',
-                right: '8px',
-                width: '28px',
-                height: '28px',
+                top: isMobile ? '12px' : '8px',
+                right: isMobile ? '12px' : '8px',
+                width: '44px',
+                height: '44px',
+                minWidth: '44px',
+                minHeight: '44px',
                 borderRadius: '50%',
                 border: 'none',
                 backgroundColor: 'var(--color-surface-tertiary)',
@@ -679,7 +738,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 e.currentTarget.style.backgroundColor = 'var(--color-surface-tertiary)';
               }}
             >
-              <Icon icon={X} size={16} decorative />
+              <Icon icon={X} size={20} decorative />
             </button>
 
             {/* 写真（あれば表示） */}
@@ -907,7 +966,8 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             <Icon icon={Maximize2} size={20} decorative />
           </button>
 
-          {/* 統計情報カード */}
+          {/* 統計情報カード - モバイルでサマリ表示時は非表示 */}
+          {!shouldHideOnMobileSummary && (
           <div style={{
             backgroundColor: 'var(--color-panel-bg)',
             backdropFilter: 'blur(10px)',
@@ -915,7 +975,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
             padding: '12px',
             border: `1px solid ${'var(--color-border-light)'}`,
-            minWidth: '140px',
+            minWidth: isMobile ? '120px' : '140px',
           }}>
             <div style={{
               fontSize: '0.7rem',
@@ -954,9 +1014,11 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               </div>
             </div>
           </div>
+          )}
         </div>
 
-        {/* コンパクトリスト（下部オーバーレイ） */}
+        {/* コンパクトリスト（下部オーバーレイ） - モバイルでサマリ表示時は非表示 */}
+        {!shouldHideOnMobileSummary && (
         <div style={{
           position: 'absolute',
           bottom: 0,
@@ -1074,6 +1136,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             ))}
           </div>
         </div>
+        )}
       </div>
 
       {/* CSSアニメーション */}
