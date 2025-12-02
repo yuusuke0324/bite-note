@@ -356,30 +356,28 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             photoCard.style.height = `${captureHeight}px`;
           }
 
-          // PC/モバイル共通: 潮汐チャートの位置調整（温度との重なり防止）
-          const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
+          // PC/モバイル共通: グラフを縮小・右寄せ
+          const tideChartArea = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
+          if (tideChartArea) {
+            tideChartArea.style.transform = 'scale(0.8)';
+            tideChartArea.style.transformOrigin = 'top right';
+            tideChartArea.style.right = '4px'; // より右寄せ
+          }
+
+          // PC/モバイル共通: 情報パネルを左寄せ
+          const infoPanel = clonedElement.querySelector('.photo-hero-card__info-panel') as HTMLElement;
+          if (infoPanel) {
+            infoPanel.style.setProperty('left', '8px', 'important');
+          }
+
+          // モバイル: 上部に移動
           const isFullscreen = clonedElement.querySelector('.photo-hero-card--fullscreen') !== null;
-
           if (isFullscreen) {
-            // モバイル: 上部に移動＆サイズ拡大
-            if (tideChart) {
-              tideChart.style.top = '12px';
-              tideChart.style.right = '8px'; // 少し右に寄せて重なり防止
-              tideChart.style.transform = 'scale(1.2)'; // 1.3→1.2に縮小
-              tideChart.style.transformOrigin = 'top right';
+            if (tideChartArea) {
+              tideChartArea.style.top = '12px';
             }
-
-            // 情報パネルを上部に移動＆サイズ拡大
-            const infoPanel = clonedElement.querySelector('.photo-hero-card__info-panel') as HTMLElement;
             if (infoPanel) {
               infoPanel.style.setProperty('top', '12px', 'important');
-              infoPanel.style.setProperty('transform', 'scale(1.1)', 'important'); // 1.2→1.1に縮小
-              infoPanel.style.setProperty('transform-origin', 'top left', 'important');
-            }
-          } else {
-            // デスクトップ: 重なり防止のみ
-            if (tideChart) {
-              tideChart.style.right = '8px';
             }
           }
         },
