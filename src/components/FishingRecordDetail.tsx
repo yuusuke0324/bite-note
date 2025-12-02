@@ -356,17 +356,21 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             photoCard.style.height = `${captureHeight}px`;
           }
 
-          // 潮汐チャートを保存用にサイズ調整（元サイズ維持）
+          // 保存用: 潮汐チャートを上部に移動＆サイズ拡大
+          // アプリ表示時はボタン回避で top: 72px だが、保存時はボタン非表示なので上へ
           const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
           if (tideChart) {
-            tideChart.style.transform = 'scale(1.0)';
+            tideChart.style.top = '12px';
+            tideChart.style.transform = 'scale(1.3)';
             tideChart.style.transformOrigin = 'top right';
           }
 
-          // 潮名（大潮、中潮など）のテキストを非表示（黒背景問題回避）
-          const tideName = clonedElement.querySelector('.photo-hero-card__tide-name') as HTMLElement;
-          if (tideName) {
-            tideName.style.display = 'none';
+          // 保存用: 情報パネル（日時・場所等）を上部に移動＆サイズ拡大
+          const infoPanel = clonedElement.querySelector('.photo-hero-card__info-panel') as HTMLElement;
+          if (infoPanel) {
+            infoPanel.style.top = '12px';
+            infoPanel.style.transform = 'scale(1.2)';
+            infoPanel.style.transformOrigin = 'top left';
           }
         },
         // Ignore elements that cause issues
