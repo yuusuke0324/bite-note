@@ -576,7 +576,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           top: 0,
           left: 0,
           right: 0,
-          bottom: isMobile ? 56 : 0, // モバイル: フッターの高さ分空けてタップ可能に
+          bottom: isMobile ? 56 : 0, // モバイル: フッターを視覚的に表示
           backgroundColor: isMobile ? 'var(--color-surface-primary)' : 'rgba(0,0,0,0.5)',
           display: 'flex',
           alignItems: isMobile ? 'stretch' : 'center',
@@ -1191,7 +1191,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             top: 0,
             left: 0,
             right: 0,
-            bottom: isMobile ? 56 : 0, // モバイル: フッターの高さ分空けてタップ可能に
+            bottom: isMobile ? 56 : 0, // モバイル: フッターを視覚的に表示
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
             display: 'flex',
             alignItems: 'center',
@@ -1310,7 +1310,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             top: 0,
             left: 0,
             right: 0,
-            bottom: isMobile ? 56 : 0, // モバイル: フッターの高さ分空けてタップ可能に
+            bottom: isMobile ? 56 : 0, // モバイル: フッターを視覚的に表示
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             display: 'flex',
             flexDirection: 'column',
@@ -1420,7 +1420,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             top: 0,
             left: 0,
             right: 0,
-            bottom: isMobile ? 56 : 0, // モバイル: フッターの高さ分空けてタップ可能に
+            bottom: isMobile ? 56 : 0, // モバイル: フッターを視覚的に表示
             backgroundColor: 'rgba(0,0,0,0.9)',
             display: 'flex',
             alignItems: 'center',

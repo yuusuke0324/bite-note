@@ -1767,7 +1767,13 @@ function ModernApp() {
         navigation={
           <BottomNavigation
             items={navigationItems}
-            onItemClick={(id) => setActiveTab(id as any)}
+            onItemClick={(id) => {
+              setActiveTab(id as any);
+              // すべてのモーダルを閉じてナビゲーションを有効にする
+              setSelectedRecord(null);
+              setEditingRecord(null);
+              setDeletingRecord(null);
+            }}
           />
         }
       >
