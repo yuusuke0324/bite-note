@@ -580,7 +580,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           alignItems: isMobile ? 'stretch' : 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          padding: isMobile ? 0 : '1rem'
+          padding: isMobile ? 0 : '1rem',
+          pointerEvents: 'none', // クリックを透過してフッターに届ける
         }}
         onClick={(e) => {
           if (!isMobile && e.target === e.currentTarget) {
@@ -607,7 +608,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             boxShadow: isMobile ? 'none' : '0 20px 40px rgba(0,0,0,0.3)',
             border: isMobile ? 'none' : `1px solid ${'var(--color-border-light)'}`,
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            pointerEvents: 'auto', // コンテンツはクリック可能に
           }}
           role="dialog"
           aria-label={`${record.fishSpecies}の詳細`}
