@@ -754,7 +754,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   alt={`${selectedRecord.fishSpecies}の写真`}
                   style={{
                     width: '100%',
-                    maxHeight: '200px',
+                    maxHeight: isMobile ? '150px' : '200px',
                     objectFit: 'cover',
                     display: 'block',
                   }}
