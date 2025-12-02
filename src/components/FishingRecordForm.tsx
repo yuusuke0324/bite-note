@@ -5,6 +5,7 @@ import { useValidatedForm } from '../hooks/useFormValidation';
 import { createFishingRecordSchema, type CreateFishingRecordFormData } from '../lib/validation';
 import { PhotoUpload } from './PhotoUpload';
 import { FishSpeciesAutocomplete } from './FishSpeciesAutocomplete';
+import { HeartAnimation } from './animation/HeartAnimation';
 import { photoService } from '../lib/photo-service';
 import type { PhotoMetadata, AutoFillData, FishSpecies } from '../types';
 import type { TideInfo } from '../types/tide';
@@ -51,6 +52,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
   const [extractedMetadata, setExtractedMetadata] = useState<PhotoMetadata | null>(null);
   const [tideInfo, setTideInfo] = useState<TideInfo | null>(null);
   const [tideLoading, setTideLoading] = useState(false);
+  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
 
   const {
     register,
@@ -223,6 +225,9 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
       }
 
       await onSubmit(submissionData);
+
+      // 保存成功時にハートアニメーションを表示
+      setShowHeartAnimation(true);
     });
   };
 
@@ -1486,6 +1491,12 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
           }
         }
       `}</style>
+
+      {/* 保存成功時のハートアニメーション */}
+      <HeartAnimation
+        visible={showHeartAnimation}
+        onAnimationEnd={() => setShowHeartAnimation(false)}
+      />
     </div>
   );
 };
