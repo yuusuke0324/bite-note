@@ -11,32 +11,19 @@
  */
 
 import React from 'react';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
+import { render, cleanup } from '@testing-library/react';
 import { GlassPanel } from '../ui/GlassPanel';
 
 describe('GlassPanel', () => {
-  beforeEach(async () => {
-    // CI環境でのJSDOM初期化待機
-    if (process.env.CI) {
-      await waitFor(
-        () => {
-          if (!document.body || document.body.children.length === 0) {
-            throw new Error('JSDOM not ready');
-          }
-        },
-        { timeout: 5000, interval: 100 }
-      );
-    } else {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    }
-  });
+  // beforeEachは不要（setupTests.tsの初期化に依存）
 
-  afterEach(() => {
-    // CI環境ではroot containerを保持
-    if (!process.env.CI) {
-      document.body.innerHTML = '';
-    }
+  afterEach(async () => {
+    // Reactのクリーンアップを確実に完了
+    cleanup();
+
+    // 非同期処理の完了を待機（React内部処理の完了待ち）
+    await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
   describe('Rendering', () => {
@@ -175,6 +162,9 @@ describe('GlassPanel', () => {
       render(<GlassPanel ref={ref}>Test</GlassPanel>);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
       expect(ref.current).toHaveClass('glass-panel-wrapper');
+
+      // メモリリーク防止
+      (ref as React.MutableRefObject<HTMLDivElement | null>).current = null;
     });
   });
 
