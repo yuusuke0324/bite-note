@@ -634,7 +634,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  zIndex: 30,
+                  zIndex: 100,
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                 }}
                 aria-label="戻る"
@@ -661,7 +661,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  zIndex: 30,
+                  zIndex: 100,
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                 }}
                 aria-label={photoFitMode === 'cover' ? '写真全体を表示' : '画面いっぱいに表示'}
@@ -672,7 +672,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
               {/* メニューボタン（右上） */}
               {(onEdit || onDelete) && (
-                <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 30 }}>
+                <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 100 }}>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
