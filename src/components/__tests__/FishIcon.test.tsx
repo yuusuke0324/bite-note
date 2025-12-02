@@ -15,8 +15,8 @@
  */
 
 import React from 'react';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { render, cleanup } from '@testing-library/react';
 import { FISH_COLORS, DEFAULT_FISH_COLOR } from '../../theme/fishColors';
 import { FishIcon } from '../ui/FishIcon';
 
@@ -84,26 +84,14 @@ function expectFishSpeciesColor(element: HTMLElement | null, species: string): v
 }
 
 describe('FishIcon', () => {
-  beforeEach(async () => {
-    // CI環境でのJSDOM初期化待機
-    if (process.env.CI) {
-      await waitFor(
-        () => {
-          if (!document.body || document.body.children.length === 0) {
-            throw new Error('JSDOM not ready');
-          }
-        },
-        { timeout: 5000, interval: 100 }
-      );
-    } else {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    }
-  });
+  // beforeEachは不要（setupTests.tsの初期化に依存）
 
-  afterEach(() => {
-    if (!process.env.CI) {
-      document.body.innerHTML = '';
-    }
+  afterEach(async () => {
+    // Reactのクリーンアップを確実に完了
+    cleanup();
+
+    // 非同期処理の完了を待機（React内部のフォーカス管理処理の完了待ち）
+    await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
   describe('Rendering', () => {
@@ -283,6 +271,9 @@ describe('FishIcon', () => {
       render(<FishIcon ref={ref} species="シーバス" />);
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
       expect(ref.current).toHaveClass('fish-icon-container');
+
+      // メモリリーク防止
+      (ref as React.MutableRefObject<HTMLDivElement | null>).current = null;
     });
   });
 });

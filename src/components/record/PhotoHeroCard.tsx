@@ -43,6 +43,12 @@ export interface PhotoHeroCardProps {
   tideLoading?: boolean;
   /** Whether to show "tap to view map" hint (detail view only) */
   showMapHint?: boolean;
+  /** Whether to use fullscreen layout (mobile detail view) */
+  fullscreen?: boolean;
+  /** Whether to use transparent info panel (no background) */
+  transparentInfo?: boolean;
+  /** Photo fit mode for fullscreen: 'cover' fills screen (may crop), 'contain' shows full photo */
+  fitMode?: 'cover' | 'contain';
 }
 
 /**
@@ -117,7 +123,9 @@ const calculateTideName = (date: Date): TideName => {
 
 /**
  * CompactTideChart - Compact tide chart for PhotoHeroCard overlay
- * Uses Recharts directly with minimal margin for 180x100px display
+ * Uses Recharts directly with responsive sizing
+ * - Mobile (<=768px): 120x53px
+ * - Desktop: 180x80px
  */
 interface CompactTideChartProps {
   data: TideChartData[];
@@ -126,6 +134,19 @@ interface CompactTideChartProps {
 }
 
 const CompactTideChart: React.FC<CompactTideChartProps> = ({ data, fishingTime, fishingDate }) => {
+  // Responsive chart size
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const chartWidth = isMobile ? 140 : 180;
+  const chartHeight = isMobile ? 65 : 80;
+
   // Find fishing time marker position
   const fishingMarker = fishingTime
     ? data.find((point) => point.time === fishingTime)
@@ -142,8 +163,8 @@ const CompactTideChart: React.FC<CompactTideChartProps> = ({ data, fishingTime, 
       )}
       <LineChart
         data={data}
-        width={180}
-        height={80}
+        width={chartWidth}
+        height={chartHeight}
         margin={{ top: 4, right: 8, bottom: 4, left: 8 }}
       >
         {/* Hidden axes required for ReferenceDot positioning */}
@@ -186,6 +207,9 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
   fishingTime,
   tideLoading = false,
   showMapHint = false,
+  fullscreen = false,
+  transparentInfo = false,
+  fitMode = 'cover',
 }) => {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
@@ -281,7 +305,7 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
 
   return (
     <div
-      className={`photo-hero-card photo-hero-card--${variant} ${isBestCatch ? 'photo-hero-card--best-catch' : ''} ${className}`}
+      className={`photo-hero-card ${fullscreen ? `photo-hero-card--fullscreen photo-hero-card--fit-${fitMode}` : `photo-hero-card--${variant}`} ${isBestCatch ? 'photo-hero-card--best-catch' : ''} ${transparentInfo ? 'photo-hero-card--transparent-info' : ''} ${className}`}
       onClick={handleClick}
       role="button"
       tabIndex={0}

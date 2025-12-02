@@ -1,6 +1,6 @@
 // 釣果記録詳細コンポーネント
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 // import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
 import type { TideChartData } from './chart/tide/types';
@@ -17,7 +17,12 @@ import {
   ChevronLeft,
   ChevronRight,
   MoreVertical,
+  Maximize2,
+  Minimize2,
+  Download,
 } from 'lucide-react';
+import { photoService } from '../lib/photo-service';
+import html2canvas from 'html2canvas';
 
 interface FishingRecordDetailProps {
   record: FishingRecord;
@@ -105,6 +110,219 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [tideChartData, setTideChartData] = useState<TideChartData[] | null>(null);
   const [tideLoading, setTideLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [photoFitMode, setPhotoFitMode] = useState<'cover' | 'contain'>('cover');
+  const [localPhotoUrl, setLocalPhotoUrl] = useState<string | null>(null);
+  const photoContainerRef = useRef<HTMLDivElement>(null);
+
+  // タッチデバイス判定（macOSデスクトップでのWeb Share API誤発火防止）
+  const isTouchDevice = () => {
+    return (
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
+  };
+
+  // Web Share API使用の判定（タッチデバイスかつAPI対応の場合のみ）
+  const shouldUseWebShare = () => {
+    if (!isTouchDevice()) return false;
+    return 'share' in navigator && 'canShare' in navigator;
+  };
+
+  // Load photo URL for save functionality
+  useEffect(() => {
+    if (!record.photoId) {
+      setLocalPhotoUrl(null);
+      return;
+    }
+
+    const loadPhoto = async () => {
+      const result = await photoService.getPhotoDataUrl(record.photoId!, false);
+      if (result.success && result.data) {
+        setLocalPhotoUrl(result.data);
+      }
+    };
+    loadPhoto();
+  }, [record.photoId]);
+
+  // Save photo with overlay info (screen capture)
+  const handleSavePhotoWithInfo = async () => {
+    if (!photoContainerRef.current) return;
+
+    setShowContextMenu(false);
+
+    const filename = `BiteNote_${record.fishSpecies}_${record.date.toISOString().split('T')[0]}.jpg`;
+    const container = photoContainerRef.current;
+
+    // Elements to restore after capture
+    const mapBar = container.querySelector('.photo-hero-card__map-bar') as HTMLElement | null;
+    const glassElements = container.querySelectorAll('.glass-panel, .photo-hero-card__tide-chart-overlay, .photo-hero-card__tide-name');
+    type StyleRecord = { element: HTMLElement; backdrop: string; webkitBackdrop: string; bg: string };
+    const originalStyles: StyleRecord[] = [];
+
+    // Save current fitMode and temporarily set to 'cover' to ensure overlay is visible
+    const originalFitMode = photoFitMode;
+    const needsFitModeChange = photoFitMode === 'contain';
+
+    // Helper to restore all styles
+    const restoreStyles = () => {
+      if (mapBar) mapBar.style.display = '';
+      originalStyles.forEach(({ element, backdrop, webkitBackdrop, bg }) => {
+        element.style.backdropFilter = backdrop;
+        (element.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter = webkitBackdrop;
+        element.style.background = bg;
+      });
+      // Restore original fitMode if changed
+      if (needsFitModeChange) {
+        setPhotoFitMode(originalFitMode);
+      }
+    };
+
+    try {
+      // Change fitMode to 'cover' if needed to show overlays
+      if (needsFitModeChange) {
+        setPhotoFitMode('cover');
+        // Wait for React to re-render with new fitMode
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Hide map bar before capture
+      if (mapBar) mapBar.style.display = 'none';
+
+      // Disable backdrop-filter for capture (html-to-image doesn't support it)
+      glassElements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        const computed = window.getComputedStyle(htmlEl);
+        const styleWithWebkit = htmlEl.style as CSSStyleDeclaration & { webkitBackdropFilter?: string };
+        originalStyles.push({
+          element: htmlEl,
+          backdrop: htmlEl.style.backdropFilter,
+          webkitBackdrop: styleWithWebkit.webkitBackdropFilter || '',
+          bg: htmlEl.style.background,
+        });
+        // Replace backdrop-filter with solid semi-transparent background
+        htmlEl.style.backdropFilter = 'none';
+        styleWithWebkit.webkitBackdropFilter = 'none';
+        // If background is transparent or very light, add solid background
+        if (!computed.background || computed.background.includes('rgba(0, 0, 0, 0)')) {
+          htmlEl.style.background = 'rgba(0, 0, 0, 0.7)';
+        }
+      });
+
+      // Wait for browser to complete render cycle (including SVG)
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Get the photo's natural dimensions to capture at correct aspect ratio
+      const imgElement = container.querySelector('.photo-hero-card__photo-foreground img') as HTMLImageElement;
+      const photoAspect = imgElement?.naturalWidth && imgElement?.naturalHeight
+        ? imgElement.naturalWidth / imgElement.naturalHeight
+        : 3 / 4; // Default to portrait 3:4
+
+      // Calculate capture dimensions based on photo aspect ratio
+      const containerRect = container.getBoundingClientRect();
+      let captureWidth = containerRect.width;
+      let captureHeight = captureWidth / photoAspect;
+
+      // If calculated height is larger than container, use container height instead
+      if (captureHeight > containerRect.height) {
+        captureHeight = containerRect.height;
+        captureWidth = captureHeight * photoAspect;
+      }
+
+      // Capture using html2canvas at photo's aspect ratio
+      const canvas = await html2canvas(container, {
+        backgroundColor: '#0f172a',
+        scale: 2, // Higher resolution
+        width: captureWidth,
+        height: captureHeight,
+        useCORS: true, // Allow cross-origin images
+        allowTaint: true, // Allow tainted canvas for local images
+        logging: false, // Disable logging
+        // Adjust the cloned element to show the full photo
+        onclone: (_clonedDoc, clonedElement) => {
+          // Set the cloned container to match capture dimensions
+          clonedElement.style.width = `${captureWidth}px`;
+          clonedElement.style.height = `${captureHeight}px`;
+          clonedElement.style.overflow = 'hidden';
+
+          // Find and adjust the photo to fill the new dimensions
+          const clonedImg = clonedElement.querySelector('.photo-hero-card__photo-foreground img') as HTMLImageElement;
+          if (clonedImg) {
+            clonedImg.style.objectFit = 'cover';
+            clonedImg.style.width = '100%';
+            clonedImg.style.height = '100%';
+          }
+
+          // Adjust PhotoHeroCard container
+          const photoContainer = clonedElement.querySelector('.photo-hero-card__photo-container') as HTMLElement;
+          if (photoContainer) {
+            photoContainer.style.width = `${captureWidth}px`;
+            photoContainer.style.height = `${captureHeight}px`;
+          }
+
+          // Adjust the PhotoHeroCard itself
+          const photoCard = clonedElement.querySelector('.photo-hero-card') as HTMLElement;
+          if (photoCard) {
+            photoCard.style.width = `${captureWidth}px`;
+            photoCard.style.height = `${captureHeight}px`;
+          }
+
+          // Shrink the tide chart for capture (70% of original size)
+          const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
+          if (tideChart) {
+            tideChart.style.transform = 'scale(0.7)';
+            tideChart.style.transformOrigin = 'top right';
+          }
+        },
+        // Ignore elements that cause issues
+        ignoreElements: (element) => {
+          const tagName = element.tagName;
+          return tagName === 'SCRIPT' || tagName === 'NOSCRIPT';
+        },
+      });
+
+      // Convert canvas to JPEG data URL
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+      // Restore styles immediately after capture
+      restoreStyles();
+
+      // タッチデバイス（モバイル/タブレット）: Web Share APIでネイティブ共有
+      if (shouldUseWebShare()) {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], filename, { type: 'image/jpeg' });
+
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `${record.fishSpecies}の写真`,
+          });
+          return;
+        }
+      }
+
+      // デスクトップ: 直接ダウンロード
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      restoreStyles();
+      logger.error('Photo capture failed', { error });
+    }
+  };
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Calculate tide data for overlay when coordinates exist
   useEffect(() => {
@@ -243,15 +461,15 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: isMobile ? 'var(--color-surface-primary)' : 'rgba(0,0,0,0.5)',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: isMobile ? 'stretch' : 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          padding: '1rem'
+          padding: isMobile ? 0 : '1rem'
         }}
         onClick={(e) => {
-          if (e.target === e.currentTarget) {
+          if (!isMobile && e.target === e.currentTarget) {
             onClose?.();
           }
         }}
@@ -260,20 +478,234 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       >
         <div
           style={{
-            position: 'relative',
+            position: isMobile ? 'absolute' : 'relative',
+            top: isMobile ? 0 : undefined,
+            left: isMobile ? 0 : undefined,
+            right: isMobile ? 0 : undefined,
+            bottom: isMobile ? 56 : undefined, // フッターの高さ分空ける
             backgroundColor: 'var(--color-surface-primary)',
-            borderRadius: '12px',
-            maxWidth: '600px',
-            width: '100%',
-            maxHeight: '90vh',
+            borderRadius: isMobile ? 0 : '12px',
+            maxWidth: isMobile ? '100%' : '600px',
+            width: isMobile ? undefined : '100%',
+            maxHeight: isMobile ? undefined : '90vh',
+            height: isMobile ? undefined : 'auto',
             overflow: 'auto',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-            border: `1px solid ${'var(--color-border-light)'}`
+            boxShadow: isMobile ? 'none' : '0 20px 40px rgba(0,0,0,0.3)',
+            border: isMobile ? 'none' : `1px solid ${'var(--color-border-light)'}`,
+            display: 'flex',
+            flexDirection: 'column'
           }}
           role="dialog"
           aria-label={`${record.fishSpecies}の詳細`}
         >
-          {/* 右上のアクションボタン群 */}
+          {/* モバイル用フローティングボタン（写真上に配置） */}
+          {isMobile && (
+            <>
+              {/* 戻るボタン（左上） */}
+              <button
+                onClick={onClose}
+                style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  width: '44px',
+                  height: '44px',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 30,
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                }}
+                aria-label="戻る"
+              >
+                <Icon icon={ChevronLeft} size={28} decorative />
+              </button>
+
+              {/* 写真表示切替ボタン（右上） */}
+              <button
+                onClick={() => setPhotoFitMode(prev => prev === 'cover' ? 'contain' : 'cover')}
+                style={{
+                  position: 'absolute',
+                  top: 12,
+                  right: (onEdit || onDelete) ? 64 : 12, // メニューボタンがある場合は左にずらす
+                  width: '44px',
+                  height: '44px',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 30,
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                }}
+                aria-label={photoFitMode === 'cover' ? '写真全体を表示' : '画面いっぱいに表示'}
+                title={photoFitMode === 'cover' ? '写真全体を表示' : '画面いっぱいに表示'}
+              >
+                <Icon icon={photoFitMode === 'cover' ? Minimize2 : Maximize2} size={22} decorative />
+              </button>
+
+              {/* メニューボタン（右上） */}
+              {(onEdit || onDelete) && (
+                <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 30 }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowContextMenu(!showContextMenu);
+                    }}
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      background: 'rgba(0, 0, 0, 0.5)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      border: 'none',
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                    }}
+                    aria-label="アクションメニュー"
+                  >
+                    <Icon icon={MoreVertical} size={24} decorative />
+                  </button>
+
+                  {/* ドロップダウンメニュー */}
+                  {showContextMenu && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '52px',
+                        right: '0',
+                        background: 'rgba(30, 30, 30, 0.95)',
+                        backdropFilter: 'blur(20px)',
+                        borderRadius: '12px',
+                        padding: '8px',
+                        minWidth: '140px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)'
+                      }}
+                    >
+                      {/* 保存 */}
+                      {localPhotoUrl && (
+                        <button
+                          onClick={handleSavePhotoWithInfo}
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderRadius: '8px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            transition: 'background 0.2s ease',
+                            minHeight: '44px'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          <Icon icon={Download} size={16} decorative />
+                          <span>保存</span>
+                        </button>
+                      )}
+                      {onEdit && (
+                        <button
+                          onClick={() => {
+                            setShowContextMenu(false);
+                            onEdit(record);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderRadius: '8px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            transition: 'background 0.2s ease',
+                            minHeight: '44px'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          <Icon icon={Edit} size={16} decorative />
+                          <span>編集</span>
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          onClick={() => {
+                            setShowContextMenu(false);
+                            setShowDeleteConfirm(true);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderRadius: '8px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            color: '#ef4444',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            transition: 'background 0.2s ease',
+                            minHeight: '44px'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          <Icon icon={Trash2} size={16} decorative />
+                          <span>削除</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* 右上のアクションボタン群（デスクトップのみ） */}
+          {!isMobile && (
           <div style={{
             position: 'absolute',
             top: '8px',
@@ -332,6 +764,37 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                       border: '1px solid rgba(255, 255, 255, 0.1)'
                     }}
                   >
+                    {/* 保存（デスクトップ: 写真がある場合） */}
+                    {localPhotoUrl && (
+                      <button
+                        onClick={handleSavePhotoWithInfo}
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'transparent',
+                          border: 'none',
+                          borderRadius: '8px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          transition: 'background 0.2s ease',
+                          minHeight: '44px'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        <Icon icon={Download} size={16} decorative />
+                        <span>保存</span>
+                      </button>
+                    )}
                     {onEdit && (
                       <button
                         onClick={() => {
@@ -432,9 +895,10 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
               <Icon icon={X} size={18} decorative />
             </button>
           </div>
+          )}
 
-          {/* ナビゲーション（前後ボタン） */}
-          {(hasPrevious || hasNext) && (
+          {/* ナビゲーション（前後ボタン） - デスクトップのみ */}
+          {!isMobile && (hasPrevious || hasNext) && (
             <div style={{
               position: 'absolute',
               top: '50%',
@@ -493,40 +957,90 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             </div>
           )}
 
-          {/* コンテンツ */}
-          <div id="record-content">
-            {/* 写真表示 - PhotoHeroCardを使用 */}
-            <PhotoHeroCard
-              record={record}
-              onClick={() => {
-                if (record.coordinates && onNavigateToMap) {
-                  onNavigateToMap(record);
-                  onClose?.();
-                } else if (photoUrl) {
-                  setPhotoExpanded(true);
-                }
+          {/* モバイル: PhotoHeroCardを背景レイヤーとして固定配置 */}
+          {isMobile && (
+            <div
+              ref={photoContainerRef}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 5,
               }}
-              tideChartData={tideChartData ?? undefined}
-              fishingTime={fishingTimeForChart}
-              tideLoading={tideLoading}
-              showMapHint={!!record.coordinates}
-            />
+            >
+              <PhotoHeroCard
+                record={record}
+                tideChartData={tideChartData ?? undefined}
+                fishingTime={fishingTimeForChart}
+                tideLoading={tideLoading}
+                showMapHint={!!record.coordinates}
+                fullscreen={true}
+                transparentInfo={true}
+                fitMode={photoFitMode}
+              />
+            </div>
+          )}
+
+          {/* コンテンツ: デスクトップは通常表示 */}
+          <div id="record-content" style={{
+            flex: isMobile ? 1 : 'none',
+            overflow: isMobile ? 'auto' : 'visible',
+            position: 'relative',
+            zIndex: isMobile ? 2 : 'auto', // PhotoHeroCardより低いz-index
+            pointerEvents: isMobile ? 'none' : 'auto', // モバイルではクリックをPhotoHeroCardに通す
+          }}>
+            {/* デスクトップ: PhotoHeroCardを通常表示 */}
+            {!isMobile && (
+              <div ref={photoContainerRef}>
+                <PhotoHeroCard
+                  record={record}
+                  onClick={() => {
+                    if (record.coordinates && onNavigateToMap) {
+                      onNavigateToMap(record);
+                      onClose?.();
+                    } else if (photoUrl) {
+                      setPhotoExpanded(true);
+                    }
+                  }}
+                  tideChartData={tideChartData ?? undefined}
+                  fishingTime={fishingTimeForChart}
+                  tideLoading={tideLoading}
+                  showMapHint={!!record.coordinates}
+                  fitMode={photoFitMode}
+                />
+              </div>
+            )}
 
             {/* メモ */}
             {record.notes && (
               <div style={{
-                margin: '1rem',
+                margin: isMobile ? 'auto 1rem 1rem' : '1rem',
+                marginTop: isMobile ? 'auto' : '1rem',
                 padding: '1rem',
-                backgroundColor: 'rgba(251, 191, 36, 0.15)',
+                backgroundColor: isMobile
+                  ? 'rgba(0, 0, 0, 0.6)'
+                  : 'rgba(251, 191, 36, 0.15)',
+                backdropFilter: isMobile ? 'blur(12px)' : 'none',
+                WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'none',
                 borderRadius: '8px',
-                border: '1px solid rgba(251, 191, 36, 0.3)'
+                border: isMobile
+                  ? '1px solid rgba(255, 255, 255, 0.15)'
+                  : '1px solid rgba(251, 191, 36, 0.3)',
+                position: isMobile ? 'absolute' : 'static',
+                bottom: isMobile ? 16 : 'auto',
+                left: isMobile ? 16 : 'auto',
+                right: isMobile ? 16 : 'auto',
+                pointerEvents: 'auto', // メモ欄はクリック可能に
               }}>
                 <h4 style={{
                   margin: '0 0 0.75rem 0',
                   fontSize: '0.875rem',
-                  color: '#fbbf24',
+                  color: isMobile ? 'rgba(255, 255, 255, 0.9)' : '#fbbf24',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
+                  letterSpacing: '0.5px',
+                  textShadow: isMobile ? '0 1px 2px rgba(0, 0, 0, 0.8)' : 'none',
                 }}>
                   <Icon icon={MessageCircle} size={14} decorative /> メモ
                 </h4>
@@ -535,7 +1049,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   fontSize: '1rem',
                   lineHeight: 1.6,
                   whiteSpace: 'pre-wrap',
-                  color: 'var(--color-text-primary)'
+                  color: isMobile ? 'rgba(255, 255, 255, 0.95)' : 'var(--color-text-primary)',
+                  textShadow: isMobile ? '0 1px 2px rgba(0, 0, 0, 0.8)' : 'none',
                 }}>
                   {record.notes}
                 </p>
