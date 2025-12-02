@@ -366,11 +366,12 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           }
 
           // 保存用: 情報パネル（日時・場所等）を上部に移動＆サイズ拡大
+          // CSSで !important が使われているため setProperty で上書き
           const infoPanel = clonedElement.querySelector('.photo-hero-card__info-panel') as HTMLElement;
           if (infoPanel) {
-            infoPanel.style.top = '12px';
-            infoPanel.style.transform = 'scale(1.2)';
-            infoPanel.style.transformOrigin = 'top left';
+            infoPanel.style.setProperty('top', '12px', 'important');
+            infoPanel.style.setProperty('transform', 'scale(1.2)', 'important');
+            infoPanel.style.setProperty('transform-origin', 'top left', 'important');
           }
         },
         // Ignore elements that cause issues
