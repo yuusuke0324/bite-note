@@ -124,12 +124,6 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     );
   };
 
-  // Web Share API使用の判定（タッチデバイスかつAPI対応の場合のみ）
-  const shouldUseWebShare = () => {
-    if (!isTouchDevice()) return false;
-    return 'share' in navigator && 'canShare' in navigator;
-  };
-
   // Load photo URL for save functionality
   useEffect(() => {
     if (!record.photoId) {
@@ -148,7 +142,10 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
   // Save photo with overlay info (screen capture)
   const handleSavePhotoWithInfo = async () => {
-    if (!photoContainerRef.current) return;
+    if (!photoContainerRef.current) {
+      logger.error('Photo container ref not found');
+      return;
+    }
 
     setShowContextMenu(false);
 
@@ -179,6 +176,47 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       }
     };
 
+    // iOS Safari用のシェアヘルパー（エラー処理付き）
+    const shareOnMobile = async (dataUrl: string) => {
+      try {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], filename, { type: 'image/jpeg' });
+
+        // iOSでは canShare を呼び出さずに直接 share を試みる
+        // （一部のiOSバージョンで canShare が正しく動作しないため）
+        if ('share' in navigator) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: `${record.fishSpecies}の写真`,
+            });
+            return true;
+          } catch (shareError) {
+            // ユーザーがキャンセルした場合は成功扱い
+            if (shareError instanceof Error && shareError.name === 'AbortError') {
+              return true;
+            }
+            logger.error('Share API failed, falling back to download', { shareError });
+          }
+        }
+        return false;
+      } catch (error) {
+        logger.error('Mobile share failed', { error });
+        return false;
+      }
+    };
+
+    // ダウンロードフォールバック
+    const downloadImage = (dataUrl: string) => {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
     try {
       // Change fitMode to 'cover' if needed to show overlays
       if (needsFitModeChange) {
@@ -190,7 +228,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       // Hide map bar before capture
       if (mapBar) mapBar.style.display = 'none';
 
-      // Disable backdrop-filter for capture (html-to-image doesn't support it)
+      // Disable backdrop-filter for capture (html2canvas doesn't support it)
       glassElements.forEach((el) => {
         const htmlEl = el as HTMLElement;
         const computed = window.getComputedStyle(htmlEl);
@@ -289,30 +327,31 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
       restoreStyles();
 
       // タッチデバイス（モバイル/タブレット）: Web Share APIでネイティブ共有
-      if (shouldUseWebShare()) {
-        const response = await fetch(dataUrl);
-        const blob = await response.blob();
-        const file = new File([blob], filename, { type: 'image/jpeg' });
-
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: `${record.fishSpecies}の写真`,
-          });
-          return;
-        }
+      if (isTouchDevice()) {
+        const shared = await shareOnMobile(dataUrl);
+        if (shared) return;
       }
 
-      // デスクトップ: 直接ダウンロード
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // デスクトップまたはシェア失敗時: 直接ダウンロード
+      downloadImage(dataUrl);
     } catch (error) {
       restoreStyles();
       logger.error('Photo capture failed', { error });
+
+      // html2canvasが失敗した場合、元の写真をそのまま保存を試みる
+      if (localPhotoUrl && isTouchDevice()) {
+        try {
+          const shared = await shareOnMobile(localPhotoUrl);
+          if (shared) return;
+        } catch {
+          // フォールバックも失敗
+        }
+      }
+
+      // 最終フォールバック: 元の写真をダウンロード
+      if (localPhotoUrl) {
+        downloadImage(localPhotoUrl);
+      }
     }
   };
 
@@ -972,6 +1011,12 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             >
               <PhotoHeroCard
                 record={record}
+                onClick={() => {
+                  if (record.coordinates && onNavigateToMap) {
+                    onNavigateToMap(record);
+                    onClose?.();
+                  }
+                }}
                 tideChartData={tideChartData ?? undefined}
                 fishingTime={fishingTimeForChart}
                 tideLoading={tideLoading}
