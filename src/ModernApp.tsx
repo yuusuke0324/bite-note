@@ -350,6 +350,9 @@ function ModernApp() {
   // 記録関連ハンドラー
   const handleRecordClick = (record: FishingRecord) => {
     setSelectedRecord(record);
+    // マップから詳細を見る場合、mapSelectedRecordIdをクリア
+    // （クリアしないとuseEffectで再度サマリパネルが表示される）
+    setMapSelectedRecordId(undefined);
   };
 
   const handleRecordEdit = (record: FishingRecord) => {
