@@ -10,11 +10,9 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
-import { photoService } from '../../lib/photo-service';
 import type { FishingRecord } from '../../types';
-import { logger } from '../../lib/errors/logger';
 import { Icon } from '../ui/Icon';
-import { Map as MapIcon, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2, Globe } from 'lucide-react';
+import { Map as MapIcon, Calendar, MapPin, BarChart3, Fish, X, Maximize2 } from 'lucide-react';
 
 // Leafletのデフォルトアイコン修正
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -290,9 +288,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
   const [selectedRecord, setSelectedRecord] = useState<FishingRecord | null>(null);
   const [flyToCoords, setFlyToCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [photoLoading, setPhotoLoading] = useState(false);
-  const photoUrlRef = React.useRef<string | null>(null);
 
   // Issue #296: ダークモード検出
   const isDarkMode = useDarkMode();
@@ -392,10 +387,9 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('ja-JP', {
+      year: 'numeric',
       month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     }).format(date);
   };
 
@@ -457,51 +451,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
       });
     }
   }, [focusedMarkerIndex, recordsWithAdjustedCoordinates]);
-
-  // 選択されたレコードの写真を読み込む
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadPhoto = async () => {
-      if (!selectedRecord?.photoId) {
-        setPhotoUrl(null);
-        setPhotoLoading(false);
-        return;
-      }
-
-      try {
-        setPhotoLoading(true);
-        const photoResult = await photoService.getPhotoById(selectedRecord.photoId);
-
-        if (isMounted && photoResult.success && photoResult.data) {
-          // 古いURLをクリーンアップ
-          if (photoUrlRef.current) {
-            URL.revokeObjectURL(photoUrlRef.current);
-          }
-
-          const url = URL.createObjectURL(photoResult.data.blob);
-          photoUrlRef.current = url;
-          setPhotoUrl(url);
-        }
-      } catch (error) {
-        logger.error('写真の読み込みエラー', { error });
-      } finally {
-        if (isMounted) {
-          setPhotoLoading(false);
-        }
-      }
-    };
-
-    loadPhoto();
-
-    return () => {
-      isMounted = false;
-      if (photoUrlRef.current) {
-        URL.revokeObjectURL(photoUrlRef.current);
-        photoUrlRef.current = null;
-      }
-    };
-  }, [selectedRecord?.photoId]);
 
   if (recordsWithCoordinates.length === 0) {
     return (
@@ -679,7 +628,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               top: 'auto',
               transform: 'none',
               borderRadius: '20px 20px 0 0',
-              maxHeight: '45vh', // 70vh → 45vh: ピン位置を見やすく
+              maxHeight: '35vh', // 45vh → 35vh: 写真なしでコンパクトに
               overflowY: 'auto',
             } : {
               top: '16px',
@@ -741,27 +690,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               <Icon icon={X} size={20} decorative />
             </button>
 
-            {/* 写真（あれば表示） */}
-            {photoUrl && !photoLoading && (
-              <div style={{
-                marginBottom: '12px',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                border: `1px solid ${'var(--color-border-light)'}`,
-              }}>
-                <img
-                  src={photoUrl}
-                  alt={`${selectedRecord.fishSpecies}の写真`}
-                  style={{
-                    width: '100%',
-                    maxHeight: isMobile ? '100px' : '200px', // 150px → 100px: コンパクト化
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                />
-              </div>
-            )}
-
             {/* ヘッダー */}
             <div style={{
               display: 'flex',
@@ -796,7 +724,13 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   fontWeight: '700',
                   marginLeft: 'auto',
                 }}>
-                  {selectedRecord.size ? `${selectedRecord.size}cm` : `${selectedRecord.weight}g`}
+                  {/* サイズと重さの両方を表示（片方のみの場合も対応） */}
+                  {selectedRecord.size && selectedRecord.weight
+                    ? `${selectedRecord.size}cm / ${selectedRecord.weight}g`
+                    : selectedRecord.size
+                      ? `${selectedRecord.size}cm`
+                      : `${selectedRecord.weight}g`
+                  }
                 </div>
               )}
             </div>
@@ -828,94 +762,37 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               }}>
                 {selectedRecord.location}
               </span>
-
-              {selectedRecord.size && selectedRecord.weight && (
-                <>
-                  <Icon icon={Ruler} size={16} color="secondary" decorative />
-                  <span style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--color-text-secondary)',
-                    fontWeight: '500',
-                  }}>
-                    {selectedRecord.size}cm / {selectedRecord.weight}g
-                  </span>
-                </>
-              )}
             </div>
 
             {/* アクションボタン */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button
-                onClick={() => onRecordClick?.(selectedRecord)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  backgroundColor: colors.primary[500],
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '0.9rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: '0 2px 8px rgba(26, 115, 232, 0.25)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[600];
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 115, 232, 0.35)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[500];
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(26, 115, 232, 0.25)';
-                }}
-              >
-                詳細を見る
-              </button>
-
-              {/* Googleマップで表示ボタン - セカンダリ（アウトライン） */}
-              {selectedRecord.coordinates && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const { latitude, longitude } = selectedRecord.coordinates!;
-                    window.open(
-                      `https://www.google.com/maps?q=${latitude},${longitude}`,
-                      '_blank',
-                      'noopener,noreferrer'
-                    );
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px', // 12px → 10px: セカンダリはコンパクトに
-                    backgroundColor: 'transparent',
-                    color: '#22c55e',
-                    border: '2px solid #22c55e',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem', // 0.9rem → 0.85rem
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <Globe size={16} />
-                  Googleマップで表示
-                </button>
-              )}
-            </div>
+            <button
+              onClick={() => onRecordClick?.(selectedRecord)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: colors.primary[500],
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 2px 8px rgba(26, 115, 232, 0.25)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.primary[600];
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 115, 232, 0.35)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = colors.primary[500];
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(26, 115, 232, 0.25)';
+              }}
+            >
+              詳細を見る
+            </button>
           </div>
         )}
 
