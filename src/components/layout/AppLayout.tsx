@@ -107,7 +107,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          zIndex: 100,
+          zIndex: 1100, // FishingRecordDetail(1000)より上に表示
           // モバイルでのみ表示（CSSメディアクエリは別途追加）
           display: 'block',
         }}>
