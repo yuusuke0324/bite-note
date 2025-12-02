@@ -356,26 +356,30 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             photoCard.style.height = `${captureHeight}px`;
           }
 
-          // モバイル（フルスクリーン）モードの場合のみ位置・サイズ調整
-          // デスクトップでは元のバランスを維持
+          // PC/モバイル共通: 潮汐チャートの位置調整（温度との重なり防止）
+          const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
           const isFullscreen = clonedElement.querySelector('.photo-hero-card--fullscreen') !== null;
+
           if (isFullscreen) {
-            // 保存用: 潮汐チャートを上部に移動＆サイズ拡大
-            // アプリ表示時はボタン回避で top: 72px だが、保存時はボタン非表示なので上へ
-            const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
+            // モバイル: 上部に移動＆サイズ拡大
             if (tideChart) {
               tideChart.style.top = '12px';
-              tideChart.style.transform = 'scale(1.3)';
+              tideChart.style.right = '8px'; // 少し右に寄せて重なり防止
+              tideChart.style.transform = 'scale(1.2)'; // 1.3→1.2に縮小
               tideChart.style.transformOrigin = 'top right';
             }
 
-            // 保存用: 情報パネル（日時・場所等）を上部に移動＆サイズ拡大
-            // CSSで !important が使われているため setProperty で上書き
+            // 情報パネルを上部に移動＆サイズ拡大
             const infoPanel = clonedElement.querySelector('.photo-hero-card__info-panel') as HTMLElement;
             if (infoPanel) {
               infoPanel.style.setProperty('top', '12px', 'important');
-              infoPanel.style.setProperty('transform', 'scale(1.2)', 'important');
+              infoPanel.style.setProperty('transform', 'scale(1.1)', 'important'); // 1.2→1.1に縮小
               infoPanel.style.setProperty('transform-origin', 'top left', 'important');
+            }
+          } else {
+            // デスクトップ: 重なり防止のみ
+            if (tideChart) {
+              tideChart.style.right = '8px';
             }
           }
         },
