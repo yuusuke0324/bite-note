@@ -741,7 +741,10 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             {/* アクションボタン */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button
-                onClick={() => onRecordClick?.(selectedRecord)}
+                onClick={() => {
+                  onRecordClick?.(selectedRecord);
+                  setSelectedRecord(null);
+                }}
                 style={{
                   width: '100%',
                   padding: '12px',
