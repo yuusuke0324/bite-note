@@ -175,9 +175,6 @@ input, textarea, select {
   /* Accent text */
   --color-accent-text: #60a5fa;
 
-  /* Heart Animation */
-  --color-heart-animation: #ef4444;
-
   /* === Glass Morphism System === */
   /* Base variables (theme-independent) */
   --glass-blur: blur(10px) saturate(150%);
@@ -263,9 +260,6 @@ body.light-theme {
 
   /* Accent text */
   --color-accent-text: #3b82f6;
-
-  /* Heart Animation - Light Theme (slightly darker for contrast) */
-  --color-heart-animation: #dc2626;
 
   /* Glass Morphism - Light Theme - Fully transparent */
   --glass-bg: transparent;
@@ -692,59 +686,4 @@ body.low-performance .glass-panel-shadow {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* === Heart Animation === */
-.heart-animation-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  pointer-events: none;
-}
-
-.heart-animation {
-  animation: heartBeat 1.5s var(--transition-bounce) forwards;
-  fill: var(--color-heart-animation);
-  stroke: var(--color-heart-animation);
-}
-
-@keyframes heartBeat {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  20% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-  46% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-}
-
-/* prefers-reduced-motion: アニメーション軽減 */
-@media (prefers-reduced-motion: reduce) {
-  .heart-animation {
-    animation: none;
-    opacity: 1;
-    transform: scale(1);
-  }
-  .heart-animation-container {
-    animation: fadeInOut 1.5s ease forwards;
-  }
-  @keyframes fadeInOut {
-    0%, 100% {
-      opacity: 0;
-    }
-    20%, 80% {
-      opacity: 1;
-    }
-  }
 }
