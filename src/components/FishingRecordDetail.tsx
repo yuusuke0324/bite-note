@@ -127,7 +127,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   // Web Share API使用の判定（タッチデバイスかつAPI対応の場合のみ）
   const shouldUseWebShare = () => {
     if (!isTouchDevice()) return false;
-    return !!(navigator.share && typeof navigator.canShare === 'function');
+    return 'share' in navigator && 'canShare' in navigator;
   };
 
   // Load photo URL for save functionality
