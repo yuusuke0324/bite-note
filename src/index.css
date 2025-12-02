@@ -607,6 +607,49 @@ body.low-performance .glass-panel-shadow {
   display: none;
 }
 
+/* === Skeleton Loading Styles === */
+
+/**
+ * Unified skeleton loading animation
+ * Uses pulse animation for consistent loading indication across all components
+ */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-secondary) 25%,
+    var(--color-surface-tertiary) 50%,
+    var(--color-surface-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  user-select: none;
+  pointer-events: none;
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Skeleton animation disabled state */
+.skeleton--no-animation,
+.skeleton.no-animation {
+  animation: none;
+  background: var(--color-surface-tertiary);
+}
+
+/* Reduced motion preferences for skeleton */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--color-surface-tertiary);
+  }
+}
+
 /* === Card Hover Effect (Shared) === */
 
 /* カードホバーエフェクト共通 */

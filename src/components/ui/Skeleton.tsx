@@ -1,6 +1,9 @@
 /**
  * Skeleton.tsx - スケルトンローディングコンポーネント
  * ローディング中のプレースホルダーを表示し、体感速度を向上
+ *
+ * CSS styles are defined in src/index.css for unified skeleton animation.
+ * Supports prefers-reduced-motion for accessibility.
  */
 
 import React from 'react';
@@ -31,57 +34,26 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   style,
   className = '',
 }) => {
+  const classNames = ['skeleton'];
+  if (noAnimation) {
+    classNames.push('skeleton--no-animation');
+  }
+  if (className) {
+    classNames.push(className);
+  }
+
   return (
-    <>
-      <div
-        className={`skeleton ${noAnimation ? 'no-animation' : ''} ${className}`}
-        style={{
-          width: circle ? height : width,
-          height,
-          borderRadius: circle ? '50%' : borderRadius,
-          backgroundColor: 'var(--color-surface-tertiary)',
-          position: 'relative',
-          overflow: 'hidden',
-          ...style,
-        }}
-      >
-        {!noAnimation && (
-          <div
-            className="skeleton-shimmer"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: `linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(255, 255, 255, 0.4) 50%,
-                transparent 100%
-              )`,
-              animation: 'skeleton-shimmer 1.5s infinite',
-            }}
-          />
-        )}
-      </div>
-
-      <style>{`
-        @keyframes skeleton-shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-
-        .skeleton {
-          user-select: none;
-          pointer-events: none;
-        }
-      `}</style>
-    </>
+    <div
+      className={classNames.join(' ')}
+      style={{
+        width: circle ? height : width,
+        height,
+        borderRadius: circle ? '50%' : borderRadius,
+        ...style,
+      }}
+      aria-hidden="true"
+      role="presentation"
+    />
   );
 };
 
@@ -97,8 +69,10 @@ export const SkeletonRecordCard: React.FC = () => {
         padding: '12px',
         borderRadius: '12px',
         backgroundColor: 'var(--color-surface-primary)',
-        border: `1px solid var(--color-border-light)`,
+        border: '1px solid var(--color-border-light)',
       }}
+      aria-hidden="true"
+      role="presentation"
     >
       {/* 写真サムネイル */}
       <Skeleton width="80px" height="80px" borderRadius="8px" />
@@ -146,6 +120,8 @@ export const SkeletonPhotoCard: React.FC = () => {
         overflow: 'hidden',
         position: 'relative',
       }}
+      aria-hidden="true"
+      role="presentation"
     >
       {/* 写真部分 */}
       <Skeleton width="100%" height="100%" borderRadius="0" />
@@ -237,3 +213,10 @@ export const SkeletonText: React.FC<SkeletonTextProps> = ({
     </div>
   );
 };
+
+/**
+ * Re-export SkeletonPhotoHeroCard for unified skeleton component family
+ * This component is defined in SkeletonPhotoHeroCard.tsx with its own CSS
+ */
+export { SkeletonPhotoHeroCard } from './SkeletonPhotoHeroCard';
+export type { SkeletonPhotoHeroCardProps } from './SkeletonPhotoHeroCard';
