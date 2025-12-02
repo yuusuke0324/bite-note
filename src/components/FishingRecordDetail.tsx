@@ -245,7 +245,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
     // Elements to restore after capture
     const mapBar = container.querySelector('.photo-hero-card__map-bar') as HTMLElement | null;
-    const glassElements = container.querySelectorAll('.glass-panel, .photo-hero-card__tide-chart-overlay, .photo-hero-card__tide-name');
+    const glassElements = container.querySelectorAll('.glass-panel, .photo-hero-card__tide-chart-overlay');
     type StyleRecord = { element: HTMLElement; backdrop: string; webkitBackdrop: string; bg: string };
     const originalStyles: StyleRecord[] = [];
 
@@ -356,11 +356,17 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             photoCard.style.height = `${captureHeight}px`;
           }
 
-          // Shrink the tide chart for capture (70% of original size)
+          // 潮汐チャートを保存用にサイズ調整（元サイズ維持）
           const tideChart = clonedElement.querySelector('.photo-hero-card__top-right') as HTMLElement;
           if (tideChart) {
-            tideChart.style.transform = 'scale(0.7)';
+            tideChart.style.transform = 'scale(1.0)';
             tideChart.style.transformOrigin = 'top right';
+          }
+
+          // 潮名（大潮、中潮など）のテキストを非表示（黒背景問題回避）
+          const tideName = clonedElement.querySelector('.photo-hero-card__tide-name') as HTMLElement;
+          if (tideName) {
+            tideName.style.display = 'none';
           }
         },
         // Ignore elements that cause issues
@@ -1343,8 +1349,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
               textAlign: 'center',
               lineHeight: 1.5
             }}>
-              「共有」をタップして、共有シートから<br />
-              「"写真"に保存」を選択してください
+              「共有」をタップして画像を保存
             </p>
 
             {/* ボタン */}
