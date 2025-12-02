@@ -607,6 +607,37 @@ body.low-performance .glass-panel-shadow {
   display: none;
 }
 
+/* === Card Hover Effect (Shared) === */
+
+/* カードホバーエフェクト共通 */
+.card-hover-effect {
+  transition: transform var(--transition-smooth),
+              box-shadow var(--transition-smooth);
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-4px) translateZ(0);
+  box-shadow: 0 12px 48px rgba(31, 38, 135, 0.2);
+}
+
+.card-hover-effect:hover .glass-badge-glass {
+  transform: scale(1.05) translateZ(0);
+  transition: transform var(--transition-smooth);
+}
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .card-hover-effect {
+    transition: box-shadow var(--transition-smooth);
+  }
+  .card-hover-effect:hover {
+    transform: none;
+  }
+  .card-hover-effect:hover .glass-badge-glass {
+    transform: none;
+  }
+}
+
 /* === Screen Reader Only === */
 .sr-only {
   position: absolute;
