@@ -1,6 +1,7 @@
 import React, { forwardRef, type ReactNode } from 'react';
 import { colors } from '../../theme/colors';
 import { textStyles } from '../../theme/typography';
+import { useRipple } from '../../hooks/useRipple';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outlined' | 'text' | 'danger';
@@ -142,11 +143,26 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     />
   );
 
+  // Ripple effect - color based on variant
+  const rippleColor = variant === 'outlined' || variant === 'text'
+    ? 'rgba(59, 130, 246, 0.3)'  // Blue for outlined/text
+    : 'rgba(255, 255, 255, 0.4)'; // White for solid backgrounds
+  const { createRipple } = useRipple<HTMLButtonElement>({
+    color: rippleColor,
+    duration: 600,
+    size: 80,
+  });
+
   // Handle mouse events for hover effects
   const [isHovered, setIsHovered] = React.useState(false);
 
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!disabled && !loading) {
+      createRipple(e);
+    }
+  };
 
   // Combine all styles
   const combinedStyles: React.CSSProperties = {
@@ -175,6 +191,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
         disabled={disabled || loading}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onMouseDown={handleMouseDown}
         {...props}
       >
         {loading && <LoadingSpinner />}

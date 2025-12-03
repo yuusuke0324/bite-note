@@ -1,5 +1,6 @@
 import React from 'react';
 import { colors } from '../../theme/colors';
+import { useRipple } from '../../hooks/useRipple';
 
 interface NavigationItem {
   id: string;
@@ -15,6 +16,61 @@ interface BottomNavigationProps {
   onItemClick: (id: string) => void;
   className?: string;
 }
+
+// 個別のナビゲーションアイテムコンポーネント（リップル効果用）
+const NavItem: React.FC<{
+  item: NavigationItem;
+  onItemClick: (id: string) => void;
+  itemStyles: (active: boolean) => React.CSSProperties;
+  iconStyles: React.CSSProperties;
+  badgeStyles: React.CSSProperties;
+}> = ({ item, onItemClick, itemStyles, iconStyles, badgeStyles }) => {
+  const { createRipple } = useRipple<HTMLButtonElement>({
+    color: item.active ? 'rgba(59, 130, 246, 0.3)' : 'rgba(100, 100, 100, 0.3)',
+    duration: 500,
+    size: 60,
+  });
+
+  return (
+    <button
+      key={item.id}
+      data-testid={item.testId || `nav-${item.id}`}
+      style={{
+        ...itemStyles(item.active || false),
+        overflow: 'hidden', // リップル効果のクリッピング用
+        border: 'none', // デフォルトボタンスタイル削除
+      }}
+      onClick={() => onItemClick(item.id)}
+      onMouseDown={(e) => createRipple(e)}
+      onMouseEnter={(e) => {
+        if (!item.active) {
+          e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!item.active) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }
+      }}
+      aria-label={item.label}
+      aria-selected={item.active}
+      aria-current={item.active ? 'page' : undefined}
+      role="tab"
+      tabIndex={0}
+    >
+      <div style={iconStyles}>
+        {item.icon}
+      </div>
+
+      {/* バッジ */}
+      {item.badge && item.badge > 0 && (
+        <div style={badgeStyles}>
+          {item.badge > 99 ? '99+' : item.badge}
+        </div>
+      )}
+    </button>
+  );
+};
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   items,
@@ -79,38 +135,14 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
       aria-label="メインナビゲーション"
     >
       {items.map((item) => (
-        <button
+        <NavItem
           key={item.id}
-          data-testid={item.testId || `nav-${item.id}`}
-          style={itemStyles(item.active || false)}
-          onClick={() => onItemClick(item.id)}
-          onMouseEnter={(e) => {
-            if (!item.active) {
-              e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!item.active) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
-          }}
-          aria-label={item.label}
-          aria-selected={item.active}
-          aria-current={item.active ? 'page' : undefined}
-          role="tab"
-          tabIndex={0}
-        >
-          <div style={iconStyles}>
-            {item.icon}
-          </div>
-
-          {/* バッジ */}
-          {item.badge && item.badge > 0 && (
-            <div style={badgeStyles}>
-              {item.badge > 99 ? '99+' : item.badge}
-            </div>
-          )}
-        </button>
+          item={item}
+          onItemClick={onItemClick}
+          itemStyles={itemStyles}
+          iconStyles={iconStyles}
+          badgeStyles={badgeStyles}
+        />
       ))}
     </nav>
   );
