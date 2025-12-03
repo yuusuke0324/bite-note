@@ -61,7 +61,9 @@ describe('useResizeObserver', () => {
 
       render(<TestComponent onResize={onResize} />);
 
-      const container = screen.getByTestId('resize-container');
+      // CI環境対応: findByTestIdで非同期に要素を取得
+      const container = await screen.findByTestId('resize-container');
+      expect(container).toBeInTheDocument();
 
       // setupTests.tsのpolyfillが自動的に動作
       await waitFor(() => {
