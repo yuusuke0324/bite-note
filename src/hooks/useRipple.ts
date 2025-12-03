@@ -13,7 +13,7 @@ export interface UseRippleReturn<T extends HTMLElement> {
   /** リップルを表示する要素へのref */
   containerRef: React.RefObject<T>;
   /** クリック時にリップルを生成するハンドラ */
-  createRipple: (event: React.MouseEvent<T> | React.TouchEvent<T>) => void;
+  createRipple: (event: React.MouseEvent<T> | React.TouchEvent<T> | React.PointerEvent<T>) => void;
 }
 
 /**
@@ -47,7 +47,7 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
   const containerRef = useRef<T>(null);
 
   const createRipple = useCallback(
-    (event: React.MouseEvent<T> | React.TouchEvent<T>) => {
+    (event: React.MouseEvent<T> | React.TouchEvent<T> | React.PointerEvent<T>) => {
       // prefers-reduced-motionをチェック（JSDOM互換）
       const getPrefersReducedMotion = (): boolean => {
         if (typeof window === 'undefined') return false;

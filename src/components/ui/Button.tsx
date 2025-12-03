@@ -191,7 +191,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
         disabled={disabled || loading}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onMouseDown={handleMouseDown}
+        onPointerDown={handleMouseDown}
         {...props}
       >
         {loading && <LoadingSpinner />}

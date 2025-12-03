@@ -136,9 +136,9 @@ export const ModernCard: React.FC<ModernCardProps> = ({
         style={combinedStyles}
         className={className}
         onClick={onClick}
-        onMouseDown={(e) => {
+        onPointerDown={(e) => {
           if (isClickable) {
-            createRipple(e);
+            createRipple(e as unknown as React.MouseEvent<HTMLDivElement>);
           }
         }}
         onMouseEnter={() => {

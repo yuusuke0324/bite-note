@@ -41,7 +41,7 @@ const NavItem: React.FC<{
         border: 'none', // デフォルトボタンスタイル削除
       }}
       onClick={() => onItemClick(item.id)}
-      onMouseDown={(e) => createRipple(e)}
+      onPointerDown={(e) => createRipple(e as unknown as React.MouseEvent<HTMLButtonElement>)}
       onMouseEnter={(e) => {
         if (!item.active) {
           e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';

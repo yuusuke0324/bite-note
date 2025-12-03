@@ -177,7 +177,7 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
         disabled={disabled || loading}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onMouseDown={handleMouseDown}
+        onPointerDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         data-testid={(props as any)["data-testid"] || "floating-action-button"}
         {...props}

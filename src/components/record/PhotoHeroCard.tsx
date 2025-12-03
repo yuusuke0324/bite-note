@@ -270,14 +270,18 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
     [loadPhoto]
   );
 
-  // Click handler with ripple effect
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      createRipple(e);
-      onClick?.(record);
+  // Ripple handler (fires on pointer down for immediate feedback)
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      createRipple(e as unknown as React.MouseEvent<HTMLDivElement>);
     },
-    [onClick, record, createRipple]
+    [createRipple]
   );
+
+  // Click handler
+  const handleClick = useCallback(() => {
+    onClick?.(record);
+  }, [onClick, record]);
 
   // Keyboard handler
   const handleKeyDown = useCallback(
@@ -319,6 +323,7 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
     <div
       className={`photo-hero-card card-hover-effect ${fullscreen ? `photo-hero-card--fullscreen photo-hero-card--fit-${fitMode}` : `photo-hero-card--${variant}`} ${isBestCatch ? 'photo-hero-card--best-catch' : ''} ${transparentInfo ? 'photo-hero-card--transparent-info' : ''} ${className}`}
       onClick={handleClick}
+      onPointerDown={handlePointerDown}
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}
