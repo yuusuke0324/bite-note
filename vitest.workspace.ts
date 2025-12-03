@@ -40,6 +40,8 @@ export default defineWorkspace([
         'src/components/__tests__/FishIcon.test.tsx', // Issue #321: FishIcon
         'src/components/__tests__/Skeleton.test.tsx', // Issue #327: Skeleton統一
         'src/components/__tests__/RippleEffect.test.tsx', // Issue #326: RippleEffect
+        'src/components/__tests__/SwipeIndicator.test.tsx', // Issue #365: スワイプナビゲーション
+        'src/components/__tests__/SwipeHint.test.tsx', // Issue #365: スワイプナビゲーション
       ],
       setupFiles: ['./src/setupTests.ts'],
       environment: 'jsdom',
