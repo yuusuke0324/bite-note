@@ -50,6 +50,8 @@ export interface PhotoHeroCardProps {
   transparentInfo?: boolean;
   /** Photo fit mode for fullscreen: 'cover' fills screen (may crop), 'contain' shows full photo */
   fitMode?: 'cover' | 'contain';
+  /** Disable ripple effect (recommended for fullscreen/overlay layouts) */
+  disableRipple?: boolean;
 }
 
 /**
@@ -211,6 +213,7 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
   fullscreen = false,
   transparentInfo = false,
   fitMode = 'cover',
+  disableRipple = false,
 }) => {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
@@ -271,11 +274,13 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
   );
 
   // Ripple handler (fires on pointer down for immediate feedback)
+  // Skip ripple when disableRipple is true (fullscreen/overlay layouts)
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      if (disableRipple) return;
       createRipple(e as unknown as React.MouseEvent<HTMLDivElement>);
     },
-    [createRipple]
+    [createRipple, disableRipple]
   );
 
   // Click handler
