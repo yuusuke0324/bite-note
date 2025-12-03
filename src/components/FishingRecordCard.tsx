@@ -7,6 +7,7 @@ import type { FishingRecord } from '../types';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { Fish, Calendar, Ruler, Map, MessageCircle, Camera, Edit, Trash2 } from 'lucide-react';
+import { useRipple } from '../hooks/useRipple';
 
 interface FishingRecordCardProps {
   record: FishingRecord;
@@ -27,6 +28,13 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
 }) => {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoLoading, setPhotoLoading] = useState(false);
+
+  // リップル効果
+  const { createRipple } = useRipple<HTMLDivElement>({
+    color: 'rgba(100, 100, 100, 0.2)',
+    duration: 500,
+    size: 120,
+  });
 
   // 写真の読み込み
   useEffect(() => {
@@ -92,6 +100,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
     <div
       className={`fishing-record-card ${className}`}
       onClick={handleCardClick}
+      onPointerDown={(e) => createRipple(e)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -110,6 +119,7 @@ export const FishingRecordCard: React.FC<FishingRecordCardProps> = ({
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         position: 'relative',
+        overflow: 'hidden',
         boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
       }}
     >

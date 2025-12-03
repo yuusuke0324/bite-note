@@ -14,6 +14,7 @@ import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { Fish, X } from 'lucide-react';
 import type { MarkerGroup, FishingMarkerData } from './types';
 import styles from './StackedMarkerCard.module.css';
+import { useRipple } from '../../../../hooks/useRipple';
 
 /**
  * Props for StackedMarkerCard component
@@ -58,6 +59,13 @@ export const StackedMarkerCard = React.memo<StackedMarkerCardProps>(
     const listRef = useRef<HTMLDivElement>(null);
     const firstRecordRef = useRef<HTMLButtonElement>(null);
     const [focusedRecordIndex, setFocusedRecordIndex] = useState(-1);
+
+    // リップル効果
+    const { createRipple } = useRipple<HTMLButtonElement>({
+      color: 'rgba(255, 255, 255, 0.3)',
+      duration: 500,
+      size: 60,
+    });
 
     const recordCount = group.records.length;
     const hasMultipleRecords = recordCount > 1;
@@ -217,6 +225,10 @@ export const StackedMarkerCard = React.memo<StackedMarkerCardProps>(
           ref={cardRef}
           className={cardClasses}
           onClick={handleCardClick}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            createRipple(e);
+          }}
           onKeyDown={handleCardKeyDown}
           aria-label={ariaLabel}
           aria-expanded={isExpanded}
