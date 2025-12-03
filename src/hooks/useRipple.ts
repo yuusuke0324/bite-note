@@ -48,10 +48,13 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
 
   const createRipple = useCallback(
     (event: React.MouseEvent<T> | React.TouchEvent<T>) => {
-      // prefers-reduced-motionをチェック
-      const prefersReducedMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
-      ).matches;
+      // prefers-reduced-motionをチェック（JSDOM互換）
+      const getPrefersReducedMotion = (): boolean => {
+        if (typeof window === 'undefined') return false;
+        if (typeof window.matchMedia !== 'function') return false;
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      };
+      const prefersReducedMotion = getPrefersReducedMotion();
 
       const element = event.currentTarget;
       const rect = element.getBoundingClientRect();
