@@ -1,4 +1,5 @@
 import React, { type ReactNode, useState } from 'react';
+import { useRipple } from '../../hooks/useRipple';
 
 interface ModernCardProps {
   children: ReactNode;
@@ -28,13 +29,21 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   'data-testid': dataTestId
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const isClickable = interactive || !!onClick;
+
+  // リップル効果（インタラクティブな場合のみ）
+  const { createRipple } = useRipple<HTMLDivElement>({
+    color: 'rgba(100, 100, 100, 0.2)',
+    duration: 500,
+    size: 120,
+  });
 
   const getBaseStyles = (): React.CSSProperties => ({
     borderRadius: '16px',
     transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
     position: 'relative',
     overflow: 'hidden',
-    cursor: interactive || onClick ? 'pointer' : 'default',
+    cursor: isClickable ? 'pointer' : 'default',
     userSelect: 'none',
     ...style,
   });
@@ -65,7 +74,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
         boxShadow: isHovered
           ? '0 12px 48px rgba(31, 38, 135, 0.2)'
           : '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
-        transform: isHovered && (interactive || onClick) ? 'translateY(-4px)' : 'translateY(0)',
+        transform: isHovered && isClickable ? 'translateY(-4px)' : 'translateY(0)',
         border: '1px solid var(--color-border-light)',
       },
       outlined: {
@@ -127,6 +136,11 @@ export const ModernCard: React.FC<ModernCardProps> = ({
         style={combinedStyles}
         className={className}
         onClick={onClick}
+        onMouseDown={(e) => {
+          if (isClickable) {
+            createRipple(e);
+          }
+        }}
         onMouseEnter={() => {
           setIsHovered(true);
           onMouseEnter?.();
