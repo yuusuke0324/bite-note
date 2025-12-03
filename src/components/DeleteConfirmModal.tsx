@@ -57,7 +57,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1001,
+        zIndex: 1200, // 親モーダル(1150)より上に表示
         padding: '1rem'
       }}
       onClick={handleBackgroundClick}

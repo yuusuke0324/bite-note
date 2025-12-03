@@ -86,7 +86,7 @@ export const ReAuthPrompt: React.FC<ReAuthPromptProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1001,
+        zIndex: 1150, // BottomNavigation(1100)より上に表示
         padding: '1rem',
       }}
       onClick={handleBackgroundClick}

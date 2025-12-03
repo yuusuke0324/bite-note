@@ -78,7 +78,7 @@ export const FishingRecordEditModal: React.FC<FishingRecordEditModalProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000,
+        zIndex: 1150, // BottomNavigation(1100)より上に表示
         padding: '1rem'
       }}
       onClick={handleBackgroundClick}

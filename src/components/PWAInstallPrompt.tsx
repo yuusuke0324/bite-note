@@ -262,7 +262,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
           padding: '1rem',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
           border: `1px solid ${'var(--color-border-light)'}`,
-          zIndex: 1000,
+          zIndex: 1150, // BottomNavigation(1100)より上に表示
           animation: 'slideUp 0.3s ease-out',
           maxWidth: '400px',
           margin: '0 auto'
@@ -420,7 +420,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ onDismiss })
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1001,
+            zIndex: 1150, // BottomNavigation(1100)より上に表示
             padding: '1rem'
           }}
           onClick={() => setShowIOSInstructions(false)}

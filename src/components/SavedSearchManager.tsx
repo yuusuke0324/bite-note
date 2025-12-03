@@ -426,7 +426,7 @@ export const SavedSearchManager: React.FC<SavedSearchManagerProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1002
+          zIndex: 1200 // 親モーダル(1150)より上に表示
         }}>
           <div style={{
             backgroundColor: 'var(--color-surface-primary)',

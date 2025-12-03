@@ -45,7 +45,7 @@ export const PWAUpdateNotification: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      zIndex: 1000,
+      zIndex: 1150, // BottomNavigation(1100)より上に表示
       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
       animation: 'slideDown 0.3s ease-out'
     }}>

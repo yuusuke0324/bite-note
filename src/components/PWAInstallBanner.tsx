@@ -139,7 +139,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        zIndex: 1000,
+        zIndex: 1150, // BottomNavigation(1100)より上に表示
         boxShadow: '0 -2px 8px rgba(0,0,0,0.15)',
         animation: 'slideUp 0.3s ease-out',
         minHeight: '60px',
