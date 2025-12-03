@@ -7,6 +7,7 @@ interface Ripple {
   id: number;
   x: number;
   y: number;
+  prefersReducedMotion: boolean;
 }
 
 export interface RippleEffectProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -48,10 +49,12 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
     const internalRef = useRef<HTMLDivElement>(null);
     const containerRef = (ref as React.RefObject<HTMLDivElement>) || internalRef;
 
-    // prefers-reduced-motionをチェック
-    const prefersReducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // prefers-reduced-motionをチェック（JSDOM互換）
+    const getPrefersReducedMotion = (): boolean => {
+      if (typeof window === 'undefined') return false;
+      if (typeof window.matchMedia !== 'function') return false;
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    };
 
     const handleClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
@@ -65,7 +68,8 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
         const y = e.clientY - rect.top;
         const id = ++rippleIdCounter;
 
-        setRipples((prev) => [...prev, { id, x, y }]);
+        const prefersReducedMotion = getPrefersReducedMotion();
+        setRipples((prev) => [...prev, { id, x, y, prefersReducedMotion }]);
 
         const cleanupDuration = prefersReducedMotion ? 300 : duration;
         setTimeout(() => {
@@ -74,7 +78,7 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
 
         onClick?.(e);
       },
-      [disabled, duration, onClick, prefersReducedMotion]
+      [disabled, duration, onClick, getPrefersReducedMotion]
     );
 
     return (
@@ -88,7 +92,7 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
         {ripples.map((ripple) => (
           <span
             key={ripple.id}
-            className={prefersReducedMotion ? 'ripple ripple-reduced' : 'ripple'}
+            className={ripple.prefersReducedMotion ? 'ripple ripple-reduced' : 'ripple'}
             style={{
               left: ripple.x,
               top: ripple.y,
