@@ -9,7 +9,7 @@
  * - Reduced motion support
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MapPin, Calendar, Trophy, AlertCircle, RefreshCw, Fish, Ruler, Scale, Cloud, Thermometer, Waves, Map } from 'lucide-react';
 import { LineChart, Line, ReferenceDot, XAxis, YAxis } from 'recharts';
 import { GlassBadge } from '../ui/GlassBadge';
