@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, forwardRef } from 'react';
+import React, { useState, useCallback, useRef, forwardRef, useEffect } from 'react';
 
 // ユニークなIDを生成するためのカウンター
 let rippleIdCounter = 0;
@@ -48,6 +48,15 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
     const [ripples, setRipples] = useState<Ripple[]>([]);
     const internalRef = useRef<HTMLDivElement>(null);
     const containerRef = (ref as React.RefObject<HTMLDivElement>) || internalRef;
+    const timerIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+    // コンポーネントのアンマウント時にタイマーをクリーンアップ
+    useEffect(() => {
+      return () => {
+        timerIdsRef.current.forEach((timerId) => clearTimeout(timerId));
+        timerIdsRef.current.clear();
+      };
+    }, []);
 
     // prefers-reduced-motionをチェック（JSDOM互換）
     const getPrefersReducedMotion = (): boolean => {
@@ -72,9 +81,11 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
         setRipples((prev) => [...prev, { id, x, y, prefersReducedMotion }]);
 
         const cleanupDuration = prefersReducedMotion ? 300 : duration;
-        setTimeout(() => {
+        const timerId = setTimeout(() => {
           setRipples((prev) => prev.filter((r) => r.id !== id));
+          timerIdsRef.current.delete(timerId);
         }, cleanupDuration);
+        timerIdsRef.current.add(timerId);
 
         onClick?.(e);
       },
