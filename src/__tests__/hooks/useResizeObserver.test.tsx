@@ -39,19 +39,10 @@ describe('useResizeObserver', () => {
   // テストスイート全体で元の実装を保持
   const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
 
-  beforeEach(async () => {
-    // CI環境でのJSDOM初期化待機
-    if (process.env.CI) {
-      await waitFor(
-        () => {
-          if (!document.body || document.body.children.length === 0) {
-            throw new Error('JSDOM not ready');
-          }
-        },
-        { timeout: 5000, interval: 100 }
-      );
-    } else {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+  beforeEach(() => {
+    // JSDOMの初期化確認（bodyとdocumentElementの存在のみ確認）
+    if (!document.body) {
+      document.body = document.createElement('body');
     }
   });
 
@@ -62,11 +53,6 @@ describe('useResizeObserver', () => {
     vi.restoreAllMocks();
     // Element.prototype.getBoundingClientRect を確実に復元
     Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
-
-    // CI環境ではroot containerを保持
-    if (!process.env.CI) {
-      document.body.innerHTML = '';
-    }
   });
 
   describe('basic functionality', () => {
