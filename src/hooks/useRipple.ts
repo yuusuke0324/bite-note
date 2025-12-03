@@ -56,7 +56,8 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
       };
       const prefersReducedMotion = getPrefersReducedMotion();
 
-      const element = event.currentTarget;
+      // イベントから即座に必要な値を取得（イベントオブジェクトは後でnullになる可能性がある）
+      const element = event.currentTarget as T;
       const rect = element.getBoundingClientRect();
 
       // クリック位置を取得（タッチイベントとマウスイベントの両方に対応）
@@ -78,25 +79,31 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
       const x = clientX - rect.left;
       const y = clientY - rect.top;
 
-      const ripple = document.createElement('span');
-      ripple.className = prefersReducedMotion ? 'ripple ripple-reduced' : 'ripple';
-      ripple.style.left = `${x}px`;
-      ripple.style.top = `${y}px`;
-      ripple.style.backgroundColor = color;
-      ripple.style.width = `${size}px`;
-      ripple.style.height = `${size}px`;
-      ripple.style.marginLeft = `${-size / 2}px`;
-      ripple.style.marginTop = `${-size / 2}px`;
+      // DOM操作を次のフレームに延期（イベント処理をブロックしない）
+      requestAnimationFrame(() => {
+        // 要素がまだDOMに存在するか確認
+        if (!element.isConnected) return;
 
-      element.appendChild(ripple);
+        const ripple = document.createElement('span');
+        ripple.className = prefersReducedMotion ? 'ripple ripple-reduced' : 'ripple';
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.style.backgroundColor = color;
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.marginLeft = `${-size / 2}px`;
+        ripple.style.marginTop = `${-size / 2}px`;
 
-      // アニメーション完了後に要素を削除
-      const cleanupDuration = prefersReducedMotion ? 300 : duration;
-      setTimeout(() => {
-        if (ripple.parentNode) {
-          ripple.remove();
-        }
-      }, cleanupDuration);
+        element.appendChild(ripple);
+
+        // アニメーション完了後に要素を削除
+        const cleanupDuration = prefersReducedMotion ? 300 : duration;
+        setTimeout(() => {
+          if (ripple.parentNode) {
+            ripple.remove();
+          }
+        }, cleanupDuration);
+      });
     },
     [color, duration, size]
   );

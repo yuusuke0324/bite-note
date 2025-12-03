@@ -28,6 +28,13 @@ const mockMatchMedia = (matches: boolean) => {
   }));
 };
 
+// requestAnimationFrameの実行を待つヘルパー
+const waitForAnimationFrame = (): Promise<void> => {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+};
+
 describe('useRipple', () => {
   beforeEach(async () => {
     // Default: prefers-reduced-motion: no-preference
@@ -110,6 +117,7 @@ describe('useRipple', () => {
 
       await act(async () => {
         fireEvent.click(button, { clientX: 50, clientY: 25 });
+        await waitForAnimationFrame(); // requestAnimationFrame完了を待つ
       });
 
       const ripple = button.querySelector('.ripple');
@@ -134,6 +142,7 @@ describe('useRipple', () => {
 
       await act(async () => {
         fireEvent.click(button, { clientX: 60, clientY: 45 });
+        await waitForAnimationFrame();
       });
 
       const ripple = button.querySelector('.ripple') as HTMLElement;
@@ -160,6 +169,7 @@ describe('useRipple', () => {
 
       await act(async () => {
         fireEvent.click(button, { clientX: 50, clientY: 25 });
+        await waitForAnimationFrame();
       });
 
       const ripple = button.querySelector('.ripple') as HTMLElement;
@@ -185,6 +195,7 @@ describe('useRipple', () => {
 
       await act(async () => {
         fireEvent.click(button, { clientX: 50, clientY: 25 });
+        await waitForAnimationFrame();
       });
 
       const ripple = button.querySelector('.ripple') as HTMLElement;
@@ -213,6 +224,8 @@ describe('useRipple', () => {
 
       await act(async () => {
         fireEvent.click(button, { clientX: 50, clientY: 25 });
+        // fakeTimersを使う場合は、rAFをadvanceで進める
+        vi.advanceTimersByTime(16); // 1フレーム分
       });
 
       expect(button.querySelector('.ripple')).toBeInTheDocument();
@@ -260,6 +273,7 @@ describe('useRipple', () => {
 
       await act(async () => {
         fireEvent.click(button, { clientX: 50, clientY: 25 });
+        await waitForAnimationFrame();
       });
 
       const ripple = button.querySelector('.ripple');
@@ -287,6 +301,7 @@ describe('useRipple', () => {
 
       await act(async () => {
         fireEvent.click(button, { clientX: 50, clientY: 25 });
+        vi.advanceTimersByTime(16); // 1フレーム分
       });
 
       expect(button.querySelector('.ripple')).toBeInTheDocument();
@@ -334,6 +349,7 @@ describe('useRipple', () => {
         fireEvent.touchStart(button, {
           touches: [{ clientX: 50, clientY: 25 }],
         });
+        await waitForAnimationFrame();
       });
 
       const ripple = button.querySelector('.ripple') as HTMLElement;
@@ -374,6 +390,7 @@ describe('useRipple', () => {
 
       await act(async () => {
         result.current.createRipple(mockEvent);
+        await waitForAnimationFrame();
       });
 
       const ripple = button.querySelector('.ripple') as HTMLElement;
