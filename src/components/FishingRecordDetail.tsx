@@ -540,7 +540,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000
+        zIndex: 1150 // BottomNavigation(1100)より上に表示
       }}>
         <div style={{
           backgroundColor: 'var(--color-surface-primary)',
@@ -581,7 +581,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           display: 'flex',
           alignItems: isMobile ? 'stretch' : 'center',
           justifyContent: 'center',
-          zIndex: 1000,
+          zIndex: 1150, // BottomNavigation(1100)より上に表示
           padding: isMobile ? 0 : '1rem',
         }}
         onClick={(e) => {
@@ -1425,7 +1425,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1050, // フッター(1100)より下、メインダイアログ(1000)より上
+            zIndex: 1175, // BottomNavigation(1100)・メインダイアログ(1150)より上
             padding: '2rem'
           }}
           onClick={() => setPhotoExpanded(false)}
