@@ -664,6 +664,7 @@ body.low-performance .glass-panel-shadow {
   margin-left: -50px;
   margin-top: -50px;
   opacity: 1;
+  z-index: 1; /* 親要素内で前面に表示 */
 }
 
 /* リップルアニメーション */

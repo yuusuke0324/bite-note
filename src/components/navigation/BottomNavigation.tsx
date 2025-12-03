@@ -84,6 +84,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
     borderTop: '1px solid var(--color-border-light)',
     boxShadow: '0 -2px 8px var(--color-border-light)',
     position: 'relative',
+    zIndex: 100, // ナビゲーションバーを前面に配置
   };
 
   const itemStyles = (active: boolean): React.CSSProperties => ({
