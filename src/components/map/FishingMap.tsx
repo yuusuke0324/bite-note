@@ -348,7 +348,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
   }, [currentNearbyIndex, nearbyRecords]);
 
   // スワイプフック（MapPopup用）
-  const { ref: mapSwipeRef, state: mapSwipeState, handlers: mapSwipeHandlers } = useSwipe<HTMLDivElement>(
+  const { ref: mapSwipeRef, handlers: mapSwipeHandlers } = useSwipe<HTMLDivElement>(
     {
       threshold: DEFAULT_SWIPE_CONFIG.POPUP_THRESHOLD,
       velocityThreshold: DEFAULT_SWIPE_CONFIG.POPUP_VELOCITY_THRESHOLD,

@@ -14,9 +14,9 @@ import {
   MATERIAL_EASING,
   prefersReducedMotion,
   SPRING_EASING,
-  SwipeDirection,
   triggerHaptic,
 } from '../lib/swipe-utils';
+import type { SwipeDirection } from '../lib/swipe-utils';
 
 /**
  * スワイプ設定
