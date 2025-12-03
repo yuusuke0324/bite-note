@@ -79,8 +79,11 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
       const x = clientX - rect.left;
       const y = clientY - rect.top;
 
-      // DOM操作を次のフレームに延期（イベント処理をブロックしない）
-      requestAnimationFrame(() => {
+      // DOM操作をイベントループの次サイクルに延期
+      // 重要: requestAnimationFrameではなくsetTimeout(fn, 0)を使用
+      // これにより、ポインタダウン→クリックのイベント判定が完了した後にDOM変更が行われ、
+      // クリックイベントの発火を阻害しない
+      setTimeout(() => {
         // 要素がまだDOMに存在するか確認
         if (!element.isConnected) return;
 
@@ -93,6 +96,7 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
         ripple.style.height = `${size}px`;
         ripple.style.marginLeft = `${-size / 2}px`;
         ripple.style.marginTop = `${-size / 2}px`;
+        ripple.style.pointerEvents = 'none'; // 明示的に設定
 
         element.appendChild(ripple);
 
@@ -103,7 +107,7 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
             ripple.remove();
           }
         }, cleanupDuration);
-      });
+      }, 0);
     },
     [color, duration, size]
   );
