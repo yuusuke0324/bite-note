@@ -1,5 +1,6 @@
 import React, { forwardRef, type ReactNode } from 'react';
 import { colors } from '../../theme/colors';
+import { useRipple } from '../../hooks/useRipple';
 
 export interface FloatingActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'md' | 'lg';
@@ -124,6 +125,13 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     />
   );
 
+  // Ripple effect
+  const { createRipple } = useRipple<HTMLButtonElement>({
+    color: 'rgba(255, 255, 255, 0.4)',
+    duration: 600,
+    size: 80,
+  });
+
   // Handle mouse events
   const [isHovered, setIsHovered] = React.useState(false);
   const [isPressed, setIsPressed] = React.useState(false);
@@ -133,7 +141,12 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     setIsHovered(false);
     setIsPressed(false);
   };
-  const handleMouseDown = () => setIsPressed(true);
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setIsPressed(true);
+    if (!disabled && !loading) {
+      createRipple(e);
+    }
+  };
   const handleMouseUp = () => setIsPressed(false);
 
   // Combine all styles

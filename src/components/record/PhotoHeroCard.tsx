@@ -16,6 +16,7 @@ import { GlassBadge } from '../ui/GlassBadge';
 import { GlassPanel } from '../ui/GlassPanel';
 import { SkeletonPhotoHeroCard } from '../ui/SkeletonPhotoHeroCard';
 import { FishIcon } from '../ui/FishIcon';
+import { useRipple } from '../../hooks/useRipple';
 import type { TideChartData } from '../chart/tide/types';
 import { photoService } from '../../lib/photo-service';
 import { logger } from '../../lib/errors/logger';
@@ -216,6 +217,13 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
 
+  // Ripple effect for card tap
+  const { createRipple } = useRipple<HTMLDivElement>({
+    color: 'rgba(255, 255, 255, 0.3)',
+    duration: 600,
+    size: 150,
+  });
+
   // Load photo data
   const loadPhoto = useCallback(async () => {
     if (!record.photoId) return;
@@ -262,10 +270,14 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
     [loadPhoto]
   );
 
-  // Click handler
-  const handleClick = useCallback(() => {
-    onClick?.(record);
-  }, [onClick, record]);
+  // Click handler with ripple effect
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      createRipple(e);
+      onClick?.(record);
+    },
+    [onClick, record, createRipple]
+  );
 
   // Keyboard handler
   const handleKeyDown = useCallback(
