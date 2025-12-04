@@ -97,6 +97,16 @@ button {
   background: none;
   cursor: pointer;
   outline: none;
+  /* iOS Safari: ダブルタップズーム防止でタップ反応性向上 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === タッチデバイス向けグローバル設定 === */
+/* iOS Safari での「1回目hover、2回目click」問題を回避 */
+a, button, [role="button"], [role="tab"], .photo-hero-card, .card-hover-effect {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* フォーカス管理 */
@@ -465,10 +475,13 @@ input[type="search"]::-webkit-search-results-decoration {
   justify-content: center;
 }
 
-.glass-badge-wrapper--interactive:hover .glass-badge-glass {
-  will-change: transform; /* Apply only on hover for performance */
-  transform: translateY(-1px) translateZ(0);
-  box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+/* ホバーエフェクトはマウス/トラックパッドデバイスのみ */
+@media (hover: hover) and (pointer: fine) {
+  .glass-badge-wrapper--interactive:hover .glass-badge-glass {
+    will-change: transform; /* Apply only on hover for performance */
+    transform: translateY(-1px) translateZ(0);
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+  }
 }
 
 .glass-badge-wrapper--interactive:active .glass-badge-glass {
@@ -704,14 +717,18 @@ body.low-performance .glass-panel-shadow {
               box-shadow var(--transition-smooth);
 }
 
-.card-hover-effect:hover {
-  transform: translateY(-4px) translateZ(0);
-  box-shadow: 0 12px 48px rgba(31, 38, 135, 0.2);
-}
+/* ホバーエフェクトはマウス/トラックパッドデバイスのみ */
+/* iOS Safari で「1回目hover、2回目click」問題を回避 */
+@media (hover: hover) and (pointer: fine) {
+  .card-hover-effect:hover {
+    transform: translateY(-4px) translateZ(0);
+    box-shadow: 0 12px 48px rgba(31, 38, 135, 0.2);
+  }
 
-.card-hover-effect:hover .glass-badge-glass {
-  transform: scale(1.05) translateZ(0);
-  transition: transform var(--transition-smooth);
+  .card-hover-effect:hover .glass-badge-glass {
+    transform: scale(1.05) translateZ(0);
+    transition: transform var(--transition-smooth);
+  }
 }
 
 /* prefers-reduced-motion */
