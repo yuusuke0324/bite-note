@@ -96,12 +96,20 @@ export interface UseSwipeReturn<T extends HTMLElement> {
 }
 
 // Leaflet型定義（実行時に存在しない場合に備えて）
-declare namespace L {
-  interface Map {
-    dragging: {
-      disable: () => void;
-      enable: () => void;
-    };
+interface LeafletMapDragging {
+  disable: () => void;
+  enable: () => void;
+}
+
+interface LeafletMap {
+  dragging: LeafletMapDragging;
+}
+
+// グローバル型定義
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace L {
+    type Map = LeafletMap;
   }
 }
 

@@ -210,6 +210,7 @@ SwipeHint.displayName = 'SwipeHint';
 /**
  * ヒント表示状態をリセット（テスト用）
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function resetSwipeHint(screenName: string): void {
   if (typeof window === 'undefined') return;
   try {
