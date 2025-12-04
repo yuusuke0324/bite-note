@@ -40,33 +40,41 @@ describe('useResizeObserver', () => {
   const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
 
   beforeEach(async () => {
+    // 前テストのゴミを確実に削除（flaky test対策）
+    cleanup();
+
+    // すべての環境でDOMをリセット
+    document.body.innerHTML = '';
+
+    // React Testing Libraryのroot containerを作成
+    const root = document.createElement('div');
+    root.id = 'vitest-root';
+    document.body.appendChild(root);
+
     // CI環境でのJSDOM初期化待機
     if (process.env.CI) {
       await waitFor(
         () => {
-          if (!document.body || document.body.children.length === 0) {
-            throw new Error('JSDOM not ready');
+          // document.bodyが存在し、準備完了していることを確認
+          if (!document.body) {
+            throw new Error('JSDOM not ready: document.body is null');
           }
         },
-        { timeout: 5000, interval: 100 }
+        { timeout: 5000, interval: 50 }
       );
-    } else {
-      await new Promise((resolve) => setTimeout(resolve, 0));
     }
   });
 
   afterEach(() => {
-    // Testing Library のクリーンアップを明示的に実行
-    cleanup();
-    // 各テスト後にモックをリセット
+    // モックを先にリセット
     vi.restoreAllMocks();
-    // Element.prototype.getBoundingClientRect を確実に復元
     Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
 
-    // CI環境ではroot containerを保持
-    if (!process.env.CI) {
-      document.body.innerHTML = '';
-    }
+    // Testing Library のクリーンアップを明示的に実行
+    cleanup();
+
+    // すべての環境でDOMをリセット（CI/非CI問わず）
+    document.body.innerHTML = '';
   });
 
   describe('basic functionality', () => {
@@ -75,7 +83,8 @@ describe('useResizeObserver', () => {
 
       render(<TestComponent onResize={onResize} />);
 
-      const container = screen.getByTestId('resize-container');
+      // CI環境ではDOMレンダリングに時間がかかる場合があるため、waitFor内で要素を取得
+      const container = await screen.findByTestId('resize-container');
 
       // setupTests.tsのpolyfillが自動的に動作
       await waitFor(() => {
