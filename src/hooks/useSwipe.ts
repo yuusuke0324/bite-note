@@ -39,7 +39,7 @@ export interface SwipeConfig {
   /** 右スワイプを無効化 */
   disableRight?: boolean;
   /** Leafletマップ参照（MapPopup用） */
-  leafletMap?: L.Map | null;
+  leafletMap?: LeafletMapLike | null;
 }
 
 /**
@@ -95,22 +95,15 @@ export interface UseSwipeReturn<T extends HTMLElement> {
   };
 }
 
-// Leaflet型定義（実行時に存在しない場合に備えて）
-interface LeafletMapDragging {
-  disable: () => void;
-  enable: () => void;
-}
-
-interface LeafletMap {
-  dragging: LeafletMapDragging;
-}
-
-// グローバル型定義
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace L {
-    type Map = LeafletMap;
-  }
+/**
+ * Leafletマップのドラッグ制御インターフェース
+ * @description Leaflet未インストール環境でも型安全に動作するための最小定義
+ */
+interface LeafletMapLike {
+  dragging: {
+    disable: () => void;
+    enable: () => void;
+  };
 }
 
 /**
