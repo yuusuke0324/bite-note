@@ -1,6 +1,6 @@
 // 釣果記録詳細コンポーネント
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 // import { textStyles, typography } from '../theme/typography';
 import type { FishingRecord } from '../types';
@@ -10,6 +10,10 @@ import type { TideChartData } from './chart/tide/types';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { PhotoHeroCard } from './record/PhotoHeroCard';
+import { useSwipe } from '../hooks/useSwipe';
+import { SwipeIndicator } from './ui/SwipeIndicator';
+import { SwipeHint } from './ui/SwipeHint';
+import { DEFAULT_SWIPE_CONFIG } from '../lib/swipe-utils';
 import {
   MessageCircle,
   Edit,
@@ -37,6 +41,10 @@ interface FishingRecordDetailProps {
   photoUrl?: string;
   loading?: boolean;
   onNavigateToMap?: (record: FishingRecord) => void;
+  /** 現在のインデックス（スワイプインジケーター用） */
+  currentIndex?: number;
+  /** 総レコード数（スワイプインジケーター用） */
+  totalCount?: number;
 }
 
 /**
@@ -104,7 +112,9 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   hasNext = false,
   photoUrl,
   loading = false,
-  onNavigateToMap
+  onNavigateToMap,
+  currentIndex = 0,
+  totalCount = 1,
 }) => {
   const [photoExpanded, setPhotoExpanded] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -120,6 +130,37 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const photoContainerRef = useRef<HTMLDivElement>(null);
+
+  // スワイプナビゲーション用コールバック
+  const handleSwipeLeft = useCallback(() => {
+    if (hasNext && onNext) {
+      onNext();
+    }
+  }, [hasNext, onNext]);
+
+  const handleSwipeRight = useCallback(() => {
+    if (hasPrevious && onPrevious) {
+      onPrevious();
+    }
+  }, [hasPrevious, onPrevious]);
+
+  // スワイプフック（モバイルのみ有効化）
+  const { ref: swipeRef, state: swipeState, handlers: swipeHandlers } = useSwipe<HTMLDivElement>(
+    {
+      threshold: DEFAULT_SWIPE_CONFIG.DETAIL_THRESHOLD,
+      velocityThreshold: DEFAULT_SWIPE_CONFIG.DETAIL_VELOCITY_THRESHOLD,
+      maxVerticalDeviation: DEFAULT_SWIPE_CONFIG.DETAIL_MAX_VERTICAL_DEVIATION,
+      edgeZone: DEFAULT_SWIPE_CONFIG.EDGE_ZONE,
+      animationDuration: DEFAULT_SWIPE_CONFIG.DETAIL_ANIMATION_DURATION,
+      dampingFactor: DEFAULT_SWIPE_CONFIG.DETAIL_DAMPING_FACTOR,
+      disableLeft: !hasNext,
+      disableRight: !hasPrevious,
+    },
+    {
+      onSwipeLeft: handleSwipeLeft,
+      onSwipeRight: handleSwipeRight,
+    }
+  );
 
   // タッチデバイス判定（macOSデスクトップでのWeb Share API誤発火防止）
   const isTouchDevice = () => {
@@ -1073,10 +1114,14 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
             </div>
           )}
 
-          {/* モバイル: PhotoHeroCardを背景レイヤーとして固定配置 */}
+          {/* モバイル: PhotoHeroCardを背景レイヤーとして固定配置 + スワイプナビゲーション */}
           {isMobile && (
             <div
-              ref={photoContainerRef}
+              ref={(node) => {
+                // 両方のrefを設定
+                (photoContainerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+                (swipeRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+              }}
               style={{
                 position: 'absolute',
                 top: 0,
@@ -1084,11 +1129,15 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 right: 0,
                 bottom: 0,
                 zIndex: 5,
+                touchAction: 'pan-y', // 垂直スクロールを許可、水平スワイプを処理
               }}
+              {...swipeHandlers}
             >
               <PhotoHeroCard
                 record={record}
                 onClick={() => {
+                  // スワイプ中はクリックを無視
+                  if (swipeState.isSwiping) return;
                   if (record.coordinates && onNavigateToMap) {
                     onNavigateToMap(record);
                     onClose?.();
@@ -1103,6 +1152,31 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 fitMode={photoFitMode}
                 disableRipple={true}
               />
+
+              {/* スワイプインジケーター */}
+              {totalCount > 1 && (
+                <SwipeIndicator
+                  currentIndex={currentIndex}
+                  totalCount={totalCount}
+                  style={{
+                    position: 'absolute',
+                    bottom: record.notes ? 140 : 72,
+                    left: 0,
+                    right: 0,
+                    zIndex: 10,
+                  }}
+                />
+              )}
+
+              {/* スワイプヒント（初回のみ表示） */}
+              {totalCount > 1 && (
+                <SwipeHint
+                  screenName="FishingRecordDetail"
+                  style={{
+                    bottom: record.notes ? 180 : 112,
+                  }}
+                />
+              )}
             </div>
           )}
 

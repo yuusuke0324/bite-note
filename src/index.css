@@ -215,6 +215,10 @@ input, textarea, select {
   --glass-shadow-bg: rgba(0, 0, 0, 0.6);
   --glass-text-color: #ffffff;
 
+  /* Swipe Navigation (Issue #365) */
+  --swipe-indicator-inactive: rgba(255, 255, 255, 0.3);
+  --swipe-hint-bg: rgba(0, 0, 0, 0.7);
+
 }
 
 /* Light Theme */
@@ -276,6 +280,10 @@ body.light-theme {
   --glass-border: transparent;
   --glass-shadow-bg: rgba(0, 0, 0, 0.6);
   --glass-text-color: #ffffff;
+
+  /* Swipe Navigation (Issue #365) */
+  --swipe-indicator-inactive: rgba(0, 0, 0, 0.25);
+  --swipe-hint-bg: rgba(30, 41, 59, 0.85);
 
 }
 

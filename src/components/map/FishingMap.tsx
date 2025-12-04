@@ -13,6 +13,10 @@ import { textStyles } from '../../theme/typography';
 import type { FishingRecord } from '../../types';
 import { Icon } from '../ui/Icon';
 import { Map as MapIcon, Calendar, MapPin, Ruler, BarChart3, Fish, X, Maximize2, Globe } from 'lucide-react';
+import { useSwipe } from '../../hooks/useSwipe';
+import { SwipeIndicator } from '../ui/SwipeIndicator';
+import { SwipeHint } from '../ui/SwipeHint';
+import { haversineDistance, DEFAULT_SWIPE_CONFIG } from '../../lib/swipe-utils';
 
 // Leafletのデフォルトアイコン修正
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -288,6 +292,78 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
   const [selectedRecord, setSelectedRecord] = useState<FishingRecord | null>(null);
   const [flyToCoords, setFlyToCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
+
+  // 近隣レコード計算（スワイプナビゲーション用）
+  const nearbyRecords = useMemo(() => {
+    if (!selectedRecord || !selectedRecord.coordinates) return [];
+
+    const recordsWithCoords = records.filter(r => r.coordinates && r.id !== selectedRecord.id);
+
+    // 優先順位1: 同一釣り場（location名が完全一致）
+    const sameLocation = recordsWithCoords.filter(
+      r => r.location === selectedRecord.location
+    );
+
+    // 優先順位2: 近隣釣り場（距離5km以内）
+    const nearby = recordsWithCoords.filter(r => {
+      if (r.location === selectedRecord.location) return false; // 同一釣り場は除外
+      const distance = haversineDistance(
+        selectedRecord.coordinates!,
+        r.coordinates!
+      );
+      return distance <= DEFAULT_SWIPE_CONFIG.NEARBY_DISTANCE_THRESHOLD;
+    });
+
+    // 同一釣り場 → 日付が近い順でソート
+    sameLocation.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+    // 近隣釣り場 → 距離が近い順でソート
+    nearby.sort((a, b) => {
+      const distA = haversineDistance(selectedRecord.coordinates!, a.coordinates!);
+      const distB = haversineDistance(selectedRecord.coordinates!, b.coordinates!);
+      return distA - distB;
+    });
+
+    // 選択中のレコードを含めた配列を作成
+    return [selectedRecord, ...sameLocation, ...nearby];
+  }, [selectedRecord, records]);
+
+  // 現在のインデックス（スワイプナビゲーション用）
+  const currentNearbyIndex = useMemo(() => {
+    if (!selectedRecord) return 0;
+    return nearbyRecords.findIndex(r => r.id === selectedRecord.id);
+  }, [selectedRecord, nearbyRecords]);
+
+  // スワイプコールバック
+  const handleMapSwipeLeft = useCallback(() => {
+    if (currentNearbyIndex < nearbyRecords.length - 1) {
+      setSelectedRecord(nearbyRecords[currentNearbyIndex + 1]);
+    }
+  }, [currentNearbyIndex, nearbyRecords]);
+
+  const handleMapSwipeRight = useCallback(() => {
+    if (currentNearbyIndex > 0) {
+      setSelectedRecord(nearbyRecords[currentNearbyIndex - 1]);
+    }
+  }, [currentNearbyIndex, nearbyRecords]);
+
+  // スワイプフック（MapPopup用）
+  const { ref: mapSwipeRef, handlers: mapSwipeHandlers } = useSwipe<HTMLDivElement>(
+    {
+      threshold: DEFAULT_SWIPE_CONFIG.POPUP_THRESHOLD,
+      velocityThreshold: DEFAULT_SWIPE_CONFIG.POPUP_VELOCITY_THRESHOLD,
+      maxVerticalDeviation: DEFAULT_SWIPE_CONFIG.POPUP_MAX_VERTICAL_DEVIATION,
+      edgeZone: DEFAULT_SWIPE_CONFIG.EDGE_ZONE,
+      animationDuration: DEFAULT_SWIPE_CONFIG.POPUP_ANIMATION_DURATION,
+      dampingFactor: DEFAULT_SWIPE_CONFIG.POPUP_DAMPING_FACTOR,
+      disableLeft: currentNearbyIndex >= nearbyRecords.length - 1,
+      disableRight: currentNearbyIndex <= 0,
+    },
+    {
+      onSwipeLeft: handleMapSwipeLeft,
+      onSwipeRight: handleMapSwipeRight,
+    }
+  );
 
   // Issue #296: ダークモード検出
   const isDarkMode = useDarkMode();
@@ -618,21 +694,26 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
 
         {/* 選択された釣果のサマリパネル（モバイル: Bottom Sheet、デスクトップ: 上部中央） */}
         {selectedRecord && (
-          <div style={{
-            position: 'absolute',
-            top: '16px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            borderRadius: '16px',
-            maxWidth: isMobile ? '90%' : '400px',
-            minWidth: isMobile ? '280px' : '320px',
-            zIndex: 1001,
-            backgroundColor: 'var(--color-panel-bg-solid)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-            padding: '16px 20px',
-            border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
-          }}>
+          <div
+            ref={isMobile ? mapSwipeRef : undefined}
+            {...(isMobile ? mapSwipeHandlers : {})}
+            style={{
+              position: 'absolute',
+              top: '16px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              borderRadius: '16px',
+              maxWidth: isMobile ? '90%' : '400px',
+              minWidth: isMobile ? '280px' : '320px',
+              zIndex: 1001,
+              backgroundColor: 'var(--color-panel-bg-solid)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+              padding: '16px 20px',
+              border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
+              touchAction: isMobile ? 'pan-y' : 'auto',
+            }}
+          >
             {/* 閉じるボタン - iOS HIG準拠 44x44px */}
             <button
               onClick={() => setSelectedRecord(null)}
@@ -814,6 +895,35 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 </button>
               )}
             </div>
+
+            {/* スワイプインジケーター（モバイルで複数レコードがある場合のみ表示） */}
+            {isMobile && nearbyRecords.length > 1 && (
+              <SwipeIndicator
+                currentIndex={currentNearbyIndex}
+                totalCount={nearbyRecords.length}
+                onDotClick={(index) => {
+                  setSelectedRecord(nearbyRecords[index]);
+                }}
+                style={{
+                  marginTop: '12px',
+                  justifyContent: 'center',
+                }}
+              />
+            )}
+
+            {/* スワイプヒント（モバイルで複数レコードがある場合、初回のみ表示） */}
+            {isMobile && nearbyRecords.length > 1 && (
+              <SwipeHint
+                screenName="FishingMapPopup"
+                text="← 近隣の記録をスワイプ →"
+                style={{
+                  position: 'absolute',
+                  bottom: '-48px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                }}
+              />
+            )}
           </div>
         )}
 

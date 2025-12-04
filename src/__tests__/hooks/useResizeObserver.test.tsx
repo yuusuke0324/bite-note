@@ -7,6 +7,8 @@
  * - setupTests.tsのResizeObserverPolyfillを活用
  * - Testing Libraryのrenderで実際のコンポーネントをマウント
  * - tech-leadレビュー（Issue #120）に基づく実装（アプローチB）
+ * - CI環境での並列実行時のDOM参照問題を回避するため、
+ *   `screen` → `container.querySelector` パターンを採用
  *
  * 【参考】
  * - Issue #120: useResizeObserver skipテスト復活
@@ -14,8 +16,8 @@
  */
 
 import React, { useEffect } from 'react';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
-import { vi } from 'vitest';
+import { render, waitFor, cleanup } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useResizeObserver, ResizeObserverEntry } from '../../hooks/useResizeObserver';
 
 // テスト用コンポーネント
@@ -62,7 +64,6 @@ describe('useResizeObserver', () => {
     vi.restoreAllMocks();
     // Element.prototype.getBoundingClientRect を確実に復元
     Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
-
     // CI環境ではroot containerを保持
     if (!process.env.CI) {
       document.body.innerHTML = '';
@@ -73,9 +74,11 @@ describe('useResizeObserver', () => {
     it('should detect initial size when mounted', async () => {
       const onResize = vi.fn();
 
-      render(<TestComponent onResize={onResize} />);
+      const { container } = render(<TestComponent onResize={onResize} />);
 
-      const container = screen.getByTestId('resize-container');
+      // container.querySelectorで要素を取得
+      const element = container.querySelector('[data-testid="resize-container"]');
+      expect(element).toBeInTheDocument();
 
       // setupTests.tsのpolyfillが自動的に動作
       await waitFor(() => {
@@ -117,11 +120,14 @@ describe('useResizeObserver', () => {
         return originalGetBoundingClientRect.call(this);
       };
 
-      render(<TestComponent onResize={onResize} testId="resize-container-mobile" />);
+      const { container } = render(<TestComponent onResize={onResize} testId="resize-container-mobile" />);
 
       await waitFor(() => {
         expect(onResize).toHaveBeenCalled();
       });
+
+      const element = container.querySelector('[data-testid="resize-container-mobile"]');
+      expect(element).toBeInTheDocument();
 
       // 最後の呼び出しでmobileデバイスとして検出されている
       const lastCall = onResize.mock.calls[onResize.mock.calls.length - 1][0] as ResizeObserverEntry;
@@ -151,11 +157,14 @@ describe('useResizeObserver', () => {
         return originalGetBoundingClientRect.call(this);
       };
 
-      render(<TestComponent onResize={onResize} testId="resize-container-tablet" />);
+      const { container } = render(<TestComponent onResize={onResize} testId="resize-container-tablet" />);
 
       await waitFor(() => {
         expect(onResize).toHaveBeenCalled();
       });
+
+      const element = container.querySelector('[data-testid="resize-container-tablet"]');
+      expect(element).toBeInTheDocument();
 
       // 最後の呼び出しでtabletデバイスとして検出されている
       const lastCall = onResize.mock.calls[onResize.mock.calls.length - 1][0] as ResizeObserverEntry;
@@ -185,11 +194,14 @@ describe('useResizeObserver', () => {
         return originalGetBoundingClientRect.call(this);
       };
 
-      render(<TestComponent onResize={onResize} testId="resize-container-desktop" />);
+      const { container } = render(<TestComponent onResize={onResize} testId="resize-container-desktop" />);
 
       await waitFor(() => {
         expect(onResize).toHaveBeenCalled();
       });
+
+      const element = container.querySelector('[data-testid="resize-container-desktop"]');
+      expect(element).toBeInTheDocument();
 
       // 最後の呼び出しでdesktopデバイスとして検出されている
       const lastCall = onResize.mock.calls[onResize.mock.calls.length - 1][0] as ResizeObserverEntry;
@@ -222,12 +234,15 @@ describe('useResizeObserver', () => {
         return originalGetBoundingClientRect.call(this);
       };
 
-      render(<TestComponent onResize={onResize} testId="resize-container-dynamic" />);
+      const { container } = render(<TestComponent onResize={onResize} testId="resize-container-dynamic" />);
 
       // 初期サイズの検証
       await waitFor(() => {
         expect(onResize).toHaveBeenCalled();
       });
+
+      const element = container.querySelector('[data-testid="resize-container-dynamic"]');
+      expect(element).toBeInTheDocument();
 
       const lastCall = onResize.mock.calls[onResize.mock.calls.length - 1][0] as ResizeObserverEntry;
       expect(lastCall.width).toBe(1200);
@@ -247,12 +262,15 @@ describe('useResizeObserver', () => {
     it('should use window.resize when ResizeObserver is unavailable', async () => {
       // ResizeObserverを一時的に無効化
       const originalResizeObserver = global.ResizeObserver;
-      (global as any).ResizeObserver = undefined;
+      (global as unknown as { ResizeObserver: undefined }).ResizeObserver = undefined;
 
       const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
       const onResize = vi.fn();
 
-      render(<TestComponent onResize={onResize} testId="resize-container-fallback" />);
+      const { container } = render(<TestComponent onResize={onResize} testId="resize-container-fallback" />);
+
+      const element = container.querySelector('[data-testid="resize-container-fallback"]');
+      expect(element).toBeInTheDocument();
 
       // window.resize イベントリスナーが登録されることを確認
       await waitFor(() => {
@@ -261,7 +279,7 @@ describe('useResizeObserver', () => {
 
       // cleanup
       addEventListenerSpy.mockRestore();
-      (global as any).ResizeObserver = originalResizeObserver;
+      (global as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = originalResizeObserver;
     });
   });
 
@@ -269,7 +287,10 @@ describe('useResizeObserver', () => {
     it('should properly clean up on unmount', async () => {
       const onResize = vi.fn();
 
-      const { unmount } = render(<TestComponent onResize={onResize} testId="resize-container-cleanup" />);
+      const { container, unmount } = render(<TestComponent onResize={onResize} testId="resize-container-cleanup" />);
+
+      const element = container.querySelector('[data-testid="resize-container-cleanup"]');
+      expect(element).toBeInTheDocument();
 
       // 初期化を待つ
       await waitFor(() => {
@@ -283,12 +304,15 @@ describe('useResizeObserver', () => {
     it('should remove resize listener on unmount when using fallback', async () => {
       // ResizeObserverを一時的に無効化
       const originalResizeObserver = global.ResizeObserver;
-      (global as any).ResizeObserver = undefined;
+      (global as unknown as { ResizeObserver: undefined }).ResizeObserver = undefined;
 
       const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
       const onResize = vi.fn();
 
-      const { unmount } = render(<TestComponent onResize={onResize} testId="resize-container-cleanup-fallback" />);
+      const { container, unmount } = render(<TestComponent onResize={onResize} testId="resize-container-cleanup-fallback" />);
+
+      const element = container.querySelector('[data-testid="resize-container-cleanup-fallback"]');
+      expect(element).toBeInTheDocument();
 
       // useLayoutEffectの実行を待つ
       await waitFor(() => {
@@ -304,7 +328,7 @@ describe('useResizeObserver', () => {
 
       // cleanup
       removeEventListenerSpy.mockRestore();
-      (global as any).ResizeObserver = originalResizeObserver;
+      (global as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = originalResizeObserver;
     });
   });
 });
