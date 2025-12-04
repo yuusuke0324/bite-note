@@ -288,8 +288,10 @@ body.light-theme .photo-hero-card--fit-contain .photo-hero-card__photo-backgroun
   min-width: var(--touch-target-min);
 }
 
-.photo-hero-card__retry-button:hover {
-  background: var(--color-surface-hover);
+@media (hover: hover) and (pointer: fine) {
+  .photo-hero-card__retry-button:hover {
+    background: var(--color-surface-hover);
+  }
 }
 
 .photo-hero-card__retry-button:disabled {
@@ -583,7 +585,19 @@ body.light-theme .photo-hero-card--fit-contain .photo-hero-card__photo-backgroun
   transition: opacity 0.2s ease;
 }
 
-.photo-hero-card:hover .photo-hero-card__map-bar,
+/* ホバーエフェクトはマウス/トラックパッドデバイスのみ */
+/* iOS Safari で「1回目hover、2回目click」問題を回避 */
+@media (hover: hover) and (pointer: fine) {
+  .photo-hero-card:hover .photo-hero-card__map-bar {
+    opacity: 1;
+  }
+
+  .photo-hero-card:hover .photo-hero-card__map-bar svg {
+    transform: scale(1.15);
+  }
+}
+
+/* フォーカス表示は全デバイスで有効 */
 .photo-hero-card:focus-visible .photo-hero-card__map-bar {
   opacity: 1;
 }
@@ -592,7 +606,6 @@ body.light-theme .photo-hero-card--fit-contain .photo-hero-card__photo-backgroun
   transition: transform 0.2s ease;
 }
 
-.photo-hero-card:hover .photo-hero-card__map-bar svg,
 .photo-hero-card:focus-visible .photo-hero-card__map-bar svg {
   transform: scale(1.15);
 }

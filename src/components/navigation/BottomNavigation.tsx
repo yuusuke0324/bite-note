@@ -42,16 +42,6 @@ const NavItem: React.FC<{
       }}
       onClick={() => onItemClick(item.id)}
       onPointerDown={(e) => createRipple(e as unknown as React.MouseEvent<HTMLButtonElement>)}
-      onMouseEnter={(e) => {
-        if (!item.active) {
-          e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!item.active) {
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }
-      }}
       aria-label={item.label}
       aria-selected={item.active}
       aria-current={item.active ? 'page' : undefined}
