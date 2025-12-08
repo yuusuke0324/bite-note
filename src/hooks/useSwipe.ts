@@ -368,7 +368,9 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const onPointerMove = useCallback(
     (e: React.PointerEvent<T>) => {
-      if (!state.isSwiping || isAnimating.current) return;
+      // isSwipingRefを使用（state.isSwipingではなく）
+      // これにより依存配列からstate.isSwipingを除外でき、イベントリスナーの再登録頻度を削減
+      if (!isSwipingRef.current || isAnimating.current) return;
 
       const deltaX = e.clientX - startX.current;
       const deltaY = e.clientY - startY.current;
@@ -435,7 +437,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       onSwipeProgress?.(progress, direction);
     },
     [
-      state.isSwiping,
+      // state.isSwipingを除外（isSwipingRef.currentを使用）
+      // イベントリスナーの再登録頻度を削減
       maxVerticalDeviation,
       disableLeft,
       disableRight,
@@ -452,7 +455,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const onPointerUp = useCallback(
     (e: React.PointerEvent<T>) => {
-      if (!state.isSwiping) return;
+      // isSwipingRefを使用（state.isSwipingではなく）
+      if (!isSwipingRef.current) return;
 
       // ポインターキャプチャ解放（存在する場合のみ）
       const target = e.target as HTMLElement;
@@ -500,7 +504,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       }
     },
     [
-      state.isSwiping,
+      // state.isSwipingを除外（isSwipingRef.currentを使用）
       leafletMap,
       threshold,
       velocityThreshold,
@@ -519,7 +523,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const onPointerCancel = useCallback(
     (e: React.PointerEvent<T>) => {
-      if (!state.isSwiping) return;
+      // isSwipingRefを使用（state.isSwipingではなく）
+      if (!isSwipingRef.current) return;
 
       // ポインターキャプチャ解放（存在する場合のみ）
       const target = e.target as HTMLElement;
@@ -534,7 +539,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
 
       animateBack();
     },
-    [state.isSwiping, leafletMap, animateBack]
+    [leafletMap, animateBack] // state.isSwipingを除外
   );
 
   /**
