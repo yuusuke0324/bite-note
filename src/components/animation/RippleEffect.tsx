@@ -49,10 +49,13 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
     const internalRef = useRef<HTMLDivElement>(null);
     const containerRef = (ref as React.RefObject<HTMLDivElement>) || internalRef;
     const timerIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+    const isMountedRef = useRef(true);
 
     // コンポーネントのアンマウント時にタイマーをクリーンアップ
     useEffect(() => {
+      isMountedRef.current = true;
       return () => {
+        isMountedRef.current = false;
         timerIdsRef.current.forEach((timerId) => clearTimeout(timerId));
         timerIdsRef.current.clear();
       };
@@ -82,7 +85,10 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
 
         const cleanupDuration = prefersReducedMotion ? 300 : duration;
         const timerId = setTimeout(() => {
-          setRipples((prev) => prev.filter((r) => r.id !== id));
+          // アンマウント後の状態更新を防ぐ
+          if (isMountedRef.current) {
+            setRipples((prev) => prev.filter((r) => r.id !== id));
+          }
           timerIdsRef.current.delete(timerId);
         }, cleanupDuration);
         timerIdsRef.current.add(timerId);
