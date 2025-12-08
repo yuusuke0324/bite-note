@@ -867,6 +867,19 @@ body.low-performance .glass-panel-shadow {
   }
 }
 
+/* === FloatingActionButton Press Feedback === */
+/* iOS Safari対応: JavaScriptの状態管理を使わずCSSのみで実装 */
+/* onPointerDown/onMouseUp + isPressed状態だとiOS Safariでタップが効かない問題を回避 */
+.fab-active:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-active:active:not(:disabled) {
+    transform: none;
+  }
+}
+
 /* === Screen Reader Only === */
 .sr-only {
   position: absolute;
