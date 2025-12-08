@@ -642,29 +642,33 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
 
     if (supportsPointerEvents) {
       // PointerEventを使用（モダンブラウザ）
-      element.addEventListener('pointerdown', handlePointerDown as EventListener);
-      element.addEventListener('pointermove', handlePointerMove as EventListener, { passive: false });
-      element.addEventListener('pointerup', handlePointerUp as EventListener);
-      element.addEventListener('pointercancel', handlePointerCancel as EventListener);
+      // キャプチャフェーズで登録（子要素より先に処理される）
+      // これにより、子要素のイベントハンドラがstopPropagation()しても影響を受けない
+      element.addEventListener('pointerdown', handlePointerDown as EventListener, { capture: true });
+      element.addEventListener('pointermove', handlePointerMove as EventListener, { capture: true, passive: false });
+      element.addEventListener('pointerup', handlePointerUp as EventListener, { capture: true });
+      element.addEventListener('pointercancel', handlePointerCancel as EventListener, { capture: true });
     } else {
       // TouchEventにフォールバック（古いブラウザ）
-      element.addEventListener('touchstart', handlePointerDown as EventListener);
-      element.addEventListener('touchmove', handlePointerMove as EventListener, { passive: false });
-      element.addEventListener('touchend', handlePointerUp as EventListener);
-      element.addEventListener('touchcancel', handlePointerCancel as EventListener);
+      // 同様にキャプチャフェーズで登録
+      element.addEventListener('touchstart', handlePointerDown as EventListener, { capture: true });
+      element.addEventListener('touchmove', handlePointerMove as EventListener, { capture: true, passive: false });
+      element.addEventListener('touchend', handlePointerUp as EventListener, { capture: true });
+      element.addEventListener('touchcancel', handlePointerCancel as EventListener, { capture: true });
     }
 
     return () => {
       if (supportsPointerEvents) {
-        element.removeEventListener('pointerdown', handlePointerDown as EventListener);
-        element.removeEventListener('pointermove', handlePointerMove as EventListener);
-        element.removeEventListener('pointerup', handlePointerUp as EventListener);
-        element.removeEventListener('pointercancel', handlePointerCancel as EventListener);
+        // キャプチャフェーズで登録したリスナーを削除（captureオプション必須）
+        element.removeEventListener('pointerdown', handlePointerDown as EventListener, { capture: true });
+        element.removeEventListener('pointermove', handlePointerMove as EventListener, { capture: true });
+        element.removeEventListener('pointerup', handlePointerUp as EventListener, { capture: true });
+        element.removeEventListener('pointercancel', handlePointerCancel as EventListener, { capture: true });
       } else {
-        element.removeEventListener('touchstart', handlePointerDown as EventListener);
-        element.removeEventListener('touchmove', handlePointerMove as EventListener);
-        element.removeEventListener('touchend', handlePointerUp as EventListener);
-        element.removeEventListener('touchcancel', handlePointerCancel as EventListener);
+        element.removeEventListener('touchstart', handlePointerDown as EventListener, { capture: true });
+        element.removeEventListener('touchmove', handlePointerMove as EventListener, { capture: true });
+        element.removeEventListener('touchend', handlePointerUp as EventListener, { capture: true });
+        element.removeEventListener('touchcancel', handlePointerCancel as EventListener, { capture: true });
       }
     };
   }, [element, onPointerDown, onPointerMove, onPointerUp, onPointerCancel]);

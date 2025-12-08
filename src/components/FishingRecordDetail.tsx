@@ -121,7 +121,11 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [tideChartData, setTideChartData] = useState<TideChartData[] | null>(null);
   const [tideLoading, setTideLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // isMobileを即座に計算（不要な再レンダリングを防ぐ）
+  // SSRではwindowが存在しないためfalseを使用
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  );
   const [photoFitMode, setPhotoFitMode] = useState<'cover' | 'contain'>('cover');
   const [localPhotoUrl, setLocalPhotoUrl] = useState<string | null>(null);
   // 2ステップ共有用の状態
