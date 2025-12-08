@@ -100,9 +100,12 @@
   min-width: 44px;
 }
 
-.record-grid__empty-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+/* Hover state - only for hover-capable devices (iOS Safari compatibility) */
+@media (hover: hover) and (pointer: fine) {
+  .record-grid__empty-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  }
 }
 
 .record-grid__empty-cta:active {

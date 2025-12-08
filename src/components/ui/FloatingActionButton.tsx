@@ -123,7 +123,7 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     }
   };
   const handleMouseUp = () => setIsPressed(false);
-  const handleMouseLeave = () => setIsPressed(false);
+  // Note: onMouseLeave removed for iOS Safari compatibility (prevents 2-tap issue)
 
   // Combine all styles
   const combinedStyles: React.CSSProperties = {
@@ -153,7 +153,6 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
         className={combinedClassName}
         style={combinedStyles}
         disabled={disabled || loading}
-        onMouseLeave={handleMouseLeave}
         onPointerDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         data-testid={(props as any)["data-testid"] || "floating-action-button"}

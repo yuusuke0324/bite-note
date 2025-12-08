@@ -205,17 +205,30 @@
   transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fish-species-autocomplete .suggestion-item:hover::before,
+/* Selected state (keyboard navigation) - always apply */
 .fish-species-autocomplete .suggestion-item.selected::before {
   opacity: 1;
 }
 
-.fish-species-autocomplete .suggestion-item:hover,
 .fish-species-autocomplete .suggestion-item.selected {
   background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(29, 78, 216, 0.25) 100%);
   transform: translateX(0.25rem);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
               0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover state - only for hover-capable devices (iOS Safari compatibility) */
+@media (hover: hover) and (pointer: fine) {
+  .fish-species-autocomplete .suggestion-item:hover::before {
+    opacity: 1;
+  }
+
+  .fish-species-autocomplete .suggestion-item:hover {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(29, 78, 216, 0.25) 100%);
+    transform: translateX(0.25rem);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
+                0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .fish-species-autocomplete .suggestion-item:active {
@@ -238,9 +251,14 @@
   transition: color 0.2s;
 }
 
-.fish-species-autocomplete .suggestion-item:hover .species-name,
 .fish-species-autocomplete .suggestion-item.selected .species-name {
   color: var(--color-accent-text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fish-species-autocomplete .suggestion-item:hover .species-name {
+    color: var(--color-accent-text);
+  }
 }
 
 .fish-species-autocomplete .species-category {
@@ -255,11 +273,18 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fish-species-autocomplete .suggestion-item:hover .species-category,
 .fish-species-autocomplete .suggestion-item.selected .species-category {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: #ffffff;
   transform: scale(1.05);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fish-species-autocomplete .suggestion-item:hover .species-category {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    transform: scale(1.05);
+  }
 }
 
 .fish-species-autocomplete .species-scientific {
@@ -271,9 +296,14 @@
   transition: color 0.2s;
 }
 
-.fish-species-autocomplete .suggestion-item:hover .species-scientific,
 .fish-species-autocomplete .suggestion-item.selected .species-scientific {
   color: var(--color-text-primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fish-species-autocomplete .suggestion-item:hover .species-scientific {
+    color: var(--color-text-primary);
+  }
 }
 
 .fish-species-autocomplete .no-results {
