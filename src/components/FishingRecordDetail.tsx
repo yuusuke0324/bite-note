@@ -144,14 +144,9 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     }
   }, [hasPrevious, onPrevious]);
 
-  // iOS Safari対応: refコールバックをメモ化してイベントリスナーの再登録を防ぐ
-  const setSwipeAndPhotoRefs = useCallback((node: HTMLDivElement | null) => {
-    (photoContainerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-    (swipeRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-  }, []);
-
   // スワイプフック（モバイルのみ有効化）
   // Note: handlersは使用しない（useSwipe内でネイティブイベントリスナーを自動登録）
+  // 重要: useSwipeが返すrefは読み取り専用のRefObject<T>なので、直接要素に設定する必要がある
   const { ref: swipeRef, state: swipeState } = useSwipe<HTMLDivElement>(
     {
       threshold: DEFAULT_SWIPE_CONFIG.DETAIL_THRESHOLD,
@@ -280,7 +275,9 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
 
   // 1ステップ目: 画像生成（情報オーバーレイ付きスクリーンキャプチャ）
   const handleSavePhotoWithInfo = async () => {
-    if (!photoContainerRef.current) {
+    // モバイルではswipeRef、デスクトップではphotoContainerRefを使用
+    const container = isMobile ? swipeRef.current : photoContainerRef.current;
+    if (!container) {
       logger.error('Photo container ref not found');
       return;
     }
@@ -289,8 +286,6 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     if (isSaving) return;
     setIsSaving(true);
     setShowContextMenu(false);
-
-    const container = photoContainerRef.current;
 
     // Elements to restore after capture
     const mapBar = container.querySelector('.photo-hero-card__map-bar') as HTMLElement | null;
@@ -1124,7 +1119,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           {/* モバイル: PhotoHeroCardを背景レイヤーとして固定配置 + スワイプナビゲーション */}
           {isMobile && (
             <div
-              ref={setSwipeAndPhotoRefs}
+              ref={swipeRef}
               style={{
                 position: 'absolute',
                 top: 0,
