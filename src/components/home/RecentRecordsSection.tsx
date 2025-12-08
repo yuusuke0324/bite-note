@@ -100,12 +100,7 @@ export const RecentRecordsSection: React.FC<RecentRecordsSectionProps> = ({
               alignItems: 'center',
               gap: '4px',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.primary[50];
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
+            className="hover-primary-50"
           >
             <span>もっと見る</span>
             <Icon icon={ArrowRight} size={16} decorative />

@@ -136,7 +136,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
 
   return (
     <div
-      className={`photo-based-record-card ${className}`}
+      className={`photo-based-record-card hover-card-lift ${className}`}
       onClick={handleCardClick}
       onPointerDown={(e) => createRipple(e)}
       role="button"
@@ -158,14 +158,6 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
         boxShadow: '0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)',
         border: `1px solid var(--color-border-light)`,
         fontFamily: typography.fontFamily.primary,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 4px 8px 3px rgba(60,64,67,.15), 0 1px 3px rgba(60,64,67,.3)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)';
       }}
     >
       {/* 写真部分 */}

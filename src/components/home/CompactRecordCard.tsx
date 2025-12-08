@@ -101,7 +101,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
 
   return (
     <div
-      className={`compact-record-card ${className}`}
+      className={`compact-record-card hover-compact-card ${className}`}
       onClick={handleClick}
       onPointerDown={(e) => createRipple(e)}
       role="button"
@@ -125,16 +125,6 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
         boxShadow: '0 1px 2px rgba(60,64,67,.1)',
         position: 'relative',
         overflow: 'hidden',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 2px 4px rgba(60,64,67,.2)';
-        e.currentTarget.style.borderColor = colors.primary[300];
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 1px 2px rgba(60,64,67,.1)';
-        e.currentTarget.style.borderColor = 'var(--color-border-light)';
       }}
     >
       {/* 写真サムネイル */}

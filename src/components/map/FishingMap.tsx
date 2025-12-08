@@ -718,6 +718,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
             <button
               onClick={() => setSelectedRecord(null)}
               aria-label="サマリパネルを閉じる"
+              className="hover-map-close-btn"
               style={{
                 position: 'absolute',
                 top: '8px',
@@ -735,12 +736,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-border-medium)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-surface-tertiary)';
               }}
             >
               <Icon icon={X} size={20} decorative />
@@ -826,6 +821,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   onRecordClick?.(selectedRecord);
                   setSelectedRecord(null);
                 }}
+                className="hover-map-detail-btn"
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -838,16 +834,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   cursor: 'pointer',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   boxShadow: '0 2px 8px rgba(26, 115, 232, 0.25)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[600];
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 115, 232, 0.35)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[500];
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(26, 115, 232, 0.25)';
                 }}
               >
                 詳細を見る
@@ -865,6 +851,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                       'noopener,noreferrer'
                     );
                   }}
+                  className="hover-map-google-btn"
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -880,14 +867,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <Globe size={16} />
@@ -946,6 +925,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               // 地図を初期表示に戻す
               setResetTrigger(prev => prev + 1);
             }}
+            className="hover-map-reset-btn"
             style={{
               width: '44px',
               height: '44px',
@@ -962,14 +942,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
             }}
             title="全体表示に戻す"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-panel-hover)';
-              e.currentTarget.style.boxShadow = '0 6px 32px rgba(0, 0, 0, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-panel-bg)';
-              e.currentTarget.style.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.15)';
-            }}
           >
             <Icon icon={Maximize2} size={20} decorative />
           </button>
@@ -1074,6 +1046,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   });
                   // 詳細モーダルは開かない（地図に集中）
                 }}
+                className={selectedRecord?.id !== record.id ? 'hover-map-record-item' : ''}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1085,16 +1058,6 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
                   border: selectedRecord?.id === record.id ? `2px solid rgba(96, 165, 250, 0.5)` : '2px solid transparent',
                   cursor: 'pointer',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedRecord?.id !== record.id) {
-                    e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedRecord?.id !== record.id) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
                 }}
               >
                 <div style={{

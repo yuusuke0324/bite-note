@@ -490,6 +490,173 @@ input[type="search"]::-webkit-search-results-decoration {
     transform: translateY(-1px) translateZ(0);
     box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
   }
+
+  /* iOS Safari対応: JavaScriptのonMouseEnter/Leaveを置き換えるCSSホバー */
+  .hover-surface-secondary:hover {
+    background-color: var(--color-surface-secondary) !important;
+  }
+
+  .hover-filter-clear:hover {
+    background-color: var(--color-primary-100) !important;
+    color: var(--color-primary-700) !important;
+  }
+
+  .hover-primary-button:hover {
+    background-color: var(--color-primary-600) !important;
+  }
+
+  .hover-primary-button-lift:hover {
+    background-color: var(--color-primary-600) !important;
+    transform: translateY(-2px);
+  }
+
+  .hover-card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .hover-header-button:hover {
+    background-color: var(--color-surface-tertiary) !important;
+  }
+
+  .hover-primary-50:hover {
+    background-color: var(--color-primary-50) !important;
+  }
+
+  .hover-primary-100:hover {
+    background-color: var(--color-primary-100) !important;
+  }
+
+  .hover-list-item:hover {
+    background-color: var(--color-surface-secondary) !important;
+    transform: translateX(4px);
+  }
+
+  .hover-compact-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(60, 64, 67, 0.2);
+    border-color: var(--color-primary-300) !important;
+  }
+
+  .hover-ranking-item:hover {
+    background-color: var(--color-surface-secondary) !important;
+    transform: translateX(2px);
+  }
+
+  /* コンテキストメニュー・モーダルボタン用 */
+  .hover-menu-item:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .hover-menu-item-danger:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+  }
+
+  .hover-action-button:hover {
+    background-color: var(--color-surface-secondary) !important;
+  }
+
+  .hover-icon-button:hover {
+    background-color: var(--color-surface-tertiary) !important;
+  }
+
+  .hover-map-button:hover {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* モーダルボタン用 */
+  .hover-cancel-button:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .hover-danger-button:hover {
+    background: #dc2626 !important;
+  }
+
+  /* Button コンポーネント用 hover */
+  .btn-hover-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-600) !important;
+    box-shadow: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-hover-secondary:hover:not(:disabled) {
+    background-color: var(--color-secondary-600) !important;
+    box-shadow: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-hover-outlined:hover:not(:disabled) {
+    background-color: var(--color-primary-50) !important;
+    transform: translateY(-1px);
+  }
+
+  .btn-hover-text:hover:not(:disabled) {
+    background-color: var(--color-primary-50) !important;
+  }
+
+  .btn-hover-danger:hover:not(:disabled) {
+    background-color: #D32F2F !important;
+    box-shadow: 0 4px 8px 3px rgba(234, 67, 53, 0.15), 0 1px 3px rgba(234, 67, 53, 0.3);
+    transform: translateY(-1px);
+  }
+
+  /* FloatingActionButton用 hover */
+  .fab-hover:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  /* ModernCard用 hover */
+  .modern-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Form button hover */
+  .hover-submit-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  }
+
+  .hover-cancel-form-button:hover:not(:disabled) {
+    background-color: #5a6268 !important;
+    transform: translateY(-1px);
+  }
+
+  /* FishingMap hover classes */
+  .hover-map-close-btn:hover {
+    background-color: var(--color-border-medium) !important;
+  }
+
+  .hover-map-detail-btn:hover {
+    background-color: var(--color-primary-600) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35) !important;
+  }
+
+  .hover-map-google-btn:hover {
+    background-color: rgba(34, 197, 94, 0.1) !important;
+    transform: translateY(-1px);
+  }
+
+  .hover-map-reset-btn:hover {
+    background-color: var(--color-panel-hover) !important;
+    box-shadow: 0 6px 32px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .hover-map-record-item:hover {
+    background-color: var(--color-surface-hover) !important;
+  }
+
+  /* PWAInstallBanner hover classes */
+  .hover-pwa-install-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .hover-pwa-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
 }
 
 .glass-badge-wrapper--interactive:active .glass-badge-glass {

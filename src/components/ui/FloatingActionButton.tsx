@@ -86,29 +86,10 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     },
   };
 
-  // Hover styles
-  const getHoverStyles = (variant: string): React.CSSProperties => {
-    if (disabled || loading) return {};
-
-    const hoverStyles: Record<string, React.CSSProperties> = {
-      primary: {
-        backgroundColor: colors.primary[600],
-        boxShadow: '0 8px 12px 6px rgba(60,64,67,.15), 0 4px 4px rgba(60,64,67,.3)',
-        transform: 'scale(1.05)',
-      },
-      secondary: {
-        backgroundColor: colors.secondary[600],
-        boxShadow: '0 8px 12px 6px rgba(60,64,67,.15), 0 4px 4px rgba(60,64,67,.3)',
-        transform: 'scale(1.05)',
-      },
-      accent: {
-        backgroundColor: colors.accent[600],
-        boxShadow: '0 8px 12px 6px rgba(255,107,53,.15), 0 4px 4px rgba(255,107,53,.3)',
-        transform: 'scale(1.05)',
-      },
-    };
-
-    return hoverStyles[variant] || {};
+  // Hover CSS class (iOS Safari対応: CSSで@media (hover: hover)を使用)
+  const getHoverClassName = (): string => {
+    if (disabled || loading) return '';
+    return 'fab-hover';
   };
 
   // Loading spinner
@@ -132,15 +113,9 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     size: 80,
   });
 
-  // Handle mouse events
-  const [isHovered, setIsHovered] = React.useState(false);
+  // Handle mouse/pointer events
   const [isPressed, setIsPressed] = React.useState(false);
 
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setIsPressed(false);
-  };
   const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
     setIsPressed(true);
     if (!disabled && !loading) {
@@ -148,15 +123,18 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     }
   };
   const handleMouseUp = () => setIsPressed(false);
+  // Note: onMouseLeave removed for iOS Safari compatibility (prevents 2-tap issue)
 
   // Combine all styles
   const combinedStyles: React.CSSProperties = {
     ...baseStyles,
     ...sizeStyles[size],
     ...variantStyles[variant],
-    ...(isHovered ? getHoverStyles(variant) : {}),
     ...(isPressed && !disabled && !loading ? { transform: 'scale(0.95)' } : {}),
   };
+
+  // Combine class names
+  const combinedClassName = [className, getHoverClassName()].filter(Boolean).join(' ');
 
   return (
     <>
@@ -172,11 +150,9 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
 
       <button
         ref={ref}
-        className={className}
+        className={combinedClassName}
         style={combinedStyles}
         disabled={disabled || loading}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         onPointerDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         data-testid={(props as any)["data-testid"] || "floating-action-button"}

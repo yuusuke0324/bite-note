@@ -97,36 +97,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     },
   };
 
-  // Hover styles (applied via onMouseEnter/Leave)
-  const getHoverStyles = (variant: string): React.CSSProperties => {
-    if (disabled || loading) return {};
-
-    const hoverStyles: Record<string, React.CSSProperties> = {
-      primary: {
-        backgroundColor: colors.primary[600],
-        boxShadow: '0 4px 8px 3px rgba(60,64,67,.15), 0 1px 3px rgba(60,64,67,.3)',
-        transform: 'translateY(-1px)',
-      },
-      secondary: {
-        backgroundColor: colors.secondary[600],
-        boxShadow: '0 4px 8px 3px rgba(60,64,67,.15), 0 1px 3px rgba(60,64,67,.3)',
-        transform: 'translateY(-1px)',
-      },
-      outlined: {
-        backgroundColor: colors.primary[50],
-        transform: 'translateY(-1px)',
-      },
-      text: {
-        backgroundColor: colors.primary[50],
-      },
-      danger: {
-        backgroundColor: '#D32F2F',
-        boxShadow: '0 4px 8px 3px rgba(234,67,53,.15), 0 1px 3px rgba(234,67,53,.3)',
-        transform: 'translateY(-1px)',
-      },
+  // Hover CSS classes (iOS Safari対応: CSSで@media (hover: hover)を使用)
+  const getHoverClassName = (variant: string): string => {
+    if (disabled || loading) return '';
+    const hoverClasses: Record<string, string> = {
+      primary: 'btn-hover-primary',
+      secondary: 'btn-hover-secondary',
+      outlined: 'btn-hover-outlined',
+      text: 'btn-hover-text',
+      danger: 'btn-hover-danger',
     };
-
-    return hoverStyles[variant] || {};
+    return hoverClasses[variant] || '';
   };
 
   // Loading spinner component
@@ -153,11 +134,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     size: 80,
   });
 
-  // Handle mouse events for hover effects
-  const [isHovered, setIsHovered] = React.useState(false);
-
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => setIsHovered(false);
+  // Handle pointer down for ripple effect
   const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled && !loading) {
       createRipple(e);
@@ -169,8 +146,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     ...baseStyles,
     ...sizeStyles[size],
     ...variantStyles[variant],
-    ...(isHovered ? getHoverStyles(variant) : {}),
   };
+
+  // Combine class names
+  const combinedClassName = [className, getHoverClassName(variant)].filter(Boolean).join(' ');
 
   return (
     <>
@@ -186,11 +165,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
 
       <button
         ref={ref}
-        className={className}
+        className={combinedClassName}
         style={combinedStyles}
         disabled={disabled || loading}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         onPointerDown={handleMouseDown}
         {...props}
       >

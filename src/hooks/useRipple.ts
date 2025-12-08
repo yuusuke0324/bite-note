@@ -84,8 +84,8 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
       // これにより、ポインタダウン→クリックのイベント判定が完了した後にDOM変更が行われ、
       // クリックイベントの発火を阻害しない
       setTimeout(() => {
-        // 要素がまだDOMに存在するか確認
-        if (!element.isConnected) return;
+        // 要素がまだDOMに存在するか確認（テスト環境のteardown対応）
+        if (typeof window === 'undefined' || !element.isConnected) return;
 
         const ripple = document.createElement('span');
         ripple.className = prefersReducedMotion ? 'ripple ripple-reduced' : 'ripple';
@@ -103,7 +103,8 @@ export function useRipple<T extends HTMLElement = HTMLElement>(
         // アニメーション完了後に要素を削除
         const cleanupDuration = prefersReducedMotion ? 300 : duration;
         setTimeout(() => {
-          if (ripple.parentNode) {
+          // テスト環境のteardown対応
+          if (typeof document !== 'undefined' && ripple.parentNode) {
             ripple.remove();
           }
         }, cleanupDuration);
