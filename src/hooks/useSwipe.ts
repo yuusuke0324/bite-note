@@ -194,6 +194,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const reset = useCallback(() => {
     cancelCurrentAnimation();
+    // iOS Safari対応: refを即時更新（setStateは非同期のため）
+    isSwipingRef.current = false;
     setState({
       isSwiping: false,
       progress: 0,
@@ -342,6 +344,9 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       startTime.current = Date.now();
       hasTriggeredHaptic.current = false;
 
+      // iOS Safari対応: refを即時更新（setStateは非同期のため）
+      // pointermoveイベントが発火する前にisSwipingRef.currentがtrueになっている必要がある
+      isSwipingRef.current = true;
       setState((prev) => ({
         ...prev,
         isSwiping: true,
