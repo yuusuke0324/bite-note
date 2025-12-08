@@ -1112,7 +1112,6 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 fullscreen={true}
                 transparentInfo={true}
                 fitMode={photoFitMode}
-                disableRipple={true}
               />
 
               {/* スワイプインジケーター */}

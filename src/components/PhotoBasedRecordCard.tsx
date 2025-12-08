@@ -7,7 +7,6 @@ import type { FishingRecord } from '../types';
 import { logger } from '../lib/errors/logger';
 import { Icon } from './ui/Icon';
 import { Fish, MapPin, CloudSun, Waves, FileText, Ruler, Pencil, Trash2 } from 'lucide-react';
-import { useRipple } from '../hooks/useRipple';
 
 interface PhotoBasedRecordCardProps {
   record: FishingRecord;
@@ -30,13 +29,6 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
   const [photoLoading, setPhotoLoading] = useState(true);
   const [photoError, setPhotoError] = useState(false);
   const photoUrlRef = React.useRef<string | null>(null);
-
-  // リップル効果
-  const { createRipple } = useRipple<HTMLDivElement>({
-    color: 'rgba(100, 100, 100, 0.2)',
-    duration: 500,
-    size: 120,
-  });
 
   // 写真の読み込み
   useEffect(() => {
@@ -138,7 +130,6 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
     <div
       className={`photo-based-record-card hover-card-lift ${className}`}
       onClick={handleCardClick}
-      onPointerDown={(e) => createRipple(e)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
