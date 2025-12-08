@@ -105,18 +105,13 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     />
   );
 
-  // Handle mouse/pointer events for press feedback
-  const [isPressed, setIsPressed] = React.useState(false);
-
-  const handleMouseDown = () => setIsPressed(true);
-  const handleMouseUp = () => setIsPressed(false);
-
   // Combine all styles
+  // Note: Press feedback is handled via CSS :active pseudo-class (fab-active)
+  // to avoid iOS Safari tap detection issues with JavaScript state management
   const combinedStyles: React.CSSProperties = {
     ...baseStyles,
     ...sizeStyles[size],
     ...variantStyles[variant],
-    ...(isPressed && !disabled && !loading ? { transform: 'scale(0.95)' } : {}),
   };
 
   // Combine class names
@@ -136,11 +131,9 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
 
       <button
         ref={ref}
-        className={combinedClassName}
+        className={`${combinedClassName} fab-active`}
         style={combinedStyles}
         disabled={disabled || loading}
-        onPointerDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
         data-testid={(props as any)["data-testid"] || "floating-action-button"}
         {...props}
       >
