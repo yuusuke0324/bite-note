@@ -145,7 +145,8 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
   }, [hasPrevious, onPrevious]);
 
   // スワイプフック（モバイルのみ有効化）
-  const { ref: swipeRef, state: swipeState, handlers: swipeHandlers } = useSwipe<HTMLDivElement>(
+  // Note: handlersは使用しない（useSwipe内でネイティブイベントリスナーを自動登録）
+  const { ref: swipeRef, state: swipeState } = useSwipe<HTMLDivElement>(
     {
       threshold: DEFAULT_SWIPE_CONFIG.DETAIL_THRESHOLD,
       velocityThreshold: DEFAULT_SWIPE_CONFIG.DETAIL_VELOCITY_THRESHOLD,
@@ -1129,9 +1130,10 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 right: 0,
                 bottom: 0,
                 zIndex: 5,
-                touchAction: 'pan-y', // 垂直スクロールを許可、水平スワイプを処理
+                // iOS Safari対応: pan-x pan-yで水平・垂直両方のタッチ操作を有効化
+                touchAction: 'pan-x pan-y',
               }}
-              {...swipeHandlers}
+              // Note: swipeHandlersは削除（useSwipe内でネイティブイベントリスナーを自動登録）
             >
               <PhotoHeroCard
                 record={record}

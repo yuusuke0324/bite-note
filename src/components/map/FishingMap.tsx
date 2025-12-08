@@ -348,7 +348,8 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
   }, [currentNearbyIndex, nearbyRecords]);
 
   // スワイプフック（MapPopup用）
-  const { ref: mapSwipeRef, handlers: mapSwipeHandlers } = useSwipe<HTMLDivElement>(
+  // Note: handlersは使用しない（useSwipe内でネイティブイベントリスナーを自動登録）
+  const { ref: mapSwipeRef } = useSwipe<HTMLDivElement>(
     {
       threshold: DEFAULT_SWIPE_CONFIG.POPUP_THRESHOLD,
       velocityThreshold: DEFAULT_SWIPE_CONFIG.POPUP_VELOCITY_THRESHOLD,
@@ -696,7 +697,7 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
         {selectedRecord && (
           <div
             ref={isMobile ? mapSwipeRef : undefined}
-            {...(isMobile ? mapSwipeHandlers : {})}
+            // Note: swipeHandlersは削除（useSwipe内でネイティブイベントリスナーを自動登録）
             style={{
               position: 'absolute',
               top: '16px',
@@ -711,7 +712,8 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
               padding: '16px 20px',
               border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
-              touchAction: isMobile ? 'pan-y' : 'auto',
+              // iOS Safari対応: pan-x pan-yで水平・垂直両方のタッチ操作を有効化
+              touchAction: isMobile ? 'pan-x pan-y' : 'auto',
             }}
           >
             {/* 閉じるボタン - iOS HIG準拠 44x44px */}

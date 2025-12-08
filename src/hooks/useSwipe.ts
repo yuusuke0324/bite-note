@@ -86,13 +86,12 @@ export interface UseSwipeReturn<T extends HTMLElement> {
   state: SwipeState;
   /** スワイプをリセット */
   reset: () => void;
-  /** イベントハンドラ（手動バインド用） */
-  handlers: {
-    onPointerDown: (e: React.PointerEvent<T>) => void;
-    onPointerMove: (e: React.PointerEvent<T>) => void;
-    onPointerUp: (e: React.PointerEvent<T>) => void;
-    onPointerCancel: (e: React.PointerEvent<T>) => void;
-  };
+  /**
+   * @deprecated イベントハンドラは自動的にrefに登録されます。
+   * iOS Safari対応のため、ネイティブイベントリスナー（passive: false）を使用しています。
+   * handlersをスプレッドする必要はありません。refを設定するだけで動作します。
+   */
+  handlers: Record<string, never>;
 }
 
 /**
@@ -553,15 +552,57 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
     };
   }, [cancelCurrentAnimation]);
 
+  /**
+   * iOS Safari対応: ネイティブイベントリスナーを使用
+   *
+   * React SyntheticEventは passive: false を設定できないため、
+   * iOS SafariではpreventDefault()が効かず水平スワイプがブロックされる問題がある。
+   * ネイティブイベントリスナーで passive: false を明示的に設定することで解決。
+   */
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      onPointerDown(e as unknown as React.PointerEvent<T>);
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      // スワイプ中はブラウザのデフォルトスクロールを防止
+      if (state.isSwiping) {
+        e.preventDefault();
+      }
+      onPointerMove(e as unknown as React.PointerEvent<T>);
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      onPointerUp(e as unknown as React.PointerEvent<T>);
+    };
+
+    const handlePointerCancel = (e: PointerEvent) => {
+      onPointerCancel(e as unknown as React.PointerEvent<T>);
+    };
+
+    // passive: false でイベントリスナーを登録（iOS Safari対応）
+    element.addEventListener('pointerdown', handlePointerDown);
+    element.addEventListener('pointermove', handlePointerMove, { passive: false });
+    element.addEventListener('pointerup', handlePointerUp);
+    element.addEventListener('pointercancel', handlePointerCancel);
+
+    return () => {
+      element.removeEventListener('pointerdown', handlePointerDown);
+      element.removeEventListener('pointermove', handlePointerMove);
+      element.removeEventListener('pointerup', handlePointerUp);
+      element.removeEventListener('pointercancel', handlePointerCancel);
+    };
+  }, [onPointerDown, onPointerMove, onPointerUp, onPointerCancel, state.isSwiping]);
+
   return {
     ref,
     state,
     reset,
-    handlers: {
-      onPointerDown,
-      onPointerMove,
-      onPointerUp,
-      onPointerCancel,
-    },
+    // handlersは後方互換性のために空オブジェクトを返す
+    // イベントリスナーは上記useEffectで自動的にrefに登録される
+    handlers: {} as Record<string, never>,
   };
 }
