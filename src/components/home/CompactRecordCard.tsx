@@ -126,16 +126,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
         position: 'relative',
         overflow: 'hidden',
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 2px 4px rgba(60,64,67,.2)';
-        e.currentTarget.style.borderColor = colors.primary[300];
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 1px 2px rgba(60,64,67,.1)';
-        e.currentTarget.style.borderColor = 'var(--color-border-light)';
-      }}
+      className="hover-compact-card"
     >
       {/* 写真サムネイル */}
       <div

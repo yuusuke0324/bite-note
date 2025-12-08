@@ -777,12 +777,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                             transition: 'background 0.2s ease',
                             minHeight: '44px'
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                          }}
+                          className="hover-menu-item"
                         >
                           <Icon icon={Download} size={16} decorative />
                           <span>保存</span>
@@ -810,12 +805,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                             transition: 'background 0.2s ease',
                             minHeight: '44px'
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                          }}
+                          className="hover-menu-item"
                         >
                           <Icon icon={Edit} size={16} decorative />
                           <span>編集</span>
@@ -843,12 +833,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                             transition: 'background 0.2s ease',
                             minHeight: '44px'
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                          }}
+                          className="hover-menu-item-danger"
                         >
                           <Icon icon={Trash2} size={16} decorative />
                           <span>削除</span>
@@ -893,12 +878,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                     justifyContent: 'center',
                     transition: 'background 0.2s ease'
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.5)';
-                  }}
+                  className="hover-map-button"
                   aria-label="アクションメニュー"
                   title="メニュー"
                 >
@@ -941,12 +921,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                           transition: 'background 0.2s ease',
                           minHeight: '44px'
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                        }}
+                        className="hover-menu-item"
                       >
                         <Icon icon={Download} size={16} decorative />
                         <span>保存</span>
@@ -974,12 +949,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                           transition: 'background 0.2s ease',
                           minHeight: '44px'
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                        }}
+                        className="hover-menu-item"
                       >
                         <Icon icon={Edit} size={16} decorative />
                         <span>編集</span>
@@ -1007,12 +977,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                           transition: 'background 0.2s ease',
                           minHeight: '44px'
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                        }}
+                        className="hover-menu-item-danger"
                       >
                         <Icon icon={Trash2} size={16} decorative />
                         <span>削除</span>
@@ -1040,12 +1005,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 justifyContent: 'center',
                 transition: 'background 0.2s ease'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.5)';
-              }}
+              className="hover-map-button"
               aria-label="詳細を閉じる"
               title="閉じる"
             >
@@ -1339,12 +1299,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   minHeight: '48px',
                   transition: 'background 0.2s ease'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                }}
+                className="hover-cancel-button"
               >
                 キャンセル
               </button>
@@ -1363,12 +1318,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                   minHeight: '48px',
                   transition: 'background 0.2s ease'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#dc2626';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#ef4444';
-                }}
+                className="hover-danger-button"
               >
                 削除
               </button>

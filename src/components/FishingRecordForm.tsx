@@ -1231,20 +1231,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
               transform: 'translateY(0)',
               width: '100%'
             }}
-            onMouseEnter={(e) => {
-              if (!(!isValid || isSubmitting || isLoading || photoUploading)) {
-                const target = e.target as HTMLElement;
-                target.style.transform = 'translateY(-1px)';
-                target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.4)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              const target = e.target as HTMLElement;
-              target.style.transform = 'translateY(0)';
-              target.style.boxShadow = !isValid || isSubmitting || isLoading || photoUploading
-                ? 'none'
-                : '0 2px 8px rgba(40, 167, 69, 0.3)';
-            }}
+            className="hover-submit-button"
           >
             {isSubmitting || isLoading || photoUploading ? (
               <>
@@ -1288,20 +1275,7 @@ export const FishingRecordForm: React.FC<FishingRecordFormProps> = ({
                 ? 'none'
                 : '0 2px 4px rgba(108, 117, 125, 0.2)'
             }}
-            onMouseEnter={(e) => {
-              if (!(isSubmitting || isLoading)) {
-                const target = e.target as HTMLElement;
-                target.style.backgroundColor = '#5a6268';
-                target.style.transform = 'translateY(-1px)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!(isSubmitting || isLoading)) {
-                const target = e.target as HTMLElement;
-                target.style.backgroundColor = '#6c757d';
-                target.style.transform = 'translateY(0)';
-              }
-            }}
+            className="hover-cancel-form-button"
           >
             <Icon icon={RefreshCw} size={16} decorative /> リセット
           </button>

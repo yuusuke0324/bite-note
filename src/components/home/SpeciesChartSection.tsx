@@ -280,16 +280,7 @@ export const SpeciesChartSection: React.FC<SpeciesChartSectionProps> = ({
                   cursor: onSpeciesClick && item.name !== 'その他' ? 'pointer' : 'default',
                   transition: 'all 0.2s ease',
                 }}
-                onMouseEnter={(e) => {
-                  if (onSpeciesClick && item.name !== 'その他') {
-                    e.currentTarget.style.backgroundColor = 'var(--color-surface-secondary)';
-                    e.currentTarget.style.transform = 'translateX(4px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-surface-primary)';
-                  e.currentTarget.style.transform = 'translateX(0)';
-                }}
+                className={onSpeciesClick && item.name !== 'その他' ? 'hover-list-item' : ''}
               >
                 {/* カラーアイコン */}
                 <div style={{

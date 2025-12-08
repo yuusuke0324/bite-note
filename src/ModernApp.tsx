@@ -624,12 +624,7 @@ function ModernApp() {
               justifyContent: 'center',
               transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.surface.secondary;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.surface.tertiary;
-            }}
+            className="hover-surface-secondary"
             title="クリア"
           >
             <X size={14} aria-hidden="true" />
@@ -727,14 +722,7 @@ function ModernApp() {
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.primary[100];
-                  e.currentTarget.style.color = colors.primary[700];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colors.surface.tertiary;
-                  e.currentTarget.style.color = colors.text.secondary;
-                }}
+                className="hover-filter-clear"
               >
                 クリア
               </button>
@@ -975,14 +963,7 @@ function ModernApp() {
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.primary[600];
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.primary[500];
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
+            className="hover-primary-button-lift"
           >
             すべてのフィルターをクリア
           </button>
@@ -1512,12 +1493,7 @@ function ModernApp() {
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = colors.primary[600];
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = colors.primary[500];
-                    }}
+                    className="hover-primary-button"
                   >
                     フィルタークリア
                   </button>
