@@ -154,7 +154,15 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
     onEdgeReached,
   } = callbacks;
 
-  const ref = useRef<T>(null);
+  // 要素をstateで管理することで、要素がアタッチされた時にuseEffectが再実行される
+  // これにより、条件付きレンダリング（isMobile && ...）でも正しく動作する
+  const [element, setElement] = useState<T | null>(null);
+  const ref = useCallback((node: T | null) => {
+    setElement(node);
+  }, []) as React.RefCallback<T> & { current: T | null };
+  // RefObject互換性のためcurrentプロパティを追加
+  (ref as { current: T | null }).current = element;
+
   const animationRef = useRef<number | null>(null);
   const isAnimating = useRef(false);
 
@@ -590,7 +598,6 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    * 古い値を参照してしまう可能性がある。refを使うことで常に最新値を参照できる。
    */
   useEffect(() => {
-    const element = ref.current;
     if (!element) return;
 
     // PointerEvent → React.PointerEvent への変換ヘルパー
@@ -660,8 +667,9 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
         element.removeEventListener('touchcancel', handlePointerCancel as EventListener);
       }
     };
-  }, [onPointerDown, onPointerMove, onPointerUp, onPointerCancel]);
-  // 注意: state.isSwiping は依存配列から除外（isSwipingRef経由で参照）
+  }, [element, onPointerDown, onPointerMove, onPointerUp, onPointerCancel]);
+  // 注意: elementを依存配列に含めることで、条件付きレンダリング後も正しく動作
+  // state.isSwiping は依存配列から除外（isSwipingRef経由で参照）
 
   return {
     ref,
