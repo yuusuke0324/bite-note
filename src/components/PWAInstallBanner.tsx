@@ -173,6 +173,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
       <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
         <button
           onClick={handleInstall}
+          className="hover-pwa-install-btn"
           style={{
             backgroundColor: 'rgba(255,255,255,0.2)',
             color: 'white',
@@ -185,17 +186,12 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
             transition: 'background-color 0.2s ease',
             whiteSpace: 'nowrap',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
-          }}
         >
           インストール
         </button>
         <button
           onClick={handleDismiss}
+          className="hover-pwa-close-btn"
           style={{
             backgroundColor: 'transparent',
             color: 'white',
@@ -210,12 +206,6 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({ className = 
             justifyContent: 'center',
             transition: 'background-color 0.2s ease',
             flexShrink: 0,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
           }}
           aria-label="閉じる"
         >

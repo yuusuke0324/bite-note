@@ -1,4 +1,4 @@
-import React, { type ReactNode, useState } from 'react';
+import React, { type ReactNode } from 'react';
 import { useRipple } from '../../hooks/useRipple';
 
 interface ModernCardProps {
@@ -8,8 +8,6 @@ interface ModernCardProps {
   interactive?: boolean;
   loading?: boolean;
   onClick?: () => void;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
   className?: string;
   style?: React.CSSProperties;
   'data-testid'?: string;
@@ -22,13 +20,10 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   interactive = false,
   loading = false,
   onClick,
-  onMouseEnter,
-  onMouseLeave,
   className = '',
   style = {},
   'data-testid': dataTestId
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const isClickable = interactive || !!onClick;
 
   // リップル効果（インタラクティブな場合のみ）
@@ -71,10 +66,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
     const variants = {
       elevated: {
         backgroundColor: 'var(--color-surface-primary)',
-        boxShadow: isHovered
-          ? '0 12px 48px rgba(31, 38, 135, 0.2)'
-          : '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
-        transform: isHovered && isClickable ? 'translateY(-4px)' : 'translateY(0)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
         border: '1px solid var(--color-border-light)',
       },
       outlined: {
@@ -88,6 +80,12 @@ export const ModernCard: React.FC<ModernCardProps> = ({
       },
     };
     return variants[variant];
+  };
+
+  // Hover CSS class (iOS Safari対応)
+  const getHoverClassName = (): string => {
+    if (!isClickable) return '';
+    return 'modern-card-hover';
   };
 
   const loadingOverlayStyles: React.CSSProperties = {
@@ -134,20 +132,12 @@ export const ModernCard: React.FC<ModernCardProps> = ({
       </style>
       <div
         style={combinedStyles}
-        className={className}
+        className={[className, getHoverClassName()].filter(Boolean).join(' ')}
         onClick={onClick}
         onPointerDown={(e) => {
           if (isClickable) {
             createRipple(e as unknown as React.MouseEvent<HTMLDivElement>);
           }
-        }}
-        onMouseEnter={() => {
-          setIsHovered(true);
-          onMouseEnter?.();
-        }}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          onMouseLeave?.();
         }}
         data-testid={dataTestId}
       >

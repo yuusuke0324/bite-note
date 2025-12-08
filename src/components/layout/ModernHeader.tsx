@@ -123,12 +123,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
           <button
             style={menuButtonStyles}
             onClick={onMenuClick}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
+            className="hover-icon-button"
             aria-label="メニューを開く"
           >
             <MenuIcon />
