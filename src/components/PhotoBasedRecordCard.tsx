@@ -136,7 +136,7 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
 
   return (
     <div
-      className={`photo-based-record-card ${className}`}
+      className={`photo-based-record-card hover-card-lift ${className}`}
       onClick={handleCardClick}
       onPointerDown={(e) => createRipple(e)}
       role="button"
@@ -159,7 +159,6 @@ export const PhotoBasedRecordCard: React.FC<PhotoBasedRecordCardProps> = React.m
         border: `1px solid var(--color-border-light)`,
         fontFamily: typography.fontFamily.primary,
       }}
-      className="hover-card-lift"
     >
       {/* 写真部分 */}
       <div style={{

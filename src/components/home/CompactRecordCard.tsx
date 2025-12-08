@@ -101,7 +101,7 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
 
   return (
     <div
-      className={`compact-record-card ${className}`}
+      className={`compact-record-card hover-compact-card ${className}`}
       onClick={handleClick}
       onPointerDown={(e) => createRipple(e)}
       role="button"
@@ -126,7 +126,6 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
         position: 'relative',
         overflow: 'hidden',
       }}
-      className="hover-compact-card"
     >
       {/* 写真サムネイル */}
       <div
