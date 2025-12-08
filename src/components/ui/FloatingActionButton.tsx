@@ -1,6 +1,5 @@
 import React, { forwardRef, type ReactNode } from 'react';
 import { colors } from '../../theme/colors';
-import { useRipple } from '../../hooks/useRipple';
 
 export interface FloatingActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'md' | 'lg';
@@ -106,24 +105,11 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
     />
   );
 
-  // Ripple effect
-  const { createRipple } = useRipple<HTMLButtonElement>({
-    color: 'rgba(255, 255, 255, 0.4)',
-    duration: 600,
-    size: 80,
-  });
-
-  // Handle mouse/pointer events
+  // Handle mouse/pointer events for press feedback
   const [isPressed, setIsPressed] = React.useState(false);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setIsPressed(true);
-    if (!disabled && !loading) {
-      createRipple(e);
-    }
-  };
+  const handleMouseDown = () => setIsPressed(true);
   const handleMouseUp = () => setIsPressed(false);
-  // Note: onMouseLeave removed for iOS Safari compatibility (prevents 2-tap issue)
 
   // Combine all styles
   const combinedStyles: React.CSSProperties = {

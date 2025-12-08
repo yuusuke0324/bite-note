@@ -1,5 +1,4 @@
 import React, { type ReactNode } from 'react';
-import { useRipple } from '../../hooks/useRipple';
 
 interface ModernCardProps {
   children: ReactNode;
@@ -25,13 +24,6 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   'data-testid': dataTestId
 }) => {
   const isClickable = interactive || !!onClick;
-
-  // リップル効果（インタラクティブな場合のみ）
-  const { createRipple } = useRipple<HTMLDivElement>({
-    color: 'rgba(100, 100, 100, 0.2)',
-    duration: 500,
-    size: 120,
-  });
 
   const getBaseStyles = (): React.CSSProperties => ({
     borderRadius: '16px',
@@ -134,11 +126,6 @@ export const ModernCard: React.FC<ModernCardProps> = ({
         style={combinedStyles}
         className={[className, getHoverClassName()].filter(Boolean).join(' ')}
         onClick={onClick}
-        onPointerDown={(e) => {
-          if (isClickable) {
-            createRipple(e as unknown as React.MouseEvent<HTMLDivElement>);
-          }
-        }}
         data-testid={dataTestId}
       >
         {children}

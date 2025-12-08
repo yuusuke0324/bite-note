@@ -16,7 +16,6 @@ import { GlassBadge } from '../ui/GlassBadge';
 import { GlassPanel } from '../ui/GlassPanel';
 import { SkeletonPhotoHeroCard } from '../ui/SkeletonPhotoHeroCard';
 import { FishIcon } from '../ui/FishIcon';
-import { useRipple } from '../../hooks/useRipple';
 import type { TideChartData } from '../chart/tide/types';
 import { photoService } from '../../lib/photo-service';
 import { logger } from '../../lib/errors/logger';
@@ -50,8 +49,6 @@ export interface PhotoHeroCardProps {
   transparentInfo?: boolean;
   /** Photo fit mode for fullscreen: 'cover' fills screen (may crop), 'contain' shows full photo */
   fitMode?: 'cover' | 'contain';
-  /** Disable ripple effect (recommended for fullscreen/overlay layouts) */
-  disableRipple?: boolean;
 }
 
 /**
@@ -213,19 +210,11 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
   fullscreen = false,
   transparentInfo = false,
   fitMode = 'cover',
-  disableRipple = false,
 }) => {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
-
-  // Ripple effect for card tap
-  const { createRipple } = useRipple<HTMLDivElement>({
-    color: 'rgba(255, 255, 255, 0.3)',
-    duration: 600,
-    size: 150,
-  });
 
   // Load photo data
   const loadPhoto = useCallback(async () => {
@@ -273,16 +262,6 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
     [loadPhoto]
   );
 
-  // Ripple handler (fires on pointer down for immediate feedback)
-  // Skip ripple when disableRipple is true (fullscreen/overlay layouts)
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (disableRipple) return;
-      createRipple(e as unknown as React.MouseEvent<HTMLDivElement>);
-    },
-    [createRipple, disableRipple]
-  );
-
   // Click handler
   const handleClick = useCallback(() => {
     onClick?.(record);
@@ -328,7 +307,6 @@ export const PhotoHeroCard: React.FC<PhotoHeroCardProps> = ({
     <div
       className={`photo-hero-card card-hover-effect ${fullscreen ? `photo-hero-card--fullscreen photo-hero-card--fit-${fitMode}` : `photo-hero-card--${variant}`} ${isBestCatch ? 'photo-hero-card--best-catch' : ''} ${transparentInfo ? 'photo-hero-card--transparent-info' : ''} ${className}`}
       onClick={handleClick}
-      onPointerDown={handlePointerDown}
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}

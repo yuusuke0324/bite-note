@@ -1,6 +1,5 @@
 import React from 'react';
 import { colors } from '../../theme/colors';
-import { useRipple } from '../../hooks/useRipple';
 
 interface NavigationItem {
   id: string;
@@ -17,7 +16,7 @@ interface BottomNavigationProps {
   className?: string;
 }
 
-// 個別のナビゲーションアイテムコンポーネント（リップル効果用）
+// 個別のナビゲーションアイテムコンポーネント
 const NavItem: React.FC<{
   item: NavigationItem;
   onItemClick: (id: string) => void;
@@ -25,23 +24,16 @@ const NavItem: React.FC<{
   iconStyles: React.CSSProperties;
   badgeStyles: React.CSSProperties;
 }> = ({ item, onItemClick, itemStyles, iconStyles, badgeStyles }) => {
-  const { createRipple } = useRipple<HTMLButtonElement>({
-    color: item.active ? 'rgba(59, 130, 246, 0.3)' : 'rgba(100, 100, 100, 0.3)',
-    duration: 500,
-    size: 60,
-  });
-
   return (
     <button
       key={item.id}
       data-testid={item.testId || `nav-${item.id}`}
       style={{
         ...itemStyles(item.active || false),
-        overflow: 'hidden', // リップル効果のクリッピング用
-        border: 'none', // デフォルトボタンスタイル削除
+        overflow: 'hidden',
+        border: 'none',
       }}
       onClick={() => onItemClick(item.id)}
-      onPointerDown={(e) => createRipple(e as unknown as React.MouseEvent<HTMLButtonElement>)}
       aria-label={item.label}
       aria-selected={item.active}
       aria-current={item.active ? 'page' : undefined}

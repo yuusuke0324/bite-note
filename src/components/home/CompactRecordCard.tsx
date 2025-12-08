@@ -12,7 +12,6 @@ import type { FishingRecord } from '../../types';
 import { logger } from '../../lib/errors/logger';
 import { Icon } from '../ui/Icon';
 import { Fish, MapPin, Clock } from 'lucide-react';
-import { useRipple } from '../../hooks/useRipple';
 
 interface CompactRecordCardProps {
   record: FishingRecord;
@@ -28,13 +27,6 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoLoading, setPhotoLoading] = useState(true);
   const photoUrlRef = React.useRef<string | null>(null);
-
-  // リップル効果
-  const { createRipple } = useRipple<HTMLDivElement>({
-    color: 'rgba(100, 100, 100, 0.2)',
-    duration: 500,
-    size: 120,
-  });
 
   // 写真の読み込み
   useEffect(() => {
@@ -103,7 +95,6 @@ export const CompactRecordCard: React.FC<CompactRecordCardProps> = React.memo(({
     <div
       className={`compact-record-card hover-compact-card ${className}`}
       onClick={handleClick}
-      onPointerDown={(e) => createRipple(e)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
