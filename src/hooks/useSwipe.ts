@@ -575,11 +575,15 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   }, [state.isSwiping]);
 
   /**
-   * iOS Safari対応: ネイティブイベントリスナーを使用
+   * iOS Safari対応: PointerEventとTouchEventの両方をサポート
    *
    * React SyntheticEventは passive: false を設定できないため、
    * iOS SafariではpreventDefault()が効かず水平スワイプがブロックされる問題がある。
    * ネイティブイベントリスナーで passive: false を明示的に設定することで解決。
+   *
+   * TouchEventフォールバック:
+   * - iOS SafariではPointerEventがサポートされているが、古いデバイスとの互換性のため
+   * - PointerEventとTouchEventの両方をサポートし、デバイスに応じて適切に動作
    *
    * 【重要】isSwipingRef を使用してクロージャ問題を回避
    * state.isSwiping を直接参照すると、useEffectの依存配列による再登録のタイミングで
@@ -589,38 +593,72 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
     const element = ref.current;
     if (!element) return;
 
-    const handlePointerDown = (e: PointerEvent) => {
-      onPointerDown(e as unknown as React.PointerEvent<T>);
+    // PointerEvent → React.PointerEvent への変換ヘルパー
+    const convertPointerEvent = (e: PointerEvent | TouchEvent): React.PointerEvent<T> => {
+      if (e instanceof PointerEvent) {
+        return e as unknown as React.PointerEvent<T>;
+      }
+      // TouchEvent の場合、最初のタッチポイントを使用
+      const touch = (e as TouchEvent).touches[0] || (e as TouchEvent).changedTouches[0];
+      return {
+        ...e,
+        clientX: touch?.clientX ?? 0,
+        clientY: touch?.clientY ?? 0,
+        pointerId: 0,
+        target: e.target,
+      } as unknown as React.PointerEvent<T>;
     };
 
-    const handlePointerMove = (e: PointerEvent) => {
+    const handlePointerDown = (e: PointerEvent | TouchEvent) => {
+      onPointerDown(convertPointerEvent(e));
+    };
+
+    const handlePointerMove = (e: PointerEvent | TouchEvent) => {
       // スワイプ中はブラウザのデフォルトスクロールを防止
       // isSwipingRef を使用してクロージャ問題を回避
       if (isSwipingRef.current) {
         e.preventDefault();
       }
-      onPointerMove(e as unknown as React.PointerEvent<T>);
+      onPointerMove(convertPointerEvent(e));
     };
 
-    const handlePointerUp = (e: PointerEvent) => {
-      onPointerUp(e as unknown as React.PointerEvent<T>);
+    const handlePointerUp = (e: PointerEvent | TouchEvent) => {
+      onPointerUp(convertPointerEvent(e));
     };
 
-    const handlePointerCancel = (e: PointerEvent) => {
-      onPointerCancel(e as unknown as React.PointerEvent<T>);
+    const handlePointerCancel = (e: PointerEvent | TouchEvent) => {
+      onPointerCancel(convertPointerEvent(e));
     };
 
-    // passive: false でイベントリスナーを登録（iOS Safari対応）
-    element.addEventListener('pointerdown', handlePointerDown);
-    element.addEventListener('pointermove', handlePointerMove, { passive: false });
-    element.addEventListener('pointerup', handlePointerUp);
-    element.addEventListener('pointercancel', handlePointerCancel);
+    // PointerEventがサポートされているか確認
+    const supportsPointerEvents = 'PointerEvent' in window;
+
+    if (supportsPointerEvents) {
+      // PointerEventを使用（モダンブラウザ）
+      element.addEventListener('pointerdown', handlePointerDown as EventListener);
+      element.addEventListener('pointermove', handlePointerMove as EventListener, { passive: false });
+      element.addEventListener('pointerup', handlePointerUp as EventListener);
+      element.addEventListener('pointercancel', handlePointerCancel as EventListener);
+    } else {
+      // TouchEventにフォールバック（古いブラウザ）
+      element.addEventListener('touchstart', handlePointerDown as EventListener);
+      element.addEventListener('touchmove', handlePointerMove as EventListener, { passive: false });
+      element.addEventListener('touchend', handlePointerUp as EventListener);
+      element.addEventListener('touchcancel', handlePointerCancel as EventListener);
+    }
 
     return () => {
-      element.removeEventListener('pointerdown', handlePointerDown);
-      element.removeEventListener('pointermove', handlePointerMove);
-      element.removeEventListener('pointerup', handlePointerUp);
-      element.removeEventListener('pointercancel', handlePointerCancel);
+      if (supportsPointerEvents) {
+        element.removeEventListener('pointerdown', handlePointerDown as EventListener);
+        element.removeEventListener('pointermove', handlePointerMove as EventListener);
+        element.removeEventListener('pointerup', handlePointerUp as EventListener);
+        element.removeEventListener('pointercancel', handlePointerCancel as EventListener);
+      } else {
+        element.removeEventListener('touchstart', handlePointerDown as EventListener);
+        element.removeEventListener('touchmove', handlePointerMove as EventListener);
+        element.removeEventListener('touchend', handlePointerUp as EventListener);
+        element.removeEventListener('touchcancel', handlePointerCancel as EventListener);
+      }
     };
   }, [onPointerDown, onPointerMove, onPointerUp, onPointerCancel]);
   // 注意: state.isSwiping は依存配列から除外（isSwipingRef経由で参照）

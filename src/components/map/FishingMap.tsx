@@ -712,8 +712,9 @@ export const FishingMap: React.FC<FishingMapProps> = ({ records, onRecordClick, 
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
               padding: '16px 20px',
               border: `2px solid ${getFishSpeciesColor(selectedRecord.fishSpecies)}`,
-              // iOS Safari対応: pan-x pan-yで水平・垂直両方のタッチ操作を有効化
-              touchAction: isMobile ? 'pan-x pan-y' : 'auto',
+              // iOS Safari対応: touch-action: noneでpreventDefault()を確実に有効化
+              // pan-x pan-yだとpreventDefault()が無視されるため、noneに変更
+              touchAction: isMobile ? 'none' : 'auto',
             }}
           >
             {/* 閉じるボタン - iOS HIG準拠 44x44px */}

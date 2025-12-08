@@ -144,6 +144,12 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
     }
   }, [hasPrevious, onPrevious]);
 
+  // iOS Safari対応: refコールバックをメモ化してイベントリスナーの再登録を防ぐ
+  const setSwipeAndPhotoRefs = useCallback((node: HTMLDivElement | null) => {
+    (photoContainerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    (swipeRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+  }, []);
+
   // スワイプフック（モバイルのみ有効化）
   // Note: handlersは使用しない（useSwipe内でネイティブイベントリスナーを自動登録）
   const { ref: swipeRef, state: swipeState } = useSwipe<HTMLDivElement>(
@@ -1118,11 +1124,7 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
           {/* モバイル: PhotoHeroCardを背景レイヤーとして固定配置 + スワイプナビゲーション */}
           {isMobile && (
             <div
-              ref={(node) => {
-                // 両方のrefを設定
-                (photoContainerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-                (swipeRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-              }}
+              ref={setSwipeAndPhotoRefs}
               style={{
                 position: 'absolute',
                 top: 0,
@@ -1130,8 +1132,9 @@ export const FishingRecordDetail: React.FC<FishingRecordDetailProps> = ({
                 right: 0,
                 bottom: 0,
                 zIndex: 5,
-                // iOS Safari対応: pan-x pan-yで水平・垂直両方のタッチ操作を有効化
-                touchAction: 'pan-x pan-y',
+                // iOS Safari対応: touch-action: noneでpreventDefault()を確実に有効化
+                // pan-x pan-yだとpreventDefault()が無視されるため、noneに変更
+                touchAction: 'none',
               }}
               // Note: swipeHandlersは削除（useSwipe内でネイティブイベントリスナーを自動登録）
             >
