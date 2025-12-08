@@ -166,6 +166,10 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   // 閾値到達フラグ（ハプティック1回のみ）
   const hasTriggeredHaptic = useRef(false);
 
+  // iOS Safari対応: クロージャ問題を回避するためのref
+  // useEffect内のイベントリスナーが常に最新のisSwiping状態を参照できるようにする
+  const isSwipingRef = useRef(false);
+
   const [state, setState] = useState<SwipeState>({
     isSwiping: false,
     progress: 0,
@@ -553,11 +557,23 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   }, [cancelCurrentAnimation]);
 
   /**
+   * クロージャ問題回避: state.isSwipingをrefに同期
+   * イベントリスナー内で常に最新の値を参照できるようにする
+   */
+  useEffect(() => {
+    isSwipingRef.current = state.isSwiping;
+  }, [state.isSwiping]);
+
+  /**
    * iOS Safari対応: ネイティブイベントリスナーを使用
    *
    * React SyntheticEventは passive: false を設定できないため、
    * iOS SafariではpreventDefault()が効かず水平スワイプがブロックされる問題がある。
    * ネイティブイベントリスナーで passive: false を明示的に設定することで解決。
+   *
+   * 【重要】isSwipingRef を使用してクロージャ問題を回避
+   * state.isSwiping を直接参照すると、useEffectの依存配列による再登録のタイミングで
+   * 古い値を参照してしまう可能性がある。refを使うことで常に最新値を参照できる。
    */
   useEffect(() => {
     const element = ref.current;
@@ -569,7 +585,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
 
     const handlePointerMove = (e: PointerEvent) => {
       // スワイプ中はブラウザのデフォルトスクロールを防止
-      if (state.isSwiping) {
+      // isSwipingRef を使用してクロージャ問題を回避
+      if (isSwipingRef.current) {
         e.preventDefault();
       }
       onPointerMove(e as unknown as React.PointerEvent<T>);
@@ -595,7 +612,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       element.removeEventListener('pointerup', handlePointerUp);
       element.removeEventListener('pointercancel', handlePointerCancel);
     };
-  }, [onPointerDown, onPointerMove, onPointerUp, onPointerCancel, state.isSwiping]);
+  }, [onPointerDown, onPointerMove, onPointerUp, onPointerCancel]);
+  // 注意: state.isSwiping は依存配列から除外（isSwipingRef経由で参照）
 
   return {
     ref,
