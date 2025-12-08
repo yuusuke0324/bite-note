@@ -86,13 +86,12 @@ export interface UseSwipeReturn<T extends HTMLElement> {
   state: SwipeState;
   /** スワイプをリセット */
   reset: () => void;
-  /** イベントハンドラ（手動バインド用） */
-  handlers: {
-    onPointerDown: (e: React.PointerEvent<T>) => void;
-    onPointerMove: (e: React.PointerEvent<T>) => void;
-    onPointerUp: (e: React.PointerEvent<T>) => void;
-    onPointerCancel: (e: React.PointerEvent<T>) => void;
-  };
+  /**
+   * @deprecated イベントハンドラは自動的にrefに登録されます。
+   * iOS Safari対応のため、ネイティブイベントリスナー（passive: false）を使用しています。
+   * handlersをスプレッドする必要はありません。refを設定するだけで動作します。
+   */
+  handlers: Record<string, never>;
 }
 
 /**
@@ -167,6 +166,10 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   // 閾値到達フラグ（ハプティック1回のみ）
   const hasTriggeredHaptic = useRef(false);
 
+  // iOS Safari対応: クロージャ問題を回避するためのref
+  // useEffect内のイベントリスナーが常に最新のisSwiping状態を参照できるようにする
+  const isSwipingRef = useRef(false);
+
   const [state, setState] = useState<SwipeState>({
     isSwiping: false,
     progress: 0,
@@ -191,6 +194,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const reset = useCallback(() => {
     cancelCurrentAnimation();
+    // iOS Safari対応: refを即時更新（setStateは非同期のため）
+    isSwipingRef.current = false;
     setState({
       isSwiping: false,
       progress: 0,
@@ -339,6 +344,9 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       startTime.current = Date.now();
       hasTriggeredHaptic.current = false;
 
+      // iOS Safari対応: refを即時更新（setStateは非同期のため）
+      // pointermoveイベントが発火する前にisSwipingRef.currentがtrueになっている必要がある
+      isSwipingRef.current = true;
       setState((prev) => ({
         ...prev,
         isSwiping: true,
@@ -360,7 +368,9 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const onPointerMove = useCallback(
     (e: React.PointerEvent<T>) => {
-      if (!state.isSwiping || isAnimating.current) return;
+      // isSwipingRefを使用（state.isSwipingではなく）
+      // これにより依存配列からstate.isSwipingを除外でき、イベントリスナーの再登録頻度を削減
+      if (!isSwipingRef.current || isAnimating.current) return;
 
       const deltaX = e.clientX - startX.current;
       const deltaY = e.clientY - startY.current;
@@ -427,7 +437,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       onSwipeProgress?.(progress, direction);
     },
     [
-      state.isSwiping,
+      // state.isSwipingを除外（isSwipingRef.currentを使用）
+      // イベントリスナーの再登録頻度を削減
       maxVerticalDeviation,
       disableLeft,
       disableRight,
@@ -444,7 +455,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const onPointerUp = useCallback(
     (e: React.PointerEvent<T>) => {
-      if (!state.isSwiping) return;
+      // isSwipingRefを使用（state.isSwipingではなく）
+      if (!isSwipingRef.current) return;
 
       // ポインターキャプチャ解放（存在する場合のみ）
       const target = e.target as HTMLElement;
@@ -492,7 +504,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       }
     },
     [
-      state.isSwiping,
+      // state.isSwipingを除外（isSwipingRef.currentを使用）
       leafletMap,
       threshold,
       velocityThreshold,
@@ -511,7 +523,8 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
    */
   const onPointerCancel = useCallback(
     (e: React.PointerEvent<T>) => {
-      if (!state.isSwiping) return;
+      // isSwipingRefを使用（state.isSwipingではなく）
+      if (!isSwipingRef.current) return;
 
       // ポインターキャプチャ解放（存在する場合のみ）
       const target = e.target as HTMLElement;
@@ -526,7 +539,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
 
       animateBack();
     },
-    [state.isSwiping, leafletMap, animateBack]
+    [leafletMap, animateBack] // state.isSwipingを除外
   );
 
   /**
@@ -553,15 +566,71 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
     };
   }, [cancelCurrentAnimation]);
 
+  /**
+   * クロージャ問題回避: state.isSwipingをrefに同期
+   * イベントリスナー内で常に最新の値を参照できるようにする
+   */
+  useEffect(() => {
+    isSwipingRef.current = state.isSwiping;
+  }, [state.isSwiping]);
+
+  /**
+   * iOS Safari対応: ネイティブイベントリスナーを使用
+   *
+   * React SyntheticEventは passive: false を設定できないため、
+   * iOS SafariではpreventDefault()が効かず水平スワイプがブロックされる問題がある。
+   * ネイティブイベントリスナーで passive: false を明示的に設定することで解決。
+   *
+   * 【重要】isSwipingRef を使用してクロージャ問題を回避
+   * state.isSwiping を直接参照すると、useEffectの依存配列による再登録のタイミングで
+   * 古い値を参照してしまう可能性がある。refを使うことで常に最新値を参照できる。
+   */
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      onPointerDown(e as unknown as React.PointerEvent<T>);
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      // スワイプ中はブラウザのデフォルトスクロールを防止
+      // isSwipingRef を使用してクロージャ問題を回避
+      if (isSwipingRef.current) {
+        e.preventDefault();
+      }
+      onPointerMove(e as unknown as React.PointerEvent<T>);
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      onPointerUp(e as unknown as React.PointerEvent<T>);
+    };
+
+    const handlePointerCancel = (e: PointerEvent) => {
+      onPointerCancel(e as unknown as React.PointerEvent<T>);
+    };
+
+    // passive: false でイベントリスナーを登録（iOS Safari対応）
+    element.addEventListener('pointerdown', handlePointerDown);
+    element.addEventListener('pointermove', handlePointerMove, { passive: false });
+    element.addEventListener('pointerup', handlePointerUp);
+    element.addEventListener('pointercancel', handlePointerCancel);
+
+    return () => {
+      element.removeEventListener('pointerdown', handlePointerDown);
+      element.removeEventListener('pointermove', handlePointerMove);
+      element.removeEventListener('pointerup', handlePointerUp);
+      element.removeEventListener('pointercancel', handlePointerCancel);
+    };
+  }, [onPointerDown, onPointerMove, onPointerUp, onPointerCancel]);
+  // 注意: state.isSwiping は依存配列から除外（isSwipingRef経由で参照）
+
   return {
     ref,
     state,
     reset,
-    handlers: {
-      onPointerDown,
-      onPointerMove,
-      onPointerUp,
-      onPointerCancel,
-    },
+    // handlersは後方互換性のために空オブジェクトを返す
+    // イベントリスナーは上記useEffectで自動的にrefに登録される
+    handlers: {} as Record<string, never>,
   };
 }
