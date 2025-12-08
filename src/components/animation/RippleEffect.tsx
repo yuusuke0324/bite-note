@@ -85,8 +85,8 @@ export const RippleEffect = forwardRef<HTMLDivElement, RippleEffectProps>(
 
         const cleanupDuration = prefersReducedMotion ? 300 : duration;
         const timerId = setTimeout(() => {
-          // アンマウント後の状態更新を防ぐ
-          if (isMountedRef.current) {
+          // アンマウント後の状態更新を防ぐ（テスト環境のteardown対応）
+          if (isMountedRef.current && typeof window !== 'undefined') {
             setRipples((prev) => prev.filter((r) => r.id !== id));
           }
           timerIdsRef.current.delete(timerId);
