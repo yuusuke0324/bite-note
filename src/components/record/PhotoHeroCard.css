@@ -84,6 +84,21 @@
   transform: none !important;
   box-shadow: none !important;
   cursor: default;
+  /*
+   * iOS Safari スワイプ対応:
+   * CSS touch-actionは継承されないため、明示的に設定する必要がある。
+   * これがないとpreventDefault()が効かず、スワイプが動作しない。
+   */
+  touch-action: none !important;
+}
+
+/* iOS Safari: touch-actionは継承されないため、すべての子要素にも設定 */
+.photo-hero-card--fullscreen *,
+.photo-hero-card--fullscreen .photo-hero-card__photo-container,
+.photo-hero-card--fullscreen .photo-hero-card__photo-background,
+.photo-hero-card--fullscreen .photo-hero-card__photo-foreground,
+.photo-hero-card--fullscreen img {
+  touch-action: none !important;
 }
 
 .photo-hero-card--fullscreen:hover {
